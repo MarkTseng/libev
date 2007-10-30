@@ -68,12 +68,7 @@ get_clock (void)
 #define array_needsize(base,cur,cnt,init)		\
   if ((cnt) > cur)					\
     {							\
-      int newcnt = cur;					\
-      do						\
-        {						\
-          newcnt += (newcnt >> 1) + 16;			\
-        }						\
-      while ((cnt) > newcnt);				\
+      int newcnt = cur ? cur << 1 : 16;			\
       fprintf (stderr, "resize(" # base ") from %d to %d\n", cur, newcnt);\
       base = realloc (base, sizeof (*base) * (newcnt));	\
       init (base + cur, newcnt - cur);			\
@@ -161,7 +156,7 @@ downheap (int k)
 {
   struct ev_timer *w = timers [k];
 
-  while (k <= (timercnt >> 1))
+  while (k < (timercnt >> 1))
     {
       int j = k << 1;
 
@@ -172,7 +167,7 @@ downheap (int k)
         break;
 
       timers [k] = timers [j];
-      timers [k]->active = k;
+      timers [k]->active = k + 1;
       k = j;
     }
 
@@ -263,12 +258,13 @@ timer_reify (void)
     {
       struct ev_timer *w = timers [0];
 
+          fprintf (stderr, "0 %f, %d c%d\n", w->at, w->active, timercnt);//D
       /* first reschedule timer */
       if (w->repeat)
         {
           fprintf (stderr, "a %f now %f repeat %f, %f\n", w->at, ev_now, w->repeat, w->repeat *1e30);//D
           if (w->is_abs)
-            w->at += floor ((ev_now - w->at) / w->repeat + 1.) * w->repeat;
+            w->at += ceil ((ev_now - w->at) / w->repeat + 1.) * w->repeat;
           else
             w->at = ev_now + w->repeat;
 
@@ -277,7 +273,10 @@ timer_reify (void)
           downheap (0);
         }
       else
+        {
+          fprintf (stderr, "c %f, %d c%d\n", w->at, w->active, timercnt);//D
         evtimer_stop (w); /* nonrepeating: stop timer */
+        }
 
       event ((struct ev_watcher *)w, EV_TIMEOUT);
     }
@@ -400,6 +399,7 @@ evtimer_start (struct ev_timer *w)
   fprintf (stderr, "t1 %f a %d\n", w->at, w->is_abs);//D
   if (w->is_abs)
     {
+      /* this formula differs from the one in timer_reify becuse we do not round up */
       if (w->repeat)
         w->at += ceil ((ev_now - w->at) / w->repeat) * w->repeat;
     }
@@ -416,11 +416,17 @@ evtimer_start (struct ev_timer *w)
 void
 evtimer_stop (struct ev_timer *w)
 {
+  fprintf (stderr, "-topping %d, %d\n", w->active, timercnt);//D
   if (!ev_is_active (w))
     return;
 
-  timers [w->active - 1] = timers [--timercnt];
-  downheap (w->active - 1);
+  fprintf (stderr, "stopping %d, %d\n", w->active, timercnt);//D
+  if (w->active < timercnt)
+    {
+      timers [w->active - 1] = timers [--timercnt];
+      downheap (w->active - 1);
+    }
+
   ev_stop ((struct ev_watcher *)w);
 }
 
@@ -470,15 +476,18 @@ int main (void)
   evio_set (&sin, 0, EV_READ);
   evio_start (&sin);
 
-  struct ev_timer t1;
-  evw_init (&t1, ocb, 1);
-  evtimer_set_rel (&t1, 1, 0);
-  evtimer_start (&t1);
+  struct ev_timer t[1000];
 
-  struct ev_timer t2;
-  evw_init (&t2, ocb, 2);
-  evtimer_set_abs (&t2, ev_time () + 2, 0);
-  evtimer_start (&t2);
+  int i;
+  for (i = 0; i < 1000; ++i)
+    {
+      struct ev_timer *w = t + i;
+      evw_init (w, ocb, i);
+      evtimer_set_rel (w, drand48 (), 0);
+      evtimer_start (w);
+      if (drand48 () < 0.5)
+        evtimer_stop (w);
+    }
 
   ev_loop (0);
 
