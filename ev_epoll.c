@@ -3,44 +3,31 @@
 static int epoll_fd = -1;
 
 static void
-epoll_reify_fd (int fd)
+epoll_modify (int fd, int oev, int nev)
 {
-  ANFD *anfd = anfds + fd;
-  struct ev_io *w;
+  int mode = nev ? oev ? EPOLL_CTL_MOD : EPOLL_CTL_ADD : EPOLL_CTL_DEL;
 
-  int wev = 0;
+  struct epoll_event ev;
+  ev.data.fd = fd;
+  ev.events =
+      (nev & EV_READ ? EPOLLIN : 0)
+      | (nev & EV_WRITE ? EPOLLOUT : 0);
 
-  for (w = anfd->head; w; w = w->next)
-    wev |= w->events;
-
-  if (anfd->wev != wev)
-    {
-      int mode = wev ? anfd->wev ? EPOLL_CTL_MOD : EPOLL_CTL_ADD : EPOLL_CTL_DEL;
-      struct epoll_event ev;
-      ev.events = wev;
-      ev.data.fd = fd;
-      fprintf (stderr, "reify %d,%d,%d m%d (r=%d)\n", fd, anfd->wev, wev, mode,//D
-      epoll_ctl (epoll_fd, mode, fd, &ev)
-      );//D
-      anfd->wev = wev;
-    }
+  fprintf (stderr, "reify %d,%d,%d m%d (r=%d)\n", fd, oev, nev, mode,//D
+  epoll_ctl (epoll_fd, mode, fd, &ev)
+  );//D
 }
 
 void epoll_postfork_child (void)
 {
-  int i;
+  int fd;
 
   epoll_fd = epoll_create (256);
 
-  for (i = 0; i < anfdmax; ++i)
-    epoll_reify_fd (i);
-}
-
-static void epoll_reify (void)
-{
-  int i;
-  for (i = 0; i < fdchangecnt; ++i)
-    epoll_reify_fd (fdchanges [i]);
+  /* re-register interest in fds */
+  for (fd = 0; fd < anfdmax; ++fd)
+    if (anfds [fd].wev)
+      epoll_modify (fd, EV_NONE, anfds [fd].wev);
 }
 
 static struct epoll_event *events;
@@ -57,8 +44,8 @@ static void epoll_poll (ev_tstamp timeout)
   for (i = 0; i < eventcnt; ++i)
     fd_event (
       events [i].data.fd,
-      (events [i].events & (EPOLLOUT | EPOLLERR | EPOLLHUP | EPOLLPRI) ? EV_WRITE : 0)
-      | (events [i].events & (EPOLLIN | EPOLLERR | EPOLLHUP)           ? EV_READ  : 0)
+      (events [i].events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
+      | (events [i].events & (EPOLLIN | EPOLLERR | EPOLLHUP) ? EV_READ : 0)
     );
 
   /* if the receive array was full, increase its size */
@@ -78,9 +65,9 @@ int epoll_init (int flags)
     return 0;
 
   ev_method = EVMETHOD_EPOLL;
-  method_fudge = 1e-3; /* needed to compensate fro epoll returning early */
-  method_reify = epoll_reify;
-  method_poll  = epoll_poll;
+  method_fudge  = 1e-3; /* needed to compensate for epoll returning early */
+  method_modify = epoll_modify;
+  method_poll   = epoll_poll;
 
   eventmax = 64; /* intiial number of events receivable per poll */
   events = malloc (sizeof (struct epoll_event) * eventmax);

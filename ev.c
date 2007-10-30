@@ -14,7 +14,7 @@
 
 #define HAVE_EPOLL 1
 #define HAVE_REALTIME 1
-#define HAVE_SELECT 0
+#define HAVE_SELECT 1
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 60.
@@ -36,7 +36,7 @@ int ev_method;
 static int have_monotonic; /* runtime */
 
 static ev_tstamp method_fudge; /* stupid epoll-returns-early bug */
-static void (*method_reify)(void);
+static void (*method_modify)(int fd, int oev, int nev);
 static void (*method_poll)(ev_tstamp timeout);
 
 ev_tstamp
@@ -236,8 +236,35 @@ void ev_postfork_parent (void)
 void ev_postfork_child (void)
 {
 #if HAVE_EPOLL
-  epoll_postfork_child ();
+  if (ev_method == EVMETHOD_EPOLL)
+    epoll_postfork_child ();
 #endif
+}
+
+static void
+fd_reify (void)
+{
+  int i;
+
+  for (i = 0; i < fdchangecnt; ++i)
+    {
+      int fd = fdchanges [i];
+      ANFD *anfd = anfds + fd;
+      struct ev_io *w;
+
+      int wev = 0;
+
+      for (w = anfd->head; w; w = w->next)
+        wev |= w->events;
+
+      if (anfd->wev != wev)
+        {
+          method_modify (fd, anfd->wev, wev);
+          anfd->wev = wev;
+        }
+    }
+
+  fdchangecnt = 0;
 }
 
 static void
@@ -338,7 +365,7 @@ void ev_loop (int flags)
   do
     {
       /* update fd-related kernel structures */
-      method_reify (); fdchangecnt = 0;
+      fd_reify ();
 
       /* calculate blocking time */
       if (flags & EVLOOP_NONBLOCK)

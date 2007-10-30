@@ -22,6 +22,9 @@ to be faster and more correct, and also more featureful. Examples:
 - can correctly remove timers while executing callbacks
   (libevent doesn't handle this reliably and can crash)
 
+- race-free signal processing
+  (libevent may delay processing signals till after the next event)
+
 - less calls to epoll_ctl
   (stopping and starting an io watcher between two loop iterations will now
   result in spuriois epoll_ctl calls)
