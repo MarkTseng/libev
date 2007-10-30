@@ -64,13 +64,14 @@ ev_tstamp ev_time (void);
 int ev_loop (int flags);
 extern int ev_loop_done; /* set to 1 to break out of event loop */
 
+/* these may evaluate ev multiple times, and the other arguments at most once */
 #define evw_init(ev,cb_,data_)             do { (ev)->active = 0; (ev)->cb = (cb_); (ev)->data = (void *)data_; } while (0)
 #define evio_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
 #define evtimer_set_rel(ev,after_,repeat_) do { (ev)->at = (after_); (ev)->repeat = (repeat_); (ev)->is_abs = 0; } while (0)
 #define evtimer_set_abs(ev,at_,repeat_)    do { (ev)->at = (at_); (ev)->repeat = (repeat_); (ev)->is_abs = 1; } while (0)
 #define evsignal_set(ev,signum_)           do { (ev)->signum = (signum_); } while (0)
 
-#define ev_is_active(ev) (0 + (ev)->active) /* wether the watcher has been started */
+#define ev_is_active(ev) (0 + (ev)->active) /* true when the watcher has been started */
 
 void evio_start (struct ev_io *w);
 void evio_stop  (struct ev_io *w);

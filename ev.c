@@ -258,25 +258,18 @@ timer_reify (void)
     {
       struct ev_timer *w = timers [0];
 
-          fprintf (stderr, "0 %f, %d c%d\n", w->at, w->active, timercnt);//D
       /* first reschedule timer */
       if (w->repeat)
         {
-          fprintf (stderr, "a %f now %f repeat %f, %f\n", w->at, ev_now, w->repeat, w->repeat *1e30);//D
           if (w->is_abs)
             w->at += ceil ((ev_now - w->at) / w->repeat + 1.) * w->repeat;
           else
             w->at = ev_now + w->repeat;
 
-          fprintf (stderr, "b %f\n", w->at);//D
-
           downheap (0);
         }
       else
-        {
-          fprintf (stderr, "c %f, %d c%d\n", w->at, w->active, timercnt);//D
         evtimer_stop (w); /* nonrepeating: stop timer */
-        }
 
       event ((struct ev_watcher *)w, EV_TIMEOUT);
     }
@@ -308,7 +301,6 @@ int ev_loop (int flags)
           else if (block > MAX_BLOCKTIME) block = MAX_BLOCKTIME;
         }
 
-      fprintf (stderr, "block %f\n", block);//D
       method_poll (block);
 
       /* put pending timers into pendign queue and reschedule them */
@@ -396,7 +388,6 @@ evtimer_start (struct ev_timer *w)
   if (ev_is_active (w))
     return;
 
-  fprintf (stderr, "t1 %f a %d\n", w->at, w->is_abs);//D
   if (w->is_abs)
     {
       /* this formula differs from the one in timer_reify becuse we do not round up */
@@ -405,7 +396,6 @@ evtimer_start (struct ev_timer *w)
     }
   else
     w->at += ev_now;
-  fprintf (stderr, "t2 %f a %d\n", w->at, w->is_abs);//D
 
   ev_start ((struct ev_watcher *)w, ++timercnt);
   array_needsize (timers, timermax, timercnt, );
@@ -416,14 +406,12 @@ evtimer_start (struct ev_timer *w)
 void
 evtimer_stop (struct ev_timer *w)
 {
-  fprintf (stderr, "-topping %d, %d\n", w->active, timercnt);//D
   if (!ev_is_active (w))
     return;
 
-  fprintf (stderr, "stopping %d, %d\n", w->active, timercnt);//D
-  if (w->active < timercnt)
+  if (w->active < timercnt--)
     {
-      timers [w->active - 1] = timers [--timercnt];
+      timers [w->active - 1] = timers [timercnt];
       downheap (w->active - 1);
     }
 
