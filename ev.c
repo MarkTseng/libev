@@ -12,8 +12,8 @@
 # define HAVE_MONOTONIC 1
 #endif
 
-#define HAVE_EPOLL 1
 #define HAVE_REALTIME 1
+#define HAVE_EPOLL 1
 #define HAVE_SELECT 1
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
