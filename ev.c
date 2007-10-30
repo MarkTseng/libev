@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <sys/time.h>
 #include <time.h>
@@ -15,6 +16,7 @@
 #define HAVE_REALTIME 1
 #define HAVE_SELECT 0
 
+#define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 60.
 
 #include "ev.h"
@@ -27,6 +29,7 @@ struct ev_watcher_list {
   EV_WATCHER_LIST (ev_watcher_list);
 };
 
+static ev_tstamp now, diff; /* monotonic clock */
 ev_tstamp ev_now;
 int ev_method;
 
@@ -131,11 +134,14 @@ fd_event (int fd, int events)
     }
 }
 
-static struct ev_timer **timers;
-static int timermax, timercnt;
+static struct ev_timer **atimers;
+static int atimermax, atimercnt;
+
+static struct ev_timer **rtimers;
+static int rtimermax, rtimercnt;
 
 static void
-upheap (int k)
+upheap (struct ev_timer **timers, int k)
 {
   struct ev_timer *w = timers [k];
 
@@ -152,15 +158,15 @@ upheap (int k)
 }
 
 static void
-downheap (int k)
+downheap (struct ev_timer **timers, int N, int k)
 {
   struct ev_timer *w = timers [k];
 
-  while (k < (timercnt >> 1))
+  while (k < (N >> 1))
     {
       int j = k << 1;
 
-      if (j + 1 < timercnt && timers [j]->at > timers [j + 1]->at)
+      if (j + 1 < N && timers [j]->at > timers [j + 1]->at)
         ++j;
 
       if (w->at <= timers [j]->at)
@@ -176,7 +182,7 @@ downheap (int k)
 }
 
 static struct ev_signal **signals;
-static int signalmax, signalcnt;
+static int signalmax;
 
 static void
 signals_init (struct ev_signal **base, int count)
@@ -203,6 +209,8 @@ int ev_init (int flags)
 #endif
 
   ev_now = ev_time ();
+  now    = get_clock ();
+  diff   = ev_now - now;
 
 #if HAVE_EPOLL
   if (epoll_init (flags))
@@ -252,32 +260,77 @@ call_pending ()
 }
 
 static void
-timer_reify (void)
+timers_reify (struct ev_timer **timers, int timercnt, ev_tstamp now)
 {
-  while (timercnt && timers [0]->at <= ev_now)
+  while (timercnt && timers [0]->at <= now)
     {
       struct ev_timer *w = timers [0];
 
-      /* first reschedule timer */
+      /* first reschedule or stop timer */
       if (w->repeat)
         {
           if (w->is_abs)
-            w->at += ceil ((ev_now - w->at) / w->repeat + 1.) * w->repeat;
+            w->at += floor ((now - w->at) / w->repeat + 1.) * w->repeat;
           else
-            w->at = ev_now + w->repeat;
+            w->at = now + w->repeat;
 
-          downheap (0);
+          assert (w->at > now);
+
+          downheap (timers, timercnt, 0);
         }
       else
-        evtimer_stop (w); /* nonrepeating: stop timer */
+        {
+          evtimer_stop (w); /* nonrepeating: stop timer */
+          --timercnt; /* maybe pass by reference instead? */
+        }
 
       event ((struct ev_watcher *)w, EV_TIMEOUT);
     }
 }
 
+static void
+time_update ()
+{
+  int i;
+  ev_now = ev_time ();
+
+  if (have_monotonic)
+    {
+      ev_tstamp odiff = diff;
+
+      /* detecting time jumps is much more difficult */
+      for (i = 2; --i; ) /* loop a few times, before making important decisions */
+        {
+          now = get_clock ();
+          diff = ev_now - now;
+
+          if (fabs (odiff - diff) < MIN_TIMEJUMP)
+            return; /* all is well */
+
+          ev_now = ev_time ();
+        }
+
+      /* time jump detected, reschedule atimers */
+      for (i = 0; i < atimercnt; ++i)
+        {
+          struct ev_timer *w = atimers [i];
+          w->at += ceil ((ev_now - w->at) / w->repeat + 1.) * w->repeat;
+        }
+    }
+  else
+    {
+      if (now > ev_now || now < ev_now - MAX_BLOCKTIME - MIN_TIMEJUMP)
+        /* time jump detected, adjust rtimers */
+        for (i = 0; i < rtimercnt; ++i)
+          rtimers [i]->at += ev_now - now;
+
+      now = ev_now;
+    }
+}
+
 int ev_loop_done;
 
-int ev_loop (int flags)
+void ev_loop (int flags)
 {
   double block;
   ev_loop_done = flags & EVLOOP_ONESHOT;
@@ -288,25 +341,38 @@ int ev_loop (int flags)
       method_reify (); fdchangecnt = 0;
 
       /* calculate blocking time */
-      ev_now = ev_time ();
-
       if (flags & EVLOOP_NONBLOCK)
         block = 0.;
-      else if (!timercnt)
-        block = MAX_BLOCKTIME;
       else
         {
-          block = timers [0]->at - ev_now + method_fudge;
+          block = MAX_BLOCKTIME;
+
+          if (rtimercnt)
+            {
+              ev_tstamp to = rtimers [0]->at - get_clock () + method_fudge;
+              if (block > to) block = to;
+            }
+
+          if (atimercnt)
+            {
+              ev_tstamp to = atimers [0]->at - ev_time   () + method_fudge;
+              if (block > to) block = to;
+            }
+
           if (block < 0.) block = 0.;
-          else if (block > MAX_BLOCKTIME) block = MAX_BLOCKTIME;
         }
 
       method_poll (block);
 
-      /* put pending timers into pendign queue and reschedule them */
-      timer_reify ();
+      /* update ev_now, do magic */
+      time_update ();
 
-      ev_now = ev_time ();
+      /* put pending timers into pendign queue and reschedule them */
+      /* absolute timers first */
+      timers_reify (atimers, atimercnt, ev_now);
+      /* relative timers second */
+      timers_reify (rtimers, rtimercnt, now);
+
       call_pending ();
     }
   while (!ev_loop_done);
@@ -393,14 +459,22 @@ evtimer_start (struct ev_timer *w)
       /* this formula differs from the one in timer_reify becuse we do not round up */
       if (w->repeat)
         w->at += ceil ((ev_now - w->at) / w->repeat) * w->repeat;
+
+      ev_start ((struct ev_watcher *)w, ++atimercnt);
+      array_needsize (atimers, atimermax, atimercnt, );
+      atimers [atimercnt - 1] = w;
+      upheap (atimers, atimercnt - 1);
     }
   else
-    w->at += ev_now;
+    {
+      w->at += now;
 
-  ev_start ((struct ev_watcher *)w, ++timercnt);
-  array_needsize (timers, timermax, timercnt, );
-  timers [timercnt - 1] = w;
-  upheap (timercnt - 1);
+      ev_start ((struct ev_watcher *)w, ++rtimercnt);
+      array_needsize (rtimers, rtimermax, rtimercnt, );
+      rtimers [rtimercnt - 1] = w;
+      upheap (rtimers, rtimercnt - 1);
+    }
+
 }
 
 void
@@ -409,10 +483,21 @@ evtimer_stop (struct ev_timer *w)
   if (!ev_is_active (w))
     return;
 
-  if (w->active < timercnt--)
+  if (w->is_abs)
     {
-      timers [w->active - 1] = timers [timercnt];
-      downheap (w->active - 1);
+      if (w->active < atimercnt--)
+        {
+          atimers [w->active - 1] = atimers [atimercnt];
+          downheap (atimers, atimercnt, w->active - 1);
+        }
+    }
+  else
+    {
+      if (w->active < rtimercnt--)
+        {
+          rtimers [w->active - 1] = rtimers [rtimercnt];
+          downheap (rtimers, rtimercnt, w->active - 1);
+        }
     }
 
   ev_stop ((struct ev_watcher *)w);
@@ -451,7 +536,9 @@ sin_cb (struct ev_io *w, int revents)
 static void
 ocb (struct ev_timer *w, int revents)
 {
-  fprintf (stderr, "timer %f,%f (%x) (%f) d%p\n", w->at, w->repeat, revents, w->at - ev_time (), w->data);
+  //fprintf (stderr, "timer %f,%f (%x) (%f) d%p\n", w->at, w->repeat, revents, w->at - ev_time (), w->data);
+  evtimer_stop (w);
+  evtimer_start (w);
 }
 
 int main (void)
@@ -464,18 +551,25 @@ int main (void)
   evio_set (&sin, 0, EV_READ);
   evio_start (&sin);
 
-  struct ev_timer t[1000];
+  struct ev_timer t[10000];
 
+#if 1
   int i;
-  for (i = 0; i < 1000; ++i)
+  for (i = 0; i < 10000; ++i)
     {
       struct ev_timer *w = t + i;
       evw_init (w, ocb, i);
-      evtimer_set_rel (w, drand48 (), 0);
+      evtimer_set_abs (w, drand48 (), 0.99775533);
       evtimer_start (w);
       if (drand48 () < 0.5)
         evtimer_stop (w);
     }
+#endif
+
+  struct ev_timer t1;
+  evw_init (&t1, ocb, 0);
+  evtimer_set_abs (&t1, 5, 10);
+  evtimer_start (&t1);
 
   ev_loop (0);
 
