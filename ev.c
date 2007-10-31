@@ -338,10 +338,12 @@ int ev_init (int flags)
 
 void ev_prefork (void)
 {
+  /* nop */
 }
 
 void ev_postfork_parent (void)
 {
+  /* nop */
 }
 
 void ev_postfork_child (void)
@@ -575,7 +577,6 @@ ev_stop (W w)
     pendings [w->pending - 1].w = 0;
 
   w->active = 0;
-  /* nop */
 }
 
 /*****************************************************************************/
