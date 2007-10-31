@@ -45,7 +45,8 @@ epoll_modify (int fd, int oev, int nev)
   epoll_ctl (epoll_fd, mode, fd, &ev);
 }
 
-void epoll_postfork_child (void)
+static void
+epoll_postfork_child (void)
 {
   int fd;
 
@@ -61,7 +62,8 @@ void epoll_postfork_child (void)
 static struct epoll_event *events;
 static int eventmax;
 
-static void epoll_poll (ev_tstamp timeout)
+static void
+epoll_poll (ev_tstamp timeout)
 {
   int eventcnt = epoll_wait (epoll_fd, events, eventmax, ceil (timeout * 1000.));
   int i;
@@ -85,7 +87,8 @@ static void epoll_poll (ev_tstamp timeout)
     }
 }
 
-void epoll_init (int flags)
+static void
+epoll_init (int flags)
 {
   epoll_fd = epoll_create (256);
 
@@ -102,3 +105,4 @@ void epoll_init (int flags)
   eventmax = 64; /* intiial number of events receivable per poll */
   events = malloc (sizeof (struct epoll_event) * eventmax);
 }
+

@@ -34,16 +34,16 @@ typedef double ev_tstamp;
 
 /* eventmask, revents, events... */
 #define EV_UNDEF   -1 /* guaranteed to be invalid */
-#define EV_NONE    0x00
-#define EV_READ    0x01
-#define EV_WRITE   0x02
-#define EV_TIMEOUT 0x04
-#define EV_SIGNAL  0x08
-#define EV_IDLE    0x10
-#define EV_CHECK   0x20
-#define EV_PREPARE 0x40
-#define EV_CHILD   0x80
-#define EV_ERROR   (0xff|0x8000)
+#define EV_NONE    0x000000
+#define EV_READ    0x000001
+#define EV_WRITE   0x000002
+#define EV_TIMEOUT 0x000004
+#define EV_SIGNAL  0x000008
+#define EV_IDLE    0x000010
+#define EV_CHECK   0x000020
+#define EV_PREPARE 0x000040
+#define EV_CHILD   0x000080
+#define EV_ERROR   0x800000
 
 /* can be used to add custom fields to all watchers */
 #ifndef EV_COMMON
@@ -52,6 +52,9 @@ typedef double ev_tstamp;
 #ifndef EV_PROTOTYPES
 # define EV_PROTOTYPES 1
 #endif
+
+#define EV_VERSION_MAJOR 1
+#define EV_VERSION_MINOR 1
 
 /*
  * struct member types:
@@ -157,6 +160,8 @@ struct ev_child
 #if EV_PROTOTYPES
 extern int ev_method;
 int ev_init (int flags); /* returns ev_method */
+int ev_version_major (void);
+int ev_version_minor (void);
 
 /* these three calls are suitable for plugging into pthread_atfork */
 void ev_prefork (void);

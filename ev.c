@@ -199,7 +199,7 @@ queue_events (W *events, int eventcnt, int type)
 
 /* called on EBADF to verify fds */
 static void
-fd_recheck ()
+fd_recheck (void)
 {
   int fd;
 
@@ -207,7 +207,10 @@ fd_recheck ()
     if (anfds [fd].wev)
       if (fcntl (fd, F_GETFD) == -1 && errno == EBADF)
         while (anfds [fd].head)
-          evio_stop (anfds [fd].head);
+          {
+            event ((W)anfds [fd].head, EV_ERROR);
+            evio_stop (anfds [fd].head);
+          }
 }
 
 /*****************************************************************************/
@@ -374,6 +377,18 @@ childcb (struct ev_signal *sw, int revents)
 # include "ev_select.c"
 #endif
 
+int
+ev_version_major (void)
+{
+  return EV_VERSION_MAJOR;
+}
+
+int
+ev_version_minor (void)
+{
+  return EV_VERSION_MINOR;
+}
+
 int ev_init (int flags)
 {
   if (!ev_method)
@@ -416,17 +431,20 @@ int ev_init (int flags)
 
 /*****************************************************************************/
 
-void ev_prefork (void)
+void
+ev_prefork (void)
 {
   /* nop */
 }
 
-void ev_postfork_parent (void)
+void
+ev_postfork_parent (void)
 {
   /* nop */
 }
 
-void ev_postfork_child (void)
+void
+ev_postfork_child (void)
 {
 #if HAVE_EPOLL
   if (ev_method == EVMETHOD_EPOLL)
@@ -469,7 +487,7 @@ fd_reify (void)
 }
 
 static void
-call_pending ()
+call_pending (void)
 {
   while (pendingcnt)
     {
@@ -484,7 +502,7 @@ call_pending ()
 }
 
 static void
-timers_reify ()
+timers_reify (void)
 {
   while (timercnt && timers [0]->at <= now)
     {
@@ -505,7 +523,7 @@ timers_reify ()
 }
 
 static void
-periodics_reify ()
+periodics_reify (void)
 {
   while (periodiccnt && periodics [0]->at <= ev_now)
     {
@@ -551,7 +569,7 @@ periodics_reschedule (ev_tstamp diff)
 }
 
 static void
-time_update ()
+time_update (void)
 {
   int i;
 
