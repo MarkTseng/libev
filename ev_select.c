@@ -79,14 +79,12 @@ static void select_poll (ev_tstamp timeout)
     }
 }
 
-int select_init (int flags)
+void select_init (int flags)
 {
-  ev_method = EVMETHOD_SELECT;
+  ev_method     = EVMETHOD_SELECT;
   method_fudge  = 1e-2; /* needed to compensate for select returning early, very conservative */
   method_modify = select_modify;
   method_poll   = select_poll;
-
-  return 1;
 }
 
 

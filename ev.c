@@ -1,5 +1,8 @@
 #include <math.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <signal.h>
 
 #include <stdio.h>
 
@@ -181,14 +184,73 @@ downheap (struct ev_timer **timers, int N, int k)
   timers [k]->active = k + 1;
 }
 
-static struct ev_signal **signals;
+typedef struct
+{
+  struct ev_signal *head;
+  sig_atomic_t gotsig;
+} ANSIG;
+
+static ANSIG *signals;
 static int signalmax;
 
+static int sigpipe [2];
+static sig_atomic_t gotsig;
+static struct ev_io sigev;
+
 static void
-signals_init (struct ev_signal **base, int count)
+signals_init (ANSIG *base, int count)
 {
   while (count--)
-    *base++ = 0;
+    {
+      base->head   = 0;
+      base->gotsig = 0;
+      ++base;
+    }
+}
+
+static void
+sighandler (int signum)
+{
+  signals [signum - 1].gotsig = 1;
+
+  if (!gotsig)
+    {
+      gotsig = 1;
+      write (sigpipe [1], &gotsig, 1);
+    }
+}
+
+static void
+sigcb (struct ev_io *iow, int revents)
+{
+  struct ev_signal *w;
+  int sig;
+
+  gotsig = 0;
+  read (sigpipe [0], &revents, 1);
+
+  for (sig = signalmax; sig--; )
+    if (signals [sig].gotsig)
+      {
+        signals [sig].gotsig = 0;
+
+        for (w = signals [sig].head; w; w = w->next)
+          event ((struct ev_watcher *)w, EV_SIGNAL);
+      }
+}
+
+static void
+siginit (void)
+{
+  fcntl (sigpipe [0], F_SETFD, FD_CLOEXEC);
+  fcntl (sigpipe [1], F_SETFD, FD_CLOEXEC);
+
+  /* rather than sort out wether we really need nb, set it */
+  fcntl (sigpipe [0], F_SETFL, O_NONBLOCK);
+  fcntl (sigpipe [1], F_SETFL, O_NONBLOCK);
+
+  evio_set (&sigev, sigpipe [0], EV_READ);
+  evio_start (&sigev);
 }
 
 #if HAVE_EPOLL
@@ -212,16 +274,23 @@ int ev_init (int flags)
   now    = get_clock ();
   diff   = ev_now - now;
 
-#if HAVE_EPOLL
-  if (epoll_init (flags))
-    return ev_method;
-#endif
-#if HAVE_SELECT
-  if (select_init (flags))
-    return ev_method;
-#endif
+  if (pipe (sigpipe))
+    return 0;
 
   ev_method = EVMETHOD_NONE;
+#if HAVE_EPOLL
+  if (ev_method == EVMETHOD_NONE) epoll_init (flags);
+#endif
+#if HAVE_SELECT
+  if (ev_method == EVMETHOD_NONE) select_init (flags);
+#endif
+
+  if (ev_method)
+    {
+      evw_init (&sigev, sigcb, 0);
+      siginit ();
+    }
+
   return ev_method;
 }
 
@@ -239,6 +308,12 @@ void ev_postfork_child (void)
   if (ev_method == EVMETHOD_EPOLL)
     epoll_postfork_child ();
 #endif
+
+  evio_stop (&sigev);
+  close (sigpipe [0]);
+  close (sigpipe [1]);
+  pipe (sigpipe);
+  siginit ();
 }
 
 static void
@@ -538,7 +613,16 @@ evsignal_start (struct ev_signal *w)
 
   ev_start ((struct ev_watcher *)w, 1);
   array_needsize (signals, signalmax, w->signum, signals_init);
-  wlist_add ((struct ev_watcher_list **)&signals [w->signum - 1], (struct ev_watcher_list *)w);
+  wlist_add ((struct ev_watcher_list **)&signals [w->signum - 1].head, (struct ev_watcher_list *)w);
+
+  if (!w->next)
+    {
+      struct sigaction sa;
+      sa.sa_handler = sighandler;
+      sigfillset (&sa.sa_mask);
+      sa.sa_flags = 0;
+      sigaction (w->signum, &sa, 0);
+    }
 }
 
 void
@@ -547,8 +631,11 @@ evsignal_stop (struct ev_signal *w)
   if (!ev_is_active (w))
     return;
 
-  wlist_del ((struct ev_watcher_list **)&signals [w->signum - 1], (struct ev_watcher_list *)w);
+  wlist_del ((struct ev_watcher_list **)&signals [w->signum - 1].head, (struct ev_watcher_list *)w);
   ev_stop ((struct ev_watcher *)w);
+
+  if (!signals [w->signum - 1].head)
+    signal (w->signum, SIG_DFL);
 }
 
 /*****************************************************************************/
@@ -568,6 +655,12 @@ ocb (struct ev_timer *w, int revents)
   evtimer_start (w);
 }
 
+static void
+scb (struct ev_signal *w, int revents)
+{
+  fprintf (stderr, "signal %x,%d\n", revents, w->signum);
+}
+
 int main (void)
 {
   struct ev_io sin;
@@ -580,7 +673,7 @@ int main (void)
 
   struct ev_timer t[10000];
 
-#if 1
+#if 0
   int i;
   for (i = 0; i < 10000; ++i)
     {
@@ -597,6 +690,11 @@ int main (void)
   evw_init (&t1, ocb, 0);
   evtimer_set_abs (&t1, 5, 10);
   evtimer_start (&t1);
+
+  struct ev_signal sig;
+  evw_init (&sig, scb, 65535);
+  evsignal_set (&sig, SIGQUIT);
+  evsignal_start (&sig);
 
   ev_loop (0);
 

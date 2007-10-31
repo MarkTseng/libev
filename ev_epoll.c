@@ -23,6 +23,7 @@ void epoll_postfork_child (void)
   int fd;
 
   epoll_fd = epoll_create (256);
+  fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
 
   /* re-register interest in fds */
   for (fd = 0; fd < anfdmax; ++fd)
@@ -57,20 +58,20 @@ static void epoll_poll (ev_tstamp timeout)
     }
 }
 
-int epoll_init (int flags)
+void epoll_init (int flags)
 {
   epoll_fd = epoll_create (256);
 
   if (epoll_fd < 0)
-    return 0;
+    return;
 
-  ev_method = EVMETHOD_EPOLL;
+  fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
+
+  ev_method     = EVMETHOD_EPOLL;
   method_fudge  = 1e-3; /* needed to compensate for epoll returning early */
   method_modify = epoll_modify;
   method_poll   = epoll_poll;
 
   eventmax = 64; /* intiial number of events receivable per poll */
   events = malloc (sizeof (struct epoll_event) * eventmax);
-
-  return 1;
 }

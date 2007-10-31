@@ -1,7 +1,8 @@
 libev is modelled after libevent (http://monkey.org/~provos/libevent/), but aims
 to be faster and more correct, and also more featureful. Examples:
 
-- multiple watchers can wait for the same event without deregistering others.
+- multiple watchers can wait for the same event without deregistering others,
+  both for file descriptors as well as signals.
   (registering two read events on fd 10 and unregistering one will not
   break the other)
 
@@ -56,7 +57,9 @@ whats missing?
 - evdns, evhttp, bufferevent are missing, libev is only an even library at
   the moment.
 
-- no priority support at the moment.
+- no priority support at the moment
 
-- kqueue, poll (libev currently implements epoll and select).
+- kqueue, poll (libev currently implements epoll and select)
+
+- windows support (whats windows?)
 
