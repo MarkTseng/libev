@@ -742,11 +742,16 @@ evio_start (struct ev_io *w)
   ++fdchangecnt;
   array_needsize (fdchanges, fdchangemax, fdchangecnt, );
   fdchanges [fdchangecnt - 1] = fd;
+
+  if (w->fd == 9)
+    printf ("start %p:%x\n", w, w->events);//D
 }
 
 void
 evio_stop (struct ev_io *w)
 {
+  if (w->fd == 9)
+    printf ("stop  %p:%x\n", w, w->events);//D
   ev_clear ((W)w);
   if (!ev_is_active (w))
     return;
