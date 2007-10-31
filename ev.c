@@ -326,6 +326,9 @@ siginit (void)
 static struct ev_idle **idles;
 static int idlemax, idlecnt;
 
+static struct ev_prepare **prepares;
+static int preparemax, preparecnt;
+
 static struct ev_check **checks;
 static int checkmax, checkcnt;
 
@@ -555,14 +558,15 @@ void ev_loop (int flags)
   double block;
   ev_loop_done = flags & EVLOOP_ONESHOT ? 1 : 0;
 
-  if (checkcnt)
-    {
-      queue_events ((W *)checks, checkcnt, EV_CHECK);
-      call_pending ();
-    }
-
   do
     {
+      /* queue check watchers (and execute them) */
+      if (checkcnt)
+        {
+          queue_events ((W *)prepares, preparecnt, EV_PREPARE);
+          call_pending ();
+        }
+
       /* update fd-related kernel structures */
       fd_reify ();
 
@@ -598,15 +602,16 @@ void ev_loop (int flags)
       time_update ();
 
       /* queue pending timers and reschedule them */
-      periodics_reify (); /* absolute timers first */
-      timers_reify (); /* relative timers second */
+      timers_reify (); /* relative timers called last */
+      periodics_reify (); /* absolute timers called first */
 
       /* queue idle watchers unless io or timers are pending */
       if (!pendingcnt)
         queue_events ((W *)idles, idlecnt, EV_IDLE);
 
-      /* queue check and possibly idle watchers */
-      queue_events ((W *)checks, checkcnt, EV_CHECK);
+      /* queue check watchers, to be executed first */
+      if (checkcnt)
+        queue_events ((W *)checks, checkcnt, EV_CHECK);
 
       call_pending ();
     }
@@ -832,6 +837,26 @@ void evidle_stop (struct ev_idle *w)
     return;
 
   idles [w->active - 1] = idles [--idlecnt];
+  ev_stop ((W)w);
+}
+
+void evprepare_start (struct ev_prepare *w)
+{
+  if (ev_is_active (w))
+    return;
+
+  ev_start ((W)w, ++preparecnt);
+  array_needsize (prepares, preparemax, preparecnt, );
+  prepares [preparecnt - 1] = w;
+}
+
+void evprepare_stop (struct ev_prepare *w)
+{
+  ev_clear ((W)w);
+  if (ev_is_active (w))
+    return;
+
+  prepares [w->active - 1] = prepares [--preparecnt];
   ev_stop ((W)w);
 }
 

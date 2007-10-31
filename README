@@ -54,6 +54,8 @@ to be faster and more correct, and also more featureful. Examples:
   (in libevent, backends have to deal with watchers, thus the problems)
   (epoll backend in libevent: 366 lines, libev: 90 lines, and more features)
 
+- libev handles EBADF gracefully by removing the offending fds.
+
 whats missing?
 
 - evdns, evhttp, bufferevent are missing, libev is only an even library at

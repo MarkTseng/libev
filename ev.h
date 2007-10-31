@@ -41,7 +41,8 @@ typedef double ev_tstamp;
 #define EV_SIGNAL  0x08
 #define EV_IDLE    0x10
 #define EV_CHECK   0x20
-#define EV_ERROR   (0x3f|0x80)
+#define EV_PREPARE 0x40
+#define EV_ERROR   (0x7f|0x80)
 
 /* can be used to add custom fields to all watchers */
 #ifndef EV_COMMON
@@ -127,7 +128,14 @@ struct ev_idle
   EV_WATCHER (ev_idle);
 };
 
-/* invoked for each run of the mainloop, just before the next blocking vall is initiated */
+/* invoked for each run of the mainloop, just before the blocking call */
+/* you can still change events in any way you like */
+struct ev_prepare
+{
+  EV_WATCHER (ev_prepare);
+};
+
+/* invoked for each run of the mainloop, just after the blocking call */
 struct ev_check
 {
   EV_WATCHER (ev_check);
@@ -168,15 +176,17 @@ void ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, voi
 #define evtimer_set(ev,after_,repeat_)     do { (ev)->at = (after_); (ev)->repeat = (repeat_); } while (0)
 #define evperiodic_set(ev,at_,interval_)   do { (ev)->at = (at_); (ev)->interval = (interval_); } while (0)
 #define evsignal_set(ev,signum_)           do { (ev)->signum = (signum_); } while (0)
-#define evcheck_set(ev)                    /* nop, yes, this is a serious in-joke */
 #define evidle_set(ev)                     /* nop, yes, this is a serious in-joke */
+#define evprepare_set(ev)                  /* nop, yes, this is a serious in-joke */
+#define evcheck_set(ev)                    /* nop, yes, this is a serious in-joke */
 
 #define evio_init(ev,cb,fd,events)         do { evw_init ((ev), (cb)); evio_set ((ev),(fd),(events)); } while (0)
 #define evtimer_init(ev,cb,after,repeat)   do { evw_init ((ev), (cb)); evtimer_set ((ev),(after),(repeat)); } while (0)
 #define evperiodic_init(ev,cb,at,interval) do { evw_init ((ev), (cb)); evperiodic_set ((ev),(at),(interval)); } while (0)
 #define evsignal_init(ev,cb,signum)        do { evw_init ((ev), (cb)); evsignal_set ((ev), (signum)); } while (0)
-#define evcheck_init(ev,cb)                do { evw_init ((ev), (cb)); evcheck_set ((ev)); } while (0)
 #define evidle_init(ev,cb)                 do { evw_init ((ev), (cb)); evidle_set ((ev)); } while (0)
+#define evprepare_init(ev,cb)              do { evw_init ((ev), (cb)); evprepare_set ((ev)); } while (0)
+#define evcheck_init(ev,cb)                do { evw_init ((ev), (cb)); evcheck_set ((ev)); } while (0)
 
 #define ev_is_active(ev) (0 + (ev)->active) /* true when the watcher has been started */
 
@@ -198,6 +208,9 @@ void evsignal_stop    (struct ev_signal *w);
 
 void evidle_start     (struct ev_idle *w);
 void evidle_stop      (struct ev_idle *w);
+
+void evprepare_start  (struct ev_prepare *w);
+void evprepare_stop   (struct ev_prepare *w);
 
 void evcheck_start    (struct ev_check *w);
 void evcheck_stop     (struct ev_check *w);
