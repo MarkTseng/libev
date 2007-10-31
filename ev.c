@@ -38,6 +38,8 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/time.h>
 #include <time.h>
 
@@ -61,6 +63,7 @@
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 60.
+#define PID_HASHSIZE  16 /* size of pid hahs table, must be power of two */
 
 #include "ev.h"
 
@@ -334,6 +337,30 @@ static int checkmax, checkcnt;
 
 /*****************************************************************************/
 
+static struct ev_child *childs [PID_HASHSIZE];
+static struct ev_signal childev;
+
+#ifndef WCONTINUED
+# define WCONTINUED 0
+#endif
+
+static void
+childcb (struct ev_signal *sw, int revents)
+{
+  struct ev_child *w;
+  int pid, status;
+
+  while ((pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)) != -1)
+    for (w = childs [pid & (PID_HASHSIZE - 1)]; w; w = w->next)
+      if (w->pid == pid || w->pid == -1)
+        {
+          w->status = status;
+          event ((W)w, EV_CHILD);
+        }
+}
+
+/*****************************************************************************/
+
 #if HAVE_EPOLL
 # include "ev_epoll.c"
 #endif
@@ -370,6 +397,9 @@ int ev_init (int flags)
     {
       evw_init (&sigev, sigcb);
       siginit ();
+
+      evsignal_init (&childev, childcb, SIGCHLD);
+      evsignal_start (&childev);
     }
 
   return ev_method;
@@ -878,6 +908,25 @@ void evcheck_stop (struct ev_check *w)
     return;
 
   checks [w->active - 1] = checks [--checkcnt];
+  ev_stop ((W)w);
+}
+
+void evchild_start (struct ev_child *w)
+{
+  if (ev_is_active (w))
+    return;
+
+  ev_start ((W)w, 1);
+  wlist_add ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
+}
+
+void evchild_stop (struct ev_child *w)
+{
+  ev_clear ((W)w);
+  if (ev_is_active (w))
+    return;
+
+  wlist_del ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
   ev_stop ((W)w);
 }
 

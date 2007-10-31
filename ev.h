@@ -42,7 +42,8 @@ typedef double ev_tstamp;
 #define EV_IDLE    0x10
 #define EV_CHECK   0x20
 #define EV_PREPARE 0x40
-#define EV_ERROR   (0x7f|0x80)
+#define EV_CHILD   0x80
+#define EV_ERROR   (0xff|0x8000)
 
 /* can be used to add custom fields to all watchers */
 #ifndef EV_COMMON
@@ -141,6 +142,15 @@ struct ev_check
   EV_WATCHER (ev_check);
 };
 
+/* invoked when sigchld is received and waitpid indicates the givne pid */
+struct ev_child
+{
+  EV_WATCHER_LIST (ev_child);
+
+  int pid;    /* ro */
+  int status; /* holds the exit status, use the macros from sys/wait.h */
+};
+
 #define EVMETHOD_NONE   0
 #define EVMETHOD_SELECT 1
 #define EVMETHOD_EPOLL  2
@@ -179,6 +189,7 @@ void ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, voi
 #define evidle_set(ev)                     /* nop, yes, this is a serious in-joke */
 #define evprepare_set(ev)                  /* nop, yes, this is a serious in-joke */
 #define evcheck_set(ev)                    /* nop, yes, this is a serious in-joke */
+#define evchild_set(ev,pid_)               do { (ev)->pid = (pid_); } while (0)
 
 #define evio_init(ev,cb,fd,events)         do { evw_init ((ev), (cb)); evio_set ((ev),(fd),(events)); } while (0)
 #define evtimer_init(ev,cb,after,repeat)   do { evw_init ((ev), (cb)); evtimer_set ((ev),(after),(repeat)); } while (0)
@@ -187,6 +198,7 @@ void ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, voi
 #define evidle_init(ev,cb)                 do { evw_init ((ev), (cb)); evidle_set ((ev)); } while (0)
 #define evprepare_init(ev,cb)              do { evw_init ((ev), (cb)); evprepare_set ((ev)); } while (0)
 #define evcheck_init(ev,cb)                do { evw_init ((ev), (cb)); evcheck_set ((ev)); } while (0)
+#define evchild_init(ev,cb,pid)            do { evw_init ((ev), (cb)); evchild_set ((ev),(pid)); } while (0)
 
 #define ev_is_active(ev) (0 + (ev)->active) /* true when the watcher has been started */
 
@@ -214,6 +226,9 @@ void evprepare_stop   (struct ev_prepare *w);
 
 void evcheck_start    (struct ev_check *w);
 void evcheck_stop     (struct ev_check *w);
+
+void evchild_start    (struct ev_child *w);
+void evchild_stop     (struct ev_child *w);
 #endif
 
 #endif
