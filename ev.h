@@ -40,6 +40,21 @@ typedef double ev_tstamp;
   EV_WATCHER (type);				\
   ev_tstamp at     /* private */
 
+/* base class, nothing to see here unless you subclass */
+struct ev_watcher {
+  EV_WATCHER (ev_watcher);
+};
+
+/* base class, nothing to see here unless you subclass */
+struct ev_watcher_list {
+  EV_WATCHER_LIST (ev_watcher_list);
+};
+
+/* base class, nothing to see here unless you subclass */
+struct ev_watcher_time {
+  EV_WATCHER_TIME (ev_watcher_time);
+};
+
 /* invoked after a specific time, repeatable (based on monotonic clock) */
 struct ev_timer
 {
@@ -102,7 +117,7 @@ ev_tstamp ev_time (void);
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */
 #define EVLOOP_ONESHOT	2 /* block *once* only */
 void ev_loop (int flags);
-extern int ev_loop_done; /* set to 1 to break out of event loop */
+extern int ev_loop_done; /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
 
 /* these may evaluate ev multiple times, and the other arguments at most once */
 /* either use evw_init + evXXX_set, or the evXXX_init macro, below, to first initialise a watcher */

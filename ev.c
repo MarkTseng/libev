@@ -36,18 +36,6 @@
 
 #include "ev.h"
 
-struct ev_watcher {
-  EV_WATCHER (ev_watcher);
-};
-
-struct ev_watcher_list {
-  EV_WATCHER_LIST (ev_watcher_list);
-};
-
-struct ev_watcher_time {
-  EV_WATCHER_TIME (ev_watcher_time);
-};
-
 typedef struct ev_watcher *W;
 typedef struct ev_watcher_list *WL;
 typedef struct ev_watcher_time *WT;
@@ -457,11 +445,11 @@ periodics_reify ()
 }
 
 static void
-time_jump (ev_tstamp diff)
+periodics_reschedule (ev_tstamp diff)
 {
   int i;
 
-  /* adjust periodics */
+  /* adjust periodics after time jump */
   for (i = 0; i < periodiccnt; ++i)
     {
       struct ev_periodic *w = periodics [i];
@@ -479,10 +467,6 @@ time_jump (ev_tstamp diff)
             }
         }
     }
-
-  /* adjust timers. this is easy, as the offset is the same for all */
-  for (i = 0; i < timercnt; ++i)
-    timers [i]->at += diff;
 }
 
 static void
@@ -507,12 +491,19 @@ time_update ()
           ev_now = ev_time ();
         }
 
-      time_jump (diff - odiff);
+      periodics_reschedule (diff - odiff);
+      /* no timer adjustment, as the monotonic clock doesn't jump */
     }
   else
     {
       if (now > ev_now || now < ev_now - MAX_BLOCKTIME - MIN_TIMEJUMP)
-        time_jump (ev_now - now);
+        {
+          periodics_reschedule (ev_now - now);
+
+          /* adjust timers. this is easy, as the offset is the same for all */
+          for (i = 0; i < timercnt; ++i)
+            timers [i]->at += diff;
+        }
 
       now = ev_now;
     }
@@ -523,7 +514,7 @@ int ev_loop_done;
 void ev_loop (int flags)
 {
   double block;
-  ev_loop_done = flags & EVLOOP_ONESHOT;
+  ev_loop_done = flags & EVLOOP_ONESHOT ? 1 : 0;
 
   if (checkcnt)
     {
@@ -581,6 +572,9 @@ void ev_loop (int flags)
       call_pending ();
     }
   while (!ev_loop_done);
+
+  if (ev_loop_done != 2)
+    ev_loop_done = 0;
 }
 
 /*****************************************************************************/
@@ -665,6 +659,8 @@ evtimer_start (struct ev_timer *w)
 
   w->at += now;
 
+  assert (("timer repeat value less than zero not allowed", w->repeat >= 0.));
+
   ev_start ((W)w, ++timercnt);
   array_needsize (timers, timermax, timercnt, );
   timers [timercnt - 1] = w;
@@ -691,6 +687,8 @@ evperiodic_start (struct ev_periodic *w)
 {
   if (ev_is_active (w))
     return;
+
+  assert (("periodic interval value less than zero not allowed", w->interval >= 0.));
 
   /* this formula differs from the one in periodic_reify because we do not always round up */
   if (w->interval)
@@ -784,7 +782,7 @@ void evcheck_stop (struct ev_check *w)
 
 /*****************************************************************************/
 
-#if 1
+#if 0
 
 struct ev_io wio;
 
