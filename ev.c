@@ -42,6 +42,8 @@ static ev_tstamp method_fudge; /* stupid epoll-returns-early bug */
 static void (*method_modify)(int fd, int oev, int nev);
 static void (*method_poll)(ev_tstamp timeout);
 
+/*****************************************************************************/
+
 ev_tstamp
 ev_time (void)
 {
@@ -80,6 +82,8 @@ get_clock (void)
       init (base + cur, newcnt - cur);			\
       cur = newcnt;					\
     }
+
+/*****************************************************************************/
 
 typedef struct
 {
@@ -137,6 +141,8 @@ fd_event (int fd, int events)
     }
 }
 
+/*****************************************************************************/
+
 static struct ev_timer **atimers;
 static int atimermax, atimercnt;
 
@@ -183,6 +189,8 @@ downheap (struct ev_timer **timers, int N, int k)
   timers [k] = w;
   timers [k]->active = k + 1;
 }
+
+/*****************************************************************************/
 
 typedef struct
 {
@@ -253,6 +261,8 @@ siginit (void)
   evio_start (&sigev);
 }
 
+/*****************************************************************************/
+
 #if HAVE_EPOLL
 # include "ev_epoll.c"
 #endif
@@ -294,6 +304,8 @@ int ev_init (int flags)
   return ev_method;
 }
 
+/*****************************************************************************/
+
 void ev_prefork (void)
 {
 }
@@ -314,6 +326,29 @@ void ev_postfork_child (void)
   close (sigpipe [1]);
   pipe (sigpipe);
   siginit ();
+}
+
+/*****************************************************************************/
+
+static ev_hook hooks [EVHOOK_NUM];
+
+void
+ev_hook_register (int type, ev_hook hook)
+{
+  hooks [type] = hook;
+}
+
+void
+ev_hook_unregister (int type, ev_hook hook)
+{
+  hooks [type] = 0;
+}
+
+static void
+hook_call (int type)
+{
+  if (hooks [type])
+    hooks [type] ();
 }
 
 static void
@@ -439,6 +474,8 @@ void ev_loop (int flags)
 
   do
     {
+      hook_call (EVHOOK_PREPOLL);
+
       /* update fd-related kernel structures */
       fd_reify ();
 
@@ -469,6 +506,8 @@ void ev_loop (int flags)
       /* update ev_now, do magic */
       time_update ();
 
+      hook_call (EVHOOK_POSTPOLL);
+
       /* put pending timers into pendign queue and reschedule them */
       /* absolute timers first */
       timers_reify (atimers, atimercnt, ev_now);
@@ -479,6 +518,8 @@ void ev_loop (int flags)
     }
   while (!ev_loop_done);
 }
+
+/*****************************************************************************/
 
 static void
 wlist_add (struct ev_watcher_list **head, struct ev_watcher_list *elem)
@@ -518,6 +559,8 @@ ev_stop (struct ev_watcher *w)
   w->active = 0;
   /* nop */
 }
+
+/*****************************************************************************/
 
 void
 evio_start (struct ev_io *w)
@@ -673,7 +716,7 @@ int main (void)
 
   struct ev_timer t[10000];
 
-#if 0
+#if 1
   int i;
   for (i = 0; i < 10000; ++i)
     {

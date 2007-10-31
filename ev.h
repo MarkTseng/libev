@@ -64,6 +64,13 @@ ev_tstamp ev_time (void);
 void ev_loop (int flags);
 extern int ev_loop_done; /* set to 1 to break out of event loop */
 
+#define EVHOOK_PREPOLL  0 /* called before updating fds, timers and blocking */
+#define EVHOOK_POSTPOLL 1 /* called after blocking */
+#define EVHOOK_NUM      2 /* just the # of hooks */
+typedef void (*ev_hook)(void);
+void ev_hook_register (int type, ev_hook hook);
+void ev_hook_unregister (int type, ev_hook hook);
+
 /* these may evaluate ev multiple times, and the other arguments at most once */
 #define evw_init(ev,cb_,data_)             do { (ev)->active = 0; (ev)->cb = (cb_); (ev)->data = (void *)data_; } while (0)
 
