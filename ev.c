@@ -141,6 +141,15 @@ fd_event (int fd, int events)
     }
 }
 
+static void
+queue_events (struct ev_watcher **events, int eventcnt, int type)
+{
+  int i;
+
+  for (i = 0; i < eventcnt; ++i)
+    event (events [i], type);
+}
+
 /*****************************************************************************/
 
 static struct ev_timer **atimers;
@@ -263,6 +272,14 @@ siginit (void)
 
 /*****************************************************************************/
 
+static struct ev_idle **idles;
+static int idlemax, idlecnt;
+
+static struct ev_check **checks;
+static int checkmax, checkcnt;
+
+/*****************************************************************************/
+
 #if HAVE_EPOLL
 # include "ev_epoll.c"
 #endif
@@ -329,27 +346,6 @@ void ev_postfork_child (void)
 }
 
 /*****************************************************************************/
-
-static ev_hook hooks [EVHOOK_NUM];
-
-void
-ev_hook_register (int type, ev_hook hook)
-{
-  hooks [type] = hook;
-}
-
-void
-ev_hook_unregister (int type, ev_hook hook)
-{
-  hooks [type] = 0;
-}
-
-static void
-hook_call (int type)
-{
-  if (hooks [type])
-    hooks [type] ();
-}
 
 static void
 fd_reify (void)
@@ -472,15 +468,19 @@ void ev_loop (int flags)
   double block;
   ev_loop_done = flags & EVLOOP_ONESHOT;
 
+  if (checkcnt)
+    {
+      queue_events (checks, checkcnt, EV_CHECK);
+      call_pending ();
+    }
+
   do
     {
-      hook_call (EVHOOK_PREPOLL);
-
       /* update fd-related kernel structures */
       fd_reify ();
 
       /* calculate blocking time */
-      if (flags & EVLOOP_NONBLOCK)
+      if (flags & EVLOOP_NONBLOCK || idlecnt)
         block = 0.;
       else
         {
@@ -506,13 +506,18 @@ void ev_loop (int flags)
       /* update ev_now, do magic */
       time_update ();
 
-      hook_call (EVHOOK_POSTPOLL);
-
-      /* put pending timers into pendign queue and reschedule them */
+      /* queue pending timers and reschedule them */
       /* absolute timers first */
       timers_reify (atimers, atimercnt, ev_now);
       /* relative timers second */
       timers_reify (rtimers, rtimercnt, now);
+
+      /* queue idle watchers unless io or timers are pending */
+      if (!pendingcnt)
+        queue_events (idles, idlecnt, EV_IDLE);
+
+      /* queue check and possibly idle watchers */
+      queue_events (checks, checkcnt, EV_CHECK);
 
       call_pending ();
     }
@@ -681,6 +686,38 @@ evsignal_stop (struct ev_signal *w)
     signal (w->signum, SIG_DFL);
 }
 
+void evidle_start (struct ev_idle *w)
+{
+  if (ev_is_active (w))
+    return;
+
+  ev_start ((struct ev_watcher *)w, ++idlecnt);
+  array_needsize (idles, idlemax, idlecnt, );
+  idles [idlecnt - 1] = w;
+}
+
+void evidle_stop (struct ev_idle *w)
+{
+  idles [w->active - 1] = idles [--idlecnt];
+  ev_stop ((struct ev_watcher *)w);
+}
+
+void evcheck_start (struct ev_check *w)
+{
+  if (ev_is_active (w))
+    return;
+
+  ev_start ((struct ev_watcher *)w, ++checkcnt);
+  array_needsize (checks, checkmax, checkcnt, );
+  checks [checkcnt - 1] = w;
+}
+
+void evcheck_stop (struct ev_check *w)
+{
+  checks [w->active - 1] = checks [--checkcnt];
+  ev_stop ((struct ev_watcher *)w);
+}
+
 /*****************************************************************************/
 #if 1
 
@@ -704,6 +741,12 @@ scb (struct ev_signal *w, int revents)
   fprintf (stderr, "signal %x,%d\n", revents, w->signum);
 }
 
+static void
+gcb (struct ev_signal *w, int revents)
+{
+  fprintf (stderr, "generic %x\n", revents);
+}
+
 int main (void)
 {
   struct ev_io sin;
@@ -716,7 +759,7 @@ int main (void)
 
   struct ev_timer t[10000];
 
-#if 1
+#if 0
   int i;
   for (i = 0; i < 10000; ++i)
     {
@@ -738,6 +781,14 @@ int main (void)
   evw_init (&sig, scb, 65535);
   evsignal_set (&sig, SIGQUIT);
   evsignal_start (&sig);
+
+  struct ev_check cw;
+  evw_init (&cw, gcb, 0);
+  evcheck_start (&cw);
+
+  struct ev_idle iw;
+  evw_init (&iw, gcb, 0);
+  evidle_start (&iw);
 
   ev_loop (0);
 
