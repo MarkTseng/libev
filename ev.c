@@ -613,7 +613,7 @@ int ev_loop_done;
 void ev_loop (int flags)
 {
   double block;
-  ev_loop_done = flags & EVLOOP_ONESHOT ? 1 : 0;
+  ev_loop_done = flags & (EVLOOP_ONESHOT | EVLOOP_NONBLOCK) ? 1 : 0;
 
   do
     {
