@@ -11,13 +11,23 @@
 #include <sys/time.h>
 #include <time.h>
 
-#ifdef CLOCK_MONOTONIC
-# define HAVE_MONOTONIC 1
+#ifndef HAVE_MONOTONIC
+# ifdef CLOCK_MONOTONIC
+#  define HAVE_MONOTONIC 1
+# endif
 #endif
 
-#define HAVE_REALTIME 1
-#define HAVE_EPOLL 1
-#define HAVE_SELECT 1
+#ifndef HAVE_SELECT
+# define HAVE_SELECT 1
+#endif
+
+#ifndef HAVE_EPOLL
+# define HAVE_EPOLL 0
+#endif
+
+#ifndef HAVE_REALTIME
+# define HAVE_REALTIME 1 /* posix requirement, but might be slower */
+#endif
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 60.
@@ -31,6 +41,9 @@ struct ev_watcher {
 struct ev_watcher_list {
   EV_WATCHER_LIST (ev_watcher_list);
 };
+
+typedef struct ev_watcher *W;
+typedef struct ev_watcher_list *WL;
 
 static ev_tstamp now, diff; /* monotonic clock */
 ev_tstamp ev_now;
@@ -110,7 +123,7 @@ anfds_init (ANFD *base, int count)
 
 typedef struct
 {
-  struct ev_watcher *w;
+  W w;
   int events;
 } ANPENDING;
 
@@ -118,7 +131,7 @@ static ANPENDING *pendings;
 static int pendingmax, pendingcnt;
 
 static void
-event (struct ev_watcher *w, int events)
+event (W w, int events)
 {
   w->pending = ++pendingcnt;
   array_needsize (pendings, pendingmax, pendingcnt, );
@@ -137,12 +150,12 @@ fd_event (int fd, int events)
       int ev = w->events & events;
 
       if (ev)
-        event ((struct ev_watcher *)w, ev);
+        event ((W)w, ev);
     }
 }
 
 static void
-queue_events (struct ev_watcher **events, int eventcnt, int type)
+queue_events (W *events, int eventcnt, int type)
 {
   int i;
 
@@ -252,7 +265,7 @@ sigcb (struct ev_io *iow, int revents)
         signals [sig].gotsig = 0;
 
         for (w = signals [sig].head; w; w = w->next)
-          event ((struct ev_watcher *)w, EV_SIGNAL);
+          event ((W)w, EV_SIGNAL);
       }
 }
 
@@ -417,7 +430,7 @@ timers_reify (struct ev_timer **timers, int timercnt, ev_tstamp now)
           --timercnt; /* maybe pass by reference instead? */
         }
 
-      event ((struct ev_watcher *)w, EV_TIMEOUT);
+      event ((W)w, EV_TIMEOUT);
     }
 }
 
@@ -470,7 +483,7 @@ void ev_loop (int flags)
 
   if (checkcnt)
     {
-      queue_events (checks, checkcnt, EV_CHECK);
+      queue_events ((W *)checks, checkcnt, EV_CHECK);
       call_pending ();
     }
 
@@ -514,10 +527,10 @@ void ev_loop (int flags)
 
       /* queue idle watchers unless io or timers are pending */
       if (!pendingcnt)
-        queue_events (idles, idlecnt, EV_IDLE);
+        queue_events ((W *)idles, idlecnt, EV_IDLE);
 
       /* queue check and possibly idle watchers */
-      queue_events (checks, checkcnt, EV_CHECK);
+      queue_events ((W *)checks, checkcnt, EV_CHECK);
 
       call_pending ();
     }
@@ -527,14 +540,14 @@ void ev_loop (int flags)
 /*****************************************************************************/
 
 static void
-wlist_add (struct ev_watcher_list **head, struct ev_watcher_list *elem)
+wlist_add (WL *head, WL elem)
 {
   elem->next = *head;
   *head = elem;
 }
 
 static void
-wlist_del (struct ev_watcher_list **head, struct ev_watcher_list *elem)
+wlist_del (WL *head, WL elem)
 {
   while (*head)
     {
@@ -549,14 +562,14 @@ wlist_del (struct ev_watcher_list **head, struct ev_watcher_list *elem)
 }
 
 static void
-ev_start (struct ev_watcher *w, int active)
+ev_start (W w, int active)
 {
   w->pending = 0;
   w->active = active;
 }
 
 static void
-ev_stop (struct ev_watcher *w)
+ev_stop (W w)
 {
   if (w->pending)
     pendings [w->pending - 1].w = 0;
@@ -575,9 +588,9 @@ evio_start (struct ev_io *w)
 
   int fd = w->fd;
 
-  ev_start ((struct ev_watcher *)w, 1);
+  ev_start ((W)w, 1);
   array_needsize (anfds, anfdmax, fd + 1, anfds_init);
-  wlist_add ((struct ev_watcher_list **)&anfds[fd].head, (struct ev_watcher_list *)w);
+  wlist_add ((WL *)&anfds[fd].head, (WL)w);
 
   ++fdchangecnt;
   array_needsize (fdchanges, fdchangemax, fdchangecnt, );
@@ -590,8 +603,8 @@ evio_stop (struct ev_io *w)
   if (!ev_is_active (w))
     return;
 
-  wlist_del ((struct ev_watcher_list **)&anfds[w->fd].head, (struct ev_watcher_list *)w);
-  ev_stop ((struct ev_watcher *)w);
+  wlist_del ((WL *)&anfds[w->fd].head, (WL)w);
+  ev_stop ((W)w);
 
   ++fdchangecnt;
   array_needsize (fdchanges, fdchangemax, fdchangecnt, );
@@ -610,7 +623,7 @@ evtimer_start (struct ev_timer *w)
       if (w->repeat)
         w->at += ceil ((ev_now - w->at) / w->repeat) * w->repeat;
 
-      ev_start ((struct ev_watcher *)w, ++atimercnt);
+      ev_start ((W)w, ++atimercnt);
       array_needsize (atimers, atimermax, atimercnt, );
       atimers [atimercnt - 1] = w;
       upheap (atimers, atimercnt - 1);
@@ -619,7 +632,7 @@ evtimer_start (struct ev_timer *w)
     {
       w->at += now;
 
-      ev_start ((struct ev_watcher *)w, ++rtimercnt);
+      ev_start ((W)w, ++rtimercnt);
       array_needsize (rtimers, rtimermax, rtimercnt, );
       rtimers [rtimercnt - 1] = w;
       upheap (rtimers, rtimercnt - 1);
@@ -650,7 +663,7 @@ evtimer_stop (struct ev_timer *w)
         }
     }
 
-  ev_stop ((struct ev_watcher *)w);
+  ev_stop ((W)w);
 }
 
 void
@@ -659,9 +672,9 @@ evsignal_start (struct ev_signal *w)
   if (ev_is_active (w))
     return;
 
-  ev_start ((struct ev_watcher *)w, 1);
+  ev_start ((W)w, 1);
   array_needsize (signals, signalmax, w->signum, signals_init);
-  wlist_add ((struct ev_watcher_list **)&signals [w->signum - 1].head, (struct ev_watcher_list *)w);
+  wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
 
   if (!w->next)
     {
@@ -679,8 +692,8 @@ evsignal_stop (struct ev_signal *w)
   if (!ev_is_active (w))
     return;
 
-  wlist_del ((struct ev_watcher_list **)&signals [w->signum - 1].head, (struct ev_watcher_list *)w);
-  ev_stop ((struct ev_watcher *)w);
+  wlist_del ((WL *)&signals [w->signum - 1].head, (WL)w);
+  ev_stop ((W)w);
 
   if (!signals [w->signum - 1].head)
     signal (w->signum, SIG_DFL);
@@ -691,7 +704,7 @@ void evidle_start (struct ev_idle *w)
   if (ev_is_active (w))
     return;
 
-  ev_start ((struct ev_watcher *)w, ++idlecnt);
+  ev_start ((W)w, ++idlecnt);
   array_needsize (idles, idlemax, idlecnt, );
   idles [idlecnt - 1] = w;
 }
@@ -699,7 +712,7 @@ void evidle_start (struct ev_idle *w)
 void evidle_stop (struct ev_idle *w)
 {
   idles [w->active - 1] = idles [--idlecnt];
-  ev_stop ((struct ev_watcher *)w);
+  ev_stop ((W)w);
 }
 
 void evcheck_start (struct ev_check *w)
@@ -707,7 +720,7 @@ void evcheck_start (struct ev_check *w)
   if (ev_is_active (w))
     return;
 
-  ev_start ((struct ev_watcher *)w, ++checkcnt);
+  ev_start ((W)w, ++checkcnt);
   array_needsize (checks, checkmax, checkcnt, );
   checks [checkcnt - 1] = w;
 }
@@ -715,11 +728,12 @@ void evcheck_start (struct ev_check *w)
 void evcheck_stop (struct ev_check *w)
 {
   checks [w->active - 1] = checks [--checkcnt];
-  ev_stop ((struct ev_watcher *)w);
+  ev_stop ((W)w);
 }
 
 /*****************************************************************************/
-#if 1
+
+#if 0
 
 static void
 sin_cb (struct ev_io *w, int revents)
