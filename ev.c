@@ -418,11 +418,9 @@ fd_reify (void)
 static void
 call_pending ()
 {
-  int i;
-
-  for (i = 0; i < pendingcnt; ++i)
+  while (pendingcnt)
     {
-      ANPENDING *p = pendings + i;
+      ANPENDING *p = pendings + --pendingcnt;
 
       if (p->w)
         {
@@ -430,8 +428,6 @@ call_pending ()
           p->w->cb (p->w, p->events);
         }
     }
-
-  pendingcnt = 0;
 }
 
 static void
