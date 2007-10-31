@@ -540,7 +540,7 @@ void ev_loop (int flags)
 
           if (timercnt)
             {
-              ev_tstamp to = timers [0]->at - get_clock () + method_fudge;
+              ev_tstamp to = timers [0]->at - (have_monotonic ? get_clock () : ev_now) + method_fudge;
               if (block > to) block = to;
             }
 
@@ -679,7 +679,26 @@ evtimer_stop (struct ev_timer *w)
       downheap ((WT *)timers, timercnt, w->active - 1);
     }
 
+  w->at = w->repeat;
+
   ev_stop ((W)w);
+}
+
+void
+evtimer_again (struct ev_timer *w)
+{
+  if (ev_is_active (w))
+    {
+      if (w->repeat)
+        {
+          w->at = now + w->repeat;
+          downheap ((WT *)timers, timercnt, w->active - 1);
+        }
+      else
+        evtimer_stop (w);
+    }
+  else if (w->repeat)
+    evtimer_start (w);
 }
 
 void

@@ -146,6 +146,7 @@ void evio_stop        (struct ev_io *w);
 
 void evtimer_start    (struct ev_timer *w);
 void evtimer_stop     (struct ev_timer *w);
+void evtimer_again    (struct ev_timer *w); /* stops if active and no repeat, restarts if active and repeating, starts if inactive and repeating */
 
 void evperiodic_start (struct ev_periodic *w);
 void evperiodic_stop  (struct ev_periodic *w);
