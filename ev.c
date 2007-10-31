@@ -41,8 +41,6 @@
 #include <sys/time.h>
 #include <time.h>
 
-#define HAVE_EPOLL 1
-
 #ifndef HAVE_MONOTONIC
 # ifdef CLOCK_MONOTONIC
 #  define HAVE_MONOTONIC 1
@@ -188,6 +186,19 @@ queue_events (W *events, int eventcnt, int type)
 
   for (i = 0; i < eventcnt; ++i)
     event (events [i], type);
+}
+
+/* called on EBADF to verify fds */
+static void
+fd_recheck ()
+{
+  int fd;
+
+  for (fd = 0; fd < anfdmax; ++fd)
+    if (anfds [fd].wev)
+      if (fcntl (fd, F_GETFD) == -1 && errno == EBADF)
+        while (anfds [fd].head)
+          evio_stop (anfds [fd].head);
 }
 
 /*****************************************************************************/

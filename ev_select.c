@@ -49,12 +49,16 @@ select_modify (int fd, int oev, int nev)
 
   if (vec_max < (fd >> 5) + 1)
     {
-      vec_max = (fd >> 5) + 1;
+      int new_max = (fd >> 5) + 1;
 
-      vec_ri = (unsigned char *)realloc (vec_ri, vec_max * 4);
-      vec_ro = (unsigned char *)realloc (vec_ro, vec_max * 4); /* could free/malloc */
-      vec_wi = (unsigned char *)realloc (vec_wi, vec_max * 4);
-      vec_wo = (unsigned char *)realloc (vec_wo, vec_max * 4); /* could free/malloc */
+      vec_ri = (unsigned char *)realloc (vec_ri, new_max * 4);
+      vec_ro = (unsigned char *)realloc (vec_ro, new_max * 4); /* could free/malloc */
+      vec_wi = (unsigned char *)realloc (vec_wi, new_max * 4);
+      vec_wo = (unsigned char *)realloc (vec_wo, new_max * 4); /* could free/malloc */
+
+      for (; vec_max < new_max; ++vec_max)
+        ((uint32_t *)vec_ri)[vec_max] =
+        ((uint32_t *)vec_wi)[vec_max] = 0;
     }
 
   vec_ri [offs] |= mask;
@@ -105,6 +109,11 @@ static void select_poll (ev_tstamp timeout)
                     }
               }
         }
+    }
+  else if (res < 0)
+    {
+      if (errno == EBADF)
+        fd_recheck ();
     }
 }
 
