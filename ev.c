@@ -11,6 +11,8 @@
 #include <sys/time.h>
 #include <time.h>
 
+#define HAVE_EPOLL 1
+
 #ifndef HAVE_MONOTONIC
 # ifdef CLOCK_MONOTONIC
 #  define HAVE_MONOTONIC 1
@@ -42,8 +44,13 @@ struct ev_watcher_list {
   EV_WATCHER_LIST (ev_watcher_list);
 };
 
+struct ev_watcher_time {
+  EV_WATCHER_TIME (ev_watcher_time);
+};
+
 typedef struct ev_watcher *W;
 typedef struct ev_watcher_list *WL;
+typedef struct ev_watcher_time *WT;
 
 static ev_tstamp now, diff; /* monotonic clock */
 ev_tstamp ev_now;
@@ -165,16 +172,16 @@ queue_events (W *events, int eventcnt, int type)
 
 /*****************************************************************************/
 
-static struct ev_timer **atimers;
-static int atimermax, atimercnt;
+static struct ev_timer **timers;
+static int timermax, timercnt;
 
-static struct ev_timer **rtimers;
-static int rtimermax, rtimercnt;
+static struct ev_periodic **periodics;
+static int periodicmax, periodiccnt;
 
 static void
-upheap (struct ev_timer **timers, int k)
+upheap (WT *timers, int k)
 {
-  struct ev_timer *w = timers [k];
+  WT w = timers [k];
 
   while (k && timers [k >> 1]->at > w->at)
     {
@@ -189,9 +196,9 @@ upheap (struct ev_timer **timers, int k)
 }
 
 static void
-downheap (struct ev_timer **timers, int N, int k)
+downheap (WT *timers, int N, int k)
 {
-  struct ev_timer *w = timers [k];
+  WT w = timers [k];
 
   while (k < (N >> 1))
     {
@@ -327,7 +334,7 @@ int ev_init (int flags)
 
   if (ev_method)
     {
-      evw_init (&sigev, sigcb, 0);
+      evw_init (&sigev, sigcb);
       siginit ();
     }
 
@@ -408,7 +415,7 @@ call_pending ()
 }
 
 static void
-timers_reify (struct ev_timer **timers, int timercnt, ev_tstamp now)
+timers_reify ()
 {
   while (timercnt && timers [0]->at <= now)
     {
@@ -417,37 +424,79 @@ timers_reify (struct ev_timer **timers, int timercnt, ev_tstamp now)
       /* first reschedule or stop timer */
       if (w->repeat)
         {
-          if (w->is_abs)
-            w->at += floor ((now - w->at) / w->repeat + 1.) * w->repeat;
-          else
-            w->at = now + w->repeat;
-
-          assert (w->at > now);
-
-          downheap (timers, timercnt, 0);
+          w->at = now + w->repeat;
+          assert (("timer timeout in the past, negative repeat?", w->at > now));
+          downheap ((WT *)timers, timercnt, 0);
         }
       else
-        {
-          evtimer_stop (w); /* nonrepeating: stop timer */
-          --timercnt; /* maybe pass by reference instead? */
-        }
+        evtimer_stop (w); /* nonrepeating: stop timer */
 
       event ((W)w, EV_TIMEOUT);
     }
 }
 
 static void
+periodics_reify ()
+{
+  while (periodiccnt && periodics [0]->at <= ev_now)
+    {
+      struct ev_periodic *w = periodics [0];
+
+      /* first reschedule or stop timer */
+      if (w->interval)
+        {
+          w->at += floor ((ev_now - w->at) / w->interval + 1.) * w->interval;
+          assert (("periodic timeout in the past, negative interval?", w->at > ev_now));
+          downheap ((WT *)periodics, periodiccnt, 0);
+        }
+      else
+        evperiodic_stop (w); /* nonrepeating: stop timer */
+
+      event ((W)w, EV_TIMEOUT);
+    }
+}
+
+static void
+time_jump (ev_tstamp diff)
+{
+  int i;
+
+  /* adjust periodics */
+  for (i = 0; i < periodiccnt; ++i)
+    {
+      struct ev_periodic *w = periodics [i];
+
+      if (w->interval)
+        {
+          ev_tstamp diff = ceil ((ev_now - w->at) / w->interval) * w->interval;
+
+          if (fabs (diff) >= 1e-4)
+            {
+              evperiodic_stop (w);
+              evperiodic_start (w);
+
+              i = 0; /* restart loop, inefficient, but time jumps should be rare */
+            }
+        }
+    }
+
+  /* adjust timers. this is easy, as the offset is the same for all */
+  for (i = 0; i < timercnt; ++i)
+    timers [i]->at += diff;
+}
+
+static void
 time_update ()
 {
   int i;
+
   ev_now = ev_time ();
 
   if (have_monotonic)
     {
       ev_tstamp odiff = diff;
 
-      /* detecting time jumps is much more difficult */
-      for (i = 2; --i; ) /* loop a few times, before making important decisions */
+      for (i = 4; --i; ) /* loop a few times, before making important decisions */
         {
           now = get_clock ();
           diff = ev_now - now;
@@ -458,19 +507,12 @@ time_update ()
           ev_now = ev_time ();
         }
 
-      /* time jump detected, reschedule atimers */
-      for (i = 0; i < atimercnt; ++i)
-        {
-          struct ev_timer *w = atimers [i];
-          w->at += ceil ((ev_now - w->at) / w->repeat + 1.) * w->repeat;
-        }
+      time_jump (diff - odiff);
     }
   else
     {
       if (now > ev_now || now < ev_now - MAX_BLOCKTIME - MIN_TIMEJUMP)
-        /* time jump detected, adjust rtimers */
-        for (i = 0; i < rtimercnt; ++i)
-          rtimers [i]->at += ev_now - now;
+        time_jump (ev_now - now);
 
       now = ev_now;
     }
@@ -495,21 +537,25 @@ void ev_loop (int flags)
       fd_reify ();
 
       /* calculate blocking time */
+
+      /* we only need this for !monotonic clock, but as we always have timers, we just calculate it every time */
+      ev_now = ev_time ();
+
       if (flags & EVLOOP_NONBLOCK || idlecnt)
         block = 0.;
       else
         {
           block = MAX_BLOCKTIME;
 
-          if (rtimercnt)
+          if (timercnt)
             {
-              ev_tstamp to = rtimers [0]->at - get_clock () + method_fudge;
+              ev_tstamp to = timers [0]->at - get_clock () + method_fudge;
               if (block > to) block = to;
             }
 
-          if (atimercnt)
+          if (periodiccnt)
             {
-              ev_tstamp to = atimers [0]->at - ev_time   () + method_fudge;
+              ev_tstamp to = periodics [0]->at - ev_now + method_fudge;
               if (block > to) block = to;
             }
 
@@ -522,10 +568,8 @@ void ev_loop (int flags)
       time_update ();
 
       /* queue pending timers and reschedule them */
-      /* absolute timers first */
-      timers_reify (atimers, atimercnt, ev_now);
-      /* relative timers second */
-      timers_reify (rtimers, rtimercnt, now);
+      periodics_reify (); /* absolute timers first */
+      timers_reify (); /* relative timers second */
 
       /* queue idle watchers unless io or timers are pending */
       if (!pendingcnt)
@@ -612,33 +656,19 @@ evio_stop (struct ev_io *w)
   fdchanges [fdchangecnt - 1] = w->fd;
 }
 
+
 void
 evtimer_start (struct ev_timer *w)
 {
   if (ev_is_active (w))
     return;
 
-  if (w->is_abs)
-    {
-      /* this formula differs from the one in timer_reify becuse we do not round up */
-      if (w->repeat)
-        w->at += ceil ((ev_now - w->at) / w->repeat) * w->repeat;
+  w->at += now;
 
-      ev_start ((W)w, ++atimercnt);
-      array_needsize (atimers, atimermax, atimercnt, );
-      atimers [atimercnt - 1] = w;
-      upheap (atimers, atimercnt - 1);
-    }
-  else
-    {
-      w->at += now;
-
-      ev_start ((W)w, ++rtimercnt);
-      array_needsize (rtimers, rtimermax, rtimercnt, );
-      rtimers [rtimercnt - 1] = w;
-      upheap (rtimers, rtimercnt - 1);
-    }
-
+  ev_start ((W)w, ++timercnt);
+  array_needsize (timers, timermax, timercnt, );
+  timers [timercnt - 1] = w;
+  upheap ((WT *)timers, timercnt - 1);
 }
 
 void
@@ -647,21 +677,41 @@ evtimer_stop (struct ev_timer *w)
   if (!ev_is_active (w))
     return;
 
-  if (w->is_abs)
+  if (w->active < timercnt--)
     {
-      if (w->active < atimercnt--)
-        {
-          atimers [w->active - 1] = atimers [atimercnt];
-          downheap (atimers, atimercnt, w->active - 1);
-        }
+      timers [w->active - 1] = timers [timercnt];
+      downheap ((WT *)timers, timercnt, w->active - 1);
     }
-  else
+
+  ev_stop ((W)w);
+}
+
+void
+evperiodic_start (struct ev_periodic *w)
+{
+  if (ev_is_active (w))
+    return;
+
+  /* this formula differs from the one in periodic_reify because we do not always round up */
+  if (w->interval)
+    w->at += ceil ((ev_now - w->at) / w->interval) * w->interval;
+
+  ev_start ((W)w, ++periodiccnt);
+  array_needsize (periodics, periodicmax, periodiccnt, );
+  periodics [periodiccnt - 1] = w;
+  upheap ((WT *)periodics, periodiccnt - 1);
+}
+
+void
+evperiodic_stop (struct ev_periodic *w)
+{
+  if (!ev_is_active (w))
+    return;
+
+  if (w->active < periodiccnt--)
     {
-      if (w->active < rtimercnt--)
-        {
-          rtimers [w->active - 1] = rtimers [rtimercnt];
-          downheap (rtimers, rtimercnt, w->active - 1);
-        }
+      periodics [w->active - 1] = periodics [periodiccnt];
+      downheap ((WT *)periodics, periodiccnt, w->active - 1);
     }
 
   ev_stop ((W)w);
@@ -734,7 +784,9 @@ void evcheck_stop (struct ev_check *w)
 
 /*****************************************************************************/
 
-#if 0
+#if 1
+
+struct ev_io wio;
 
 static void
 sin_cb (struct ev_io *w, int revents)
@@ -754,23 +806,23 @@ static void
 scb (struct ev_signal *w, int revents)
 {
   fprintf (stderr, "signal %x,%d\n", revents, w->signum);
+  evio_stop (&wio);
+  evio_start (&wio);
 }
 
 static void
 gcb (struct ev_signal *w, int revents)
 {
   fprintf (stderr, "generic %x\n", revents);
+
 }
 
 int main (void)
 {
-  struct ev_io sin;
-
   ev_init (0);
 
-  evw_init (&sin, sin_cb, 55);
-  evio_set (&sin, 0, EV_READ);
-  evio_start (&sin);
+  evio_init (&wio, sin_cb, 0, EV_READ);
+  evio_start (&wio);
 
   struct ev_timer t[10000];
 
@@ -780,7 +832,7 @@ int main (void)
     {
       struct ev_timer *w = t + i;
       evw_init (w, ocb, i);
-      evtimer_set_abs (w, drand48 (), 0.99775533);
+      evtimer_init_abs (w, ocb, drand48 (), 0.99775533);
       evtimer_start (w);
       if (drand48 () < 0.5)
         evtimer_stop (w);
@@ -788,21 +840,19 @@ int main (void)
 #endif
 
   struct ev_timer t1;
-  evw_init (&t1, ocb, 0);
-  evtimer_set_abs (&t1, 5, 10);
+  evtimer_init (&t1, ocb, 5, 10);
   evtimer_start (&t1);
 
   struct ev_signal sig;
-  evw_init (&sig, scb, 65535);
-  evsignal_set (&sig, SIGQUIT);
+  evsignal_init (&sig, scb, SIGQUIT);
   evsignal_start (&sig);
 
   struct ev_check cw;
-  evw_init (&cw, gcb, 0);
+  evcheck_init (&cw, gcb);
   evcheck_start (&cw);
 
   struct ev_idle iw;
-  evw_init (&iw, gcb, 0);
+  evidle_init (&iw, gcb);
   evidle_start (&iw);
 
   ev_loop (0);
