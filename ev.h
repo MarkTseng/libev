@@ -33,17 +33,18 @@
 typedef double ev_tstamp;
 
 /* eventmask, revents, events... */
-#define EV_UNDEF   -1 /* guaranteed to be invalid */
-#define EV_NONE    0x000000
-#define EV_READ    0x000001
-#define EV_WRITE   0x000002
-#define EV_TIMEOUT 0x000004
-#define EV_SIGNAL  0x000008
-#define EV_IDLE    0x000010
-#define EV_CHECK   0x000020
-#define EV_PREPARE 0x000040
-#define EV_CHILD   0x000080
-#define EV_ERROR   0x800000
+#define EV_UNDEF         -1 /* guaranteed to be invalid */
+#define EV_NONE        0x00
+#define EV_READ        0x01
+#define EV_WRITE       0x02
+#define EV_REIFY       0x04 /* private */
+#define EV_TIMEOUT 0x000100
+#define EV_SIGNAL  0x000200
+#define EV_IDLE    0x000400
+#define EV_CHECK   0x000800
+#define EV_PREPARE 0x001000
+#define EV_CHILD   0x002000
+#define EV_ERROR   0x800000 /* sent when an error occurs */
 
 /* can be used to add custom fields to all watchers */
 #ifndef EV_COMMON

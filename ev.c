@@ -132,22 +132,19 @@ get_clock (void)
 typedef struct
 {
   struct ev_io *head;
-  unsigned char wev, rev; /* want, received event set */
+  int events;
 } ANFD;
 
 static ANFD *anfds;
 static int anfdmax;
-
-static int *fdchanges;
-static int fdchangemax, fdchangecnt;
 
 static void
 anfds_init (ANFD *base, int count)
 {
   while (count--)
     {
-      base->head = 0;
-      base->wev = base->rev = EV_NONE;
+      base->head   = 0;
+      base->events = EV_NONE;
       ++base;
     }
 }
@@ -174,6 +171,15 @@ event (W w, int events)
 }
 
 static void
+queue_events (W *events, int eventcnt, int type)
+{
+  int i;
+
+  for (i = 0; i < eventcnt; ++i)
+    event (events [i], type);
+}
+
+static void
 fd_event (int fd, int events)
 {
   ANFD *anfd = anfds + fd;
@@ -188,13 +194,50 @@ fd_event (int fd, int events)
     }
 }
 
+/*****************************************************************************/
+
+static int *fdchanges;
+static int fdchangemax, fdchangecnt;
+
 static void
-queue_events (W *events, int eventcnt, int type)
+fd_reify (void)
 {
   int i;
 
-  for (i = 0; i < eventcnt; ++i)
-    event (events [i], type);
+  for (i = 0; i < fdchangecnt; ++i)
+    {
+      int fd = fdchanges [i];
+      ANFD *anfd = anfds + fd;
+      struct ev_io *w;
+
+      int events = 0;
+
+      for (w = anfd->head; w; w = w->next)
+        events |= w->events;
+
+      anfd->events &= ~EV_REIFY;
+
+      if (anfd->events != events)
+        {
+          method_modify (fd, anfd->events, events);
+          anfd->events = events;
+        }
+    }
+
+  fdchangecnt = 0;
+}
+
+static void
+fd_change (int fd)
+{
+  if (anfds [fd].events & EV_REIFY)
+    return;
+
+  anfds [fd].events |= EV_REIFY;
+
+  ++fdchangecnt;
+  array_needsize (fdchanges, fdchangemax, fdchangecnt, );
+  fdchanges [fdchangecnt - 1] = fd;
 }
 
 /* called on EBADF to verify fds */
@@ -204,7 +247,7 @@ fd_recheck (void)
   int fd;
 
   for (fd = 0; fd < anfdmax; ++fd)
-    if (anfds [fd].wev)
+    if (anfds [fd].events)
       if (fcntl (fd, F_GETFD) == -1 && errno == EBADF)
         while (anfds [fd].head)
           {
@@ -461,32 +504,6 @@ ev_postfork_child (void)
 /*****************************************************************************/
 
 static void
-fd_reify (void)
-{
-  int i;
-
-  for (i = 0; i < fdchangecnt; ++i)
-    {
-      int fd = fdchanges [i];
-      ANFD *anfd = anfds + fd;
-      struct ev_io *w;
-
-      int wev = 0;
-
-      for (w = anfd->head; w; w = w->next)
-        wev |= w->events;
-
-      if (anfd->wev != wev)
-        {
-          method_modify (fd, anfd->wev, wev);
-          anfd->wev = wev;
-        }
-    }
-
-  fdchangecnt = 0;
-}
-
-static void
 call_pending (void)
 {
   while (pendingcnt)
@@ -739,19 +756,12 @@ evio_start (struct ev_io *w)
   array_needsize (anfds, anfdmax, fd + 1, anfds_init);
   wlist_add ((WL *)&anfds[fd].head, (WL)w);
 
-  ++fdchangecnt;
-  array_needsize (fdchanges, fdchangemax, fdchangecnt, );
-  fdchanges [fdchangecnt - 1] = fd;
-
-  if (w->fd == 9)
-    printf ("start %p:%x\n", w, w->events);//D
+  fd_change (fd);
 }
 
 void
 evio_stop (struct ev_io *w)
 {
-  if (w->fd == 9)
-    printf ("stop  %p:%x\n", w, w->events);//D
   ev_clear ((W)w);
   if (!ev_is_active (w))
     return;
@@ -759,9 +769,7 @@ evio_stop (struct ev_io *w)
   wlist_del ((WL *)&anfds[w->fd].head, (WL)w);
   ev_stop ((W)w);
 
-  ++fdchangecnt;
-  array_needsize (fdchanges, fdchangemax, fdchangecnt, );
-  fdchanges [fdchangecnt - 1] = w->fd;
+  fd_change (w->fd);
 }
 
 void
