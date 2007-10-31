@@ -13,9 +13,7 @@ epoll_modify (int fd, int oev, int nev)
       (nev & EV_READ ? EPOLLIN : 0)
       | (nev & EV_WRITE ? EPOLLOUT : 0);
 
-  fprintf (stderr, "reify %d,%d,%d m%d (r=%d)\n", fd, oev, nev, mode,//D
-  epoll_ctl (epoll_fd, mode, fd, &ev)
-  );//D
+  epoll_ctl (epoll_fd, mode, fd, &ev);
 }
 
 void epoll_postfork_child (void)

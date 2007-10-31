@@ -85,7 +85,6 @@ get_clock (void)
   if ((cnt) > cur)					\
     {							\
       int newcnt = cur ? cur << 1 : 16;			\
-      fprintf (stderr, "resize(" # base ") from %d to %d\n", cur, newcnt);\
       base = realloc (base, sizeof (*base) * (newcnt));	\
       init (base + cur, newcnt - cur);			\
       cur = newcnt;					\
