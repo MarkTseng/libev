@@ -115,7 +115,13 @@ get_clock (void)
 #define array_needsize(base,cur,cnt,init)		\
   if ((cnt) > cur)					\
     {							\
-      int newcnt = cur ? cur << 1 : 16;			\
+      int newcnt = cur;					\
+      do						\
+        {						\
+          newcnt = (newcnt << 1) | 4 & ~3;		\
+        }						\
+      while ((cnt) > newcnt);				\
+      							\
       base = realloc (base, sizeof (*base) * (newcnt));	\
       init (base + cur, newcnt - cur);			\
       cur = newcnt;					\
@@ -370,36 +376,39 @@ childcb (struct ev_signal *sw, int revents)
 
 int ev_init (int flags)
 {
+  if (!ev_method)
+    {
 #if HAVE_MONOTONIC
-  {
-    struct timespec ts;
-    if (!clock_gettime (CLOCK_MONOTONIC, &ts))
-      have_monotonic = 1;
-  }
+      {
+        struct timespec ts;
+        if (!clock_gettime (CLOCK_MONOTONIC, &ts))
+          have_monotonic = 1;
+      }
 #endif
 
-  ev_now = ev_time ();
-  now    = get_clock ();
-  diff   = ev_now - now;
+      ev_now = ev_time ();
+      now    = get_clock ();
+      diff   = ev_now - now;
 
-  if (pipe (sigpipe))
-    return 0;
+      if (pipe (sigpipe))
+        return 0;
 
-  ev_method = EVMETHOD_NONE;
+      ev_method = EVMETHOD_NONE;
 #if HAVE_EPOLL
-  if (ev_method == EVMETHOD_NONE) epoll_init (flags);
+      if (ev_method == EVMETHOD_NONE) epoll_init (flags);
 #endif
 #if HAVE_SELECT
-  if (ev_method == EVMETHOD_NONE) select_init (flags);
+      if (ev_method == EVMETHOD_NONE) select_init (flags);
 #endif
 
-  if (ev_method)
-    {
-      evw_init (&sigev, sigcb);
-      siginit ();
+      if (ev_method)
+        {
+          evw_init (&sigev, sigcb);
+          siginit ();
 
-      evsignal_init (&childev, childcb, SIGCHLD);
-      evsignal_start (&childev);
+          evsignal_init (&childev, childcb, SIGCHLD);
+          evsignal_start (&childev);
+        }
     }
 
   return ev_method;

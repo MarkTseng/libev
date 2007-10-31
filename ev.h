@@ -148,7 +148,7 @@ struct ev_child
   EV_WATCHER_LIST (ev_child);
 
   int pid;    /* ro */
-  int status; /* holds the exit status, use the macros from sys/wait.h */
+  int status; /* rw, holds the exit status, use the macros from sys/wait.h */
 };
 
 #define EVMETHOD_NONE   0
