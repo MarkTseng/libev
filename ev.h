@@ -12,10 +12,14 @@ typedef double ev_tstamp;
 #define EV_SIGNAL  0x08
 #define EV_IDLE    0x10
 #define EV_CHECK   0x20
+#define EV_ERROR   (0x3f|0x80)
 
 /* can be used to add custom fields to all watchers */
 #ifndef EV_COMMON
 # define EV_COMMON void *data
+#endif
+#ifndef EV_PROTOTYPES
+# define EV_PROTOTYPES 1
 #endif
 
 /*
@@ -103,8 +107,9 @@ struct ev_check
 #define EVMETHOD_NONE   0
 #define EVMETHOD_SELECT 1
 #define EVMETHOD_EPOLL  2
-int ev_init (int flags); /* returns ev_method */
+#if EV_PROTOTYPES
 extern int ev_method;
+int ev_init (int flags); /* returns ev_method */
 
 /* these three calls are suitable for plugging into pthread_atfork */
 void ev_prefork (void);
@@ -113,22 +118,29 @@ void ev_postfork_child (void);
 
 extern ev_tstamp ev_now; /* time w.r.t. timers and the eventloop, updated after each poll */
 ev_tstamp ev_time (void);
+#endif
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */
 #define EVLOOP_ONESHOT	2 /* block *once* only */
+#if EV_PROTOTYPES
 void ev_loop (int flags);
 extern int ev_loop_done; /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
 
+/* convinience function, wait for a single event, without registering an event watcher */
+/* if timeout is < 0, do wait indefinitely */
+void ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg);
+#endif
+
 /* these may evaluate ev multiple times, and the other arguments at most once */
 /* either use evw_init + evXXX_set, or the evXXX_init macro, below, to first initialise a watcher */
-#define evw_init(ev,cb_)                   do { (ev)->active = 0; (ev)->cb = (cb_); } while (0)
+#define evw_init(ev,cb_)                   do { (ev)->active = 0; (ev)->pending = 0; (ev)->cb = (cb_); } while (0)
 
 #define evio_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
 #define evtimer_set(ev,after_,repeat_)     do { (ev)->at = (after_); (ev)->repeat = (repeat_); } while (0)
 #define evperiodic_set(ev,at_,interval_)   do { (ev)->at = (at_); (ev)->interval = (interval_); } while (0)
 #define evsignal_set(ev,signum_)           do { (ev)->signum = (signum_); } while (0)
-#define evcheck_set(ev)                    /* nop, yes this is a serious in-joke */
-#define evidle_set(ev)                     /* nop, yes this is a serious in-joke */
+#define evcheck_set(ev)                    /* nop, yes, this is a serious in-joke */
+#define evidle_set(ev)                     /* nop, yes, this is a serious in-joke */
 
 #define evio_init(ev,cb,fd,events)         do { evw_init ((ev), (cb)); evio_set ((ev),(fd),(events)); } while (0)
 #define evtimer_init(ev,cb,after,repeat)   do { evw_init ((ev), (cb)); evtimer_set ((ev),(after),(repeat)); } while (0)
@@ -141,6 +153,7 @@ extern int ev_loop_done; /* set to 1 to break out of event loop, set to 2 to bre
 
 /* stopping (enabling, adding) a watcher does nothing if it is already running */
 /* stopping (disabling, deleting) a watcher does nothing unless its already running */
+#if EV_PROTOTYPES
 void evio_start       (struct ev_io *w);
 void evio_stop        (struct ev_io *w);
 
@@ -159,6 +172,7 @@ void evidle_stop      (struct ev_idle *w);
 
 void evcheck_start    (struct ev_check *w);
 void evcheck_stop     (struct ev_check *w);
+#endif
 
 #endif
 

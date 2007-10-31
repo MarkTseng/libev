@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stddef.h>
 
 #include <stdio.h>
 
@@ -127,10 +128,13 @@ static int pendingmax, pendingcnt;
 static void
 event (W w, int events)
 {
-  w->pending = ++pendingcnt;
-  array_needsize (pendings, pendingmax, pendingcnt, );
-  pendings [pendingcnt - 1].w      = w;
-  pendings [pendingcnt - 1].events = events;
+  if (w->active)
+    {
+      w->pending = ++pendingcnt;
+      array_needsize (pendings, pendingmax, pendingcnt, );
+      pendings [pendingcnt - 1].w      = w;
+      pendings [pendingcnt - 1].events = events;
+    }
 }
 
 static void
@@ -408,6 +412,8 @@ timers_reify ()
     {
       struct ev_timer *w = timers [0];
 
+      event ((W)w, EV_TIMEOUT);
+
       /* first reschedule or stop timer */
       if (w->repeat)
         {
@@ -417,8 +423,6 @@ timers_reify ()
         }
       else
         evtimer_stop (w); /* nonrepeating: stop timer */
-
-      event ((W)w, EV_TIMEOUT);
     }
 }
 
@@ -601,18 +605,24 @@ wlist_del (WL *head, WL elem)
 }
 
 static void
+ev_clear (W w)
+{
+  if (w->pending)
+    {
+      pendings [w->pending - 1].w = 0;
+      w->pending = 0;
+    }
+}
+
+static void
 ev_start (W w, int active)
 {
-  w->pending = 0;
   w->active = active;
 }
 
 static void
 ev_stop (W w)
 {
-  if (w->pending)
-    pendings [w->pending - 1].w = 0;
-
   w->active = 0;
 }
 
@@ -638,6 +648,7 @@ evio_start (struct ev_io *w)
 void
 evio_stop (struct ev_io *w)
 {
+  ev_clear ((W)w);
   if (!ev_is_active (w))
     return;
 
@@ -648,7 +659,6 @@ evio_stop (struct ev_io *w)
   array_needsize (fdchanges, fdchangemax, fdchangecnt, );
   fdchanges [fdchangecnt - 1] = w->fd;
 }
-
 
 void
 evtimer_start (struct ev_timer *w)
@@ -669,6 +679,7 @@ evtimer_start (struct ev_timer *w)
 void
 evtimer_stop (struct ev_timer *w)
 {
+  ev_clear ((W)w);
   if (!ev_is_active (w))
     return;
 
@@ -721,6 +732,7 @@ evperiodic_start (struct ev_periodic *w)
 void
 evperiodic_stop (struct ev_periodic *w)
 {
+  ev_clear ((W)w);
   if (!ev_is_active (w))
     return;
 
@@ -756,6 +768,7 @@ evsignal_start (struct ev_signal *w)
 void
 evsignal_stop (struct ev_signal *w)
 {
+  ev_clear ((W)w);
   if (!ev_is_active (w))
     return;
 
@@ -778,6 +791,10 @@ void evidle_start (struct ev_idle *w)
 
 void evidle_stop (struct ev_idle *w)
 {
+  ev_clear ((W)w);
+  if (ev_is_active (w))
+    return;
+
   idles [w->active - 1] = idles [--idlecnt];
   ev_stop ((W)w);
 }
@@ -794,8 +811,77 @@ void evcheck_start (struct ev_check *w)
 
 void evcheck_stop (struct ev_check *w)
 {
+  ev_clear ((W)w);
+  if (ev_is_active (w))
+    return;
+
   checks [w->active - 1] = checks [--checkcnt];
   ev_stop ((W)w);
+}
+
+/*****************************************************************************/
+
+struct ev_once
+{
+  struct ev_io io;
+  struct ev_timer to;
+  void (*cb)(int revents, void *arg);
+  void *arg;
+};
+
+static void
+once_cb (struct ev_once *once, int revents)
+{
+  void (*cb)(int revents, void *arg) = once->cb;
+  void *arg = once->arg;
+
+  evio_stop (&once->io);
+  evtimer_stop (&once->to);
+  free (once);
+
+  cb (revents, arg);
+}
+
+static void
+once_cb_io (struct ev_io *w, int revents)
+{
+  once_cb ((struct ev_once *)(((char *)w) - offsetof (struct ev_once, io)), revents);
+}
+
+static void
+once_cb_to (struct ev_timer *w, int revents)
+{
+  once_cb ((struct ev_once *)(((char *)w) - offsetof (struct ev_once, to)), revents);
+}
+
+void
+ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg)
+{
+  struct ev_once *once = malloc (sizeof (struct ev_once));
+
+  if (!once)
+    cb (EV_ERROR, arg);
+  else
+    {
+      once->cb  = cb;
+      once->arg = arg;
+
+      evw_init (&once->io, once_cb_io);
+
+      if (fd >= 0)
+        {
+          evio_set (&once->io, fd, events);
+          evio_start (&once->io);
+        }
+
+      evw_init (&once->to, once_cb_to);
+
+      if (timeout >= 0.)
+        {
+          evtimer_set (&once->to, timeout, 0.);
+          evtimer_start (&once->to);
+        }
+    }
 }
 
 /*****************************************************************************/
