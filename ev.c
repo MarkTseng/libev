@@ -561,7 +561,7 @@ void ev_loop (int flags)
   do
     {
       /* queue check watchers (and execute them) */
-      if (checkcnt)
+      if (preparecnt)
         {
           queue_events ((W *)prepares, preparecnt, EV_PREPARE);
           call_pending ();
@@ -572,7 +572,8 @@ void ev_loop (int flags)
 
       /* calculate blocking time */
 
-      /* we only need this for !monotonic clock, but as we always have timers, we just calculate it every time */
+      /* we only need this for !monotonic clockor timers, but as we basically
+         always have timers, we just calculate it always */
       ev_now = ev_time ();
 
       if (flags & EVLOOP_NONBLOCK || idlecnt)
