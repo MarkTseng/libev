@@ -115,8 +115,7 @@ get_clock (void)
   return ev_time ();
 }
 
-#define array_nextsize(n) (((n) << 1) | 4 & ~3)
-#define array_prevsize(n) (((n) >> 1) | 4 & ~3)
+#define array_roundsize(base,n) ((n) | 4 & ~3)
 
 #define array_needsize(base,cur,cnt,init)		\
   if ((cnt) > cur)					\
@@ -124,7 +123,7 @@ get_clock (void)
       int newcnt = cur;					\
       do						\
         {						\
-          newcnt = array_nextsize (newcnt);		\
+          newcnt = array_roundsize (base, newcnt << 1);	\
         }						\
       while ((cnt) > newcnt);				\
       							\
@@ -167,13 +166,10 @@ static int pendingmax, pendingcnt;
 static void
 event (W w, int events)
 {
-  if (w->active)
-    {
-      w->pending = ++pendingcnt;
-      array_needsize (pendings, pendingmax, pendingcnt, );
-      pendings [pendingcnt - 1].w      = w;
-      pendings [pendingcnt - 1].events = events;
-    }
+  w->pending = ++pendingcnt;
+  array_needsize (pendings, pendingmax, pendingcnt, );
+  pendings [pendingcnt - 1].w      = w;
+  pendings [pendingcnt - 1].events = events;
 }
 
 static void
@@ -531,8 +527,6 @@ timers_reify (void)
     {
       struct ev_timer *w = timers [0];
 
-      event ((W)w, EV_TIMEOUT);
-
       /* first reschedule or stop timer */
       if (w->repeat)
         {
@@ -542,6 +536,8 @@ timers_reify (void)
         }
       else
         ev_timer_stop (w); /* nonrepeating: stop timer */
+
+      event ((W)w, EV_TIMEOUT);
     }
 }
 
