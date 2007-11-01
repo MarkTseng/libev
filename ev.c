@@ -60,13 +60,17 @@
 # define EV_USE_EPOLL 0
 #endif
 
+#ifndef CLOCK_REALTIME
+# define EV_USE_REALTIME 0
+#endif
 #ifndef EV_USE_REALTIME
 # define EV_USE_REALTIME 1 /* posix requirement, but might be slower */
 #endif
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
-#define MAX_BLOCKTIME 59.731
-#define PID_HASHSIZE  16 /* size of pid hahs table, must be power of two */
+#define MAX_BLOCKTIME 59.731 /* never wait longer than this time (to detetc time jumps) */
+#define PID_HASHSIZE  16 /* size of pid hash table, must be power of two */
+#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds */
 
 #include "ev.h"
 
