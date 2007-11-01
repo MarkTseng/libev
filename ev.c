@@ -252,7 +252,7 @@ fd_recheck (void)
         while (anfds [fd].head)
           {
             event ((W)anfds [fd].head, EV_ERROR);
-            evio_stop (anfds [fd].head);
+            ev_io_stop (anfds [fd].head);
           }
 }
 
@@ -372,8 +372,8 @@ siginit (void)
   fcntl (sigpipe [0], F_SETFL, O_NONBLOCK);
   fcntl (sigpipe [1], F_SETFL, O_NONBLOCK);
 
-  evio_set (&sigev, sigpipe [0], EV_READ);
-  evio_start (&sigev);
+  ev_io_set (&sigev, sigpipe [0], EV_READ);
+  ev_io_start (&sigev);
 }
 
 /*****************************************************************************/
@@ -461,11 +461,11 @@ int ev_init (int flags)
 
       if (ev_method)
         {
-          evw_init (&sigev, sigcb);
+          ev_watcher_init (&sigev, sigcb);
           siginit ();
 
-          evsignal_init (&childev, childcb, SIGCHLD);
-          evsignal_start (&childev);
+          ev_signal_init (&childev, childcb, SIGCHLD);
+          ev_signal_start (&childev);
         }
     }
 
@@ -494,7 +494,7 @@ ev_postfork_child (void)
     epoll_postfork_child ();
 #endif
 
-  evio_stop (&sigev);
+  ev_io_stop (&sigev);
   close (sigpipe [0]);
   close (sigpipe [1]);
   pipe (sigpipe);
@@ -535,7 +535,7 @@ timers_reify (void)
           downheap ((WT *)timers, timercnt, 0);
         }
       else
-        evtimer_stop (w); /* nonrepeating: stop timer */
+        ev_timer_stop (w); /* nonrepeating: stop timer */
     }
 }
 
@@ -554,7 +554,7 @@ periodics_reify (void)
           downheap ((WT *)periodics, periodiccnt, 0);
         }
       else
-        evperiodic_stop (w); /* nonrepeating: stop timer */
+        ev_periodic_stop (w); /* nonrepeating: stop timer */
 
       event ((W)w, EV_TIMEOUT);
     }
@@ -576,8 +576,8 @@ periodics_reschedule (ev_tstamp diff)
 
           if (fabs (diff) >= 1e-4)
             {
-              evperiodic_stop (w);
-              evperiodic_start (w);
+              ev_periodic_stop (w);
+              ev_periodic_start (w);
 
               i = 0; /* restart loop, inefficient, but time jumps should be rare */
             }
@@ -745,7 +745,7 @@ ev_stop (W w)
 /*****************************************************************************/
 
 void
-evio_start (struct ev_io *w)
+ev_io_start (struct ev_io *w)
 {
   if (ev_is_active (w))
     return;
@@ -760,7 +760,7 @@ evio_start (struct ev_io *w)
 }
 
 void
-evio_stop (struct ev_io *w)
+ev_io_stop (struct ev_io *w)
 {
   ev_clear ((W)w);
   if (!ev_is_active (w))
@@ -773,7 +773,7 @@ evio_stop (struct ev_io *w)
 }
 
 void
-evtimer_start (struct ev_timer *w)
+ev_timer_start (struct ev_timer *w)
 {
   if (ev_is_active (w))
     return;
@@ -789,7 +789,7 @@ evtimer_start (struct ev_timer *w)
 }
 
 void
-evtimer_stop (struct ev_timer *w)
+ev_timer_stop (struct ev_timer *w)
 {
   ev_clear ((W)w);
   if (!ev_is_active (w))
@@ -807,7 +807,7 @@ evtimer_stop (struct ev_timer *w)
 }
 
 void
-evtimer_again (struct ev_timer *w)
+ev_timer_again (struct ev_timer *w)
 {
   if (ev_is_active (w))
     {
@@ -817,14 +817,14 @@ evtimer_again (struct ev_timer *w)
           downheap ((WT *)timers, timercnt, w->active - 1);
         }
       else
-        evtimer_stop (w);
+        ev_timer_stop (w);
     }
   else if (w->repeat)
-    evtimer_start (w);
+    ev_timer_start (w);
 }
 
 void
-evperiodic_start (struct ev_periodic *w)
+ev_periodic_start (struct ev_periodic *w)
 {
   if (ev_is_active (w))
     return;
@@ -842,7 +842,7 @@ evperiodic_start (struct ev_periodic *w)
 }
 
 void
-evperiodic_stop (struct ev_periodic *w)
+ev_periodic_stop (struct ev_periodic *w)
 {
   ev_clear ((W)w);
   if (!ev_is_active (w))
@@ -858,7 +858,7 @@ evperiodic_stop (struct ev_periodic *w)
 }
 
 void
-evsignal_start (struct ev_signal *w)
+ev_signal_start (struct ev_signal *w)
 {
   if (ev_is_active (w))
     return;
@@ -878,7 +878,7 @@ evsignal_start (struct ev_signal *w)
 }
 
 void
-evsignal_stop (struct ev_signal *w)
+ev_signal_stop (struct ev_signal *w)
 {
   ev_clear ((W)w);
   if (!ev_is_active (w))
@@ -891,7 +891,8 @@ evsignal_stop (struct ev_signal *w)
     signal (w->signum, SIG_DFL);
 }
 
-void evidle_start (struct ev_idle *w)
+void
+ev_idle_start (struct ev_idle *w)
 {
   if (ev_is_active (w))
     return;
@@ -901,7 +902,8 @@ void evidle_start (struct ev_idle *w)
   idles [idlecnt - 1] = w;
 }
 
-void evidle_stop (struct ev_idle *w)
+void
+ev_idle_stop (struct ev_idle *w)
 {
   ev_clear ((W)w);
   if (ev_is_active (w))
@@ -911,7 +913,8 @@ void evidle_stop (struct ev_idle *w)
   ev_stop ((W)w);
 }
 
-void evprepare_start (struct ev_prepare *w)
+void
+ev_prepare_start (struct ev_prepare *w)
 {
   if (ev_is_active (w))
     return;
@@ -921,7 +924,8 @@ void evprepare_start (struct ev_prepare *w)
   prepares [preparecnt - 1] = w;
 }
 
-void evprepare_stop (struct ev_prepare *w)
+void
+ev_prepare_stop (struct ev_prepare *w)
 {
   ev_clear ((W)w);
   if (ev_is_active (w))
@@ -931,7 +935,8 @@ void evprepare_stop (struct ev_prepare *w)
   ev_stop ((W)w);
 }
 
-void evcheck_start (struct ev_check *w)
+void
+ev_check_start (struct ev_check *w)
 {
   if (ev_is_active (w))
     return;
@@ -941,7 +946,8 @@ void evcheck_start (struct ev_check *w)
   checks [checkcnt - 1] = w;
 }
 
-void evcheck_stop (struct ev_check *w)
+void
+ev_check_stop (struct ev_check *w)
 {
   ev_clear ((W)w);
   if (ev_is_active (w))
@@ -951,7 +957,8 @@ void evcheck_stop (struct ev_check *w)
   ev_stop ((W)w);
 }
 
-void evchild_start (struct ev_child *w)
+void
+ev_child_start (struct ev_child *w)
 {
   if (ev_is_active (w))
     return;
@@ -960,7 +967,8 @@ void evchild_start (struct ev_child *w)
   wlist_add ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
 }
 
-void evchild_stop (struct ev_child *w)
+void
+ev_child_stop (struct ev_child *w)
 {
   ev_clear ((W)w);
   if (ev_is_active (w))
@@ -986,8 +994,8 @@ once_cb (struct ev_once *once, int revents)
   void (*cb)(int revents, void *arg) = once->cb;
   void *arg = once->arg;
 
-  evio_stop (&once->io);
-  evtimer_stop (&once->to);
+  ev_io_stop (&once->io);
+  ev_timer_stop (&once->to);
   free (once);
 
   cb (revents, arg);
@@ -1017,20 +1025,20 @@ ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *ar
       once->cb  = cb;
       once->arg = arg;
 
-      evw_init (&once->io, once_cb_io);
+      ev_watcher_init (&once->io, once_cb_io);
 
       if (fd >= 0)
         {
-          evio_set (&once->io, fd, events);
-          evio_start (&once->io);
+          ev_io_set (&once->io, fd, events);
+          ev_io_start (&once->io);
         }
 
-      evw_init (&once->to, once_cb_to);
+      ev_watcher_init (&once->to, once_cb_to);
 
       if (timeout >= 0.)
         {
-          evtimer_set (&once->to, timeout, 0.);
-          evtimer_start (&once->to);
+          ev_timer_set (&once->to, timeout, 0.);
+          ev_timer_start (&once->to);
         }
     }
 }
@@ -1051,16 +1059,16 @@ static void
 ocb (struct ev_timer *w, int revents)
 {
   //fprintf (stderr, "timer %f,%f (%x) (%f) d%p\n", w->at, w->repeat, revents, w->at - ev_time (), w->data);
-  evtimer_stop (w);
-  evtimer_start (w);
+  ev_timer_stop (w);
+  ev_timer_start (w);
 }
 
 static void
 scb (struct ev_signal *w, int revents)
 {
   fprintf (stderr, "signal %x,%d\n", revents, w->signum);
-  evio_stop (&wio);
-  evio_start (&wio);
+  ev_io_stop (&wio);
+  ev_io_start (&wio);
 }
 
 static void
@@ -1074,8 +1082,8 @@ int main (void)
 {
   ev_init (0);
 
-  evio_init (&wio, sin_cb, 0, EV_READ);
-  evio_start (&wio);
+  ev_io_init (&wio, sin_cb, 0, EV_READ);
+  ev_io_start (&wio);
 
   struct ev_timer t[10000];
 
@@ -1084,29 +1092,29 @@ int main (void)
   for (i = 0; i < 10000; ++i)
     {
       struct ev_timer *w = t + i;
-      evw_init (w, ocb, i);
-      evtimer_init_abs (w, ocb, drand48 (), 0.99775533);
-      evtimer_start (w);
+      ev_watcher_init (w, ocb, i);
+      ev_timer_init_abs (w, ocb, drand48 (), 0.99775533);
+      ev_timer_start (w);
       if (drand48 () < 0.5)
-        evtimer_stop (w);
+        ev_timer_stop (w);
     }
 #endif
 
   struct ev_timer t1;
-  evtimer_init (&t1, ocb, 5, 10);
-  evtimer_start (&t1);
+  ev_timer_init (&t1, ocb, 5, 10);
+  ev_timer_start (&t1);
 
   struct ev_signal sig;
-  evsignal_init (&sig, scb, SIGQUIT);
-  evsignal_start (&sig);
+  ev_signal_init (&sig, scb, SIGQUIT);
+  ev_signal_start (&sig);
 
   struct ev_check cw;
-  evcheck_init (&cw, gcb);
-  evcheck_start (&cw);
+  ev_check_init (&cw, gcb);
+  ev_check_start (&cw);
 
   struct ev_idle iw;
-  evidle_init (&iw, gcb);
-  evidle_start (&iw);
+  ev_idle_init (&iw, gcb);
+  ev_idle_start (&iw);
 
   ev_loop (0);
 
