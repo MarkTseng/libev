@@ -368,17 +368,17 @@ static void
 sigcb (struct ev_io *iow, int revents)
 {
   struct ev_signal *w;
-  int sig;
+  int signum;
 
   read (sigpipe [0], &revents, 1);
   gotsig = 0;
 
-  for (sig = signalmax; sig--; )
-    if (signals [sig].gotsig)
+  for (signum = signalmax; signum--; )
+    if (signals [signum].gotsig)
       {
-        signals [sig].gotsig = 0;
+        signals [signum].gotsig = 0;
 
-        for (w = signals [sig].head; w; w = w->next)
+        for (w = signals [signum].head; w; w = w->next)
           event ((W)w, EV_SIGNAL);
       }
 }
