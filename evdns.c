@@ -1,3 +1,4 @@
+#define DNS_USE_GETTIMEOFDAY_FOR_ID 1
 /* $Id$ */
 
 /* The original version of this module was written by Adam Langley; for
@@ -94,7 +95,6 @@
 #include <stdarg.h>
 
 #include "evdns.h"
-/*#include "log.h"*/
 #ifdef WIN32
 #include <windows.h>
 #include <winsock2.h>
@@ -176,7 +176,7 @@ struct request {
 };
 
 #ifndef HAVE_STRUCT_IN6_ADDR
-struct in6_addr {
+struct xin6_addr {
 	u8 s6_addr[16];
 };
 #endif
@@ -191,7 +191,7 @@ struct reply {
 		} a;
 		struct {
 			u32 addrcount;
-			struct in6_addr addresses[MAX_ADDRS];
+			struct xin6_addr addresses[MAX_ADDRS];
 		} aaaa;
 		struct {
 			char name[HOST_NAME_MAX];
@@ -2266,7 +2266,7 @@ int evdns_resolve_reverse(struct in_addr *in, int flags, evdns_callback_type cal
 	return 0;
 }
 
-int evdns_resolve_reverse_ipv6(struct in6_addr *in, int flags, evdns_callback_type callback, void *ptr) {
+int evdns_resolve_reverse_ipv6(struct xin6_addr *in, int flags, evdns_callback_type callback, void *ptr) {
 	char buf[64];
 	char *cp;
 	struct request *req;
@@ -2545,12 +2545,6 @@ evdns_resolv_set_defaults(int flags) {
 	if (flags & DNS_OPTION_NAMESERVERS) evdns_nameserver_ip_add("127.0.0.1");
 }
 
-#ifndef HAVE_STRTOK_R
-static char *
-strtok_r(char *s, const char *delim, char **state) {
-	return strtok(s, delim);
-}
-#endif
 
 /* helper version of atoi which returns -1 on error */
 static int
@@ -2623,9 +2617,9 @@ static void
 resolv_conf_parse_line(char *const start, int flags) {
 	char *strtok_state;
 	static const char *const delims = " \t";
-#define NEXT_TOKEN strtok_r(NULL, delims, &strtok_state)
+#define NEXT_TOKEN strtok(NULL, delims, &strtok_state)
 
-	char *const first_token = strtok_r(start, delims, &strtok_state);
+	char *const first_token = strtok(start, delims, &strtok_state);
 	if (!first_token) return;
 
 	if (!strcmp(first_token, "nameserver") && (flags & DNS_OPTION_NAMESERVERS)) {
