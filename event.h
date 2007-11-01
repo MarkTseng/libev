@@ -44,12 +44,12 @@ struct event
   struct ev_signal sig;
 
   struct event_base *ev_base;
-  int ev_fd;
-  short ev_events;
-  int ev_pri;
   void (*ev_callback)(int, short, void *arg);
   void *ev_arg;
+  int ev_fd;
+  int ev_pri;
   int ev_res;
+  short ev_events;
 };
 
 #define EV_PERSIST                 0x10
