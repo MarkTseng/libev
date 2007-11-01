@@ -22,11 +22,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NOTE: parts of the library might be under a different license:
-
-* event.h is same license as above, but is closely modelled after libevent,
-  so its license might apply even though its not obviously derived from it
-  (it's the 3-clause bsd license).
-* evdns.c is under public domain (so it says) but was taken out of libevent,
-  so its license might apply.
+NOTE: some parts of this library are under a different license, namely the
+3-clause BSD style license, which is compatible with this one, but carries
+the additional restriction that you must not use the name of the author(s)
+of those parts to endorse any product.
 
