@@ -11,8 +11,8 @@ to be faster and more correct, and also more featureful. Examples:
 - fork() is supported and can be handled
   (there is no way to recover from a fork when libevent is active)
 
-- timers are handled as a priority queue
-  (libevent uses a less efficient red-black tree)
+- timers are handled as a priority queue (important operations are O(1))
+  (libevent uses a much less efficient but more complex red-black tree)
 
 - supports absolute (wallclock-based) timers in addition to relative ones,
   i.e. can schedule timers to occur after n seconds, or at a specific time.
