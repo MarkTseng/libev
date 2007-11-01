@@ -26,6 +26,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#if EV_USE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <math.h>
 #include <stdlib.h>
@@ -43,26 +46,26 @@
 #include <sys/time.h>
 #include <time.h>
 
-#ifndef HAVE_MONOTONIC
+#ifndef EV_USE_MONOTONIC
 # ifdef CLOCK_MONOTONIC
-#  define HAVE_MONOTONIC 1
+#  define EV_USE_MONOTONIC 1
 # endif
 #endif
 
-#ifndef HAVE_SELECT
-# define HAVE_SELECT 1
+#ifndef EV_USE_SELECT
+# define EV_USE_SELECT 1
 #endif
 
-#ifndef HAVE_EPOLL
-# define HAVE_EPOLL 0
+#ifndef EV_USE_EPOLL
+# define EV_USE_EPOLL 0
 #endif
 
-#ifndef HAVE_REALTIME
-# define HAVE_REALTIME 1 /* posix requirement, but might be slower */
+#ifndef EV_USE_REALTIME
+# define EV_USE_REALTIME 1 /* posix requirement, but might be slower */
 #endif
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
-#define MAX_BLOCKTIME 60.
+#define MAX_BLOCKTIME 59.731
 #define PID_HASHSIZE  16 /* size of pid hahs table, must be power of two */
 
 #include "ev.h"
@@ -86,7 +89,7 @@ static void (*method_poll)(ev_tstamp timeout);
 ev_tstamp
 ev_time (void)
 {
-#if HAVE_REALTIME
+#if EV_USE_REALTIME
   struct timespec ts;
   clock_gettime (CLOCK_REALTIME, &ts);
   return ts.tv_sec + ts.tv_nsec * 1e-9;
@@ -100,7 +103,7 @@ ev_time (void)
 static ev_tstamp
 get_clock (void)
 {
-#if HAVE_MONOTONIC
+#if EV_USE_MONOTONIC
   if (have_monotonic)
     {
       struct timespec ts;
@@ -112,13 +115,16 @@ get_clock (void)
   return ev_time ();
 }
 
+#define array_nextsize(n) (((n) << 1) | 4 & ~3)
+#define array_prevsize(n) (((n) >> 1) | 4 & ~3)
+
 #define array_needsize(base,cur,cnt,init)		\
   if ((cnt) > cur)					\
     {							\
       int newcnt = cur;					\
       do						\
         {						\
-          newcnt = (newcnt << 1) | 4 & ~3;		\
+          newcnt = array_nextsize (newcnt);		\
         }						\
       while ((cnt) > newcnt);				\
       							\
@@ -230,7 +236,7 @@ fd_reify (void)
 static void
 fd_change (int fd)
 {
-  if (anfds [fd].events & EV_REIFY)
+  if (anfds [fd].events & EV_REIFY || fdchangecnt < 0)
     return;
 
   anfds [fd].events |= EV_REIFY;
@@ -251,7 +257,7 @@ fd_recheck (void)
       if (fcntl (fd, F_GETFD) == -1 && errno == EBADF)
         while (anfds [fd].head)
           {
-            event ((W)anfds [fd].head, EV_ERROR);
+            event ((W)anfds [fd].head, EV_ERROR | EV_READ | EV_WRITE | EV_TIMEOUT);
             ev_io_stop (anfds [fd].head);
           }
 }
@@ -413,10 +419,10 @@ childcb (struct ev_signal *sw, int revents)
 
 /*****************************************************************************/
 
-#if HAVE_EPOLL
+#if EV_USE_EPOLL
 # include "ev_epoll.c"
 #endif
-#if HAVE_SELECT
+#if EV_USE_SELECT
 # include "ev_select.c"
 #endif
 
@@ -436,7 +442,7 @@ int ev_init (int flags)
 {
   if (!ev_method)
     {
-#if HAVE_MONOTONIC
+#if EV_USE_MONOTONIC
       {
         struct timespec ts;
         if (!clock_gettime (CLOCK_MONOTONIC, &ts))
@@ -452,10 +458,10 @@ int ev_init (int flags)
         return 0;
 
       ev_method = EVMETHOD_NONE;
-#if HAVE_EPOLL
+#if EV_USE_EPOLL
       if (ev_method == EVMETHOD_NONE) epoll_init (flags);
 #endif
-#if HAVE_SELECT
+#if EV_USE_SELECT
       if (ev_method == EVMETHOD_NONE) select_init (flags);
 #endif
 
@@ -489,7 +495,7 @@ ev_postfork_parent (void)
 void
 ev_postfork_child (void)
 {
-#if HAVE_EPOLL
+#if EV_USE_EPOLL
   if (ev_method == EVMETHOD_EPOLL)
     epoll_postfork_child ();
 #endif
@@ -1019,14 +1025,13 @@ ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *ar
   struct ev_once *once = malloc (sizeof (struct ev_once));
 
   if (!once)
-    cb (EV_ERROR, arg);
+    cb (EV_ERROR | EV_READ | EV_WRITE | EV_TIMEOUT, arg);
   else
     {
       once->cb  = cb;
       once->arg = arg;
 
       ev_watcher_init (&once->io, once_cb_io);
-
       if (fd >= 0)
         {
           ev_io_set (&once->io, fd, events);
@@ -1034,7 +1039,6 @@ ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *ar
         }
 
       ev_watcher_init (&once->to, once_cb_to);
-
       if (timeout >= 0.)
         {
           ev_timer_set (&once->to, timeout, 0.);
