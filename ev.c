@@ -141,7 +141,8 @@ get_clock (void)
 typedef struct
 {
   struct ev_io *head;
-  int events;
+  unsigned char events;
+  unsigned char reify;
 } ANFD;
 
 static ANFD *anfds;
@@ -154,6 +155,8 @@ anfds_init (ANFD *base, int count)
     {
       base->head   = 0;
       base->events = EV_NONE;
+      base->reify  = 0;
+
       ++base;
     }
 }
@@ -227,7 +230,7 @@ fd_reify (void)
       for (w = anfd->head; w; w = w->next)
         events |= w->events;
 
-      anfd->events &= ~EV_REIFY;
+      anfd->reify = 0;
 
       if (anfd->events != events)
         {
@@ -242,10 +245,10 @@ fd_reify (void)
 static void
 fd_change (int fd)
 {
-  if (anfds [fd].events & EV_REIFY || fdchangecnt < 0)
+  if (anfds [fd].reify || fdchangecnt < 0)
     return;
 
-  anfds [fd].events |= EV_REIFY;
+  anfds [fd].reify = 1;
 
   ++fdchangecnt;
   array_needsize (fdchanges, fdchangemax, fdchangecnt, );
@@ -264,7 +267,7 @@ fd_recheck (void)
         while (anfds [fd].head)
           {
             ev_io_stop (anfds [fd].head);
-            event ((W)anfds [fd].head, EV_ERROR | EV_READ | EV_WRITE | EV_TIMEOUT);
+            event ((W)anfds [fd].head, EV_ERROR | EV_READ | EV_WRITE);
           }
 }
 
@@ -339,6 +342,7 @@ signals_init (ANSIG *base, int count)
     {
       base->head   = 0;
       base->gotsig = 0;
+
       ++base;
     }
 }
@@ -540,8 +544,8 @@ timers_reify (void)
       /* first reschedule or stop timer */
       if (w->repeat)
         {
+          assert (("negative ev_timer repeat value found while processing timers", w->repeat > 0.));
           w->at = now + w->repeat;
-          assert (("timer timeout in the past, negative repeat?", w->at > now));
           downheap ((WT *)timers, timercnt, 0);
         }
       else
@@ -562,13 +566,13 @@ periodics_reify (void)
       if (w->interval)
         {
           w->at += floor ((ev_now - w->at) / w->interval + 1.) * w->interval;
-          assert (("periodic timeout in the past, negative interval?", w->at > ev_now));
+          assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", w->at > ev_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
       else
         ev_periodic_stop (w); /* nonrepeating: stop timer */
 
-      event ((W)w, EV_TIMEOUT);
+      event ((W)w, EV_PERIODIC);
     }
 }
 
@@ -733,7 +737,7 @@ wlist_del (WL *head, WL elem)
 }
 
 static void
-ev_clear (W w)
+ev_clear_pending (W w)
 {
   if (w->pending)
     {
@@ -764,6 +768,8 @@ ev_io_start (struct ev_io *w)
 
   int fd = w->fd;
 
+  assert (("ev_io_start called with negative fd", fd >= 0));
+
   ev_start ((W)w, 1);
   array_needsize (anfds, anfdmax, fd + 1, anfds_init);
   wlist_add ((WL *)&anfds[fd].head, (WL)w);
@@ -774,7 +780,7 @@ ev_io_start (struct ev_io *w)
 void
 ev_io_stop (struct ev_io *w)
 {
-  ev_clear ((W)w);
+  ev_clear_pending ((W)w);
   if (!ev_is_active (w))
     return;
 
@@ -792,7 +798,7 @@ ev_timer_start (struct ev_timer *w)
 
   w->at += now;
 
-  assert (("timer repeat value less than zero not allowed", w->repeat >= 0.));
+  assert (("ev_timer_start called with negative timer repeat value", w->repeat >= 0.));
 
   ev_start ((W)w, ++timercnt);
   array_needsize (timers, timermax, timercnt, );
@@ -803,7 +809,7 @@ ev_timer_start (struct ev_timer *w)
 void
 ev_timer_stop (struct ev_timer *w)
 {
-  ev_clear ((W)w);
+  ev_clear_pending ((W)w);
   if (!ev_is_active (w))
     return;
 
@@ -841,7 +847,7 @@ ev_periodic_start (struct ev_periodic *w)
   if (ev_is_active (w))
     return;
 
-  assert (("periodic interval value less than zero not allowed", w->interval >= 0.));
+  assert (("ev_periodic_start called with negative interval value", w->interval >= 0.));
 
   /* this formula differs from the one in periodic_reify because we do not always round up */
   if (w->interval)
@@ -856,7 +862,7 @@ ev_periodic_start (struct ev_periodic *w)
 void
 ev_periodic_stop (struct ev_periodic *w)
 {
-  ev_clear ((W)w);
+  ev_clear_pending ((W)w);
   if (!ev_is_active (w))
     return;
 
@@ -875,6 +881,8 @@ ev_signal_start (struct ev_signal *w)
   if (ev_is_active (w))
     return;
 
+  assert (("ev_signal_start called with illegal signal number", w->signum > 0));
+
   ev_start ((W)w, 1);
   array_needsize (signals, signalmax, w->signum, signals_init);
   wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
@@ -892,7 +900,7 @@ ev_signal_start (struct ev_signal *w)
 void
 ev_signal_stop (struct ev_signal *w)
 {
-  ev_clear ((W)w);
+  ev_clear_pending ((W)w);
   if (!ev_is_active (w))
     return;
 
@@ -917,7 +925,7 @@ ev_idle_start (struct ev_idle *w)
 void
 ev_idle_stop (struct ev_idle *w)
 {
-  ev_clear ((W)w);
+  ev_clear_pending ((W)w);
   if (ev_is_active (w))
     return;
 
@@ -939,7 +947,7 @@ ev_prepare_start (struct ev_prepare *w)
 void
 ev_prepare_stop (struct ev_prepare *w)
 {
-  ev_clear ((W)w);
+  ev_clear_pending ((W)w);
   if (ev_is_active (w))
     return;
 
@@ -961,7 +969,7 @@ ev_check_start (struct ev_check *w)
 void
 ev_check_stop (struct ev_check *w)
 {
-  ev_clear ((W)w);
+  ev_clear_pending ((W)w);
   if (ev_is_active (w))
     return;
 
@@ -982,7 +990,7 @@ ev_child_start (struct ev_child *w)
 void
 ev_child_stop (struct ev_child *w)
 {
-  ev_clear ((W)w);
+  ev_clear_pending ((W)w);
   if (ev_is_active (w))
     return;
 

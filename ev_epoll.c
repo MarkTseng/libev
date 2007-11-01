@@ -55,7 +55,7 @@ epoll_postfork_child (void)
 
   /* re-register interest in fds */
   for (fd = 0; fd < anfdmax; ++fd)
-    if (anfds [fd].events && !(anfds [fd].events & EV_REIFY))//D
+    if (anfds [fd].events)//D
       epoll_modify (fd, EV_NONE, anfds [fd].events);
 }
 

@@ -33,18 +33,18 @@
 typedef double ev_tstamp;
 
 /* eventmask, revents, events... */
-#define EV_UNDEF         -1 /* guaranteed to be invalid */
-#define EV_NONE        0x00
-#define EV_READ        0x01
-#define EV_WRITE       0x02
-#define EV_REIFY       0x04 /* private */
-#define EV_TIMEOUT 0x000100
-#define EV_SIGNAL  0x000200
-#define EV_IDLE    0x000400
-#define EV_CHECK   0x000800
-#define EV_PREPARE 0x001000
-#define EV_CHILD   0x002000
-#define EV_ERROR   0x800000 /* sent when an error occurs */
+#define EV_UNDEF          -1 /* guaranteed to be invalid */
+#define EV_NONE         0x00
+#define EV_READ         0x01
+#define EV_WRITE        0x02
+#define EV_TIMEOUT  0x000100
+#define EV_PERIODIC 0x000200
+#define EV_SIGNAL   0x000400
+#define EV_IDLE     0x000800
+#define EV_CHECK    0x001000
+#define EV_PREPARE  0x002000
+#define EV_CHILD    0x004000
+#define EV_ERROR    0x800000 /* sent when an error occurs */
 
 /* can be used to add custom fields to all watchers */
 #ifndef EV_COMMON
@@ -95,6 +95,7 @@ struct ev_watcher_time {
 };
 
 /* invoked after a specific time, repeatable (based on monotonic clock) */
+/* revent EV_TIMEOUT */
 struct ev_timer
 {
   EV_WATCHER_TIME (ev_timer);
@@ -103,6 +104,7 @@ struct ev_timer
 };
 
 /* invoked at some specific time, possibly repeating at regular intervals (based on UTC) */
+/* revent EV_PERIODIC */
 struct ev_periodic
 {
   EV_WATCHER_TIME (ev_periodic);
@@ -111,6 +113,7 @@ struct ev_periodic
 };
 
 /* invoked when fd is either EV_READable or EV_WRITEable */
+/* revent EV_READ, EV_WRITE */
 struct ev_io
 {
   EV_WATCHER_LIST (ev_io);
@@ -120,6 +123,7 @@ struct ev_io
 };
 
 /* invoked when the given signal has been received */
+/* revent EV_SIGNAL */
 struct ev_signal
 {
   EV_WATCHER_LIST (ev_signal);
@@ -128,6 +132,7 @@ struct ev_signal
 };
 
 /* invoked when the nothing else needs to be done, keeps the process from blocking */
+/* revent EV_IDLE */
 struct ev_idle
 {
   EV_WATCHER (ev_idle);
@@ -135,18 +140,21 @@ struct ev_idle
 
 /* invoked for each run of the mainloop, just before the blocking call */
 /* you can still change events in any way you like */
+/* revent EV_PREPARE */
 struct ev_prepare
 {
   EV_WATCHER (ev_prepare);
 };
 
 /* invoked for each run of the mainloop, just after the blocking call */
+/* revent EV_CHECK */
 struct ev_check
 {
   EV_WATCHER (ev_check);
 };
 
 /* invoked when sigchld is received and waitpid indicates the givne pid */
+/* revent EV_CHILD */
 struct ev_child
 {
   EV_WATCHER_LIST (ev_child);
