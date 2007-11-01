@@ -425,7 +425,7 @@ childcb (struct ev_signal *sw, int revents)
 
   while ((pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)) != -1)
     for (w = childs [pid & (PID_HASHSIZE - 1)]; w; w = w->next)
-      if (w->pid == pid || w->pid == -1)
+      if (w->pid == pid || !w->pid)
         {
           w->status = status;
           event ((W)w, EV_CHILD);
