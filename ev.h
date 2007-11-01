@@ -173,9 +173,9 @@ int ev_version_major (void);
 int ev_version_minor (void);
 
 /* these three calls are suitable for plugging into pthread_atfork */
-void ev_prefork (void);
-void ev_postfork_parent (void);
-void ev_postfork_child (void);
+void ev_fork_prepare (void);
+void ev_fork_parent (void);
+void ev_fork_child (void);
 
 extern ev_tstamp ev_now; /* time w.r.t. timers and the eventloop, updated after each poll */
 ev_tstamp ev_time (void);

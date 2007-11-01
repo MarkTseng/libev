@@ -491,19 +491,19 @@ int ev_init (int flags)
 /*****************************************************************************/
 
 void
-ev_prefork (void)
+ev_fork_prepare (void)
 {
   /* nop */
 }
 
 void
-ev_postfork_parent (void)
+ev_fork_parent (void)
 {
   /* nop */
 }
 
 void
-ev_postfork_child (void)
+ev_fork_child (void)
 {
 #if EV_USE_EPOLL
   if (ev_method == EVMETHOD_EPOLL)
