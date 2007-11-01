@@ -49,9 +49,12 @@
 #include <time.h>
 
 #ifndef EV_USE_MONOTONIC
-# ifdef CLOCK_MONOTONIC
-#  define EV_USE_MONOTONIC 1
-# endif
+# define EV_USE_MONOTONIC 1
+#endif
+
+#ifndef CLOCK_MONOTONIC
+# undef EV_USE_MONOTONIC
+# define EV_USE_MONOTONIC 0
 #endif
 
 #ifndef EV_USE_SELECT
@@ -765,10 +768,10 @@ ev_stop (W w)
 void
 ev_io_start (struct ev_io *w)
 {
+  int fd = w->fd;
+
   if (ev_is_active (w))
     return;
-
-  int fd = w->fd;
 
   assert (("ev_io_start called with negative fd", fd >= 0));
 
