@@ -325,14 +325,14 @@ downheap (WT *timers, int N, int k)
 typedef struct
 {
   struct ev_signal *head;
-  sig_atomic_t gotsig;
+  sig_atomic_t volatile gotsig;
 } ANSIG;
 
 static ANSIG *signals;
 static int signalmax;
 
 static int sigpipe [2];
-static sig_atomic_t gotsig;
+static sig_atomic_t volatile gotsig;
 static struct ev_io sigev;
 
 static void
@@ -355,7 +355,7 @@ sighandler (int signum)
   if (!gotsig)
     {
       gotsig = 1;
-      write (sigpipe [1], &gotsig, 1);
+      write (sigpipe [1], &signum, 1);
     }
 }
 
@@ -365,8 +365,8 @@ sigcb (struct ev_io *iow, int revents)
   struct ev_signal *w;
   int sig;
 
-  gotsig = 0;
   read (sigpipe [0], &revents, 1);
+  gotsig = 0;
 
   for (sig = signalmax; sig--; )
     if (signals [sig].gotsig)
