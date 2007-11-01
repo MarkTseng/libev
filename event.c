@@ -182,7 +182,7 @@ int event_add (struct event *ev, struct timeval *tv)
       ++x_actives;
     }
 
-  if (ev->ev_events & (EV_READ|EV_WRITE))
+  if (ev->ev_events & (EV_READ | EV_WRITE))
     {
       if (ev_is_active (&ev->io))
         {
@@ -190,7 +190,7 @@ int event_add (struct event *ev, struct timeval *tv)
           --x_actives;
         }
 
-      ev_io_set (&ev->io, ev->ev_fd, ev->ev_events);
+      ev_io_set (&ev->io, ev->ev_fd, ev->ev_events & (EV_READ | EV_WRITE));
       ev_io_start (&ev->io);
       ++x_actives;
     }
@@ -335,7 +335,7 @@ int event_base_once (struct event_base *base, int fd, short events, void (*cb)(i
   once->cb  = cb;
   once->arg = arg;
 
-  ev_once (fd, events & (EV_READ|EV_WRITE), tv_get (tv), x_once_cb, (void *)once);
+  ev_once (fd, events & (EV_READ | EV_WRITE), tv_get (tv), x_once_cb, (void *)once);
 
   return 0;
 }
