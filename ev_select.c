@@ -1,4 +1,6 @@
 /*
+ * libev select fd activity backend
+ *
  * Copyright (c) 2007 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *

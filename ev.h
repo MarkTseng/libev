@@ -30,6 +30,10 @@
 #ifndef EV_H
 #define EV_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef double ev_tstamp;
 
 /* eventmask, revents, events... */
@@ -243,6 +247,10 @@ void ev_check_stop     (struct ev_check *w);
 
 void ev_child_start    (struct ev_child *w);
 void ev_child_stop     (struct ev_child *w);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif
