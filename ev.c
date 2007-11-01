@@ -170,6 +170,12 @@ static int pendingmax, pendingcnt;
 static void
 event (W w, int events)
 {
+  if (w->pending)
+    {
+      pendings [w->pending - 1].events |= events;
+      return;
+    }
+
   w->pending = ++pendingcnt;
   array_needsize (pendings, pendingmax, pendingcnt, );
   pendings [pendingcnt - 1].w      = w;
@@ -257,8 +263,8 @@ fd_recheck (void)
       if (fcntl (fd, F_GETFD) == -1 && errno == EBADF)
         while (anfds [fd].head)
           {
-            event ((W)anfds [fd].head, EV_ERROR | EV_READ | EV_WRITE | EV_TIMEOUT);
             ev_io_stop (anfds [fd].head);
+            event ((W)anfds [fd].head, EV_ERROR | EV_READ | EV_WRITE | EV_TIMEOUT);
           }
 }
 
