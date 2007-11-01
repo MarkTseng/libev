@@ -1,72 +1,78 @@
-libev is modelled (very losely) after libevent
-(http://monkey.org/~provos/libevent/), but aims to be faster and more
-correct, and also more featureful. Examples:
+libev is a high-performanc3 event loop/event model with lots of features.
+
+It is modelled (very losely) after libevent
+(http://monkey.org/~provos/libevent/) and the Event perl module, but aims
+to be faster and more correct, and also more featureful.
+
+DIFFERENCES AND COMPARISON TO LIBEVENT:
 
 (comparisons relative to libevent-1.3e and libev-0.00)
 
 - multiple watchers can wait for the same event without deregistering others,
   both for file descriptors as well as signals.
   (registering two read events on fd 10 and unregistering one will not
-  break the other)
+  break the other).
 
 - fork() is supported and can be handled
-  (there is no way to recover from a fork when libevent is active)
+  (there is no way to recover from a fork when libevent is active).
 
 - timers are handled as a priority queue (important operations are O(1))
-  (libevent uses a much less efficient but more complex red-black tree)
+  (libevent uses a much less efficient but more complex red-black tree).
 
 - supports absolute (wallclock-based) timers in addition to relative ones,
   i.e. can schedule timers to occur after n seconds, or at a specific time.
 
-- timers can be repeating (both absolute and relative ones)
+- timers can be repeating (both absolute and relative ones).
 
 - detects time jumps and adjusts timers
-  (works for both forward and backward time jumps and also for absolute timers)
+  (works for both forward and backward time jumps and also for absolute timers).
 
 - can correctly remove timers while executing callbacks
-  (libevent doesn't handle this reliably and can crash)
+  (libevent doesn't handle this reliably and can crash).
 
 - race-free signal processing
-  (libevent may delay processing signals till after the next event)
+  (libevent may delay processing signals till after the next event).
 
 - less calls to epoll_ctl
   (stopping and starting an io watcher between two loop iterations will now
-  result in spuriois epoll_ctl calls)
+  result in spuriois epoll_ctl calls).
 
 - usually less calls to gettimeofday and clock_gettime
-  (libevent calls it on every timer event change, libev twice per iteration)
+  (libevent calls it on every timer event change, libev twice per iteration).
 
 - watchers use less memory
-  (libevent on amd64: 152 bytes, libev: <= 56 bytes)
+  (libevent on amd64: 152 bytes, libev: <= 56 bytes).
 
 - library uses less memory
   (libevent allocates large data structures wether used or not, libev
-  scales all its data structures dynamically)
+  scales all its data structures dynamically).
 
 - no hardcoded arbitrary limits
   (libevent contains an off-by-one bug and sometimes hardcodes a limit of
-  32000 fds)
+  32000 fds).
 
 - libev separates timer, signal and io watchers from each other
   (libevent combines them, but with libev you can combine them yourself
-  by reusing the same callback and still save memory)
+  by reusing the same callback and still save memory).
 
 - simpler design, backends are potentially much simpler
   (in libevent, backends have to deal with watchers, thus the problems)
-  (epoll backend in libevent: 366 lines, libev: 90 lines, and more features)
+  (epoll backend in libevent: 366 lines, libev: 90 lines, and more features).
 
 - libev handles EBADF gracefully by removing the offending fds.
 
 - doesn't rely on nonportable BSD header files.
 
+- a event.h compatibility header exists, and can be used to run a wide
+  range of libevent programs unchanged (such as evdns.c).
+
 whats missing?
 
-- evdns, evhttp, bufferevent are missing, libev is only an even library at
-  the moment.
+- evbuffer, evhttp, bufferevent are missing.
 
-- no priority support at the moment
+- no priority support at the moment (but likely to be delivered later).
 
-- kqueue, poll (libev currently implements epoll and select)
+- kqueue, poll (libev currently implements epoll and select).
 
-- windows support (whats windows?)
+- windows support (whats windows?).
 

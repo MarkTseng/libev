@@ -1,5 +1,4 @@
 #define DNS_USE_GETTIMEOFDAY_FOR_ID 1
-/* $Id$ */
 
 /* The original version of this module was written by Adam Langley; for
  * a history of modifications, check out the subversion logs.
@@ -2267,7 +2266,7 @@ int evdns_resolve_reverse(struct in_addr *in, int flags, evdns_callback_type cal
 }
 
 int evdns_resolve_reverse_ipv6(struct xin6_addr *in, int flags, evdns_callback_type callback, void *ptr) {
-	char buf[64];
+	char buf[96];
 	char *cp;
 	struct request *req;
 	int i;
