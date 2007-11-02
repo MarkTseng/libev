@@ -167,12 +167,14 @@ struct ev_child
   int status; /* rw, holds the exit status, use the macros from sys/wait.h */
 };
 
-#define EVMETHOD_NONE   0
+#define EVMETHOD_AUTO   0 /* consults environment */
 #define EVMETHOD_SELECT 1
-#define EVMETHOD_EPOLL  2
+#define EVMETHOD_POLL   2
+#define EVMETHOD_EPOLL  4
+#define EVMETHOD_ANY    ~0 /* any method, do not consult env */
 #if EV_PROTOTYPES
 extern int ev_method;
-int ev_init (int flags); /* returns ev_method */
+int ev_init (int methods); /* returns ev_method */
 int ev_version_major (void);
 int ev_version_minor (void);
 

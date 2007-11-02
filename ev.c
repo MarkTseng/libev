@@ -58,6 +58,10 @@
 # define EV_USE_SELECT 1
 #endif
 
+#ifndef EV_USE_POLL
+# define EV_USE_POLL 0 /* poll is usually slower than select, and not as well tested */
+#endif
+
 #ifndef EV_USE_EPOLL
 # define EV_USE_EPOLL 0
 #endif
@@ -279,20 +283,44 @@ fd_change (int fd)
   fdchanges [fdchangecnt - 1] = fd;
 }
 
+static void
+fd_kill (int fd)
+{
+  struct ev_io *w;
+
+  printf ("killing fd %d\n", fd);//D
+  while ((w = anfds [fd].head))
+    {
+      ev_io_stop (w);
+      event ((W)w, EV_ERROR | EV_READ | EV_WRITE);
+    }
+}
+
 /* called on EBADF to verify fds */
 static void
-fd_recheck (void)
+fd_ebadf (void)
 {
   int fd;
 
   for (fd = 0; fd < anfdmax; ++fd)
     if (anfds [fd].events)
       if (fcntl (fd, F_GETFD) == -1 && errno == EBADF)
-        while (anfds [fd].head)
-          {
-            ev_io_stop (anfds [fd].head);
-            event ((W)anfds [fd].head, EV_ERROR | EV_READ | EV_WRITE);
-          }
+        fd_kill (fd);
+}
+
+/* called on ENOMEM in select/poll to kill some fds and retry */
+static void
+fd_enomem (void)
+{
+  int fd = anfdmax;
+
+  while (fd--)
+    if (anfds [fd].events)
+      {
+        close (fd);
+        fd_kill (fd);
+        return;
+      }
 }
 
 /*****************************************************************************/
@@ -456,6 +484,9 @@ childcb (struct ev_signal *sw, int revents)
 #if EV_USE_EPOLL
 # include "ev_epoll.c"
 #endif
+#if EV_USE_POLL
+# include "ev_poll.c"
+#endif
 #if EV_USE_SELECT
 # include "ev_select.c"
 #endif
@@ -472,7 +503,15 @@ ev_version_minor (void)
   return EV_VERSION_MINOR;
 }
 
-int ev_init (int flags)
+/* return true if we are running with elevated privileges and ignore env variables */
+static int
+enable_secure ()
+{
+  return getuid () != geteuid ()
+      || getgid () != getegid ();
+}
+
+int ev_init (int methods)
 {
   if (!ev_method)
     {
@@ -492,12 +531,21 @@ int ev_init (int flags)
       if (pipe (sigpipe))
         return 0;
 
-      ev_method = EVMETHOD_NONE;
+      if (methods == EVMETHOD_AUTO)
+          if (!enable_secure () && getenv ("LIBEV_METHODS"))
+            methods = atoi (getenv ("LIBEV_METHODS"));
+          else
+            methods = EVMETHOD_ANY;
+
+      ev_method = 0;
 #if EV_USE_EPOLL
-      if (ev_method == EVMETHOD_NONE) epoll_init (flags);
+      if (!ev_method && (methods & EVMETHOD_EPOLL )) epoll_init  (methods);
+#endif
+#if EV_USE_POLL
+      if (!ev_method && (methods & EVMETHOD_POLL  )) poll_init   (methods);
 #endif
 #if EV_USE_SELECT
-      if (ev_method == EVMETHOD_NONE) select_init (flags);
+      if (!ev_method && (methods & EVMETHOD_SELECT)) select_init (methods);
 #endif
 
       if (ev_method)

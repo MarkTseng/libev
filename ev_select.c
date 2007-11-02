@@ -116,7 +116,9 @@ select_poll (ev_tstamp timeout)
   else if (res < 0)
     {
       if (errno == EBADF)
-        fd_recheck ();
+        fd_ebadf ();
+      else if (errno == ENOMEM)
+        fd_enomem ();
     }
 }
 
