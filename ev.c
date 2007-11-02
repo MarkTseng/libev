@@ -102,6 +102,9 @@
 #define expect_false(expr) expect ((expr) != 0, 0)
 #define expect_true(expr)  expect ((expr) != 0, 1)
 
+#define NUMPRI    (EV_MAXPRI - EV_MINPRI + 1)
+#define ABSPRI(w) ((w)->priority - EV_MINPRI)
+
 typedef struct ev_watcher *W;
 typedef struct ev_watcher_list *WL;
 typedef struct ev_watcher_time *WT;
@@ -195,22 +198,22 @@ typedef struct
   int events;
 } ANPENDING;
 
-static ANPENDING *pendings;
-static int pendingmax, pendingcnt;
+static ANPENDING *pendings [NUMPRI];
+static int pendingmax [NUMPRI], pendingcnt [NUMPRI];
 
 static void
 event (W w, int events)
 {
   if (w->pending)
     {
-      pendings [w->pending - 1].events |= events;
+      pendings [ABSPRI (w)][w->pending - 1].events |= events;
       return;
     }
 
-  w->pending = ++pendingcnt;
-  array_needsize (pendings, pendingmax, pendingcnt, );
-  pendings [pendingcnt - 1].w      = w;
-  pendings [pendingcnt - 1].events = events;
+  w->pending = ++pendingcnt [ABSPRI (w)];
+  array_needsize (pendings [ABSPRI (w)], pendingmax [ABSPRI (w)], pendingcnt [ABSPRI (w)], );
+  pendings [ABSPRI (w)][w->pending - 1].w      = w;
+  pendings [ABSPRI (w)][w->pending - 1].events = events;
 }
 
 static void
@@ -595,16 +598,19 @@ ev_fork_child (void)
 static void
 call_pending (void)
 {
-  while (pendingcnt)
-    {
-      ANPENDING *p = pendings + --pendingcnt;
+  int pri;
 
-      if (p->w)
-        {
-          p->w->pending = 0;
-          p->w->cb (p->w, p->events);
-        }
-    }
+  for (pri = NUMPRI; pri--; )
+    while (pendingcnt [pri])
+      {
+        ANPENDING *p = pendings [pri] + --pendingcnt [pri];
+
+        if (p->w)
+          {
+            p->w->pending = 0;
+            p->w->cb (p->w, p->events);
+          }
+      }
 }
 
 static void
@@ -846,7 +852,7 @@ ev_clear_pending (W w)
 {
   if (w->pending)
     {
-      pendings [w->pending - 1].w = 0;
+      pendings [ABSPRI (w)][w->pending - 1].w = 0;
       w->pending = 0;
     }
 }

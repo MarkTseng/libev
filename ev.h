@@ -36,6 +36,14 @@ extern "C" {
 
 typedef double ev_tstamp;
 
+/* these priorities are inclusive, higher priorities will be called earlier */
+#ifndef EV_MINPRI
+# define EV_MINPRI -2
+#endif
+#ifndef EV_MAXPRI
+# define EV_MAXPRI +2
+#endif
+
 /* eventmask, revents, events... */
 #define EV_UNDEF          -1 /* guaranteed to be invalid */
 #define EV_NONE         0x00
@@ -72,6 +80,7 @@ typedef double ev_tstamp;
 #define EV_WATCHER(type)			\
   int active; /* private */			\
   int pending; /* private */			\
+  int priority; /* ro */			\
   EV_COMMON; /* rw */				\
   void (*cb)(struct type *, int revents); /* rw */ /* gets invoked with an eventmask */
 
@@ -200,7 +209,7 @@ void ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, voi
 
 /* these may evaluate ev multiple times, and the other arguments at most once */
 /* either use ev_watcher_init + ev_TYPE_set, or the ev_TYPE_init macro, below, to first initialise a watcher */
-#define ev_watcher_init(ev,cb_)             do { (ev)->active = 0; (ev)->pending = 0; (ev)->cb = (cb_); } while (0)
+#define ev_watcher_init(ev,cb_)             do { (ev)->active = (ev)->pending = (ev)->priority = 0; (ev)->cb = (cb_); } while (0)
 
 #define ev_io_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
 #define ev_timer_set(ev,after_,repeat_)     do { (ev)->at = (after_); (ev)->repeat = (repeat_); } while (0)
@@ -220,7 +229,8 @@ void ev_once (int fd, int events, ev_tstamp timeout, void (*cb)(int revents, voi
 #define ev_check_init(ev,cb)                do { ev_watcher_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
 #define ev_child_init(ev,cb,pid)            do { ev_watcher_init ((ev), (cb)); ev_child_set ((ev),(pid)); } while (0)
 
-#define ev_is_active(ev) (0 + (ev)->active) /* true when the watcher has been started */
+#define ev_is_active(ev)                    (0 + (ev)->active) /* true when the watcher has been started */
+#define ev_set_priority(ev,pri)             (ev)->priority = pri
 
 /* stopping (enabling, adding) a watcher does nothing if it is already running */
 /* stopping (disabling, deleting) a watcher does nothing unless its already running */
