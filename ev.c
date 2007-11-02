@@ -66,6 +66,10 @@
 # define EV_USE_EPOLL 0
 #endif
 
+#ifndef EV_USE_KQUEUE
+# define EV_USE_KQUEUE 0
+#endif
+
 #ifndef EV_USE_REALTIME
 # define EV_USE_REALTIME 1
 #endif
@@ -484,6 +488,9 @@ childcb (struct ev_signal *sw, int revents)
 
 /*****************************************************************************/
 
+#if EV_USE_KQUEUE
+# include "ev_kqueue.c"
+#endif
 #if EV_USE_EPOLL
 # include "ev_epoll.c"
 #endif
@@ -541,6 +548,9 @@ int ev_init (int methods)
             methods = EVMETHOD_ANY;
 
       ev_method = 0;
+#if EV_USE_KQUEUE
+      if (!ev_method && (methods & EVMETHOD_KQUEUE)) kqueue_init (methods);
+#endif
 #if EV_USE_EPOLL
       if (!ev_method && (methods & EVMETHOD_EPOLL )) epoll_init  (methods);
 #endif
