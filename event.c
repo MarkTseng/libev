@@ -108,16 +108,23 @@ int event_loopexit (struct timeval *tv)
 static void
 x_cb (struct event *ev, int revents)
 {
-  if (ev_is_active (&ev->sig))
+  if (ev->ev_events & EV_SIGNAL)
     {
-      ev_signal_stop (&ev->sig);
-      --x_actives;
+      /* sig */
+      if (ev_is_active (&ev->iosig.sig))
+        {
+          ev_signal_stop (&ev->iosig.sig);
+          --x_actives;
+        }
     }
-
-  if (!(ev->ev_events & EV_PERSIST) && ev_is_active (&ev->io))
+  else
     {
-      ev_io_stop (&ev->io);
-      --x_actives;
+       /* io */
+      if (!(ev->ev_events & EV_PERSIST) && ev_is_active (&ev->iosig.io))
+        {
+          ev_io_stop (&ev->iosig.io);
+          --x_actives;
+        }
     }
 
   revents &= EV_READ | EV_WRITE | EV_TIMEOUT | EV_SIGNAL;
@@ -132,7 +139,7 @@ x_cb (struct event *ev, int revents)
 static void
 x_cb_io (struct ev_io *w, int revents)
 {
-  x_cb ((struct event *)(((char *)w) - offsetof (struct event, io)), revents);
+  x_cb ((struct event *)(((char *)w) - offsetof (struct event, iosig.io)), revents);
 }
 
 static void
@@ -144,14 +151,17 @@ x_cb_to (struct ev_timer *w, int revents)
 static void
 x_cb_sig (struct ev_signal *w, int revents)
 {
-  x_cb ((struct event *)(((char *)w) - offsetof (struct event, sig)), revents);
+  x_cb ((struct event *)(((char *)w) - offsetof (struct event, iosig.sig)), revents);
 }
 
 void event_set (struct event *ev, int fd, short events, void (*cb)(int, short, void *), void *arg)
 {
-  ev_watcher_init (&ev->io, x_cb_io);
+  if (events & EV_SIGNAL)
+    ev_watcher_init (&ev->iosig.sig, x_cb_sig);
+  else
+    ev_watcher_init (&ev->iosig.io, x_cb_io);
+
   ev_watcher_init (&ev->to, x_cb_to);
-  ev_watcher_init (&ev->sig, x_cb_sig);
 
   ev->ev_base     = x_cur;
   ev->ev_fd       = fd;
@@ -169,42 +179,26 @@ int event_once (int fd, short events, void (*cb)(int, short, void *), void *arg,
 
 int event_add (struct event *ev, struct timeval *tv)
 {
-  if (tv)
-    {
-      if (ev_is_active (&ev->to))
-        {
-          ev_timer_stop (&ev->to);
-          --x_actives;
-        }
-
-      ev_timer_set (&ev->to, tv_get (tv), 0.);
-      ev_timer_start (&ev->to);
-      ++x_actives;
-    }
-
-  if (ev->ev_events & (EV_READ | EV_WRITE))
-    {
-      if (ev_is_active (&ev->io))
-        {
-          ev_io_stop (&ev->io);
-          --x_actives;
-        }
-
-      ev_io_set (&ev->io, ev->ev_fd, ev->ev_events & (EV_READ | EV_WRITE));
-      ev_io_start (&ev->io);
-      ++x_actives;
-    }
+  /* disable all watchers */
+  event_del (ev);
 
   if (ev->ev_events & EV_SIGNAL)
     {
-      if (ev_is_active (&ev->sig))
-        {
-          ev_signal_stop (&ev->sig);
-          --x_actives;
-        }
+      ev_signal_set (&ev->iosig.sig, ev->ev_fd);
+      ev_signal_start (&ev->iosig.sig);
+      ++x_actives;
+    }
+  else if (ev->ev_events & (EV_READ | EV_WRITE))
+    {
+      ev_io_set (&ev->iosig.io, ev->ev_fd, ev->ev_events & (EV_READ | EV_WRITE));
+      ev_io_start (&ev->iosig.io);
+      ++x_actives;
+    }
 
-      ev_signal_set (&ev->sig, ev->ev_fd);
-      ev_signal_start (&ev->sig);
+  if (tv)
+    {
+      ev_timer_set (&ev->to, tv_get (tv), 0.);
+      ev_timer_start (&ev->to);
       ++x_actives;
     }
 
@@ -213,21 +207,28 @@ int event_add (struct event *ev, struct timeval *tv)
 
 int event_del (struct event *ev)
 {
-  if (ev_is_active (&ev->io))
+  if (ev->ev_events & EV_SIGNAL)
     {
-      ev_io_stop (&ev->io);
-      --x_actives;
+      /* sig */
+      if (ev_is_active (&ev->iosig.sig))
+        {
+          ev_signal_stop (&ev->iosig.sig);
+          --x_actives;
+        }
+    }
+  else
+    {
+      /* io */
+      if (ev_is_active (&ev->iosig.io))
+        {
+          ev_io_stop (&ev->iosig.io);
+          --x_actives;
+        }
     }
 
   if (ev_is_active (&ev->to))
     {
       ev_timer_stop (&ev->to);
-      --x_actives;
-    }
-
-  if (ev_is_active (&ev->sig))
-    {
-      ev_signal_stop (&ev->sig);
       --x_actives;
     }
 
@@ -238,8 +239,18 @@ int event_pending (struct event *ev, short events, struct timeval *tv)
 {
   short revents;
 
-  if (ev->io.pending)
-    revents |= ev->ev_events & (EV_READ | EV_WRITE);
+  if (ev->ev_events & EV_SIGNAL)
+    {
+      /* sig */
+      if (ev->iosig.sig.pending)
+        revents |= EV_SIGNAL;
+    }
+  else
+    {
+      /* io */
+      if (ev->iosig.io.pending)
+        revents |= ev->ev_events & (EV_READ | EV_WRITE);
+    }
 
   if (ev->to.pending)
     {
@@ -248,9 +259,6 @@ int event_pending (struct event *ev, short events, struct timeval *tv)
       if (tv)
         tv_set (tv, ev_now); /* not sure if this is right :) */
     }
-
-  if (ev->sig.pending)
-    revents |= EV_SIGNAL;
 
   return events & revents;
 }

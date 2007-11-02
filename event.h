@@ -38,11 +38,15 @@ extern "C" {
 #include "ev.h"
 
 struct event
-  {
-  struct ev_io io;
+{
+  /* lib watchers we map to */
+  union {
+    struct ev_io io;
+    struct ev_signal sig;
+  } iosig;
   struct ev_timer to;
-  struct ev_signal sig;
 
+  /* compatibility slots */
   struct event_base *ev_base;
   void (*ev_callback)(int, short, void *arg);
   void *ev_arg;
