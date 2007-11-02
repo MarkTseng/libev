@@ -110,7 +110,7 @@ kqueue_poll (ev_tstamp timeout)
             fd_kill (events [i].ident);
         }
       else
-        event (
+        fd_event (
           events [i].ident,
           events [i].filter == EVFILT_READ ? EV_READ
           : events [i].filter == EVFILT_WRITE ? EV_WRITE
