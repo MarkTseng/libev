@@ -129,41 +129,27 @@ kqueue_poll (ev_tstamp timeout)
 static void
 kqueue_init (struct event_base *base)
 {
-  /* Initalize the kernel queue */
-  if ((kq_fd = kqueue ()) == -1)
-    {
-      free (kqueueop);
-      return;
-    }
+  struct kevent ch, ev;
 
-  /* Initalize fields */
-  kq_changes = malloc (NEVENT * sizeof (struct kevent));
-  if (!kq_changes)
+  /* Initalize the kernel queue */
+  if ((kq_fd = kqueue ()) < 0)
     return;
 
-  events = malloc (NEVENT * sizeof (struct kevent));
-  if (!events)
-    {
-      free (kq_changes);
-      return;
-    }
-
   /* Check for Mac OS X kqueue bug. */
-  kq_changes [0].ident  = -1;
-  kq_changes [0].filter = EVFILT_READ;
-  kq_changes [0].flags  = EV_ADD;
+  ch.ident  = -1;
+  ch.filter = EVFILT_READ;
+  ch.flags  = EV_ADD;
+
   /* 
    * If kqueue works, then kevent will succeed, and it will
    * stick an error in events[0]. If kqueue is broken, then
    * kevent will fail.
    */
-  if (kevent (kq_fd, kq_changes, 1, kq_events, NEVENT, NULL) != 1
-      || kq_events[0].ident != -1
-      || kq_events[0].flags != EV_ERROR)
+  if (kevent (kq_fd, &ch, 1, &ev, 1, 0) != 1
+      || ev.ident != -1
+      || ev.flags != EV_ERROR)
     {
       /* detected broken kqueue */
-      free (kq_changes);
-      free (kq_events);
       close (kq_fd);
       return;
     }
