@@ -39,7 +39,7 @@ extern "C" {
 
 struct event
 {
-  /* lib watchers we map to */
+  /* libev watchers we map onto */
   union {
     struct ev_io io;
     struct ev_signal sig;
@@ -120,3 +120,4 @@ int event_base_once (struct event_base *base, int fd, short events, void (*cb)(i
 int event_base_priority_init (struct event_base *base, int fd);
 
 #endif
+

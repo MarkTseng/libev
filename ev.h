@@ -181,7 +181,8 @@ struct ev_child
 #define EVMETHOD_POLL     2
 #define EVMETHOD_EPOLL    4
 #define EVMETHOD_KQUEUE   8
-#define EVMETHOD_DEVPOLL 16
+#define EVMETHOD_DEVPOLL 16 /* NYI */
+#define EVMETHOD_PORT    32 /* NYI */
 #define EVMETHOD_ANY     ~0 /* any method, do not consult env */
 #if EV_PROTOTYPES
 extern int ev_method;
