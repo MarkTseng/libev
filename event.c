@@ -234,11 +234,6 @@ int event_del (struct event *ev)
   return 0;
 }
 
-void event_active (struct event *ev, int fd, short events)
-{
-  /* unclear what this does, likely internal-use */
-}
-
 int event_pending (struct event *ev, short events, struct timeval *tv)
 {
   short revents;

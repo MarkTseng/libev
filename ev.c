@@ -48,13 +48,10 @@
 #include <sys/time.h>
 #include <time.h>
 
+/**/
+
 #ifndef EV_USE_MONOTONIC
 # define EV_USE_MONOTONIC 1
-#endif
-
-#ifndef CLOCK_MONOTONIC
-# undef EV_USE_MONOTONIC
-# define EV_USE_MONOTONIC 0
 #endif
 
 #ifndef EV_USE_SELECT
@@ -65,25 +62,47 @@
 # define EV_USE_EPOLL 0
 #endif
 
+#ifndef EV_USE_REALTIME
+# define EV_USE_REALTIME 1
+#endif
+
+/**/
+
+#ifndef CLOCK_MONOTONIC
+# undef EV_USE_MONOTONIC
+# define EV_USE_MONOTONIC 0
+#endif
+
 #ifndef CLOCK_REALTIME
+# undef EV_USE_REALTIME
 # define EV_USE_REALTIME 0
 #endif
-#ifndef EV_USE_REALTIME
-# define EV_USE_REALTIME 1 /* posix requirement, but might be slower */
-#endif
+
+/**/
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
-#define MAX_BLOCKTIME 59.731 /* never wait longer than this time (to detetc time jumps) */
+#define MAX_BLOCKTIME 59.731 /* never wait longer than this time (to detect time jumps) */
 #define PID_HASHSIZE  16 /* size of pid hash table, must be power of two */
-#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds */
+/*#define CLEANUP_INTERVAL 300. /* how often to try to free memory and re-check fds */
 
 #include "ev.h"
+
+#if __GNUC__ >= 3
+# define expect(expr,value)         __builtin_expect ((expr),(value))
+# define inline                     inline
+#else
+# define expect(expr,value)         (expr)
+# define inline                     static
+#endif
+
+#define expect_false(expr) expect ((expr) != 0, 0)
+#define expect_true(expr)  expect ((expr) != 0, 1)
 
 typedef struct ev_watcher *W;
 typedef struct ev_watcher_list *WL;
 typedef struct ev_watcher_time *WT;
 
-static ev_tstamp now, diff; /* monotonic clock */
+static ev_tstamp now_floor, now, diff; /* monotonic clock */
 ev_tstamp ev_now;
 int ev_method;
 
@@ -113,7 +132,7 @@ static ev_tstamp
 get_clock (void)
 {
 #if EV_USE_MONOTONIC
-  if (have_monotonic)
+  if (expect_true (have_monotonic))
     {
       struct timespec ts;
       clock_gettime (CLOCK_MONOTONIC, &ts);
@@ -127,7 +146,7 @@ get_clock (void)
 #define array_roundsize(base,n) ((n) | 4 & ~3)
 
 #define array_needsize(base,cur,cnt,init)		\
-  if ((cnt) > cur)					\
+  if (expect_false ((cnt) > cur))			\
     {							\
       int newcnt = cur;					\
       do						\
@@ -465,9 +484,10 @@ int ev_init (int flags)
       }
 #endif
 
-      ev_now = ev_time ();
-      now    = get_clock ();
-      diff   = ev_now - now;
+      ev_now    = ev_time ();
+      now       = get_clock ();
+      now_floor = now;
+      diff      = ev_now - now;
 
       if (pipe (sigpipe))
         return 0;
@@ -606,34 +626,58 @@ periodics_reschedule (ev_tstamp diff)
     }
 }
 
+static int
+time_update_monotonic (void)
+{
+  now = get_clock ();
+
+  if (expect_true (now - now_floor < MIN_TIMEJUMP * .5))
+    {
+      ev_now = now + diff;
+      return 0;
+    }
+  else
+    {
+      now_floor = now;
+      ev_now = ev_time ();
+      return 1;
+    }
+}
+
 static void
 time_update (void)
 {
   int i;
 
-  ev_now = ev_time ();
-
-  if (have_monotonic)
+#if EV_USE_MONOTONIC
+  if (expect_true (have_monotonic))
     {
-      ev_tstamp odiff = diff;
-
-      for (i = 4; --i; ) /* loop a few times, before making important decisions */
+      if (time_update_monotonic ())
         {
-          now = get_clock ();
-          diff = ev_now - now;
+          ev_tstamp odiff = diff;
 
-          if (fabs (odiff - diff) < MIN_TIMEJUMP)
-            return; /* all is well */
+          for (i = 4; --i; ) /* loop a few times, before making important decisions */
+            {
+              diff = ev_now - now;
 
-          ev_now = ev_time ();
+              if (fabs (odiff - diff) < MIN_TIMEJUMP)
+                return; /* all is well */
+
+              ev_now    = ev_time ();
+              now       = get_clock ();
+              now_floor = now;
+            }
+
+          periodics_reschedule (diff - odiff);
+          /* no timer adjustment, as the monotonic clock doesn't jump */
         }
-
-      periodics_reschedule (diff - odiff);
-      /* no timer adjustment, as the monotonic clock doesn't jump */
     }
   else
+#endif
     {
-      if (now > ev_now || now < ev_now - MAX_BLOCKTIME - MIN_TIMEJUMP)
+      ev_now = ev_time ();
+
+      if (expect_false (now > ev_now || now < ev_now - MAX_BLOCKTIME - MIN_TIMEJUMP))
         {
           periodics_reschedule (ev_now - now);
 
@@ -656,7 +700,7 @@ void ev_loop (int flags)
   do
     {
       /* queue check watchers (and execute them) */
-      if (preparecnt)
+      if (expect_false (preparecnt))
         {
           queue_events ((W *)prepares, preparecnt, EV_PREPARE);
           call_pending ();
@@ -669,7 +713,15 @@ void ev_loop (int flags)
 
       /* we only need this for !monotonic clockor timers, but as we basically
          always have timers, we just calculate it always */
-      ev_now = ev_time ();
+#if EV_USE_MONOTONIC
+      if (expect_true (have_monotonic))
+        time_update_monotonic ();
+      else
+#endif
+        {
+          ev_now = ev_time ();
+          now    = ev_now;
+        }
 
       if (flags & EVLOOP_NONBLOCK || idlecnt)
         block = 0.;
@@ -679,7 +731,7 @@ void ev_loop (int flags)
 
           if (timercnt)
             {
-              ev_tstamp to = timers [0]->at - (have_monotonic ? get_clock () : ev_now) + method_fudge;
+              ev_tstamp to = timers [0]->at - now + method_fudge;
               if (block > to) block = to;
             }
 

@@ -81,10 +81,10 @@ epoll_poll (ev_tstamp timeout)
     );
 
   /* if the receive array was full, increase its size */
-  if (eventcnt == eventmax)
+  if (expect_false (eventcnt == eventmax))
     {
       free (events);
-      eventmax += eventmax >> 1;
+      eventmax = array_roundsize (events, eventmax << 1);
       events = malloc (sizeof (struct epoll_event) * eventmax);
     }
 }
