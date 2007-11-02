@@ -6,7 +6,8 @@ to be faster and more correct, and also more featureful.
 
 DIFFERENCES AND COMPARISON TO LIBEVENT:
 
-(comparisons relative to libevent-1.3e and libev-0.00)
+(comparisons relative to libevent-1.3e and libev-0.00, see also the benchmark
+at http://libev.schmorp.de/bench.html).
 
 - multiple watchers can wait for the same event without deregistering others,
   both for file descriptors as well as signals.
