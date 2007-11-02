@@ -860,6 +860,9 @@ ev_clear_pending (W w)
 static void
 ev_start (W w, int active)
 {
+  if (w->priority < EV_MINPRI) w->priority = EV_MINPRI;
+  if (w->priority > EV_MAXPRI) w->priority = EV_MAXPRI;
+
   w->active = active;
 }
 
