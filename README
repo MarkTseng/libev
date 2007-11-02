@@ -1,4 +1,4 @@
-libev is a high-performanc3 event loop/event model with lots of features.
+libev is a high-performance event loop/event model with lots of features.
 
 It is modelled (very losely) after libevent
 (http://monkey.org/~provos/libevent/) and the Event perl module, but aims
