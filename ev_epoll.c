@@ -39,7 +39,7 @@ epoll_modify (int fd, int oev, int nev)
   int mode = nev ? oev ? EPOLL_CTL_MOD : EPOLL_CTL_ADD : EPOLL_CTL_DEL;
 
   struct epoll_event ev;
-  ev.data.fd = fd;
+  ev.data.u64 = fd; /* use u64 to fully initialise the struct, for nicer strace etc. */
   ev.events =
       (nev & EV_READ ? EPOLLIN : 0)
       | (nev & EV_WRITE ? EPOLLOUT : 0);
