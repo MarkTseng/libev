@@ -540,12 +540,16 @@ ev_version_minor (void)
   return EV_VERSION_MINOR;
 }
 
-/* return true if we are running with elevated privileges and ignore env variables */
+/* return true if we are running with elevated privileges and should ignore env variables */
 static int
 enable_secure ()
 {
+#ifdef WIN32
+  return 0;
+#else
   return getuid () != geteuid ()
       || getgid () != getegid ();
+#endif
 }
 
 int ev_init (int methods)
