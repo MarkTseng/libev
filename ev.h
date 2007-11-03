@@ -86,7 +86,7 @@ typedef double ev_tstamp;
 
 #define EV_WATCHER_LIST(type)			\
   EV_WATCHER (type);				\
-  struct type *next /* private */
+  struct ev_watcher_list *next /* private */
 
 #define EV_WATCHER_TIME(type)			\
   EV_WATCHER (type);				\

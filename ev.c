@@ -28,7 +28,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#if EV_USE_CONFIG_H
+#ifndef EV_STANDALONE
 # include "config.h"
 #endif
 
@@ -177,7 +177,7 @@ get_clock (void)
 
 typedef struct
 {
-  struct ev_io *head;
+  struct ev_watcher_list *head;
   unsigned char events;
   unsigned char reify;
 } ANFD;
@@ -237,7 +237,7 @@ fd_event (int fd, int events)
   ANFD *anfd = anfds + fd;
   struct ev_io *w;
 
-  for (w = anfd->head; w; w = w->next)
+  for (w = (struct ev_io *)anfd->head; w; w = (struct ev_io *)((WL)w)->next)
     {
       int ev = w->events & events;
 
@@ -264,7 +264,7 @@ fd_reify (void)
 
       int events = 0;
 
-      for (w = anfd->head; w; w = w->next)
+      for (w = (struct ev_io *)anfd->head; w; w = (struct ev_io *)((WL)w)->next)
         events |= w->events;
 
       anfd->reify = 0;
@@ -297,8 +297,7 @@ fd_kill (int fd)
 {
   struct ev_io *w;
 
-  printf ("killing fd %d\n", fd);//D
-  while ((w = anfds [fd].head))
+  while ((w = (struct ev_io *)anfds [fd].head))
     {
       ev_io_stop (w);
       event ((W)w, EV_ERROR | EV_READ | EV_WRITE);
@@ -385,7 +384,7 @@ downheap (WT *timers, int N, int k)
 
 typedef struct
 {
-  struct ev_signal *head;
+  struct ev_watcher_list *head;
   sig_atomic_t volatile gotsig;
 } ANSIG;
 
@@ -425,7 +424,7 @@ sighandler (int signum)
 static void
 sigcb (struct ev_io *iow, int revents)
 {
-  struct ev_signal *w;
+  struct ev_watcher_list *w;
   int signum;
 
   read (sigpipe [0], &revents, 1);
@@ -484,13 +483,12 @@ child_reap (struct ev_signal *sw, int chain, int pid, int status)
 {
   struct ev_child *w;
 
-  for (w = childs [chain & (PID_HASHSIZE - 1)]; w; w = w->next)
+  for (w = (struct ev_child *)childs [chain & (PID_HASHSIZE - 1)]; w; w = (struct ev_child *)((WL)w)->next)
     if (w->pid == pid || !w->pid)
       {
         w->priority = sw->priority; /* need to do it *now* */
         w->rpid     = pid;
         w->rstatus  = status;
-        printf ("rpid %p %d %d\n", w, pid, w->pid);//D
         event ((W)w, EV_CHILD);
       }
 }
@@ -500,7 +498,6 @@ childcb (struct ev_signal *sw, int revents)
 {
   int pid, status;
 
-            printf ("chld %x\n", revents);//D
   if (0 < (pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)))
     {
       /* make sure we are called again until all childs have been reaped */
@@ -573,10 +570,10 @@ int ev_init (int methods)
         return 0;
 
       if (methods == EVMETHOD_AUTO)
-          if (!enable_secure () && getenv ("LIBEV_METHODS"))
-            methods = atoi (getenv ("LIBEV_METHODS"));
-          else
-            methods = EVMETHOD_ANY;
+        if (!enable_secure () && getenv ("LIBEV_METHODS"))
+          methods = atoi (getenv ("LIBEV_METHODS"));
+        else
+          methods = EVMETHOD_ANY;
 
       ev_method = 0;
 #if EV_USE_KQUEUE

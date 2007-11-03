@@ -1,5 +1,4 @@
-#define DNS_USE_GETTIMEOFDAY_FOR_ID 1
-#define HAVE_STRUCT_IN6_ADDR 1
+/* $Id$ */
 
 /* The original version of this module was written by Adam Langley; for
  * a history of modifications, check out the subversion logs.
@@ -41,6 +40,7 @@
 #endif
 
 #ifdef WIN32
+#include "misc.h"
 #endif
 
 /* #define NDEBUG */
@@ -94,6 +94,7 @@
 #include <stdarg.h>
 
 #include "evdns.h"
+#include "log.h"
 #ifdef WIN32
 #include <windows.h>
 #include <winsock2.h>
@@ -2546,7 +2547,7 @@ evdns_resolv_set_defaults(int flags) {
 
 #ifndef HAVE_STRTOK_R
 static char *
-fake_strtok_r(char *s, const char *delim, char **state) {
+strtok_r(char *s, const char *delim, char **state) {
 	return strtok(s, delim);
 }
 #endif
@@ -2622,9 +2623,9 @@ static void
 resolv_conf_parse_line(char *const start, int flags) {
 	char *strtok_state;
 	static const char *const delims = " \t";
-#define NEXT_TOKEN fake_strtok_r(NULL, delims, &strtok_state)
+#define NEXT_TOKEN strtok_r(NULL, delims, &strtok_state)
 
-	char *const first_token = fake_strtok_r(start, delims, &strtok_state);
+	char *const first_token = strtok_r(start, delims, &strtok_state);
 	if (!first_token) return;
 
 	if (!strcmp(first_token, "nameserver") && (flags & DNS_OPTION_NAMESERVERS)) {

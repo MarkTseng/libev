@@ -90,10 +90,12 @@ int event_dispatch (void)
   return event_base_dispatch (x_cur);
 }
 
+#ifdef EV_STANDALONE
 void event_set_log_callback (event_log_cb cb)
 {
   /* nop */
 }
+#endif
 
 int event_loop (int flags)
 {
@@ -102,7 +104,7 @@ int event_loop (int flags)
 
 int event_loopexit (struct timeval *tv)
 {
-  event_base_loopexit (x_cur, tv);
+  return event_base_loopexit (x_cur, tv);
 }
 
 static void
@@ -174,7 +176,7 @@ void event_set (struct event *ev, int fd, short events, void (*cb)(int, short, v
 
 int event_once (int fd, short events, void (*cb)(int, short, void *), void *arg, struct timeval *tv)
 {
-  event_base_once (x_cur, fd, events, cb, arg, tv);
+  return event_base_once (x_cur, fd, events, cb, arg, tv);
 }
 
 int event_add (struct event *ev, struct timeval *tv)
@@ -237,7 +239,7 @@ int event_del (struct event *ev)
 
 int event_pending (struct event *ev, short events, struct timeval *tv)
 {
-  short revents;
+  short revents = 0;
 
   if (ev->ev_events & EV_SIGNAL)
     {
@@ -309,6 +311,8 @@ int event_base_loopexit (struct event_base *base, struct timeval *tv)
   ev_tstamp after = tv_get (tv);
 
   ev_once (-1, 0, after >= 0. ? after : 0., x_loopexit_cb, (void *)base);
+
+  return -1;
 }
 
 struct x_once
