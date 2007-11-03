@@ -115,44 +115,32 @@ typedef struct ev_watcher *W;
 typedef struct ev_watcher_list *WL;
 typedef struct ev_watcher_time *WT;
 
-static ev_tstamp now_floor, mn_now, diff; /* monotonic clock */
-static ev_tstamp rt_now;
-static int method;
+/*****************************************************************************/
 
-static int have_monotonic; /* runtime */
+typedef struct
+{
+  struct ev_watcher_list *head;
+  unsigned char events;
+  unsigned char reify;
+} ANFD;
 
-static ev_tstamp method_fudge; /* stupid epoll-returns-early bug */
-static void (*method_modify)(EV_P_ int fd, int oev, int nev);
-static void (*method_poll)(EV_P_ ev_tstamp timeout);
+typedef struct
+{
+  W w;
+  int events;
+} ANPENDING;
 
-static int activecnt; /* number of active events */
-
-#if EV_USE_SELECT
-static unsigned char *vec_ri, *vec_ro, *vec_wi, *vec_wo;
-static int vec_max;
+#ifdef EV_MULTIPLICITY
+struct ev_loop
+{
+# define VAR(name,decl) decl
+# include "ev_vars.h"
+};
+#else
+# define VAR(name,decl) static decl
+# include "ev_vars.h"
 #endif
-
-#if EV_USEV_POLL
-static struct pollfd *polls;
-static int pollmax, pollcnt;
-static int *pollidxs; /* maps fds into structure indices */
-static int pollidxmax;
-#endif
-
-#if EV_USE_EPOLL
-static int epoll_fd = -1;
-
-static struct epoll_event *events;
-static int eventmax;
-#endif
-
-#if EV_USE_KQUEUE
-static int kqueue_fd;
-static struct kevent *kqueue_changes;
-static int kqueue_changemax, kqueue_changecnt;
-static struct kevent *kqueue_events;
-static int kqueue_eventmax;
-#endif
+#undef VAR
 
 /*****************************************************************************/
 
@@ -210,16 +198,6 @@ ev_now (EV_P)
 
 /*****************************************************************************/
 
-typedef struct
-{
-  struct ev_watcher_list *head;
-  unsigned char events;
-  unsigned char reify;
-} ANFD;
-
-static ANFD *anfds;
-static int anfdmax;
-
 static void
 anfds_init (ANFD *base, int count)
 {
@@ -232,15 +210,6 @@ anfds_init (ANFD *base, int count)
       ++base;
     }
 }
-
-typedef struct
-{
-  W w;
-  int events;
-} ANPENDING;
-
-static ANPENDING *pendings [NUMPRI];
-static int pendingmax [NUMPRI], pendingcnt [NUMPRI];
 
 static void
 event (EV_P_ W w, int events)
@@ -282,9 +251,6 @@ fd_event (EV_P_ int fd, int events)
 }
 
 /*****************************************************************************/
-
-static int *fdchanges;
-static int fdchangemax, fdchangecnt;
 
 static void
 fd_reify (EV_P)
@@ -368,12 +334,6 @@ fd_enomem (EV_P)
 
 /*****************************************************************************/
 
-static struct ev_timer **timers;
-static int timermax, timercnt;
-
-static struct ev_periodic **periodics;
-static int periodicmax, periodiccnt;
-
 static void
 upheap (WT *timers, int k)
 {
@@ -428,7 +388,6 @@ static int signalmax;
 
 static int sigpipe [2];
 static sig_atomic_t volatile gotsig;
-static struct ev_io sigev;
 
 static void
 signals_init (ANSIG *base, int count)
@@ -493,20 +452,6 @@ siginit (EV_P)
 }
 
 /*****************************************************************************/
-
-static struct ev_idle **idles;
-static int idlemax, idlecnt;
-
-static struct ev_prepare **prepares;
-static int preparemax, preparecnt;
-
-static struct ev_check **checks;
-static int checkmax, checkcnt;
-
-/*****************************************************************************/
-
-static struct ev_child *childs [PID_HASHSIZE];
-static struct ev_signal childev;
 
 #ifndef WIN32
 
@@ -594,6 +539,10 @@ ev_method (EV_P)
 int
 ev_init (EV_P_ int methods)
 {
+#ifdef EV_MULTIPLICITY
+  memset (loop, 0, sizeof (struct ev_loop));
+#endif
+
   if (!method)
     {
 #if EV_USE_MONOTONIC
