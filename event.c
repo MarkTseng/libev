@@ -74,7 +74,7 @@ const char *event_get_method (void)
 
 void *event_init (void)
 {
-  if (ev_init (0))
+  if (!x_cur && ev_init (0))
     return x_cur = &x_base;
 
   return 0;
