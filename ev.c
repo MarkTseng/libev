@@ -415,8 +415,10 @@ sighandler (int signum)
 
   if (!gotsig)
     {
+      int old_errno = errno;
       gotsig = 1;
       write (sigpipe [1], &signum, 1);
+      errno = old_errno;
     }
 }
 
