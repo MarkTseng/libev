@@ -35,7 +35,9 @@
 #include <unistd.h>
 
 /* for unix systems */
-#include <sys/select.h>
+#ifndef WIN32
+# include <sys/select.h>
+#endif
 
 #include <string.h>
 #include <inttypes.h>

@@ -41,7 +41,6 @@
 #endif
 
 #ifdef WIN32
-#include "misc.h"
 #endif
 
 /* #define NDEBUG */

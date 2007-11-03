@@ -44,7 +44,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+#ifndef WIN32
+# include <sys/wait.h>
+#endif
 #include <sys/time.h>
 #include <time.h>
 
@@ -440,12 +442,14 @@ sigcb (struct ev_io *iow, int revents)
 static void
 siginit (void)
 {
+#ifndef WIN32
   fcntl (sigpipe [0], F_SETFD, FD_CLOEXEC);
   fcntl (sigpipe [1], F_SETFD, FD_CLOEXEC);
 
   /* rather than sort out wether we really need nb, set it */
   fcntl (sigpipe [0], F_SETFL, O_NONBLOCK);
   fcntl (sigpipe [1], F_SETFL, O_NONBLOCK);
+#endif
 
   ev_io_set (&sigev, sigpipe [0], EV_READ);
   ev_io_start (&sigev);
@@ -467,6 +471,8 @@ static int checkmax, checkcnt;
 static struct ev_child *childs [PID_HASHSIZE];
 static struct ev_signal childev;
 
+#ifndef WIN32
+
 #ifndef WCONTINUED
 # define WCONTINUED 0
 #endif
@@ -485,6 +491,8 @@ childcb (struct ev_signal *sw, int revents)
           event ((W)w, EV_CHILD);
         }
 }
+
+#endif
 
 /*****************************************************************************/
 
@@ -566,8 +574,10 @@ int ev_init (int methods)
           ev_watcher_init (&sigev, sigcb);
           siginit ();
 
+#ifndef WIN32
           ev_signal_init (&childev, childcb, SIGCHLD);
           ev_signal_start (&childev);
+#endif
         }
     }
 
