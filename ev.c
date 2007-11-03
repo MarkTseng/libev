@@ -489,6 +489,7 @@ siginit (EV_P)
 
   ev_io_set (&sigev, sigpipe [0], EV_READ);
   ev_io_start (&sigev);
+  ev_unref (EV_A); /* child watcher should not keep loop alive */
 }
 
 /*****************************************************************************/
@@ -641,6 +642,7 @@ ev_init (EV_P_ int methods)
           ev_signal_init (&childev, childcb, SIGCHLD);
           ev_set_priority (&childev, EV_MAXPRI);
           ev_signal_start (EV_A_ &childev);
+          ev_unref (EV_A); /* child watcher should not keep loop alive */
 #endif
         }
     }
@@ -913,7 +915,6 @@ ev_loop (EV_P_ int flags)
         queue_events (EV_A_ (W *)checks, checkcnt, EV_CHECK);
 
       call_pending (EV_A);
-      printf ("activecnt %d\n", activecnt);//D
     }
   while (activecnt && !loop_done);
 

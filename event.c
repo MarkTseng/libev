@@ -35,11 +35,19 @@
 
 #include "event.h"
 
-#define dLOOPev
-#define dLOOPbase
+#ifdef EV_MULTIPLICITY
+# define dLOOPev struct ev_loop *loop = ev->ev_base->loop
+# define dLOOPbase struct ev_loop *loop = base->loop
+#else
+# define dLOOPev
+# define dLOOPbase
+#endif
 
 struct event_base
 {
+#ifdef EV_MULTIPLICITY
+  struct ev_loop *loop;
+#endif
   int dummy;
 };
 
@@ -83,6 +91,8 @@ void *event_init (void)
 
 void event_base_free (struct event_base *base)
 {
+  dLOOPbase;
+
   /* nop */
 }
 
@@ -265,7 +275,8 @@ int event_base_set (struct event_base *base, struct event *ev)
 int event_base_loop (struct event_base *base, int flags)
 {
   dLOOPbase;
-  ev_loop (EV_A_ flags | EVLOOP_ONESHOT);
+
+  ev_loop (EV_A_ flags);
 
   return 0;
 }

@@ -44,10 +44,20 @@ typedef double ev_tstamp;
 # define EV_MAXPRI +2
 #endif
 
-#define EV_P void
-#define EV_P_
-#define EV_A
-#define EV_A_
+/* support multiple event loops? */
+#ifdef EV_MULTIPLICITY
+struct ev_loop;
+# define EV_P struct ev_loop *loop
+# define EV_P_ EV_P,
+# define EV_A loop
+# define EV_A_ EV_A,
+#else
+# define EV_P void
+# define EV_P_
+# define EV_A
+# define EV_A_
+
+#endif
 
 /* eventmask, revents, events... */
 #define EV_UNDEF          -1 /* guaranteed to be invalid */
