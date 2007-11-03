@@ -487,7 +487,8 @@ childcb (struct ev_signal *sw, int revents)
     for (w = childs [pid & (PID_HASHSIZE - 1)]; w; w = w->next)
       if (w->pid == pid || !w->pid)
         {
-          w->status = status;
+          w->rpid    = pid;
+          w->rstatus = status;
           event ((W)w, EV_CHILD);
         }
 }
