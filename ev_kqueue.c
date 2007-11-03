@@ -34,20 +34,14 @@
 #include <string.h>
 #include <errno.h>
 
-static int kq_fd;
-static struct kevent *kq_changes;
-static int kq_changemax, kq_changecnt;
-static struct kevent *kq_events;
-static int kq_eventmax;
-
 static void
-kqueue_change (int fd, int filter, int flags, int fflags)
+kqueue_change (EV_P_ int fd, int filter, int flags, int fflags)
 {
   struct kevent *ke;
 
-  array_needsize (kq_changes, kq_changemax, ++kq_changecnt, );
+  array_needsize (kqueue_changes, kqueue_changemax, ++kqueue_changecnt, );
 
-  ke = &kq_changes [kq_changecnt - 1];
+  ke = &kqueue_changes [kqueue_changecnt - 1];
   memset (ke, 0, sizeof (struct kevent));
   ke->ident  = fd;
   ke->filter = filter;
@@ -60,7 +54,7 @@ kqueue_change (int fd, int filter, int flags, int fflags)
 #endif
 
 static void
-kqueue_modify (int fd, int oev, int nev)
+kqueue_modify (EV_P_ int fd, int oev, int nev)
 {
   if ((oev ^ nev) & EV_READ)
     {
@@ -80,22 +74,22 @@ kqueue_modify (int fd, int oev, int nev)
 }
 
 static void
-kqueue_poll (ev_tstamp timeout)
+kqueue_poll (EV_P_ ev_tstamp timeout)
 {
   int res, i;
   struct timespec ts;
 
   ts.tv_sec  = (time_t)timeout;
   ts.tv_nsec = (long)(timeout - (ev_tstamp)ts.tv_sec) * 1e9;
-  res = kevent (kq_fd, kq_changes, kq_changecnt, kq_events, kq_eventmax, &ts);
-  kq_changecnt = 0;
+  res = kevent (kqueue_fd, kqueue_changes, kqueue_changecnt, kqueue_events, kqueue_eventmax, &ts);
+  kqueue_changecnt = 0;
 
   if (res < 0)
     return;
 
   for (i = 0; i < res; ++i)
     {
-      if (kq_events [i].flags & EV_ERROR)
+      if (kqueue_events [i].flags & EV_ERROR)
         {
           /* 
            * Error messages that can happen, when a delete fails.
@@ -109,34 +103,35 @@ kqueue_poll (ev_tstamp timeout)
            * an event we are still processing.  In that case
            * the data field is set to ENOENT.
            */
-          if (kq_events [i].data == EBADF)
-            fd_kill (kq_events [i].ident);
+          if (kqueue_events [i].data == EBADF)
+            fd_kill (EV_A_ kqueue_events [i].ident);
         }
       else
         fd_event (
-          kq_events [i].ident,
-          kq_events [i].filter == EVFILT_READ ? EV_READ
-          : kq_events [i].filter == EVFILT_WRITE ? EV_WRITE
+          EV_A_
+          kqueue_events [i].ident,
+          kqueue_events [i].filter == EVFILT_READ ? EV_READ
+          : kqueue_events [i].filter == EVFILT_WRITE ? EV_WRITE
           : 0
         );
     }
 
-  if (expect_false (res == kq_eventmax))
+  if (expect_false (res == kqueue_eventmax))
     {
-      free (kq_events);
-      kq_eventmax = array_roundsize (kq_events, kq_eventmax << 1);
-      kq_events = malloc (sizeof (struct kevent) * kq_eventmax);
+      free (kqueue_events);
+      kqueue_eventmax = array_roundsize (kqueue_events, kqueue_eventmax << 1);
+      kqueue_events = malloc (sizeof (struct kevent) * kqueue_eventmax);
     }
 }
 
-static void
-kqueue_init (int flags)
+static int
+kqueue_init (EV_P_ int flags)
 {
   struct kevent ch, ev;
 
   /* Initalize the kernel queue */
-  if ((kq_fd = kqueue ()) < 0)
-    return;
+  if ((kqueue_fd = kqueue ()) < 0)
+    return 0;
 
   /* Check for Mac OS X kqueue bug. */
   ch.ident  = -1;
@@ -148,21 +143,22 @@ kqueue_init (int flags)
    * stick an error in ev. If kqueue is broken, then
    * kevent will fail.
    */
-  if (kevent (kq_fd, &ch, 1, &ev, 1, 0) != 1
+  if (kevent (kqueue_fd, &ch, 1, &ev, 1, 0) != 1
       || ev.ident != -1
       || ev.flags != EV_ERROR)
     {
       /* detected broken kqueue */
-      close (kq_fd);
-      return;
+      close (kqueue_fd);
+      return 0;
     }
 
-  ev_method     = EVMETHOD_KQUEUE;
   method_fudge  = 1e-3; /* needed to compensate for kevent returning early */
   method_modify = kqueue_modify;
   method_poll   = kqueue_poll;
 
-  kq_eventmax = 64; /* intiial number of events receivable per poll */
-  kq_events = malloc (sizeof (struct kevent) * kq_eventmax);
+  kqueue_eventmax = 64; /* intiial number of events receivable per poll */
+  kqueue_events = malloc (sizeof (struct kevent) * kqueue_eventmax);
+
+  return EVMETHOD_KQUEUE;
 }
 

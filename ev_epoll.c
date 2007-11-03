@@ -31,10 +31,8 @@
 
 #include <sys/epoll.h>
 
-static int epoll_fd = -1;
-
 static void
-epoll_modify (int fd, int oev, int nev)
+epoll_modify (EV_P_ int fd, int oev, int nev)
 {
   int mode = nev ? oev ? EPOLL_CTL_MOD : EPOLL_CTL_ADD : EPOLL_CTL_DEL;
 
@@ -48,7 +46,7 @@ epoll_modify (int fd, int oev, int nev)
 }
 
 static void
-epoll_postfork_child (void)
+epoll_postfork_child (EV_P)
 {
   int fd;
 
@@ -58,14 +56,11 @@ epoll_postfork_child (void)
   /* re-register interest in fds */
   for (fd = 0; fd < anfdmax; ++fd)
     if (anfds [fd].events)//D
-      epoll_modify (fd, EV_NONE, anfds [fd].events);
+      epoll_modify (EV_A_ fd, EV_NONE, anfds [fd].events);
 }
 
-static struct epoll_event *events;
-static int eventmax;
-
 static void
-epoll_poll (ev_tstamp timeout)
+epoll_poll (EV_P_ ev_tstamp timeout)
 {
   int eventcnt = epoll_wait (epoll_fd, events, eventmax, ceil (timeout * 1000.));
   int i;
@@ -75,6 +70,7 @@ epoll_poll (ev_tstamp timeout)
 
   for (i = 0; i < eventcnt; ++i)
     fd_event (
+      EV_A_
       events [i].data.u64,
       (events [i].events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
       | (events [i].events & (EPOLLIN | EPOLLERR | EPOLLHUP) ? EV_READ : 0)
@@ -89,22 +85,23 @@ epoll_poll (ev_tstamp timeout)
     }
 }
 
-static void
-epoll_init (int flags)
+static int
+epoll_init (EV_P_ int flags)
 {
   epoll_fd = epoll_create (256);
 
   if (epoll_fd < 0)
-    return;
+    return 0;
 
   fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
 
-  ev_method     = EVMETHOD_EPOLL;
   method_fudge  = 1e-3; /* needed to compensate for epoll returning early */
   method_modify = epoll_modify;
   method_poll   = epoll_poll;
 
   eventmax = 64; /* intiial number of events receivable per poll */
   events = malloc (sizeof (struct epoll_event) * eventmax);
+
+  return EVMETHOD_EPOLL;
 }
 

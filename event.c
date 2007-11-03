@@ -35,12 +35,13 @@
 
 #include "event.h"
 
+#define dLOOPev
+#define dLOOPbase
+
 struct event_base
 {
   int dummy;
 };
-
-static int x_actives;
 
 static struct event_base x_base, *x_cur;
 
@@ -110,50 +111,33 @@ int event_loopexit (struct timeval *tv)
 static void
 x_cb (struct event *ev, int revents)
 {
-  if (ev->ev_events & EV_SIGNAL)
-    {
-      /* sig */
-      if (ev_is_active (&ev->iosig.sig))
-        {
-          ev_signal_stop (&ev->iosig.sig);
-          --x_actives;
-        }
-    }
-  else
-    {
-       /* io */
-      if (!(ev->ev_events & EV_PERSIST) && ev_is_active (&ev->iosig.io))
-        {
-          ev_io_stop (&ev->iosig.io);
-          --x_actives;
-        }
-    }
-
   revents &= EV_READ | EV_WRITE | EV_TIMEOUT | EV_SIGNAL;
-
-  if (revents & EV_TIMEOUT)
-    --x_actives;
 
   ev->ev_res = revents;
   ev->ev_callback (ev->ev_fd, revents, ev->ev_arg);
 }
 
 static void
-x_cb_io (struct ev_io *w, int revents)
-{
-  x_cb ((struct event *)(((char *)w) - offsetof (struct event, iosig.io)), revents);
-}
-
-static void
-x_cb_to (struct ev_timer *w, int revents)
-{
-  x_cb ((struct event *)(((char *)w) - offsetof (struct event, to)), revents);
-}
-
-static void
-x_cb_sig (struct ev_signal *w, int revents)
+x_cb_sig (EV_P_ struct ev_signal *w, int revents)
 {
   x_cb ((struct event *)(((char *)w) - offsetof (struct event, iosig.sig)), revents);
+}
+
+static void
+x_cb_io (EV_P_ struct ev_io *w, int revents)
+{
+  struct event *ev = (struct event *)(((char *)w) - offsetof (struct event, iosig.io));
+
+  if (!(ev->ev_events & EV_PERSIST) && ev_is_active (w))
+    ev_io_stop (w);
+
+  x_cb (ev, revents);
+}
+
+static void
+x_cb_to (EV_P_ struct ev_timer *w, int revents)
+{
+  x_cb ((struct event *)(((char *)w) - offsetof (struct event, to)), revents);
 }
 
 void event_set (struct event *ev, int fd, short events, void (*cb)(int, short, void *), void *arg)
@@ -181,27 +165,26 @@ int event_once (int fd, short events, void (*cb)(int, short, void *), void *arg,
 
 int event_add (struct event *ev, struct timeval *tv)
 {
+  dLOOPev;
+
   /* disable all watchers */
   event_del (ev);
 
   if (ev->ev_events & EV_SIGNAL)
     {
       ev_signal_set (&ev->iosig.sig, ev->ev_fd);
-      ev_signal_start (&ev->iosig.sig);
-      ++x_actives;
+      ev_signal_start (EV_A_ &ev->iosig.sig);
     }
   else if (ev->ev_events & (EV_READ | EV_WRITE))
     {
       ev_io_set (&ev->iosig.io, ev->ev_fd, ev->ev_events & (EV_READ | EV_WRITE));
-      ev_io_start (&ev->iosig.io);
-      ++x_actives;
+      ev_io_start (EV_A_ &ev->iosig.io);
     }
 
   if (tv)
     {
       ev_timer_set (&ev->to, tv_get (tv), 0.);
-      ev_timer_start (&ev->to);
-      ++x_actives;
+      ev_timer_start (EV_A_ &ev->to);
     }
 
   return 0;
@@ -209,36 +192,31 @@ int event_add (struct event *ev, struct timeval *tv)
 
 int event_del (struct event *ev)
 {
+  dLOOPev;
+
   if (ev->ev_events & EV_SIGNAL)
     {
       /* sig */
       if (ev_is_active (&ev->iosig.sig))
-        {
-          ev_signal_stop (&ev->iosig.sig);
-          --x_actives;
-        }
+        ev_signal_stop (EV_A_ &ev->iosig.sig);
     }
   else
     {
       /* io */
       if (ev_is_active (&ev->iosig.io))
-        {
-          ev_io_stop (&ev->iosig.io);
-          --x_actives;
-        }
+        ev_io_stop (EV_A_ &ev->iosig.io);
     }
 
   if (ev_is_active (&ev->to))
-    {
-      ev_timer_stop (&ev->to);
-      --x_actives;
-    }
+    ev_timer_stop (EV_A_ &ev->to);
 
   return 0;
 }
 
 int event_pending (struct event *ev, short events, struct timeval *tv)
 {
+  dLOOPev;
+
   short revents = 0;
 
   if (ev->ev_events & EV_SIGNAL)
@@ -259,7 +237,7 @@ int event_pending (struct event *ev, short events, struct timeval *tv)
       revents |= EV_TIMEOUT;
 
       if (tv)
-        tv_set (tv, ev_now); /* not sure if this is right :) */
+        tv_set (tv, ev_now (EV_A)); /* not sure if this is right :) */
     }
 
   return events & revents;
@@ -286,11 +264,8 @@ int event_base_set (struct event_base *base, struct event *ev)
 
 int event_base_loop (struct event_base *base, int flags)
 {
-  do
-    {
-      ev_loop (flags | EVLOOP_ONESHOT);
-    }
-  while (!(flags & (EVLOOP_ONESHOT | EVLOOP_NONBLOCK)) && x_actives && !ev_loop_done);
+  dLOOPbase;
+  ev_loop (EV_A_ flags | EVLOOP_ONESHOT);
 
   return 0;
 }
@@ -301,16 +276,17 @@ int event_base_dispatch (struct event_base *base)
 }
 
 static void
-x_loopexit_cb (int revents, void *arg)
+x_loopexit_cb (EV_P_ int revents, void *arg)
 {
-  ev_loop_done = 2;
+  ev_unloop (EV_A_ 2);
 }
 
 int event_base_loopexit (struct event_base *base, struct timeval *tv)
 {
+  dLOOPbase;
   ev_tstamp after = tv_get (tv);
 
-  ev_once (-1, 0, after >= 0. ? after : 0., x_loopexit_cb, (void *)base);
+  ev_once (EV_A_ -1, 0, after >= 0. ? after : 0., x_loopexit_cb, (void *)base);
 
   return -1;
 }
@@ -333,6 +309,7 @@ x_once_cb (int revents, void *arg)
 
 int event_base_once (struct event_base *base, int fd, short events, void (*cb)(int, short, void *), void *arg, struct timeval *tv)
 {
+  dLOOPbase;
   struct x_once *once = malloc (sizeof (struct x_once));
 
   if (!once)
@@ -342,13 +319,15 @@ int event_base_once (struct event_base *base, int fd, short events, void (*cb)(i
   once->cb  = cb;
   once->arg = arg;
 
-  ev_once (fd, events & (EV_READ | EV_WRITE), tv_get (tv), x_once_cb, (void *)once);
+  ev_once (EV_A_ fd, events & (EV_READ | EV_WRITE), tv_get (tv), x_once_cb, (void *)once);
 
   return 0;
 }
 
 int event_base_priority_init (struct event_base *base, int npri)
 {
+  dLOOPbase;
+
   return 0;
 }
 

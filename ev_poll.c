@@ -31,11 +31,6 @@
 
 #include <poll.h>
 
-static struct pollfd *polls;
-static int pollmax, pollcnt;
-static int *pollidxs; /* maps fds into structure indices */
-static int pollidxmax;
-
 static void
 pollidx_init (int *base, int count)
 {
@@ -44,7 +39,7 @@ pollidx_init (int *base, int count)
 }
 
 static void
-poll_modify (int fd, int oev, int nev)
+poll_modify (EV_P_ int fd, int oev, int nev)
 {
   int idx;
   array_needsize (pollidxs, pollidxmax, fd + 1, pollidx_init);
@@ -74,7 +69,7 @@ poll_modify (int fd, int oev, int nev)
 }
 
 static void
-poll_poll (ev_tstamp timeout)
+poll_poll (EV_P_ ev_tstamp timeout)
 {
   int res = poll (polls, pollcnt, ceil (timeout * 1000.));
 
@@ -84,6 +79,7 @@ poll_poll (ev_tstamp timeout)
 
       for (i = 0; i < pollcnt; ++i)
         fd_event (
+          EV_A_
           polls [i].fd,
           (polls [i].revents & (POLLOUT | POLLERR | POLLHUP) ? EV_WRITE : 0)
           | (polls [i].revents & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
@@ -92,17 +88,18 @@ poll_poll (ev_tstamp timeout)
   else if (res < 0)
     {
       if (errno == EBADF)
-        fd_ebadf ();
+        fd_ebadf (EV_A);
       else if (errno == ENOMEM)
-        fd_enomem ();
+        fd_enomem (EV_A);
     }
 }
 
-static void
-poll_init (int flags)
+static int
+poll_init (EV_P_ int flags)
 {
-  ev_method     = EVMETHOD_POLL;
   method_fudge  = 1e-3; /* needed to compensate for select returning early, very conservative */
   method_modify = poll_modify;
   method_poll   = poll_poll;
+
+  return EVMETHOD_POLL;
 }

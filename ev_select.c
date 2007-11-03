@@ -42,11 +42,8 @@
 #include <string.h>
 #include <inttypes.h>
 
-static unsigned char *vec_ri, *vec_ro, *vec_wi, *vec_wo;
-static int vec_max;
-
 static void
-select_modify (int fd, int oev, int nev)
+select_modify (EV_P_ int fd, int oev, int nev)
 {
   int offs = fd >> 3;
   int mask = 1 << (fd & 7);
@@ -75,7 +72,7 @@ select_modify (int fd, int oev, int nev)
 }
 
 static void
-select_poll (ev_tstamp timeout)
+select_poll (EV_P_ ev_tstamp timeout)
 {
   struct timeval tv;
   int res;
@@ -124,12 +121,13 @@ select_poll (ev_tstamp timeout)
     }
 }
 
-static void
-select_init (int flags)
+static int
+select_init (EV_P_ int flags)
 {
-  ev_method     = EVMETHOD_SELECT;
   method_fudge  = 1e-2; /* needed to compensate for select returning early, very conservative */
   method_modify = select_modify;
   method_poll   = select_poll;
+
+  return EVMETHOD_SELECT;
 }
 
