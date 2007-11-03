@@ -75,7 +75,7 @@ epoll_poll (ev_tstamp timeout)
 
   for (i = 0; i < eventcnt; ++i)
     fd_event (
-      events [i].data.fd,
+      events [i].data.u64,
       (events [i].events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
       | (events [i].events & (EPOLLIN | EPOLLERR | EPOLLHUP) ? EV_READ : 0)
     );

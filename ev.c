@@ -478,19 +478,35 @@ static struct ev_signal childev;
 #endif
 
 static void
-childcb (struct ev_signal *sw, int revents)
+child_reap (struct ev_signal *sw, int chain, int pid, int status)
 {
   struct ev_child *w;
+
+  for (w = childs [chain & (PID_HASHSIZE - 1)]; w; w = w->next)
+    if (w->pid == pid || !w->pid)
+      {
+        w->priority = sw->priority; /* need to do it *now* */
+        w->rpid     = pid;
+        w->rstatus  = status;
+        printf ("rpid %p %d %d\n", w, pid, w->pid);//D
+        event ((W)w, EV_CHILD);
+      }
+}
+
+static void
+childcb (struct ev_signal *sw, int revents)
+{
   int pid, status;
 
-  while ((pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)) != -1)
-    for (w = childs [pid & (PID_HASHSIZE - 1)]; w; w = w->next)
-      if (w->pid == pid || !w->pid)
-        {
-          w->rpid    = pid;
-          w->rstatus = status;
-          event ((W)w, EV_CHILD);
-        }
+            printf ("chld %x\n", revents);//D
+  if (0 < (pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)))
+    {
+      /* make sure we are called again until all childs have been reaped */
+      event ((W)sw, EV_SIGNAL);
+
+      child_reap (sw, pid, pid, status);
+      child_reap (sw,   0, pid, status); /* this might trigger a watcher twice, but event catches that */
+    }
 }
 
 #endif
@@ -573,10 +589,12 @@ int ev_init (int methods)
       if (ev_method)
         {
           ev_watcher_init (&sigev, sigcb);
+          ev_set_priority (&sigev, EV_MAXPRI);
           siginit ();
 
 #ifndef WIN32
           ev_signal_init (&childev, childcb, SIGCHLD);
+          ev_set_priority (&childev, EV_MAXPRI);
           ev_signal_start (&childev);
 #endif
         }
@@ -1010,6 +1028,10 @@ ev_periodic_stop (struct ev_periodic *w)
   ev_stop ((W)w);
 }
 
+#ifndef SA_RESTART
+# define SA_RESTART 0
+#endif
+
 void
 ev_signal_start (struct ev_signal *w)
 {
@@ -1027,7 +1049,7 @@ ev_signal_start (struct ev_signal *w)
       struct sigaction sa;
       sa.sa_handler = sighandler;
       sigfillset (&sa.sa_mask);
-      sa.sa_flags = 0;
+      sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
       sigaction (w->signum, &sa, 0);
     }
 }

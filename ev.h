@@ -168,6 +168,7 @@ struct ev_check
 
 /* invoked when sigchld is received and waitpid indicates the givne pid */
 /* revent EV_CHILD */
+/* does not support priorities */
 struct ev_child
 {
   EV_WATCHER_LIST (ev_child);
