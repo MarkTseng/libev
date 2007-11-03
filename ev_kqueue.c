@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2007      Marc Alexander Lehmann <libev@schmorp.de>
  * Copyright 2000-2002 Niels Provos <provos@citi.umich.edu>
@@ -56,10 +55,14 @@ kqueue_change (int fd, int filter, int flags, int fflags)
   ke->fflags = fflags;
 }
 
+#ifndef NOTE_EOF
+# define NOTE_EOF 0
+#endif
+
 static void
 kqueue_modify (int fd, int oev, int nev)
 {
-  if ((oev ^ new) & EV_READ)
+  if ((oev ^ nev) & EV_READ)
     {
       if (nev & EV_READ)
         kqueue_change (fd, EVFILT_READ, EV_ADD, NOTE_EOF);
@@ -67,7 +70,7 @@ kqueue_modify (int fd, int oev, int nev)
         kqueue_change (fd, EVFILT_READ, EV_DELETE, 0);
     }
 
-  if ((oev ^ new) & EV_WRITE)
+  if ((oev ^ nev) & EV_WRITE)
     {
       if (nev & EV_WRITE)
         kqueue_change (fd, EVFILT_WRITE, EV_ADD, NOTE_EOF);
@@ -106,14 +109,14 @@ kqueue_poll (ev_tstamp timeout)
            * an event we are still processing.  In that case
            * the data field is set to ENOENT.
            */
-          if (events [i].data == EBADF)
-            fd_kill (events [i].ident);
+          if (kq_events [i].data == EBADF)
+            fd_kill (kq_events [i].ident);
         }
       else
         fd_event (
-          events [i].ident,
-          events [i].filter == EVFILT_READ ? EV_READ
-          : events [i].filter == EVFILT_WRITE ? EV_WRITE
+          kq_events [i].ident,
+          kq_events [i].filter == EVFILT_READ ? EV_READ
+          : kq_events [i].filter == EVFILT_WRITE ? EV_WRITE
           : 0
         );
     }
@@ -127,7 +130,7 @@ kqueue_poll (ev_tstamp timeout)
 }
 
 static void
-kqueue_init (struct event_base *base)
+kqueue_init (int flags)
 {
   struct kevent ch, ev;
 
@@ -142,7 +145,7 @@ kqueue_init (struct event_base *base)
 
   /* 
    * If kqueue works, then kevent will succeed, and it will
-   * stick an error in events[0]. If kqueue is broken, then
+   * stick an error in ev. If kqueue is broken, then
    * kevent will fail.
    */
   if (kevent (kq_fd, &ch, 1, &ev, 1, 0) != 1
