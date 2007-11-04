@@ -199,6 +199,20 @@ struct ev_child
   int rstatus; /* rw, holds the exit status, use the macros from sys/wait.h */
 };
 
+union ev_any_watcher
+{
+  struct ev_watcher w;
+  struct ev_watcher_list wl;
+  struct ev_io io;
+  struct ev_timer timer;
+  struct ev_periodic periodic;
+  struct ev_signal signal;
+  struct ev_idle idle;
+  struct ev_child child;
+  struct ev_prepare prepare;
+  struct ev_check check;
+};
+
 #define EVMETHOD_AUTO     0 /* consults environment */
 #define EVMETHOD_SELECT   1
 #define EVMETHOD_POLL     2
