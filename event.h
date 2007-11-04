@@ -31,7 +31,9 @@
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
-#include "ev.h"
+#ifndef EV_EMBED
+# include "ev.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -121,7 +123,7 @@ int event_base_dispatch (struct event_base *base);
 int event_base_once (struct event_base *base, int fd, short events, void (*cb)(int, short, void *), void *arg, struct timeval *tv);
 int event_base_priority_init (struct event_base *base, int fd);
 
-#ifndef EV_STANDALONE
+#ifndef EV_EMBED
 # include "event_compat.h"
 #endif
 

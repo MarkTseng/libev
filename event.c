@@ -34,7 +34,9 @@
 #include <sys/time.h>
 #include <assert.h>
 
-#include "event.h"
+#ifndef EV_EMBED
+# include "event.h"
+#endif
 
 #if EV_MULTIPLICITY
 # define dLOOPev struct ev_loop *loop = (struct ev_loop *)ev->ev_base
@@ -110,7 +112,7 @@ int event_dispatch (void)
   return event_base_dispatch (x_cur);
 }
 
-#ifdef EV_STANDALONE
+#ifdef EV_EMBED
 void event_set_log_callback (event_log_cb cb)
 {
   /* nop */

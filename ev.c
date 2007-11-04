@@ -28,7 +28,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef EV_STANDALONE
+#ifndef EV_EMBED
 # include "config.h"
 #endif
 
@@ -95,7 +95,9 @@
 #define PID_HASHSIZE  16 /* size of pid hash table, must be power of two */
 /*#define CLEANUP_INTERVAL 300. /* how often to try to free memory and re-check fds */
 
-#include "ev.h"
+#ifndef EV_EMBED
+# include "ev.h"
+#endif
 
 #if __GNUC__ >= 3
 # define expect(expr,value)         __builtin_expect ((expr),(value))

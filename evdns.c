@@ -40,7 +40,9 @@
 #endif
 
 #ifdef WIN32
+#ifndef EV_EMBED
 #include "misc.h"
+#endif
 #endif
 
 /* #define NDEBUG */
@@ -94,7 +96,6 @@
 #include <stdarg.h>
 
 #include "evdns.h"
-#include "log.h"
 #ifdef WIN32
 #include <windows.h>
 #include <winsock2.h>
