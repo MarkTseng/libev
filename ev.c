@@ -115,6 +115,8 @@ typedef struct ev_watcher *W;
 typedef struct ev_watcher_list *WL;
 typedef struct ev_watcher_time *WT;
 
+static int have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
+
 /*****************************************************************************/
 
 typedef struct
@@ -131,16 +133,22 @@ typedef struct
 } ANPENDING;
 
 #ifdef EV_MULTIPLICITY
+
 struct ev_loop
 {
-# define VAR(name,decl) decl
+# define VAR(name,decl) decl;
 # include "ev_vars.h"
 };
+# undef VAR
+# include "ev_wrap.h"
+
 #else
-# define VAR(name,decl) static decl
+
+# define VAR(name,decl) static decl;
 # include "ev_vars.h"
+# undef VAR
+
 #endif
-#undef VAR
 
 /*****************************************************************************/
 
@@ -335,44 +343,44 @@ fd_enomem (EV_P)
 /*****************************************************************************/
 
 static void
-upheap (WT *timers, int k)
+upheap (WT *heap, int k)
 {
-  WT w = timers [k];
+  WT w = heap [k];
 
-  while (k && timers [k >> 1]->at > w->at)
+  while (k && heap [k >> 1]->at > w->at)
     {
-      timers [k] = timers [k >> 1];
-      timers [k]->active = k + 1;
+      heap [k] = heap [k >> 1];
+      heap [k]->active = k + 1;
       k >>= 1;
     }
 
-  timers [k] = w;
-  timers [k]->active = k + 1;
+  heap [k] = w;
+  heap [k]->active = k + 1;
 
 }
 
 static void
-downheap (WT *timers, int N, int k)
+downheap (WT *heap, int N, int k)
 {
-  WT w = timers [k];
+  WT w = heap [k];
 
   while (k < (N >> 1))
     {
       int j = k << 1;
 
-      if (j + 1 < N && timers [j]->at > timers [j + 1]->at)
+      if (j + 1 < N && heap [j]->at > heap [j + 1]->at)
         ++j;
 
-      if (w->at <= timers [j]->at)
+      if (w->at <= heap [j]->at)
         break;
 
-      timers [k] = timers [j];
-      timers [k]->active = k + 1;
+      heap [k] = heap [j];
+      heap [k]->active = k + 1;
       k = j;
     }
 
-  timers [k] = w;
-  timers [k]->active = k + 1;
+  heap [k] = w;
+  heap [k]->active = k + 1;
 }
 
 /*****************************************************************************/
@@ -447,7 +455,7 @@ siginit (EV_P)
 #endif
 
   ev_io_set (&sigev, sigpipe [0], EV_READ);
-  ev_io_start (&sigev);
+  ev_io_start (EV_A_ &sigev);
   ev_unref (EV_A); /* child watcher should not keep loop alive */
 }
 
@@ -536,13 +544,9 @@ ev_method (EV_P)
   return method;
 }
 
-int
-ev_init (EV_P_ int methods)
+static void
+loop_init (EV_P_ int methods)
 {
-#ifdef EV_MULTIPLICITY
-  memset (loop, 0, sizeof (struct ev_loop));
-#endif
-
   if (!method)
     {
 #if EV_USE_MONOTONIC
@@ -556,7 +560,7 @@ ev_init (EV_P_ int methods)
       rt_now    = ev_time ();
       mn_now    = get_clock ();
       now_floor = mn_now;
-      diff      = rt_now - mn_now;
+      rtmn_diff = rt_now - mn_now;
 
       if (pipe (sigpipe))
         return 0;
@@ -599,6 +603,35 @@ ev_init (EV_P_ int methods)
   return method;
 }
 
+#ifdef EV_MULTIPLICITY
+
+struct ev_loop *
+ev_loop_new (int methods)
+{
+  struct ev_loop *loop = (struct ev_loop *)calloc (1, sizeof (struct ev_loop));
+
+  loop_init (EV_A_ methods);
+
+  return loop;
+}
+
+void
+ev_loop_delete (EV_P)
+{
+  /*TODO*/
+  free (loop);
+}
+
+#else
+
+int
+ev_init (int methods)
+{
+  loop_init ();
+}
+
+#endif
+
 /*****************************************************************************/
 
 void
@@ -616,16 +649,19 @@ ev_fork_parent (void)
 void
 ev_fork_child (void)
 {
+  /*TODO*/
+#if !EV_MULTIPLICITY
 #if EV_USE_EPOLL
   if (method == EVMETHOD_EPOLL)
-    epoll_postfork_child ();
+    epoll_postfork_child (EV_A);
 #endif
 
-  ev_io_stop (&sigev);
+  ev_io_stop (EV_A_ &sigev);
   close (sigpipe [0]);
   close (sigpipe [1]);
   pipe (sigpipe);
-  siginit ();
+  siginit (EV_A);
+#endif
 }
 
 /*****************************************************************************/
@@ -665,7 +701,7 @@ timers_reify (EV_P)
       else
         ev_timer_stop (EV_A_ w); /* nonrepeating: stop timer */
 
-      event ((W)w, EV_TIMEOUT);
+      event (EV_A_ (W)w, EV_TIMEOUT);
     }
 }
 
@@ -691,7 +727,7 @@ periodics_reify (EV_P)
 }
 
 static void
-periodics_reschedule (EV_P_ ev_tstamp diff)
+periodics_reschedule (EV_P)
 {
   int i;
 
@@ -722,7 +758,7 @@ time_update_monotonic (EV_P)
 
   if (expect_true (mn_now - now_floor < MIN_TIMEJUMP * .5))
     {
-      rt_now = mn_now + diff;
+      rt_now = rtmn_diff + mn_now;
       return 0;
     }
   else
@@ -743,13 +779,13 @@ time_update (EV_P)
     {
       if (time_update_monotonic (EV_A))
         {
-          ev_tstamp odiff = diff;
+          ev_tstamp odiff = rtmn_diff;
 
           for (i = 4; --i; ) /* loop a few times, before making important decisions */
             {
-              diff = rt_now - mn_now;
+              rtmn_diff = rt_now - mn_now;
 
-              if (fabs (odiff - diff) < MIN_TIMEJUMP)
+              if (fabs (odiff - rtmn_diff) < MIN_TIMEJUMP)
                 return; /* all is well */
 
               rt_now    = ev_time ();
@@ -757,8 +793,9 @@ time_update (EV_P)
               now_floor = mn_now;
             }
 
-          periodics_reschedule (EV_A_ diff - odiff);
+          periodics_reschedule (EV_A);
           /* no timer adjustment, as the monotonic clock doesn't jump */
+          /* timers_reschedule (EV_A_ rtmn_diff - odiff) */
         }
     }
   else
@@ -768,11 +805,11 @@ time_update (EV_P)
 
       if (expect_false (mn_now > rt_now || mn_now < rt_now - MAX_BLOCKTIME - MIN_TIMEJUMP))
         {
-          periodics_reschedule (EV_A_ rt_now - mn_now);
+          periodics_reschedule (EV_A);
 
           /* adjust timers. this is easy, as the offset is the same for all */
           for (i = 0; i < timercnt; ++i)
-            timers [i]->at += diff;
+            timers [i]->at += rt_now - mn_now;
         }
 
       mn_now = rt_now;

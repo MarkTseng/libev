@@ -107,7 +107,7 @@ select_poll (EV_P_ ev_tstamp timeout)
                       events |= byte_w & (1 << bit) ? EV_WRITE : 0;
 
                       if (events)
-                        fd_event (idx * 8 + bit, events);
+                        fd_event (EV_A_ idx * 8 + bit, events);
                     }
               }
         }
@@ -115,9 +115,9 @@ select_poll (EV_P_ ev_tstamp timeout)
   else if (res < 0)
     {
       if (errno == EBADF)
-        fd_ebadf ();
+        fd_ebadf (EV_A);
       else if (errno == ENOMEM)
-        fd_enomem ();
+        fd_enomem (EV_A);
     }
 }
 

@@ -35,19 +35,17 @@
 
 #include "event.h"
 
-#ifdef EV_MULTIPLICITY
-# define dLOOPev struct ev_loop *loop = ev->ev_base->loop
-# define dLOOPbase struct ev_loop *loop = base->loop
+#if EV_MULTIPLICITY
+# define dLOOPev struct ev_loop *loop = (struct ev_loop *)ev->ev_base
+# define dLOOPbase struct ev_loop *loop = (struct ev_loop *)base
 #else
 # define dLOOPev
 # define dLOOPbase
 #endif
 
+/* never accessed, will always be cast from/to ev_loop */
 struct event_base
 {
-#ifdef EV_MULTIPLICITY
-  struct ev_loop *loop;
-#endif
   int dummy;
 };
 
@@ -83,17 +81,22 @@ const char *event_get_method (void)
 
 void *event_init (void)
 {
-  if (!x_cur && ev_init (0))
-    return x_cur = &x_base;
+#if EV_MULTIPLICITY
+  x_cur = (struct event_base *)ev_loop_new (EVMETHOD_AUTO);
+#else
+  x_cur = &x_base;
+#endif
 
-  return 0;
+  return x_cur;
 }
 
 void event_base_free (struct event_base *base)
 {
   dLOOPbase;
 
-  /* nop */
+#if EV_MULTIPLICITY
+  ev_loop_delete (loop);
+#endif
 }
 
 int event_dispatch (void)
@@ -139,7 +142,7 @@ x_cb_io (EV_P_ struct ev_io *w, int revents)
   struct event *ev = (struct event *)(((char *)w) - offsetof (struct event, iosig.io));
 
   if (!(ev->ev_events & EV_PERSIST) && ev_is_active (w))
-    ev_io_stop (w);
+    ev_io_stop (EV_A_ w);
 
   x_cb (ev, revents);
 }
@@ -152,14 +155,19 @@ x_cb_to (EV_P_ struct ev_timer *w, int revents)
 
 void event_set (struct event *ev, int fd, short events, void (*cb)(int, short, void *), void *arg)
 {
-  if (events & EV_SIGNAL)
-    ev_watcher_init (&ev->iosig.sig, x_cb_sig);
-  else
-    ev_watcher_init (&ev->iosig.io, x_cb_io);
+  if (!ev->initialised)
+    {
+      ev->initialised = 1;
 
-  ev_watcher_init (&ev->to, x_cb_to);
+      if (events & EV_SIGNAL)
+        ev_watcher_init (&ev->iosig.sig, x_cb_sig);
+      else
+        ev_watcher_init (&ev->iosig.io, x_cb_io);
 
-  ev->ev_base     = x_cur;
+      ev_watcher_init (&ev->to, x_cb_to);
+    }
+
+  ev->ev_base     = x_cur; /* not threadsafe, but its like libevent works */
   ev->ev_fd       = fd;
   ev->ev_events   = events;
   ev->ev_pri      = 0;
@@ -287,9 +295,11 @@ int event_base_dispatch (struct event_base *base)
 }
 
 static void
-x_loopexit_cb (EV_P_ int revents, void *arg)
+x_loopexit_cb (int revents, void *base)
 {
-  ev_unloop (EV_A_ 2);
+  dLOOPbase;
+
+  ev_unloop (EV_A_ EVUNLOOP_ONCE);
 }
 
 int event_base_loopexit (struct event_base *base, struct timeval *tv)

@@ -54,6 +54,8 @@ struct event
   int ev_pri;
   int ev_res;
   short ev_events;
+
+  char initialised; /* flag to work around some idiosynchrasies in the API */
 };
 
 #define EV_PERSIST                 0x10
@@ -61,7 +63,7 @@ struct event
 #define EVENT_SIGNAL(ev)           ((int) (ev)->ev_fd)
 #define EVENT_FD(ev)               ((int) (ev)->ev_fd)
 
-#define event_initialized(ev)      1
+#define event_initialized(ev)      ((ev)->initialised)
 
 #define evtimer_add(ev,tv)         event_add (ev, tv)
 #define evtimer_set(ev,cb,data)    event_set (ev, -1, 0, cb, data)

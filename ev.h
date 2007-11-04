@@ -44,8 +44,12 @@ typedef double ev_tstamp;
 # define EV_MAXPRI +2
 #endif
 
+#ifndef EV_MULTIPLICITY
+# define EV_MULTIPLICITY 1
+#endif
+
 /* support multiple event loops? */
-#ifdef EV_MULTIPLICITY
+#if EV_MULTIPLICITY
 struct ev_loop;
 # define EV_P struct ev_loop *loop
 # define EV_P_ EV_P,
@@ -56,7 +60,6 @@ struct ev_loop;
 # define EV_P_
 # define EV_A
 # define EV_A_
-
 #endif
 
 /* eventmask, revents, events... */
@@ -155,6 +158,9 @@ struct ev_io
 struct ev_signal
 {
   EV_WATCHER_LIST (ev_signal);
+#if EV_MULTIPLICITY
+  struct ev_loop *loop;
+#endif
 
   int signum; /* ro */
 };
@@ -201,9 +207,8 @@ struct ev_child
 #define EVMETHOD_DEVPOLL 16 /* NYI */
 #define EVMETHOD_PORT    32 /* NYI */
 #define EVMETHOD_ANY     ~0 /* any method, do not consult env */
+
 #if EV_PROTOTYPES
-int ev_method (EV_P);
-int ev_init (EV_P_ int methods); /* returns ev_method */
 int ev_version_major (void);
 int ev_version_minor (void);
 
@@ -213,13 +218,26 @@ void ev_fork_parent (void);
 void ev_fork_child (void);
 
 ev_tstamp ev_time (void);
+
+# if EV_MULTIPLICITY
+struct ev_loop *ev_loop_new (int methods);
+void ev_loop_delete (EV_P);
+# else
+int ev_init (int methods); /* returns ev_method */
+# endif
+
+int ev_method (EV_P);
+
 #endif
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */
 #define EVLOOP_ONESHOT	2 /* block *once* only */
+#define EVUNLOOP_ONCE   1 /* unloop once */
+#define EVUNLOOP_ALL    2 /* unloop all loops */
+
 #if EV_PROTOTYPES
 void ev_loop (EV_P_ int flags);
-void ev_unloop (EV_P_ int status); /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
+void ev_unloop (EV_P_ int how); /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
 
 ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after each poll */
 
