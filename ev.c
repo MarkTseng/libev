@@ -132,7 +132,7 @@ typedef struct
   int events;
 } ANPENDING;
 
-#ifdef EV_MULTIPLICITY
+#if EV_MULTIPLICITY
 
 struct ev_loop
 {
@@ -544,7 +544,7 @@ ev_method (EV_P)
   return method;
 }
 
-static void
+inline int
 loop_init (EV_P_ int methods)
 {
   if (!method)
@@ -603,16 +603,19 @@ loop_init (EV_P_ int methods)
   return method;
 }
 
-#ifdef EV_MULTIPLICITY
+#if EV_MULTIPLICITY
 
 struct ev_loop *
 ev_loop_new (int methods)
 {
   struct ev_loop *loop = (struct ev_loop *)calloc (1, sizeof (struct ev_loop));
 
-  loop_init (EV_A_ methods);
+  if (loop_init (EV_A_ methods))
+    return loop;
 
-  return loop;
+  ev_loop_delete (loop);
+
+  return 0;
 }
 
 void
@@ -627,7 +630,7 @@ ev_loop_delete (EV_P)
 int
 ev_init (int methods)
 {
-  loop_init ();
+  return loop_init (methods);
 }
 
 #endif

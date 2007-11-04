@@ -62,7 +62,7 @@ epoll_postfork_child (EV_P)
 static void
 epoll_poll (EV_P_ ev_tstamp timeout)
 {
-  int eventcnt = epoll_wait (epoll_fd, events, eventmax, ceil (timeout * 1000.));
+  int eventcnt = epoll_wait (epoll_fd, epoll_events, epoll_eventmax, ceil (timeout * 1000.));
   int i;
 
   if (eventcnt < 0)
@@ -71,17 +71,17 @@ epoll_poll (EV_P_ ev_tstamp timeout)
   for (i = 0; i < eventcnt; ++i)
     fd_event (
       EV_A_
-      events [i].data.u64,
-      (events [i].events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
-      | (events [i].events & (EPOLLIN | EPOLLERR | EPOLLHUP) ? EV_READ : 0)
+      epoll_events [i].data.u64,
+      (epoll_events [i].events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
+      | (epoll_events [i].events & (EPOLLIN | EPOLLERR | EPOLLHUP) ? EV_READ : 0)
     );
 
   /* if the receive array was full, increase its size */
-  if (expect_false (eventcnt == eventmax))
+  if (expect_false (eventcnt == epoll_eventmax))
     {
-      free (events);
-      eventmax = array_roundsize (events, eventmax << 1);
-      events = malloc (sizeof (struct epoll_event) * eventmax);
+      free (epoll_events);
+      epoll_eventmax = array_roundsize (epoll_events, epoll_eventmax << 1);
+      epoll_events = malloc (sizeof (struct epoll_event) * epoll_eventmax);
     }
 }
 
@@ -99,8 +99,8 @@ epoll_init (EV_P_ int flags)
   method_modify = epoll_modify;
   method_poll   = epoll_poll;
 
-  eventmax = 64; /* intiial number of events receivable per poll */
-  events = malloc (sizeof (struct epoll_event) * eventmax);
+  epoll_eventmax = 64; /* intiial number of events receivable per poll */
+  epoll_events = malloc (sizeof (struct epoll_event) * epoll_eventmax);
 
   return EVMETHOD_EPOLL;
 }
