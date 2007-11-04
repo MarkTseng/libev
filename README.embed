@@ -1,0 +1,140 @@
+EMBEDDING THE LIBEV CODE INTO YOUR OWN PROGRAMS
+
+    Instead of building the libev library you cna also include the code
+    as-is into your programs. To update, you only have to copy a few files
+    into your source tree.
+
+    This is how it works:
+
+FILESETS
+
+    To include only the libev core (all the ev_* functions):
+
+        #define EV_STANDALONE   1
+        #include "ev.c"
+
+    This will automatically include ev.h, too, and should be done in a
+    single C source file only to provide the function implementations. To
+    use it, do the same for ev.h in all users:
+
+        #define EV_STANDALONE   1
+        #include "ev.h"
+
+    You need the following files in your source tree, or in a directory
+    in your include path (e.g. in libev/ when using -Ilibev):
+
+        ev.h
+        ev.c
+        ev_vars.h
+        ev_wrap.h
+
+    To include the libevent compatibility API, also include:
+
+        #include "event.c"
+
+    in the file including "ev.c", and:
+
+        #include "event.h"
+
+    in the files that want to use the libevent API. This also includes "ev.h".
+
+    You need the following additional files for this:
+
+        event.h
+        event.c
+
+PREPROCESSOR SYMBOLS
+
+    Libev can be configured via a variety of preprocessor symbols you have to define
+    before including any of its files. The default is not to build for mulciplicity
+    and only include the select backend.
+
+    EV_STANDALONE
+
+        Must always be "1", which keeps libev from including config.h or
+        other files, and it also defines dummy implementations for some
+        libevent functions (such as logging, which is not supported). It
+        will also not define any of the structs usually found in "event.h"
+        that are not directly supported by libev code alone.
+
+    EV_USE_MONOTONIC
+
+        If undefined or defined to be "1", libev will try to detect the
+        availability of the monotonic clock option at both compiletime and
+        runtime. Otherwise no use of the monotonic clock option will be
+        attempted.
+
+    EV_USE_REALTIME
+
+        If defined to be "1", libev will try to detect the availability
+        of the realtime clock option at compiletime (and assume its
+        availability at runtime if successful). Otherwise no use of the
+        realtime clock option will be attempted. This effectively replaces
+        gettimeofday by clock_get (CLOCK_REALTIME, ...) and will not normally
+        affect correctness.
+
+    EV_USE_SELECT
+
+       If undefined or defined to be "1", libev will compile in support
+       for the select(2) backend. No attempt at autodetection will be
+       done: if no other method takes over, select will be it. Otherwise
+       the select backend will not be compiled in.
+
+    EV_USE_POLL
+
+       If defined to be "1", libev will compile in support for the poll(2)
+       backend. No attempt at autodetection will be done. poll usually
+       performs worse than select, so its not enabled by default (it is
+       also slightly less portable).
+
+    EV_USE_EPOLL
+
+       If defined to be "1", libev will compile in support for the Linux
+       epoll backend. Its availability will be detected at runtime,
+       otherwise another method will be used as fallback. This is the
+       preferred backend for GNU/Linux systems.
+
+    EV_USE_KQUEUE
+
+       If defined to be "1", libev will compile in support for the BSD
+       style kqueue backend. Its availability will be detected at runtime,
+       otherwise another method will be used as fallback. This is the
+       preferred backend for BSD and BSd-like systems. Darwin brokenness
+       will be detected at runtime and routed around by disabling this
+       backend.
+
+    EV_COMMON
+ 
+       By default, all watchers have a "void *data" member. By redefining
+       this macro to a something else you can include more and other types
+       of members. You have to define it each time you include one of the
+       files, though, and it must be identical each time.
+
+       For example, the perl EV module uses this:
+
+           #define EV_COMMON                       \
+             SV *self; /* contains this struct */  \
+             SV *cb_sv, *fh;
+
+    EV_PROTOTYPES
+
+       If defined to be "0", then "ev.h" will not define any function
+       prototypes, but still define all the structs and other
+       symbols. This is occasionally useful.
+
+    EV_MULTIPLICITY
+
+       If undefined or defined to "1", then all event-loop-specific
+       functions will have the "struct ev_loop *" as first argument, and
+       you can create additional independent event loops. Otherwise there
+       will be no support for multiple event loops and there is no first
+       event loop pointer argument. Instead, all functions act on the
+       single default loop.
+
+EXAMPLES
+
+    For a real-world example of a program the includes libev verbatim, you
+    can have a look at the EV perl module (http://software.schmorp.de/pkg/EV.html).
+    It has the libev files in the liev/ subdirectory and includes them in the
+    EV.xs files. Only this file will be compiled.
+
