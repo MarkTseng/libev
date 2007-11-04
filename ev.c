@@ -709,7 +709,9 @@ ev_default_loop (int methods)
 void
 ev_default_destroy (void)
 {
+#if EV_MULTIPLICITY
   struct ev_loop *loop = default_loop;
+#endif
 
   ev_ref (EV_A); /* child watcher */
   ev_signal_stop (EV_A_ &childev);
