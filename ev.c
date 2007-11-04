@@ -234,6 +234,9 @@ ev_now (EV_P)
       cur = newcnt;					\
     }
 
+#define array_free(stem, idx) \
+  free (stem ## s idx); stem ## cnt idx = stem ## max idx = 0;
+
 /*****************************************************************************/
 
 static void
@@ -636,6 +639,8 @@ loop_init (EV_P_ int methods)
 void
 loop_destroy (EV_P)
 {
+  int i;
+
 #if EV_USE_WIN32
   if (method == EVMETHOD_WIN32 ) win32_destroy  (EV_A);
 #endif
@@ -651,6 +656,16 @@ loop_destroy (EV_P)
 #if EV_USE_SELECT
   if (method == EVMETHOD_SELECT) select_destroy (EV_A);
 #endif
+
+  for (i = NUMPRI; i--; )
+    array_free (pending, [i]);
+
+  array_free (fdchange, );
+  array_free (timer, );
+  array_free (periodic, );
+  array_free (idle, );
+  array_free (prepare, );
+  array_free (check, );
 
   method = 0;
   /*TODO*/
@@ -796,7 +811,7 @@ call_pending (EV_P)
           {
             p->w->pending = 0;
 
-            (*(void (**)(EV_P_ W, int))&p->w->cb) (EV_A_ p->w, p->events);
+            ((void (*)(EV_P_ W, int))p->w->cb) (EV_A_ p->w, p->events);
           }
       }
 }
