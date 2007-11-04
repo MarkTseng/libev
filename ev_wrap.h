@@ -50,6 +50,3 @@
 #define checks ((loop)->checks)
 #define checkmax ((loop)->checkmax)
 #define checkcnt ((loop)->checkcnt)
-#define childs ((loop)->childs)
-#define childev ((loop)->childev)
-#define sigev ((loop)->sigev)

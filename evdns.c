@@ -40,7 +40,7 @@
 #endif
 
 #ifdef WIN32
-#ifndef EV_EMBED
+#ifndef EV_STANDALONE
 #include "misc.h"
 #endif
 #endif

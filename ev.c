@@ -28,7 +28,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef EV_EMBED
+#ifndef EV_STANDALONE
 # include "config.h"
 #endif
 
@@ -60,8 +60,8 @@
 # define EV_USE_SELECT 1
 #endif
 
-#ifndef EV_USEV_POLL
-# define EV_USEV_POLL 0 /* poll is usually slower than select, and not as well tested */
+#ifndef EV_USE_POLL
+# define EV_USE_POLL 0 /* poll is usually slower than select, and not as well tested */
 #endif
 
 #ifndef EV_USE_EPOLL
@@ -95,9 +95,7 @@
 #define PID_HASHSIZE  16 /* size of pid hash table, must be power of two */
 /*#define CLEANUP_INTERVAL 300. /* how often to try to free memory and re-check fds */
 
-#ifndef EV_EMBED
-# include "ev.h"
-#endif
+#include "ev.h"
 
 #if __GNUC__ >= 3
 # define expect(expr,value)         __builtin_expect ((expr),(value))
@@ -413,6 +411,7 @@ static int signalmax;
 
 static int sigpipe [2];
 static sig_atomic_t volatile gotsig;
+static struct ev_io sigev;
 
 static void
 signals_init (ANSIG *base, int count)
@@ -480,6 +479,9 @@ siginit (EV_P)
 
 #ifndef WIN32
 
+static struct ev_child *childs [PID_HASHSIZE];
+static struct ev_signal childev;
+
 #ifndef WCONTINUED
 # define WCONTINUED 0
 #endif
@@ -524,7 +526,7 @@ childcb (EV_P_ struct ev_signal *sw, int revents)
 #if EV_USE_EPOLL
 # include "ev_epoll.c"
 #endif
-#if EV_USEV_POLL
+#if EV_USE_POLL
 # include "ev_poll.c"
 #endif
 #if EV_USE_SELECT
@@ -592,7 +594,7 @@ loop_init (EV_P_ int methods)
 #if EV_USE_EPOLL
       if (!method && (methods & EVMETHOD_EPOLL )) method = epoll_init  (EV_A_ methods);
 #endif
-#if EV_USEV_POLL
+#if EV_USE_POLL
       if (!method && (methods & EVMETHOD_POLL  )) method = poll_init   (EV_A_ methods);
 #endif
 #if EV_USE_SELECT
@@ -610,7 +612,7 @@ loop_destroy (EV_P)
 #if EV_USE_EPOLL
   if (method == EVMETHOD_EPOLL ) epoll_destroy  (EV_A);
 #endif
-#if EV_USEV_POLL
+#if EV_USE_POLL
   if (method == EVMETHOD_POLL  ) poll_destroy   (EV_A);
 #endif
 #if EV_USE_SELECT

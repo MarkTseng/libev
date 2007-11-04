@@ -133,8 +133,10 @@ PREPROCESSOR SYMBOLS
 
 EXAMPLES
 
-    For a real-world example of a program the includes libev verbatim, you
-    can have a look at the EV perl module (http://software.schmorp.de/pkg/EV.html).
-    It has the libev files in the liev/ subdirectory and includes them in the
-    EV.xs files. Only this file will be compiled.
+    For a real-world example of a program the includes libev
+    verbatim, you can have a look at the EV perl module
+    (http://software.schmorp.de/pkg/EV.html).  It has the libev files in
+    the liev/ subdirectory and includes them in the EV/EVAPI.h (public
+    interface) and EV.xs (implementation) files. Only EV.xs file will be
+    compiled.
 

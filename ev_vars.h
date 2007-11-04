@@ -75,10 +75,5 @@ VARx(struct ev_check **, checks)
 VARx(int, checkmax)
 VARx(int, checkcnt)
 
-VAR (childs, struct ev_child *childs [PID_HASHSIZE])
-VARx(struct ev_signal, childev)
-
-VARx(struct ev_io, sigev)
-
 #undef VARx
 
