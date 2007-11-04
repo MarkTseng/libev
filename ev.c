@@ -30,6 +30,28 @@
  */
 #ifndef EV_STANDALONE
 # include "config.h"
+
+# if HAVE_CLOCK_GETTIME
+#  define EV_USE_MONOTONIC 1
+#  define EV_USE_REALTIME  1
+# endif
+
+# if HAVE_SELECT && HAVE_SYS_SELECT_H
+#  define EV_USE_SELECT 1
+# endif
+
+# if HAVE_POLL && HAVE_POLL_H
+#  define EV_USE_POLL 1
+# endif
+
+# if HAVE_EPOLL && HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H
+#  define EV_USE_EPOLL 1
+# endif
+
+# if HAVE_KQUEUE && HAVE_WORKING_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H
+#  define EV_USE_KQUEUE 1
+# endif
+
 #endif
 
 #include <math.h>
@@ -351,7 +373,7 @@ fd_rearm_all (EV_P)
     if (anfds [fd].events)
       {
         anfds [fd].events = 0;
-        fd_change (fd);
+        fd_change (EV_A_ fd);
       }
 }
 
@@ -643,7 +665,7 @@ ev_loop_new (int methods)
 
   loop_init (EV_A_ methods);
 
-  if (ev_methods (EV_A))
+  if (ev_method (EV_A))
     return loop;
 
   return 0;
@@ -730,8 +752,12 @@ ev_default_destroy (void)
 }
 
 void
-ev_default_fork (EV_P)
+ev_default_fork (void)
 {
+#if EV_MULTIPLICITY
+  struct ev_loop *loop = default_loop;
+#endif
+
   loop_fork (EV_A);
 
   ev_io_stop (EV_A_ &sigev);

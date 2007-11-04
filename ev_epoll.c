@@ -102,11 +102,9 @@ epoll_destroy (EV_P)
 static void
 epoll_fork (EV_P)
 {
-  int fd;
-
   epoll_fd = epoll_create (256);
   fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
 
-  fd_rearm_all ();
+  fd_rearm_all (EV_A);
 }
 

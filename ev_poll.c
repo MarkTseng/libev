@@ -102,7 +102,7 @@ poll_init (EV_P_ int flags)
   method_poll   = poll_poll;
 
   pollidxs = 0; pollidxmax = 0;
-  polls    = 0; pollsmax   = 0; pollscnt = 0;
+  polls    = 0; pollmax    = 0; pollcnt = 0;
 
   return EVMETHOD_POLL;
 }

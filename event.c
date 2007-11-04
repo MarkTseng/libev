@@ -87,7 +87,7 @@ void *event_init (void)
   if (x_cur)
     x_cur = (struct event_base *)ev_loop_new (EVMETHOD_AUTO);
   else
-    x_cur = ev_default_loop (EVMETHOD_AUTO);
+    x_cur = (struct event_base *)ev_default_loop (EVMETHOD_AUTO);
 #else
   assert (("multiple event bases not supported when not compiled with EV_MULTIPLICITY", !x_cur));
 
@@ -102,7 +102,8 @@ void event_base_free (struct event_base *base)
   dLOOPbase;
 
 #if EV_MULTIPLICITY
-  ev_loop_delete (loop);
+  if (ev_default_loop (EVMETHOD_AUTO) != loop)
+    ev_loop_destroy (loop);
 #endif
 }
 
@@ -354,7 +355,7 @@ int event_base_once (struct event_base *base, int fd, short events, void (*cb)(i
 
 int event_base_priority_init (struct event_base *base, int npri)
 {
-  dLOOPbase;
+  /*dLOOPbase;*/
 
   return 0;
 }

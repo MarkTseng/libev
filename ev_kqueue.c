@@ -184,6 +184,6 @@ kqueue_fork (EV_P)
   fcntl (kqueue_fd, F_SETFD, FD_CLOEXEC);
 
   /* re-register interest in fds */
-  fd_rearm_all ();
+  fd_rearm_all (EV_A);
 }
 
