@@ -158,22 +158,21 @@ x_cb_io (EV_P_ struct ev_io *w, int revents)
 static void
 x_cb_to (EV_P_ struct ev_timer *w, int revents)
 {
-  x_cb ((struct event *)(((char *)w) - offsetof (struct event, to)), revents);
+  struct event *ev = (struct event *)(((char *)w) - offsetof (struct event, to));
+
+  event_del (ev);
+
+  x_cb (ev, revents);
 }
 
 void event_set (struct event *ev, int fd, short events, void (*cb)(int, short, void *), void *arg)
 {
-  if (!ev->initialised)
-    {
-      ev->initialised = 1;
+  if (events & EV_SIGNAL)
+    ev_watcher_init (&ev->iosig.sig, x_cb_sig);
+  else
+    ev_watcher_init (&ev->iosig.io, x_cb_io);
 
-      if (events & EV_SIGNAL)
-        ev_watcher_init (&ev->iosig.sig, x_cb_sig);
-      else
-        ev_watcher_init (&ev->iosig.io, x_cb_io);
-
-      ev_watcher_init (&ev->to, x_cb_to);
-    }
+  ev_watcher_init (&ev->to, x_cb_to);
 
   ev->ev_base     = x_cur; /* not threadsafe, but its like libevent works */
   ev->ev_fd       = fd;
@@ -248,17 +247,17 @@ int event_pending (struct event *ev, short events, struct timeval *tv)
   if (ev->ev_events & EV_SIGNAL)
     {
       /* sig */
-      if (ev->iosig.sig.pending)
+      if (ev_is_active (&ev->iosig.sig) || ev_is_pending (&ev->iosig.sig))
         revents |= EV_SIGNAL;
     }
   else
     {
       /* io */
-      if (ev->iosig.io.pending)
+      if (ev_is_active (&ev->iosig.io) || ev_is_pending (&ev->iosig.io))
         revents |= ev->ev_events & (EV_READ | EV_WRITE);
     }
 
-  if (ev->to.pending)
+  if (ev->ev_events & EV_TIMEOUT || ev_is_active (&ev->to) || ev_is_pending (&ev->to))
     {
       revents |= EV_TIMEOUT;
 

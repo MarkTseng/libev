@@ -796,6 +796,8 @@ timers_reify (EV_P)
     {
       struct ev_timer *w = timers [0];
 
+      assert (("inactive timer on timer heap detected", ev_is_active (w)));
+
       /* first reschedule or stop timer */
       if (w->repeat)
         {
@@ -816,6 +818,8 @@ periodics_reify (EV_P)
   while (periodiccnt && periodics [0]->at <= rt_now)
     {
       struct ev_periodic *w = periodics [0];
+
+      assert (("inactive timer on periodic heap detected", ev_is_active (w)));
 
       /* first reschedule or stop timer */
       if (w->interval)

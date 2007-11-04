@@ -283,6 +283,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_check_init(ev,cb)                do { ev_watcher_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
 #define ev_child_init(ev,cb,pid)            do { ev_watcher_init ((ev), (cb)); ev_child_set ((ev),(pid)); } while (0)
 
+#define ev_is_pending(ev)                   (0 + (ev)->pending) /* true when watcher is waiting for callback invocation */
 #define ev_is_active(ev)                    (0 + (ev)->active) /* true when the watcher has been started */
 #define ev_set_priority(ev,pri)             (ev)->priority = pri
 
