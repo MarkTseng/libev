@@ -133,6 +133,8 @@ kqueue_init (EV_P_ int flags)
   if ((kqueue_fd = kqueue ()) < 0)
     return 0;
 
+  fcntl (kqueue_fd, F_SETFD, FD_CLOEXEC); /* not sure if necessary, hopefully doesn't hurt */
+
   /* Check for Mac OS X kqueue bug. */
   ch.ident  = -1;
   ch.filter = EVFILT_READ;
@@ -159,6 +161,29 @@ kqueue_init (EV_P_ int flags)
   kqueue_eventmax = 64; /* intiial number of events receivable per poll */
   kqueue_events = malloc (sizeof (struct kevent) * kqueue_eventmax);
 
+  kqueue_changes   = 0;
+  kqueue_changemax = 0;
+  kqueue_changecnt = 0;
+
   return EVMETHOD_KQUEUE;
+}
+
+static void
+kqueue_destroy (EV_P)
+{
+  close (kqueue_fd);
+
+  free (kqueue_events);
+  free (kqueue_changes);
+}
+
+static void
+kqueue_fork (EV_P)
+{
+  kqueue_fd = kqueue ();
+  fcntl (kqueue_fd, F_SETFD, FD_CLOEXEC);
+
+  /* re-register interest in fds */
+  fd_rearm_all ();
 }
 

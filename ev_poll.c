@@ -101,5 +101,15 @@ poll_init (EV_P_ int flags)
   method_modify = poll_modify;
   method_poll   = poll_poll;
 
+  pollidxs = 0; pollidxmax = 0;
+  polls    = 0; pollsmax   = 0; pollscnt = 0;
+
   return EVMETHOD_POLL;
+}
+
+static void
+poll_destroy (EV_P)
+{
+  free (pollidxs);
+  free (polls);
 }

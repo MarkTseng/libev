@@ -46,20 +46,6 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
 }
 
 static void
-epoll_postfork_child (EV_P)
-{
-  int fd;
-
-  epoll_fd = epoll_create (256);
-  fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
-
-  /* re-register interest in fds */
-  for (fd = 0; fd < anfdmax; ++fd)
-    if (anfds [fd].events)//D
-      epoll_modify (EV_A_ fd, EV_NONE, anfds [fd].events);
-}
-
-static void
 epoll_poll (EV_P_ ev_tstamp timeout)
 {
   int eventcnt = epoll_wait (epoll_fd, epoll_events, epoll_eventmax, ceil (timeout * 1000.));
@@ -103,5 +89,24 @@ epoll_init (EV_P_ int flags)
   epoll_events = malloc (sizeof (struct epoll_event) * epoll_eventmax);
 
   return EVMETHOD_EPOLL;
+}
+
+static void
+epoll_destroy (EV_P)
+{
+  close (epoll_fd);
+
+  free (epoll_events);
+}
+
+static void
+epoll_fork (EV_P)
+{
+  int fd;
+
+  epoll_fd = epoll_create (256);
+  fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
+
+  fd_rearm_all ();
 }
 

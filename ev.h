@@ -212,22 +212,29 @@ struct ev_child
 int ev_version_major (void);
 int ev_version_minor (void);
 
-/* these three calls are suitable for plugging into pthread_atfork */
-void ev_fork_prepare (void);
-void ev_fork_parent (void);
-void ev_fork_child (void);
-
 ev_tstamp ev_time (void);
 
 # if EV_MULTIPLICITY
+/* the default loop is the only one that handles signals and child watchers */
+/* you can call this as often as you like */
+struct ev_loop *ev_default_loop (int methods); /* returns default loop */
+
+/* create and destroy alternative loops that don't handle signals */
 struct ev_loop *ev_loop_new (int methods);
-void ev_loop_delete (EV_P);
+void ev_loop_destroy (EV_P);
+void ev_loop_fork (EV_P);
 # else
-int ev_init (int methods); /* returns ev_method */
+int ev_default_loop (int methods); /* returns true when successful */
 # endif
 
-int ev_method (EV_P);
+void ev_default_destroy (void); /* destroy the default loop */
+/* this needs to be called after fork, to duplicate the default loop */
+/* if you create alternative loops you have to call ev_loop_fork on them */
+/* you can call it in either the parent or the child */
+/* you can actually call it at any time, anywhere :) */
+void ev_default_fork (void);
 
+int ev_method (EV_P);
 #endif
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */
@@ -287,13 +294,11 @@ void ev_io_stop        (EV_P_ struct ev_io *w);
 
 void ev_timer_start    (EV_P_ struct ev_timer *w);
 void ev_timer_stop     (EV_P_ struct ev_timer *w);
-void ev_timer_again    (EV_P_ struct ev_timer *w); /* stops if active and no repeat, restarts if active and repeating, starts if inactive and repeating */
+/* stops if active and no repeat, restarts if active and repeating, starts if inactive and repeating */
+void ev_timer_again    (EV_P_ struct ev_timer *w);
 
 void ev_periodic_start (EV_P_ struct ev_periodic *w);
 void ev_periodic_stop  (EV_P_ struct ev_periodic *w);
-
-void ev_signal_start   (EV_P_ struct ev_signal *w);
-void ev_signal_stop    (EV_P_ struct ev_signal *w);
 
 void ev_idle_start     (EV_P_ struct ev_idle *w);
 void ev_idle_stop      (EV_P_ struct ev_idle *w);
@@ -304,6 +309,11 @@ void ev_prepare_stop   (EV_P_ struct ev_prepare *w);
 void ev_check_start    (EV_P_ struct ev_check *w);
 void ev_check_stop     (EV_P_ struct ev_check *w);
 
+/* only supported in the default loop */
+void ev_signal_start   (EV_P_ struct ev_signal *w);
+void ev_signal_stop    (EV_P_ struct ev_signal *w);
+
+/* only supported in the default loop */
 void ev_child_start    (EV_P_ struct ev_child *w);
 void ev_child_stop     (EV_P_ struct ev_child *w);
 #endif

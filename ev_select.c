@@ -128,6 +128,22 @@ select_init (EV_P_ int flags)
   method_modify = select_modify;
   method_poll   = select_poll;
 
+  vec_max = 0;
+  vec_ri  = 0; 
+  vec_ri  = 0;   
+  vec_wo  = 0; 
+  vec_wo  = 0; 
+
   return EVMETHOD_SELECT;
 }
+
+static void
+select_destroy (EV_P)
+{
+  free (vec_ri);
+  free (vec_ro);
+  free (vec_wi);
+  free (vec_wo);
+}
+
 

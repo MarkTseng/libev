@@ -32,6 +32,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <assert.h>
 
 #include "event.h"
 
@@ -49,7 +50,7 @@ struct event_base
   int dummy;
 };
 
-static struct event_base x_base, *x_cur;
+static struct event_base *x_cur;
 
 static void
 tv_set (struct timeval *tv, ev_tstamp at)
@@ -82,9 +83,14 @@ const char *event_get_method (void)
 void *event_init (void)
 {
 #if EV_MULTIPLICITY
-  x_cur = (struct event_base *)ev_loop_new (EVMETHOD_AUTO);
+  if (x_cur)
+    x_cur = (struct event_base *)ev_loop_new (EVMETHOD_AUTO);
+  else
+    x_cur = ev_default_loop (EVMETHOD_AUTO);
 #else
-  x_cur = &x_base;
+  assert (("multiple event bases not supported when not compiled with EV_MULTIPLICITY", !x_cur));
+
+  x_cur = (struct event_base *)ev_default_loop (EVMETHOD_AUTO);
 #endif
 
   return x_cur;

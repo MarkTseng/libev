@@ -340,6 +340,21 @@ fd_enomem (EV_P)
       }
 }
 
+/* susually called after fork if method needs to re-arm all fds from scratch */
+static void
+fd_rearm_all (EV_P)
+{
+  int fd;
+
+  /* this should be highly optimised to not do anything but set a flag */
+  for (fd = 0; fd < anfdmax; ++fd)
+    if (anfds [fd].events)
+      {
+        anfds [fd].events = 0;
+        fd_change (fd);
+      }
+}
+
 /*****************************************************************************/
 
 static void
@@ -544,7 +559,7 @@ ev_method (EV_P)
   return method;
 }
 
-inline int
+static void
 loop_init (EV_P_ int methods)
 {
   if (!method)
@@ -562,12 +577,9 @@ loop_init (EV_P_ int methods)
       now_floor = mn_now;
       rtmn_diff = rt_now - mn_now;
 
-      if (pipe (sigpipe))
-        return 0;
-
       if (methods == EVMETHOD_AUTO)
-        if (!enable_secure () && getenv ("LIBmethodS"))
-          methods = atoi (getenv ("LIBmethodS"));
+        if (!enable_secure () && getenv ("LIBEV_METHODS"))
+          methods = atoi (getenv ("LIBEV_METHODS"));
         else
           methods = EVMETHOD_ANY;
 
@@ -584,8 +596,97 @@ loop_init (EV_P_ int methods)
 #if EV_USE_SELECT
       if (!method && (methods & EVMETHOD_SELECT)) method = select_init (EV_A_ methods);
 #endif
+    }
+}
 
-      if (method)
+void
+loop_destroy (EV_P)
+{
+#if EV_USE_KQUEUE
+  if (method == EVMETHOD_KQUEUE) kqueue_destroy (EV_A);
+#endif
+#if EV_USE_EPOLL
+  if (method == EVMETHOD_EPOLL ) epoll_destroy  (EV_A);
+#endif
+#if EV_USEV_POLL
+  if (method == EVMETHOD_POLL  ) poll_destroy   (EV_A);
+#endif
+#if EV_USE_SELECT
+  if (method == EVMETHOD_SELECT) select_destroy (EV_A);
+#endif
+
+  method = 0;
+  /*TODO*/
+}
+
+void
+loop_fork (EV_P)
+{
+  /*TODO*/
+#if EV_USE_EPOLL
+  if (method == EVMETHOD_EPOLL ) epoll_fork  (EV_A);
+#endif
+#if EV_USE_KQUEUE
+  if (method == EVMETHOD_KQUEUE) kqueue_fork (EV_A);
+#endif
+}
+
+#if EV_MULTIPLICITY
+struct ev_loop *
+ev_loop_new (int methods)
+{
+  struct ev_loop *loop = (struct ev_loop *)calloc (1, sizeof (struct ev_loop));
+
+  loop_init (EV_A_ methods);
+
+  if (ev_methods (EV_A))
+    return loop;
+
+  return 0;
+}
+
+void
+ev_loop_destroy (EV_P)
+{
+  loop_destroy (EV_A);
+  free (loop);
+}
+
+void
+ev_loop_fork (EV_P)
+{
+  loop_fork (EV_A);
+}
+
+#endif
+
+#if EV_MULTIPLICITY
+struct ev_loop default_loop_struct;
+static struct ev_loop *default_loop;
+
+struct ev_loop *
+#else
+static int default_loop;
+
+int
+#endif
+ev_default_loop (int methods)
+{
+  if (sigpipe [0] == sigpipe [1])
+    if (pipe (sigpipe))
+      return 0;
+
+  if (!default_loop)
+    {
+#if EV_MULTIPLICITY
+      struct ev_loop *loop = default_loop = &default_loop_struct;
+#else
+      default_loop = 1;
+#endif
+
+      loop_init (EV_A_ methods);
+
+      if (ev_method (EV_A))
         {
           ev_watcher_init (&sigev, sigcb);
           ev_set_priority (&sigev, EV_MAXPRI);
@@ -598,73 +699,42 @@ loop_init (EV_P_ int methods)
           ev_unref (EV_A); /* child watcher should not keep loop alive */
 #endif
         }
+      else
+        default_loop = 0;
     }
 
-  return method;
-}
-
-#if EV_MULTIPLICITY
-
-struct ev_loop *
-ev_loop_new (int methods)
-{
-  struct ev_loop *loop = (struct ev_loop *)calloc (1, sizeof (struct ev_loop));
-
-  if (loop_init (EV_A_ methods))
-    return loop;
-
-  ev_loop_delete (loop);
-
-  return 0;
+  return default_loop;
 }
 
 void
-ev_loop_delete (EV_P)
+ev_default_destroy (void)
 {
-  /*TODO*/
-  free (loop);
-}
+  struct ev_loop *loop = default_loop;
 
-#else
+  ev_ref (EV_A); /* child watcher */
+  ev_signal_stop (EV_A_ &childev);
 
-int
-ev_init (int methods)
-{
-  return loop_init (methods);
-}
+  ev_ref (EV_A); /* signal watcher */
+  ev_io_stop (EV_A_ &sigev);
 
-#endif
+  close (sigpipe [0]); sigpipe [0] = 0;
+  close (sigpipe [1]); sigpipe [1] = 0;
 
-/*****************************************************************************/
-
-void
-ev_fork_prepare (void)
-{
-  /* nop */
+  loop_destroy (EV_A);
 }
 
 void
-ev_fork_parent (void)
+ev_default_fork (EV_P)
 {
-  /* nop */
-}
-
-void
-ev_fork_child (void)
-{
-  /*TODO*/
-#if !EV_MULTIPLICITY
-#if EV_USE_EPOLL
-  if (method == EVMETHOD_EPOLL)
-    epoll_postfork_child (EV_A);
-#endif
+  loop_fork (EV_A);
 
   ev_io_stop (EV_A_ &sigev);
   close (sigpipe [0]);
   close (sigpipe [1]);
   pipe (sigpipe);
+
+  ev_ref (EV_A); /* signal watcher */
   siginit (EV_A);
-#endif
 }
 
 /*****************************************************************************/
@@ -1085,46 +1155,6 @@ ev_periodic_stop (EV_P_ struct ev_periodic *w)
   ev_stop (EV_A_ (W)w);
 }
 
-#ifndef SA_RESTART
-# define SA_RESTART 0
-#endif
-
-void
-ev_signal_start (EV_P_ struct ev_signal *w)
-{
-  if (ev_is_active (w))
-    return;
-
-  assert (("ev_signal_start called with illegal signal number", w->signum > 0));
-
-  ev_start (EV_A_ (W)w, 1);
-  array_needsize (signals, signalmax, w->signum, signals_init);
-  wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
-
-  if (!w->next)
-    {
-      struct sigaction sa;
-      sa.sa_handler = sighandler;
-      sigfillset (&sa.sa_mask);
-      sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
-      sigaction (w->signum, &sa, 0);
-    }
-}
-
-void
-ev_signal_stop (EV_P_ struct ev_signal *w)
-{
-  ev_clear_pending (EV_A_ (W)w);
-  if (!ev_is_active (w))
-    return;
-
-  wlist_del ((WL *)&signals [w->signum - 1].head, (WL)w);
-  ev_stop (EV_A_ (W)w);
-
-  if (!signals [w->signum - 1].head)
-    signal (w->signum, SIG_DFL);
-}
-
 void
 ev_idle_start (EV_P_ struct ev_idle *w)
 {
@@ -1191,9 +1221,55 @@ ev_check_stop (EV_P_ struct ev_check *w)
   ev_stop (EV_A_ (W)w);
 }
 
+#ifndef SA_RESTART
+# define SA_RESTART 0
+#endif
+
+void
+ev_signal_start (EV_P_ struct ev_signal *w)
+{
+#if EV_MULTIPLICITY
+  assert (("signal watchers are only supported in the default loop", loop == default_loop));
+#endif
+  if (ev_is_active (w))
+    return;
+
+  assert (("ev_signal_start called with illegal signal number", w->signum > 0));
+
+  ev_start (EV_A_ (W)w, 1);
+  array_needsize (signals, signalmax, w->signum, signals_init);
+  wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
+
+  if (!w->next)
+    {
+      struct sigaction sa;
+      sa.sa_handler = sighandler;
+      sigfillset (&sa.sa_mask);
+      sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
+      sigaction (w->signum, &sa, 0);
+    }
+}
+
+void
+ev_signal_stop (EV_P_ struct ev_signal *w)
+{
+  ev_clear_pending (EV_A_ (W)w);
+  if (!ev_is_active (w))
+    return;
+
+  wlist_del ((WL *)&signals [w->signum - 1].head, (WL)w);
+  ev_stop (EV_A_ (W)w);
+
+  if (!signals [w->signum - 1].head)
+    signal (w->signum, SIG_DFL);
+}
+
 void
 ev_child_start (EV_P_ struct ev_child *w)
 {
+#if EV_MULTIPLICITY
+  assert (("child watchers are only supported in the default loop", loop == default_loop));
+#endif
   if (ev_is_active (w))
     return;
 
@@ -1274,87 +1350,4 @@ ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, vo
         }
     }
 }
-
-/*****************************************************************************/
-
-#if 0
-
-struct ev_io wio;
-
-static void
-sin_cb (struct ev_io *w, int revents)
-{
-  fprintf (stderr, "sin %d, revents %d\n", w->fd, revents);
-}
-
-static void
-ocb (struct ev_timer *w, int revents)
-{
-  //fprintf (stderr, "timer %f,%f (%x) (%f) d%p\n", w->at, w->repeat, revents, w->at - ev_time (), w->data);
-  ev_timer_stop (w);
-  ev_timer_start (w);
-}
-
-static void
-scb (struct ev_signal *w, int revents)
-{
-  fprintf (stderr, "signal %x,%d\n", revents, w->signum);
-  ev_io_stop (&wio);
-  ev_io_start (&wio);
-}
-
-static void
-gcb (struct ev_signal *w, int revents)
-{
-  fprintf (stderr, "generic %x\n", revents);
-
-}
-
-int main (void)
-{
-  ev_init (0);
-
-  ev_io_init (&wio, sin_cb, 0, EV_READ);
-  ev_io_start (&wio);
-
-  struct ev_timer t[10000];
-
-#if 0
-  int i;
-  for (i = 0; i < 10000; ++i)
-    {
-      struct ev_timer *w = t + i;
-      ev_watcher_init (w, ocb, i);
-      ev_timer_init_abs (w, ocb, drand48 (), 0.99775533);
-      ev_timer_start (w);
-      if (drand48 () < 0.5)
-        ev_timer_stop (w);
-    }
-#endif
-
-  struct ev_timer t1;
-  ev_timer_init (&t1, ocb, 5, 10);
-  ev_timer_start (&t1);
-
-  struct ev_signal sig;
-  ev_signal_init (&sig, scb, SIGQUIT);
-  ev_signal_start (&sig);
-
-  struct ev_check cw;
-  ev_check_init (&cw, gcb);
-  ev_check_start (&cw);
-
-  struct ev_idle iw;
-  ev_idle_init (&iw, gcb);
-  ev_idle_start (&iw);
-
-  ev_loop (0);
-
-  return 0;
-}
-
-#endif
-
-
-
 
