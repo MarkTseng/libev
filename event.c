@@ -167,6 +167,7 @@ x_cb_to (EV_P_ struct ev_timer *w, int revents)
 
 void event_set (struct event *ev, int fd, short events, void (*cb)(int, short, void *), void *arg)
 {
+  printf ("event set %p\n", ev);//D
   if (events & EV_SIGNAL)
     ev_watcher_init (&ev->iosig.sig, x_cb_sig);
   else
@@ -190,6 +191,7 @@ int event_once (int fd, short events, void (*cb)(int, short, void *), void *arg,
 
 int event_add (struct event *ev, struct timeval *tv)
 {
+  printf ("event add %p %p\n", ev, &ev->to);//D
   dLOOPev;
 
   /* disable all watchers */
@@ -217,6 +219,7 @@ int event_add (struct event *ev, struct timeval *tv)
 
 int event_del (struct event *ev)
 {
+  printf ("event del %p\n", ev);//D
   dLOOPev;
 
   if (ev->ev_events & EV_SIGNAL)
@@ -232,6 +235,7 @@ int event_del (struct event *ev)
         ev_io_stop (EV_A_ &ev->iosig.io);
     }
 
+  printf ("to %p %d\n", &ev->to, ev->to.active);//D
   if (ev_is_active (&ev->to))
     ev_timer_stop (EV_A_ &ev->to);
 

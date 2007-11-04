@@ -98,9 +98,9 @@ struct ev_loop;
 #define EV_WATCHER(type)			\
   int active; /* private */			\
   int pending; /* private */			\
-  int priority; /* ro */			\
+  int priority; /* private */			\
   EV_COMMON; /* rw */				\
-  void (*cb)(EV_P_ struct type *, int revents); /* rw */ /* gets invoked with an eventmask */
+  void (*cb)(EV_P_ struct type *, int revents); /* private */ /* gets invoked with an eventmask */
 
 #define EV_WATCHER_LIST(type)			\
   EV_WATCHER (type);				\
@@ -206,6 +206,7 @@ struct ev_child
 #define EVMETHOD_KQUEUE   8
 #define EVMETHOD_DEVPOLL 16 /* NYI */
 #define EVMETHOD_PORT    32 /* NYI */
+#define EVMETHOD_WIN32   64 /* NYI */
 #define EVMETHOD_ANY     ~0 /* any method, do not consult env */
 
 #if EV_PROTOTYPES
@@ -263,7 +264,12 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 
 /* these may evaluate ev multiple times, and the other arguments at most once */
 /* either use ev_watcher_init + ev_TYPE_set, or the ev_TYPE_init macro, below, to first initialise a watcher */
-#define ev_watcher_init(ev,cb_)             do { (ev)->active = (ev)->pending = (ev)->priority = 0; (ev)->cb = (cb_); } while (0)
+#define ev_watcher_init(ev,cb_) do {		\
+  ((struct ev_watcher *)(ev))->active   =	\
+  ((struct ev_watcher *)(ev))->pending  =	\
+  ((struct ev_watcher *)(ev))->priority = 0;	\
+  ((struct ev_watcher *)(ev))->cb = (cb_);	\
+} while (0)
 
 #define ev_io_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
 #define ev_timer_set(ev,after_,repeat_)     do { (ev)->at = (after_); (ev)->repeat = (repeat_); } while (0)
@@ -283,9 +289,13 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_check_init(ev,cb)                do { ev_watcher_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
 #define ev_child_init(ev,cb,pid)            do { ev_watcher_init ((ev), (cb)); ev_child_set ((ev),(pid)); } while (0)
 
-#define ev_is_pending(ev)                   (0 + (ev)->pending) /* true when watcher is waiting for callback invocation */
-#define ev_is_active(ev)                    (0 + (ev)->active) /* true when the watcher has been started */
-#define ev_set_priority(ev,pri)             (ev)->priority = pri
+#define ev_is_pending(ev)                   (0 + ((struct ev_watcher *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
+#define ev_is_active(ev)                    (0 + ((struct ev_watcher *)(ev))->active) /* ro, true when the watcher has been started */
+
+#define ev_priority(ev)                     ((struct ev_watcher *)(ev))->priority /* rw */
+#define ev_cb(ev)                           ((struct ev_watcher *)(ev))->cb       /* rw */
+#define ev_set_priority(ev,pri)             ev_priority (ev) = (pri)
+#define ev_set_cb(ev,cb_)                   ev_cb (ev) = (cb_)
 
 /* stopping (enabling, adding) a watcher does nothing if it is already running */
 /* stopping (disabling, deleting) a watcher does nothing unless its already running */

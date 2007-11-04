@@ -94,6 +94,14 @@
 # define EV_USE_KQUEUE 0
 #endif
 
+#ifndef EV_USE_WIN32
+# ifdef WIN32
+#  define EV_USE_WIN32 1
+# else
+#  define EV_USE_WIN32 0
+# endif
+#endif
+
 #ifndef EV_USE_REALTIME
 # define EV_USE_REALTIME 1
 #endif
@@ -351,9 +359,9 @@ fd_ebadf (EV_P)
 static void
 fd_enomem (EV_P)
 {
-  int fd = anfdmax;
+  int fd;
 
-  while (fd--)
+  for (fd = anfdmax; fd--; )
     if (anfds [fd].events)
       {
         close (fd);
@@ -387,12 +395,12 @@ upheap (WT *heap, int k)
   while (k && heap [k >> 1]->at > w->at)
     {
       heap [k] = heap [k >> 1];
-      heap [k]->active = k + 1;
+      ((W)heap [k])->active = k + 1;
       k >>= 1;
     }
 
   heap [k] = w;
-  heap [k]->active = k + 1;
+  ((W)heap [k])->active = k + 1;
 
 }
 
@@ -412,12 +420,12 @@ downheap (WT *heap, int N, int k)
         break;
 
       heap [k] = heap [j];
-      heap [k]->active = k + 1;
+      ((W)heap [k])->active = k + 1;
       k = j;
     }
 
   heap [k] = w;
-  heap [k]->active = k + 1;
+  ((W)heap [k])->active = k + 1;
 }
 
 /*****************************************************************************/
@@ -610,6 +618,9 @@ loop_init (EV_P_ int methods)
           methods = EVMETHOD_ANY;
 
       method = 0;
+#if EV_USE_WIN32
+      if (!method && (methods & EVMETHOD_WIN32 )) method = win32_init  (EV_A_ methods);
+#endif
 #if EV_USE_KQUEUE
       if (!method && (methods & EVMETHOD_KQUEUE)) method = kqueue_init (EV_A_ methods);
 #endif
@@ -628,6 +639,9 @@ loop_init (EV_P_ int methods)
 void
 loop_destroy (EV_P)
 {
+#if EV_USE_WIN32
+  if (method == EVMETHOD_WIN32 ) win32_destroy  (EV_A);
+#endif
 #if EV_USE_KQUEUE
   if (method == EVMETHOD_KQUEUE) kqueue_destroy (EV_A);
 #endif
@@ -1120,6 +1134,8 @@ ev_timer_start (EV_P_ struct ev_timer *w)
   array_needsize (timers, timermax, timercnt, );
   timers [timercnt - 1] = w;
   upheap ((WT *)timers, timercnt - 1);
+
+  assert (("internal timer heap corruption", timers [((W)w)->active - 1] == w));
 }
 
 void
@@ -1129,10 +1145,12 @@ ev_timer_stop (EV_P_ struct ev_timer *w)
   if (!ev_is_active (w))
     return;
 
-  if (w->active < timercnt--)
+  assert (("internal timer heap corruption", timers [((W)w)->active - 1] == w));
+
+  if (((W)w)->active < timercnt--)
     {
-      timers [w->active - 1] = timers [timercnt];
-      downheap ((WT *)timers, timercnt, w->active - 1);
+      timers [((W)w)->active - 1] = timers [timercnt];
+      downheap ((WT *)timers, timercnt, ((W)w)->active - 1);
     }
 
   w->at = w->repeat;
@@ -1148,7 +1166,7 @@ ev_timer_again (EV_P_ struct ev_timer *w)
       if (w->repeat)
         {
           w->at = mn_now + w->repeat;
-          downheap ((WT *)timers, timercnt, w->active - 1);
+          downheap ((WT *)timers, timercnt, ((W)w)->active - 1);
         }
       else
         ev_timer_stop (EV_A_ w);
@@ -1173,6 +1191,8 @@ ev_periodic_start (EV_P_ struct ev_periodic *w)
   array_needsize (periodics, periodicmax, periodiccnt, );
   periodics [periodiccnt - 1] = w;
   upheap ((WT *)periodics, periodiccnt - 1);
+
+  assert (("internal periodic heap corruption", periodics [((W)w)->active - 1] == w));
 }
 
 void
@@ -1182,10 +1202,12 @@ ev_periodic_stop (EV_P_ struct ev_periodic *w)
   if (!ev_is_active (w))
     return;
 
-  if (w->active < periodiccnt--)
+  assert (("internal periodic heap corruption", periodics [((W)w)->active - 1] == w));
+
+  if (((W)w)->active < periodiccnt--)
     {
-      periodics [w->active - 1] = periodics [periodiccnt];
-      downheap ((WT *)periodics, periodiccnt, w->active - 1);
+      periodics [((W)w)->active - 1] = periodics [periodiccnt];
+      downheap ((WT *)periodics, periodiccnt, ((W)w)->active - 1);
     }
 
   ev_stop (EV_A_ (W)w);
@@ -1209,7 +1231,7 @@ ev_idle_stop (EV_P_ struct ev_idle *w)
   if (ev_is_active (w))
     return;
 
-  idles [w->active - 1] = idles [--idlecnt];
+  idles [((W)w)->active - 1] = idles [--idlecnt];
   ev_stop (EV_A_ (W)w);
 }
 
@@ -1231,7 +1253,7 @@ ev_prepare_stop (EV_P_ struct ev_prepare *w)
   if (ev_is_active (w))
     return;
 
-  prepares [w->active - 1] = prepares [--preparecnt];
+  prepares [((W)w)->active - 1] = prepares [--preparecnt];
   ev_stop (EV_A_ (W)w);
 }
 
@@ -1253,7 +1275,7 @@ ev_check_stop (EV_P_ struct ev_check *w)
   if (ev_is_active (w))
     return;
 
-  checks [w->active - 1] = checks [--checkcnt];
+  checks [((W)w)->active - 1] = checks [--checkcnt];
   ev_stop (EV_A_ (W)w);
 }
 
