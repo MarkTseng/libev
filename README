@@ -28,9 +28,6 @@ at http://libev.schmorp.de/bench.html).
 - detects time jumps and adjusts timers
   (works for both forward and backward time jumps and also for absolute timers).
 
-- can correctly remove timers while executing callbacks
-  (libevent doesn't handle this reliably and can crash).
-
 - race-free signal processing
   (libevent may delay processing signals till after the next event).
 
