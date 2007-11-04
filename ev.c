@@ -308,11 +308,8 @@ fd_reify (EV_P)
 
       anfd->reify = 0;
 
-      if (anfd->events != events)
-        {
-          method_modify (EV_A_ fd, anfd->events, events);
-          anfd->events = events;
-        }
+      method_modify (EV_A_ fd, anfd->events, events);
+      anfd->events = events;
     }
 
   fdchangecnt = 0;

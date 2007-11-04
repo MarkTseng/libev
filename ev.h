@@ -268,7 +268,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
   ((struct ev_watcher *)(ev))->active   =	\
   ((struct ev_watcher *)(ev))->pending  =	\
   ((struct ev_watcher *)(ev))->priority = 0;	\
-  ((struct ev_watcher *)(ev))->cb = (cb_);	\
+  (ev)->cb = (cb_);				\
 } while (0)
 
 #define ev_io_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
@@ -293,7 +293,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_is_active(ev)                    (0 + ((struct ev_watcher *)(ev))->active) /* ro, true when the watcher has been started */
 
 #define ev_priority(ev)                     ((struct ev_watcher *)(ev))->priority /* rw */
-#define ev_cb(ev)                           ((struct ev_watcher *)(ev))->cb       /* rw */
+#define ev_cb(ev)                           (ev)->cb /* rw */
 #define ev_set_priority(ev,pri)             ev_priority (ev) = (pri)
 #define ev_set_cb(ev,cb_)                   ev_cb (ev) = (cb_)
 

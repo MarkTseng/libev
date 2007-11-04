@@ -43,7 +43,9 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
       | (nev & EV_WRITE ? EPOLLOUT : 0);
 
   if (epoll_ctl (epoll_fd, mode, fd, &ev))
-    fd_kill (EV_A_ fd);
+    if (errno != ENOENT /* on ENOENT the fd went away, so try to do the right thing */
+        || (nev && epoll_ctl (epoll_fd, EPOLL_CTL_ADD, fd, &ev)))
+      fd_kill (EV_A_ fd);
 }
 
 static void

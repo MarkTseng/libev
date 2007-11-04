@@ -91,7 +91,7 @@ void *event_init (void)
 #else
   assert (("multiple event bases not supported when not compiled with EV_MULTIPLICITY", !x_cur));
 
-  x_cur = (struct event_base *)ev_default_loop (EVMETHOD_AUTO);
+  x_cur = (struct event_base *)(long)ev_default_loop (EVMETHOD_AUTO);
 #endif
 
   return x_cur;

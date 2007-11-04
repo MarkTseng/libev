@@ -42,6 +42,10 @@ static void
 poll_modify (EV_P_ int fd, int oev, int nev)
 {
   int idx;
+
+  if (oev == nev)
+    return;
+
   array_needsize (pollidxs, pollidxmax, fd + 1, pollidx_init);
 
   idx = pollidxs [fd];

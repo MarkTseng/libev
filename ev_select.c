@@ -48,6 +48,9 @@ select_modify (EV_P_ int fd, int oev, int nev)
   int offs = fd >> 3;
   int mask = 1 << (fd & 7);
 
+  if (oev == nev)
+    return;
+
   if (vec_max < (fd >> 5) + 1)
     {
       int new_max = (fd >> 5) + 1;
