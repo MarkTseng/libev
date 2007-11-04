@@ -524,9 +524,9 @@ child_reap (EV_P_ struct ev_signal *sw, int chain, int pid, int status)
   for (w = (struct ev_child *)childs [chain & (PID_HASHSIZE - 1)]; w; w = (struct ev_child *)((WL)w)->next)
     if (w->pid == pid || !w->pid)
       {
-        w->priority = sw->priority; /* need to do it *now* */
-        w->rpid     = pid;
-        w->rstatus  = status;
+        ev_priority (w) = ev_priority (sw); /* need to do it *now* */
+        w->rpid         = pid;
+        w->rstatus      = status;
         event (EV_A_ (W)w, EV_CHILD);
       }
 }
@@ -798,7 +798,8 @@ call_pending (EV_P)
         if (p->w)
           {
             p->w->pending = 0;
-            p->w->cb (EV_A_ p->w, p->events);
+
+            (*(void (**)(EV_P_ W, int))&p->w->cb) (EV_A_ p->w, p->events);
           }
       }
 }
@@ -806,7 +807,7 @@ call_pending (EV_P)
 static void
 timers_reify (EV_P)
 {
-  while (timercnt && timers [0]->at <= mn_now)
+  while (timercnt && ((WT)timers [0])->at <= mn_now)
     {
       struct ev_timer *w = timers [0];
 
@@ -816,7 +817,7 @@ timers_reify (EV_P)
       if (w->repeat)
         {
           assert (("negative ev_timer repeat value found while processing timers", w->repeat > 0.));
-          w->at = mn_now + w->repeat;
+          ((WT)w)->at = mn_now + w->repeat;
           downheap ((WT *)timers, timercnt, 0);
         }
       else
@@ -829,7 +830,7 @@ timers_reify (EV_P)
 static void
 periodics_reify (EV_P)
 {
-  while (periodiccnt && periodics [0]->at <= rt_now)
+  while (periodiccnt && ((WT)periodics [0])->at <= rt_now)
     {
       struct ev_periodic *w = periodics [0];
 
@@ -838,8 +839,8 @@ periodics_reify (EV_P)
       /* first reschedule or stop timer */
       if (w->interval)
         {
-          w->at += floor ((rt_now - w->at) / w->interval + 1.) * w->interval;
-          assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", w->at > rt_now));
+          ((WT)w)->at += floor ((rt_now - ((WT)w)->at) / w->interval + 1.) * w->interval;
+          assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ((WT)w)->at > rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
       else
@@ -861,7 +862,7 @@ periodics_reschedule (EV_P)
 
       if (w->interval)
         {
-          ev_tstamp diff = ceil ((rt_now - w->at) / w->interval) * w->interval;
+          ev_tstamp diff = ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
 
           if (fabs (diff) >= 1e-4)
             {
@@ -932,7 +933,7 @@ time_update (EV_P)
 
           /* adjust timers. this is easy, as the offset is the same for all */
           for (i = 0; i < timercnt; ++i)
-            timers [i]->at += rt_now - mn_now;
+            ((WT)timers [i])->at += rt_now - mn_now;
         }
 
       mn_now = rt_now;
@@ -993,13 +994,13 @@ ev_loop (EV_P_ int flags)
 
           if (timercnt)
             {
-              ev_tstamp to = timers [0]->at - mn_now + method_fudge;
+              ev_tstamp to = ((WT)timers [0])->at - mn_now + method_fudge;
               if (block > to) block = to;
             }
 
           if (periodiccnt)
             {
-              ev_tstamp to = periodics [0]->at - rt_now + method_fudge;
+              ev_tstamp to = ((WT)periodics [0])->at - rt_now + method_fudge;
               if (block > to) block = to;
             }
 
@@ -1126,7 +1127,7 @@ ev_timer_start (EV_P_ struct ev_timer *w)
   if (ev_is_active (w))
     return;
 
-  w->at += mn_now;
+  ((WT)w)->at += mn_now;
 
   assert (("ev_timer_start called with negative timer repeat value", w->repeat >= 0.));
 
@@ -1153,7 +1154,7 @@ ev_timer_stop (EV_P_ struct ev_timer *w)
       downheap ((WT *)timers, timercnt, ((W)w)->active - 1);
     }
 
-  w->at = w->repeat;
+  ((WT)w)->at = w->repeat;
 
   ev_stop (EV_A_ (W)w);
 }
@@ -1165,7 +1166,7 @@ ev_timer_again (EV_P_ struct ev_timer *w)
     {
       if (w->repeat)
         {
-          w->at = mn_now + w->repeat;
+          ((WT)w)->at = mn_now + w->repeat;
           downheap ((WT *)timers, timercnt, ((W)w)->active - 1);
         }
       else
@@ -1185,7 +1186,7 @@ ev_periodic_start (EV_P_ struct ev_periodic *w)
 
   /* this formula differs from the one in periodic_reify because we do not always round up */
   if (w->interval)
-    w->at += ceil ((rt_now - w->at) / w->interval) * w->interval;
+    ((WT)w)->at += ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
 
   ev_start (EV_A_ (W)w, ++periodiccnt);
   array_needsize (periodics, periodicmax, periodiccnt, );
@@ -1298,7 +1299,7 @@ ev_signal_start (EV_P_ struct ev_signal *w)
   array_needsize (signals, signalmax, w->signum, signals_init);
   wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
 
-  if (!w->next)
+  if (!((WL)w)->next)
     {
       struct sigaction sa;
       sa.sa_handler = sighandler;

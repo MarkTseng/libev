@@ -42,7 +42,7 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
       (nev & EV_READ ? EPOLLIN : 0)
       | (nev & EV_WRITE ? EPOLLOUT : 0);
 
-  if (!epoll_ctl (epoll_fd, mode, fd, &ev))
+  if (epoll_ctl (epoll_fd, mode, fd, &ev))
     fd_kill (EV_A_ fd);
 }
 
