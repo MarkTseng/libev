@@ -265,9 +265,9 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 /* these may evaluate ev multiple times, and the other arguments at most once */
 /* either use ev_watcher_init + ev_TYPE_set, or the ev_TYPE_init macro, below, to first initialise a watcher */
 #define ev_watcher_init(ev,cb_) do {		\
-  ((struct ev_watcher *)(ev))->active   =	\
-  ((struct ev_watcher *)(ev))->pending  =	\
-  ((struct ev_watcher *)(ev))->priority = 0;	\
+  ((struct ev_watcher *)(void *)(ev))->active   =	\
+  ((struct ev_watcher *)(void *)(ev))->pending  =	\
+  ((struct ev_watcher *)(void *)(ev))->priority = 0;	\
   (ev)->cb = (cb_);				\
 } while (0)
 
@@ -289,10 +289,10 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_check_init(ev,cb)                do { ev_watcher_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
 #define ev_child_init(ev,cb,pid)            do { ev_watcher_init ((ev), (cb)); ev_child_set ((ev),(pid)); } while (0)
 
-#define ev_is_pending(ev)                   (0 + ((struct ev_watcher *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
-#define ev_is_active(ev)                    (0 + ((struct ev_watcher *)(ev))->active) /* ro, true when the watcher has been started */
+#define ev_is_pending(ev)                   (0 + ((struct ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
+#define ev_is_active(ev)                    (0 + ((struct ev_watcher *)(void *)(ev))->active) /* ro, true when the watcher has been started */
 
-#define ev_priority(ev)                     ((struct ev_watcher *)(ev))->priority /* rw */
+#define ev_priority(ev)                     ((struct ev_watcher *)(void *)(ev))->priority /* rw */
 #define ev_cb(ev)                           (ev)->cb /* rw */
 #define ev_set_priority(ev,pri)             ev_priority (ev) = (pri)
 #define ev_set_cb(ev,cb_)                   ev_cb (ev) = (cb_)

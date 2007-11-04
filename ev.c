@@ -810,8 +810,7 @@ call_pending (EV_P)
         if (p->w)
           {
             p->w->pending = 0;
-
-            ((void (*)(EV_P_ W, int))p->w->cb) (EV_A_ p->w, p->events);
+            p->w->cb (EV_A_ p->w, p->events);
           }
       }
 }
