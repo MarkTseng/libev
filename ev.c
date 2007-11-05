@@ -157,7 +157,7 @@ volatile double SIGFPE_REQ = 0.0f;
 
 typedef struct
 {
-  struct ev_watcher_list *head;
+  WL head;
   unsigned char events;
   unsigned char reify;
 } ANFD;
@@ -378,7 +378,6 @@ fd_enomem (EV_P)
   for (fd = anfdmax; fd--; )
     if (anfds [fd].events)
       {
-        close (fd);
         fd_kill (EV_A_ fd);
         return;
       }
@@ -446,7 +445,7 @@ downheap (WT *heap, int N, int k)
 
 typedef struct
 {
-  struct ev_watcher_list *head;
+  WL head;
   sig_atomic_t volatile gotsig;
 } ANSIG;
 
@@ -490,7 +489,7 @@ sighandler (int signum)
 static void
 sigcb (EV_P_ struct ev_io *iow, int revents)
 {
-  struct ev_watcher_list *w;
+  WL w;
   int signum;
 
   read (sigpipe [0], &revents, 1);
