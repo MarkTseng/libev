@@ -147,6 +147,12 @@ typedef struct ev_watcher_time *WT;
 
 static int have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
 
+#if WIN32
+/* note: the comment below could not be substantiated, but what would I care */
+/* MSDN says this is required to handle SIGFPE */
+volatile double SIGFPE_REQ = 0.0f; 
+#endif
+
 /*****************************************************************************/
 
 typedef struct
@@ -232,6 +238,14 @@ ev_now (EV_P)
       base = realloc (base, sizeof (*base) * (newcnt));	\
       init (base + cur, newcnt - cur);			\
       cur = newcnt;					\
+    }
+
+#define array_slim(stem)					\
+  if (stem ## max < array_roundsize (stem ## cnt >> 2))		\
+    {								\
+      stem ## max = array_roundsize (stem ## cnt >> 1);		\
+      base = realloc (base, sizeof (*base) * (stem ## max));	\
+      fprintf (stderr, "slimmed down " # stem " to %d\n", stem ## max);/*D*/\
     }
 
 #define array_free(stem, idx) \
@@ -458,6 +472,10 @@ signals_init (ANSIG *base, int count)
 static void
 sighandler (int signum)
 {
+#if WIN32
+  signal (signum, sighandler);
+#endif
+
   signals [signum - 1].gotsig = 1;
 
   if (!gotsig)
@@ -1312,11 +1330,15 @@ ev_signal_start (EV_P_ struct ev_signal *w)
 
   if (!((WL)w)->next)
     {
+#if WIN32
+      signal (w->signum, sighandler);
+#else
       struct sigaction sa;
       sa.sa_handler = sighandler;
       sigfillset (&sa.sa_mask);
       sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
       sigaction (w->signum, &sa, 0);
+#endif
     }
 }
 
