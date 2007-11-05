@@ -1,0 +1,94 @@
+#!/bin/sh
+
+LE=../libevent-1.3e
+
+cp $LE/evdns.h .
+
+perl -ne '
+   s/\s+char buf\[64\];/\tchar buf[96];/;
+   if (/#include "event.h"/) {
+      print "#ifndef EV_STANDALONE\n$_#endif\n";
+      next;
+   }
+   if (/#include "misc.h"/) {
+      print "#ifndef EV_STANDALONE\n$_#endif\n";
+      next;
+   }
+   next if /#include "log.h"/;
+
+   print;
+' <$LE/evdns.c >evdns.c
+
+cp $LE/epoll_sub.c .
+cp $LE/evbuffer.c .
+cp $LE/buffer.c .
+cp $LE/evhttp.h .
+cp $LE/http.c .
+cp $LE/event_tagging.c .
+cp $LE/http-internal.h .
+cp $LE/strlcpy-internal.h .
+cp $LE/log.c .
+cp $LE/log.h .
+cp $LE/strlcpy.c .
+rsync -a $LE/WIN32* $LE/sample $LE/test $LE/compat . --del
+rename 's/libevent/libev/' WIN32-Prj/lib*
+cp $LE/aclocal.m4 .
+cp $LE/acconfig.h .
+cp $LE/config.h.in .
+cp $LE/event_rpcgen.py .
+cp $LE/*.3 .
+
+perl -i -pe 's/libevent/libev/g' sample/Makefile.am
+perl -i -pe 's/libevent/libev/g' test/Makefile.am
+
+perl -i -pe 's/#include <event.h>$/#include "event.h"/' test/*.c
+
+perl -i -ne '
+   next if /"event-internal.h"/;
+   s/base\d?->sig.ev_signal_added/0/;
+   s/base\d?->sig.ev_signal_pair\[0\]/-1/;
+   next if /test_signal_(dealloc|pipeloss|switchbase)\(\)/;
+   next if /test_priorities\(\d\)/;
+   print;
+' test/regress.c
+
+perl -ne '
+   s/\bsignal.c\b//g;
+   s/\bevport.c\b//g;
+   s/\bkqueue.c\b//g;
+   s/\bdevpoll.c\b//g;
+   s/\brtsig.c\b//g;
+   s/\bselect.c\b//g;
+   s/\bpoll.c\b//g;
+   s/\bepoll.c\b//g;
+   s/\bepoll_sub.c\b//g;
+   s/\bevent-internal.h\b//g;
+   s/\bevsignal.h\b//g;
+   s/^(EXTRA_DIST\s*=\s*)/$1 ev.h ev_vars.h ev_wrap.h event_compat.h ev_epoll.c ev_select.c ev_poll.c ev_kqueue.c /;
+   s/^(include_HEADERS\s*=\s*)/$1 ev.h event_compat.h /;
+   s/^(libevent_la_SOURCES\s*=\s*)/$1 ev.c /;
+   s/^(libevent_la_LIBADD\s*=\s*)/$1 -lm /;
+   s/libevent/libev/g;
+   print;
+' <$LE/Makefile.am >Makefile.am
+
+perl -ne '
+   s/libevent/libev/g;
+   s/AC_LIBOBJ\(select\)/: ;/g;
+   s/AC_LIBOBJ\(poll\)/: ;/g;
+   s/AC_LIBOBJ\(kqueue\)/: ;/g;
+   s/AC_LIBOBJ\(epoll\)/: ;/g;
+   s/AC_LIBOBJ\(devpoll\)/: ;/g;
+   s/AC_LIBOBJ\(evport\)/: ;/g;
+   s/AC_LIBOBJ\(signal\)/: ;/g;
+   s/AC_LIBOBJ\(rtsig\)/: ;/g;
+   print;
+' <$LE/configure.in >configure.in
+
+aclocal-1.7
+automake-1.7 --add-missing
+autoconf
+libtoolize
+CC="ccache gcc" ./configure --prefix=/opt/libev --disable-shared "$@"
+
+
