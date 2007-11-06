@@ -57,7 +57,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
   if (eventcnt < 0)
     {
       if (errno != EINTR)
-        syserr ();
+        syserr ("(libev) epoll_wait");
 
       return;
     }
@@ -110,7 +110,16 @@ epoll_destroy (EV_P)
 static void
 epoll_fork (EV_P)
 {
-  epoll_fd = epoll_create (256);
+  for (;;)
+    {
+      epoll_fd = epoll_create (256);
+
+      if (epoll_fd >= 0)
+        break;
+
+      syserr ("(libev) epoll_create");
+    }
+
   fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
 
   fd_rearm_all (EV_A);

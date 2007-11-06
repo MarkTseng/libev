@@ -241,7 +241,7 @@ void ev_set_allocator (void *(*cb)(void *ptr, long size));
  * retryable syscall error
  * (such as failed select, poll, epoll_wait)
  */
-void ev_set_syserr_cb (void (*cb)(void));
+void ev_set_syserr_cb (void (*cb)(const char *msg));
 
 # if EV_MULTIPLICITY
 /* the default loop is the only one that handles signals and child watchers */

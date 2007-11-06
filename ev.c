@@ -155,21 +155,24 @@ volatile double SIGFPE_REQ = 0.0f;
 
 /*****************************************************************************/
 
-static void (*syserr_cb)(void);
+static void (*syserr_cb)(const char *msg);
 
-void ev_set_syserr_cb (void (*cb)(void))
+void ev_set_syserr_cb (void (*cb)(const char *msg))
 {
   syserr_cb = cb;
 }
 
 static void
-syserr (void)
+syserr (const char *msg)
 {
+  if (!msg)
+    msg = "(libev) system error";
+
   if (syserr_cb)
-    syserr_cb ();
+    syserr_cb (msg);
   else
     {
-      perror ("libev");
+      perror (msg);
       abort ();
     }
 }
@@ -380,7 +383,7 @@ fd_reify (EV_P)
 static void
 fd_change (EV_P_ int fd)
 {
-  if (anfds [fd].reify || fdchangecnt < 0)
+  if (anfds [fd].reify)
     return;
 
   anfds [fd].reify = 1;
@@ -428,7 +431,7 @@ fd_enomem (EV_P)
       }
 }
 
-/* susually called after fork if method needs to re-arm all fds from scratch */
+/* usually called after fork if method needs to re-arm all fds from scratch */
 static void
 fd_rearm_all (EV_P)
 {
@@ -695,6 +698,9 @@ loop_init (EV_P_ int methods)
 #if EV_USE_SELECT
       if (!method && (methods & EVMETHOD_SELECT)) method = select_init (EV_A_ methods);
 #endif
+
+      ev_watcher_init (&sigev, sigcb);
+      ev_set_priority (&sigev, EV_MAXPRI);
     }
 }
 
@@ -730,19 +736,34 @@ loop_destroy (EV_P)
   array_free (check, );
 
   method = 0;
-  /*TODO*/
 }
 
-void
+static void
 loop_fork (EV_P)
 {
-  /*TODO*/
 #if EV_USE_EPOLL
   if (method == EVMETHOD_EPOLL ) epoll_fork  (EV_A);
 #endif
 #if EV_USE_KQUEUE
   if (method == EVMETHOD_KQUEUE) kqueue_fork (EV_A);
 #endif
+
+  if (ev_is_active (&sigev))
+    {
+      /* default loop */
+
+      ev_ref (EV_A);
+      ev_io_stop (EV_A_ &sigev);
+      close (sigpipe [0]);
+      close (sigpipe [1]);
+
+      while (pipe (sigpipe))
+        syserr ("(libev) error creating pipe");
+
+      siginit (EV_A);
+    }
+
+  postfork = 0;
 }
 
 #if EV_MULTIPLICITY
@@ -771,7 +792,7 @@ ev_loop_destroy (EV_P)
 void
 ev_loop_fork (EV_P)
 {
-  loop_fork (EV_A);
+  postfork = 1;
 }
 
 #endif
@@ -804,8 +825,6 @@ ev_default_loop (int methods)
 
       if (ev_method (EV_A))
         {
-          ev_watcher_init (&sigev, sigcb);
-          ev_set_priority (&sigev, EV_MAXPRI);
           siginit (EV_A);
 
 #ifndef WIN32
@@ -848,15 +867,8 @@ ev_default_fork (void)
   struct ev_loop *loop = default_loop;
 #endif
 
-  loop_fork (EV_A);
-
-  ev_io_stop (EV_A_ &sigev);
-  close (sigpipe [0]);
-  close (sigpipe [1]);
-  pipe (sigpipe);
-
-  ev_ref (EV_A); /* signal watcher */
-  siginit (EV_A);
+  if (method)
+    postfork = 1;
 }
 
 /*****************************************************************************/
@@ -1043,6 +1055,10 @@ ev_loop (EV_P_ int flags)
           queue_events (EV_A_ (W *)prepares, preparecnt, EV_PREPARE);
           call_pending (EV_A);
         }
+
+      /* we might have forked, so reify kernel state if necessary */
+      if (expect_false (postfork))
+        loop_fork (EV_A);
 
       /* update fd-related kernel structures */
       fd_reify (EV_A);

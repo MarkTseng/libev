@@ -87,7 +87,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
   if (res < 0)
     { 
       if (errno != EINTR)
-        syserr ();
+        syserr ("(libev) kevent");
 
       return;
     } 
@@ -185,7 +185,16 @@ kqueue_destroy (EV_P)
 static void
 kqueue_fork (EV_P)
 {
-  kqueue_fd = kqueue ();
+  for (;;)
+    {
+      kqueue_fd = kqueue ();
+
+      if (kqueue_fd >= 0)
+        break;
+
+      syserr ("(libev) kqueue");
+    }
+
   fcntl (kqueue_fd, F_SETFD, FD_CLOEXEC);
 
   /* re-register interest in fds */

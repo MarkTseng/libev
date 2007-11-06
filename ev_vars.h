@@ -10,6 +10,7 @@ VARx(ev_tstamp, method_fudge) /* assumed typical timer resolution */
 VAR (method_modify, void (*method_modify)(EV_P_ int fd, int oev, int nev))
 VAR (method_poll  , void (*method_poll)(EV_P_ ev_tstamp timeout))
 
+VARx(int, postfork)  /* true if we need to recreate kernel state after fork */
 VARx(int, activecnt) /* number of active events */
 
 #if EV_USE_SELECT || EV_GENWRAP

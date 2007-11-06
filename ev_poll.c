@@ -85,7 +85,7 @@ poll_poll (EV_P_ ev_tstamp timeout)
       else if (errno == ENOMEM && !syserr_cb)
         fd_enomem (EV_A);
       else if (errno != EINTR)
-        syserr ();
+        syserr ("(libev) poll");
 
       return;
     }
