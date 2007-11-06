@@ -332,7 +332,7 @@ struct x_once
 static void
 x_once_cb (int revents, void *arg)
 {
-  struct x_once *once = arg;
+  struct x_once *once = (struct x_once *)arg;
 
   once->cb (once->fd, revents, once->arg);
   free (once);
@@ -340,7 +340,7 @@ x_once_cb (int revents, void *arg)
 
 int event_base_once (struct event_base *base, int fd, short events, void (*cb)(int, short, void *), void *arg, struct timeval *tv)
 {
-  struct x_once *once = malloc (sizeof (struct x_once));
+  struct x_once *once = (struct x_once *)malloc (sizeof (struct x_once));
   dLOOPbase;
 
   if (!once)

@@ -64,6 +64,11 @@ at http://libev.schmorp.de/bench.html).
 - a event.h compatibility header exists, and can be used to run a wide
   range of libevent programs unchanged (such as evdns.c).
 
+- win32 compatibility for the core parts.
+
+- the event core library (ev and event layer) compiles and works both as
+  C and C++.
+
 whats missing?
 
 - evbuffer, evhttp, bufferevent are missing.

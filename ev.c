@@ -270,28 +270,28 @@ ev_now (EV_P)
   return rt_now;
 }
 
-#define array_roundsize(base,n) ((n) | 4 & ~3)
+#define array_roundsize(type,n) ((n) | 4 & ~3)
 
-#define array_needsize(base,cur,cnt,init)			\
+#define array_needsize(type,base,cur,cnt,init)			\
   if (expect_false ((cnt) > cur))				\
     {								\
       int newcnt = cur;						\
       do							\
         {							\
-          newcnt = array_roundsize (base, newcnt << 1);		\
+          newcnt = array_roundsize (type, newcnt << 1);		\
         }							\
       while ((cnt) > newcnt);					\
       								\
-      base = ev_realloc (base, sizeof (*base) * (newcnt));	\
+      base = (type *)ev_realloc (base, sizeof (type) * (newcnt));\
       init (base + cur, newcnt - cur);				\
       cur = newcnt;						\
     }
 
-#define array_slim(stem)					\
+#define array_slim(type,stem)					\
   if (stem ## max < array_roundsize (stem ## cnt >> 2))		\
     {								\
       stem ## max = array_roundsize (stem ## cnt >> 1);		\
-      base = ev_realloc (base, sizeof (*base) * (stem ## max));	\
+      base = (type *)ev_realloc (base, sizeof (type) * (stem ## max));\
       fprintf (stderr, "slimmed down " # stem " to %d\n", stem ## max);/*D*/\
     }
 
@@ -328,7 +328,7 @@ event (EV_P_ W w, int events)
     }
 
   w->pending = ++pendingcnt [ABSPRI (w)];
-  array_needsize (pendings [ABSPRI (w)], pendingmax [ABSPRI (w)], pendingcnt [ABSPRI (w)], (void));
+  array_needsize (ANPENDING, pendings [ABSPRI (w)], pendingmax [ABSPRI (w)], pendingcnt [ABSPRI (w)], (void));
   pendings [ABSPRI (w)][w->pending - 1].w      = w;
   pendings [ABSPRI (w)][w->pending - 1].events = events;
 }
@@ -393,7 +393,7 @@ fd_change (EV_P_ int fd)
   anfds [fd].reify = 1;
 
   ++fdchangecnt;
-  array_needsize (fdchanges, fdchangemax, fdchangecnt, (void));
+  array_needsize (int, fdchanges, fdchangemax, fdchangecnt, (void));
   fdchanges [fdchangecnt - 1] = fd;
 }
 
@@ -1211,7 +1211,7 @@ ev_io_start (EV_P_ struct ev_io *w)
   assert (("ev_io_start called with negative fd", fd >= 0));
 
   ev_start (EV_A_ (W)w, 1);
-  array_needsize (anfds, anfdmax, fd + 1, anfds_init);
+  array_needsize (ANFD, anfds, anfdmax, fd + 1, anfds_init);
   wlist_add ((WL *)&anfds[fd].head, (WL)w);
 
   fd_change (EV_A_ fd);
@@ -1241,7 +1241,7 @@ ev_timer_start (EV_P_ struct ev_timer *w)
   assert (("ev_timer_start called with negative timer repeat value", w->repeat >= 0.));
 
   ev_start (EV_A_ (W)w, ++timercnt);
-  array_needsize (timers, timermax, timercnt, (void));
+  array_needsize (struct ev_timer *, timers, timermax, timercnt, (void));
   timers [timercnt - 1] = w;
   upheap ((WT *)timers, timercnt - 1);
 
@@ -1298,7 +1298,7 @@ ev_periodic_start (EV_P_ struct ev_periodic *w)
     ((WT)w)->at += ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
 
   ev_start (EV_A_ (W)w, ++periodiccnt);
-  array_needsize (periodics, periodicmax, periodiccnt, (void));
+  array_needsize (struct ev_periodic *, periodics, periodicmax, periodiccnt, (void));
   periodics [periodiccnt - 1] = w;
   upheap ((WT *)periodics, periodiccnt - 1);
 
@@ -1330,7 +1330,7 @@ ev_idle_start (EV_P_ struct ev_idle *w)
     return;
 
   ev_start (EV_A_ (W)w, ++idlecnt);
-  array_needsize (idles, idlemax, idlecnt, (void));
+  array_needsize (struct ev_idle *, idles, idlemax, idlecnt, (void));
   idles [idlecnt - 1] = w;
 }
 
@@ -1352,7 +1352,7 @@ ev_prepare_start (EV_P_ struct ev_prepare *w)
     return;
 
   ev_start (EV_A_ (W)w, ++preparecnt);
-  array_needsize (prepares, preparemax, preparecnt, (void));
+  array_needsize (struct ev_prepare *, prepares, preparemax, preparecnt, (void));
   prepares [preparecnt - 1] = w;
 }
 
@@ -1374,7 +1374,7 @@ ev_check_start (EV_P_ struct ev_check *w)
     return;
 
   ev_start (EV_A_ (W)w, ++checkcnt);
-  array_needsize (checks, checkmax, checkcnt, (void));
+  array_needsize (struct ev_check *, checks, checkmax, checkcnt, (void));
   checks [checkcnt - 1] = w;
 }
 
@@ -1405,7 +1405,7 @@ ev_signal_start (EV_P_ struct ev_signal *w)
   assert (("ev_signal_start called with illegal signal number", w->signum > 0));
 
   ev_start (EV_A_ (W)w, 1);
-  array_needsize (signals, signalmax, w->signum, signals_init);
+  array_needsize (ANSIG, signals, signalmax, w->signum, signals_init);
   wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
 
   if (!((WL)w)->next)
@@ -1498,7 +1498,7 @@ once_cb_to (EV_P_ struct ev_timer *w, int revents)
 void
 ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg)
 {
-  struct ev_once *once = ev_malloc (sizeof (struct ev_once));
+  struct ev_once *once = (struct ev_once *)ev_malloc (sizeof (struct ev_once));
 
   if (!once)
     cb (EV_ERROR | EV_READ | EV_WRITE | EV_TIMEOUT, arg);
