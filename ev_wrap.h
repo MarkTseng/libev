@@ -7,6 +7,7 @@
 #define method_fudge ((loop)->method_fudge)
 #define method_modify ((loop)->method_modify)
 #define method_poll ((loop)->method_poll)
+#define postfork ((loop)->postfork)
 #define activecnt ((loop)->activecnt)
 #define vec_ri ((loop)->vec_ri)
 #define vec_ro ((loop)->vec_ro)
