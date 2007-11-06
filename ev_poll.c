@@ -75,27 +75,28 @@ poll_modify (EV_P_ int fd, int oev, int nev)
 static void
 poll_poll (EV_P_ ev_tstamp timeout)
 {
+  int i;
   int res = poll (polls, pollcnt, ceil (timeout * 1000.));
 
-  if (res > 0)
-    {
-      int i;
-
-      for (i = 0; i < pollcnt; ++i)
-        fd_event (
-          EV_A_
-          polls [i].fd,
-          (polls [i].revents & (POLLOUT | POLLERR | POLLHUP) ? EV_WRITE : 0)
-          | (polls [i].revents & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
-        );
-    }
-  else if (res < 0)
+  if (res < 0)
     {
       if (errno == EBADF)
         fd_ebadf (EV_A);
-      else if (errno == ENOMEM)
+      else if (errno == ENOMEM && !syserr_cb)
         fd_enomem (EV_A);
+      else if (errno != EINTR)
+        syserr ();
+
+      return;
     }
+
+  for (i = 0; i < pollcnt; ++i)
+    fd_event (
+      EV_A_
+      polls [i].fd,
+      (polls [i].revents & (POLLOUT | POLLERR | POLLHUP) ? EV_WRITE : 0)
+      | (polls [i].revents & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
+    );
 }
 
 static int
@@ -114,6 +115,6 @@ poll_init (EV_P_ int flags)
 static void
 poll_destroy (EV_P)
 {
-  free (pollidxs);
-  free (polls);
+  ev_free (pollidxs);
+  ev_free (polls);
 }

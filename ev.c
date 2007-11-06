@@ -155,6 +155,51 @@ volatile double SIGFPE_REQ = 0.0f;
 
 /*****************************************************************************/
 
+static void (*syserr_cb)(void);
+
+void ev_set_syserr_cb (void (*cb)(void))
+{
+  syserr_cb = cb;
+}
+
+static void
+syserr (void)
+{
+  if (syserr_cb)
+    syserr_cb ();
+  else
+    {
+      perror ("libev");
+      abort ();
+    }
+}
+
+static void *(*alloc)(void *ptr, long size);
+
+void ev_set_allocator (void *(*cb)(void *ptr, long size))
+{
+  alloc = cb;
+}
+
+static void *
+ev_realloc (void *ptr, long size)
+{
+  ptr = alloc ? alloc (ptr, size) : realloc (ptr, size);
+
+  if (!ptr && size)
+    {
+      fprintf (stderr, "libev: cannot allocate %ld bytes, aborting.", size);
+      abort ();
+    }
+
+  return ptr;
+}
+
+#define ev_malloc(size) ev_realloc (0, (size))
+#define ev_free(ptr)    ev_realloc ((ptr), 0)
+
+/*****************************************************************************/
+
 typedef struct
 {
   WL head;
@@ -225,31 +270,31 @@ ev_now (EV_P)
 
 #define array_roundsize(base,n) ((n) | 4 & ~3)
 
-#define array_needsize(base,cur,cnt,init)		\
-  if (expect_false ((cnt) > cur))			\
-    {							\
-      int newcnt = cur;					\
-      do						\
-        {						\
-          newcnt = array_roundsize (base, newcnt << 1);	\
-        }						\
-      while ((cnt) > newcnt);				\
-      							\
-      base = realloc (base, sizeof (*base) * (newcnt));	\
-      init (base + cur, newcnt - cur);			\
-      cur = newcnt;					\
+#define array_needsize(base,cur,cnt,init)			\
+  if (expect_false ((cnt) > cur))				\
+    {								\
+      int newcnt = cur;						\
+      do							\
+        {							\
+          newcnt = array_roundsize (base, newcnt << 1);		\
+        }							\
+      while ((cnt) > newcnt);					\
+      								\
+      base = ev_realloc (base, sizeof (*base) * (newcnt));	\
+      init (base + cur, newcnt - cur);				\
+      cur = newcnt;						\
     }
 
 #define array_slim(stem)					\
   if (stem ## max < array_roundsize (stem ## cnt >> 2))		\
     {								\
       stem ## max = array_roundsize (stem ## cnt >> 1);		\
-      base = realloc (base, sizeof (*base) * (stem ## max));	\
+      base = ev_realloc (base, sizeof (*base) * (stem ## max));	\
       fprintf (stderr, "slimmed down " # stem " to %d\n", stem ## max);/*D*/\
     }
 
 #define array_free(stem, idx) \
-  free (stem ## s idx); stem ## cnt idx = stem ## max idx = 0;
+  ev_free (stem ## s idx); stem ## cnt idx = stem ## max idx = 0;
 
 /*****************************************************************************/
 
@@ -704,7 +749,9 @@ loop_fork (EV_P)
 struct ev_loop *
 ev_loop_new (int methods)
 {
-  struct ev_loop *loop = (struct ev_loop *)calloc (1, sizeof (struct ev_loop));
+  struct ev_loop *loop = (struct ev_loop *)ev_malloc (sizeof (struct ev_loop));
+
+  memset (loop, 0, sizeof (struct ev_loop));
 
   loop_init (EV_A_ methods);
 
@@ -718,7 +765,7 @@ void
 ev_loop_destroy (EV_P)
 {
   loop_destroy (EV_A);
-  free (loop);
+  ev_free (loop);
 }
 
 void
@@ -1397,7 +1444,7 @@ once_cb (EV_P_ struct ev_once *once, int revents)
 
   ev_io_stop (EV_A_ &once->io);
   ev_timer_stop (EV_A_ &once->to);
-  free (once);
+  ev_free (once);
 
   cb (revents, arg);
 }
@@ -1417,7 +1464,7 @@ once_cb_to (EV_P_ struct ev_timer *w, int revents)
 void
 ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg)
 {
-  struct ev_once *once = malloc (sizeof (struct ev_once));
+  struct ev_once *once = ev_malloc (sizeof (struct ev_once));
 
   if (!once)
     cb (EV_ERROR | EV_READ | EV_WRITE | EV_TIMEOUT, arg);

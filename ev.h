@@ -229,6 +229,20 @@ int ev_version_minor (void);
 
 ev_tstamp ev_time (void);
 
+/* Sets the allocation function to use, works like realloc.
+ * It is used to allocate and free memory.
+ * If it returns zero when memory needs to be allocated, the library might abort
+ * or take some potentially destructive action.
+ * The default is your system realloc function.
+ */
+void ev_set_allocator (void *(*cb)(void *ptr, long size));
+
+/* set the callback function to call on a
+ * retryable syscall error
+ * (such as failed select, poll, epoll_wait)
+ */
+void ev_set_syserr_cb (void (*cb)(void));
+
 # if EV_MULTIPLICITY
 /* the default loop is the only one that handles signals and child watchers */
 /* you can call this as often as you like */

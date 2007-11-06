@@ -55,10 +55,10 @@ select_modify (EV_P_ int fd, int oev, int nev)
     {
       int new_max = (fd >> 5) + 1;
 
-      vec_ri = (unsigned char *)realloc (vec_ri, new_max * 4);
-      vec_ro = (unsigned char *)realloc (vec_ro, new_max * 4); /* could free/malloc */
-      vec_wi = (unsigned char *)realloc (vec_wi, new_max * 4);
-      vec_wo = (unsigned char *)realloc (vec_wo, new_max * 4); /* could free/malloc */
+      vec_ri = (unsigned char *)ev_realloc (vec_ri, new_max * 4);
+      vec_ro = (unsigned char *)ev_realloc (vec_ro, new_max * 4); /* could free/malloc */
+      vec_wi = (unsigned char *)ev_realloc (vec_wi, new_max * 4);
+      vec_wo = (unsigned char *)ev_realloc (vec_wo, new_max * 4); /* could free/malloc */
 
       for (; vec_max < new_max; ++vec_max)
         ((uint32_t *)vec_ri)[vec_max] =
@@ -77,6 +77,7 @@ select_modify (EV_P_ int fd, int oev, int nev)
 static void
 select_poll (EV_P_ ev_tstamp timeout)
 {
+  int word, offs;
   struct timeval tv;
   int res;
 
@@ -88,39 +89,39 @@ select_poll (EV_P_ ev_tstamp timeout)
 
   res = select (vec_max * 32, (fd_set *)vec_ro, (fd_set *)vec_wo, 0, &tv);
 
-  if (res > 0)
-    {
-      int word, offs;
-
-      for (word = vec_max; word--; )
-        {
-          if (((uint32_t *)vec_ro) [word] | ((uint32_t *)vec_wo) [word])
-            for (offs = 4; offs--; )
-              {
-                int idx = word * 4 + offs;
-                unsigned char byte_r = vec_ro [idx];
-                unsigned char byte_w = vec_wo [idx];
-                int bit;
-
-                if (byte_r | byte_w)
-                  for (bit = 8; bit--; )
-                    {
-                      int events = 0;
-                      events |= byte_r & (1 << bit) ? EV_READ  : 0;
-                      events |= byte_w & (1 << bit) ? EV_WRITE : 0;
-
-                      if (events)
-                        fd_event (EV_A_ idx * 8 + bit, events);
-                    }
-              }
-        }
-    }
-  else if (res < 0)
+  if (res < 0)
     {
       if (errno == EBADF)
         fd_ebadf (EV_A);
-      else if (errno == ENOMEM)
+      else if (errno == ENOMEM && !syserr_cb)
         fd_enomem (EV_A);
+      else if (errno != EINTR)
+        syserr ();
+
+      return;
+    }
+
+  for (word = vec_max; word--; )
+    {
+      if (((uint32_t *)vec_ro) [word] | ((uint32_t *)vec_wo) [word])
+        for (offs = 4; offs--; )
+          {
+            int idx = word * 4 + offs;
+            unsigned char byte_r = vec_ro [idx];
+            unsigned char byte_w = vec_wo [idx];
+            int bit;
+
+            if (byte_r | byte_w)
+              for (bit = 8; bit--; )
+                {
+                  int events = 0;
+                  events |= byte_r & (1 << bit) ? EV_READ  : 0;
+                  events |= byte_w & (1 << bit) ? EV_WRITE : 0;
+
+                  if (events)
+                    fd_event (EV_A_ idx * 8 + bit, events);
+                }
+          }
     }
 }
 
@@ -143,10 +144,10 @@ select_init (EV_P_ int flags)
 static void
 select_destroy (EV_P)
 {
-  free (vec_ri);
-  free (vec_ro);
-  free (vec_wi);
-  free (vec_wo);
+  ev_free (vec_ri);
+  ev_free (vec_ro);
+  ev_free (vec_wi);
+  ev_free (vec_wo);
 }
 
 

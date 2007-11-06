@@ -51,11 +51,16 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
 static void
 epoll_poll (EV_P_ ev_tstamp timeout)
 {
-  int eventcnt = epoll_wait (epoll_fd, epoll_events, epoll_eventmax, ceil (timeout * 1000.));
   int i;
+  int eventcnt = epoll_wait (epoll_fd, epoll_events, epoll_eventmax, ceil (timeout * 1000.));
 
   if (eventcnt < 0)
-    return;
+    {
+      if (errno != EINTR)
+        syserr ();
+
+      return;
+    }
 
   for (i = 0; i < eventcnt; ++i)
     fd_event (
@@ -68,9 +73,9 @@ epoll_poll (EV_P_ ev_tstamp timeout)
   /* if the receive array was full, increase its size */
   if (expect_false (eventcnt == epoll_eventmax))
     {
-      free (epoll_events);
+      ev_free (epoll_events);
       epoll_eventmax = array_roundsize (epoll_events, epoll_eventmax << 1);
-      epoll_events = malloc (sizeof (struct epoll_event) * epoll_eventmax);
+      epoll_events = ev_malloc (sizeof (struct epoll_event) * epoll_eventmax);
     }
 }
 
@@ -89,7 +94,7 @@ epoll_init (EV_P_ int flags)
   method_poll   = epoll_poll;
 
   epoll_eventmax = 64; /* intiial number of events receivable per poll */
-  epoll_events = malloc (sizeof (struct epoll_event) * epoll_eventmax);
+  epoll_events = ev_malloc (sizeof (struct epoll_event) * epoll_eventmax);
 
   return EVMETHOD_EPOLL;
 }
@@ -99,7 +104,7 @@ epoll_destroy (EV_P)
 {
   close (epoll_fd);
 
-  free (epoll_events);
+  ev_free (epoll_events);
 }
 
 static void

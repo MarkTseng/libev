@@ -85,7 +85,12 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
   kqueue_changecnt = 0;
 
   if (res < 0)
-    return;
+    { 
+      if (errno != EINTR)
+        syserr ();
+
+      return;
+    } 
 
   for (i = 0; i < res; ++i)
     {
@@ -118,9 +123,9 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
 
   if (expect_false (res == kqueue_eventmax))
     {
-      free (kqueue_events);
+      ev_free (kqueue_events);
       kqueue_eventmax = array_roundsize (kqueue_events, kqueue_eventmax << 1);
-      kqueue_events = malloc (sizeof (struct kevent) * kqueue_eventmax);
+      kqueue_events = ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
     }
 }
 
@@ -159,7 +164,7 @@ kqueue_init (EV_P_ int flags)
   method_poll   = kqueue_poll;
 
   kqueue_eventmax = 64; /* intiial number of events receivable per poll */
-  kqueue_events = malloc (sizeof (struct kevent) * kqueue_eventmax);
+  kqueue_events = ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
 
   kqueue_changes   = 0;
   kqueue_changemax = 0;
@@ -173,8 +178,8 @@ kqueue_destroy (EV_P)
 {
   close (kqueue_fd);
 
-  free (kqueue_events);
-  free (kqueue_changes);
+  ev_free (kqueue_events);
+  ev_free (kqueue_changes);
 }
 
 static void
