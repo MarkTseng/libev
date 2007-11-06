@@ -56,21 +56,20 @@ kqueue_change (EV_P_ int fd, int filter, int flags, int fflags)
 static void
 kqueue_modify (EV_P_ int fd, int oev, int nev)
 {
-  if ((oev ^ nev) & EV_READ)
-    {
-      if (nev & EV_READ)
-        kqueue_change (EV_A_ fd, EVFILT_READ, EV_ADD, NOTE_EOF);
-      else
-        kqueue_change (EV_A_ fd, EVFILT_READ, EV_DELETE, 0);
-    }
+  /* to detect close/reopen reliably, we have to remove and re-add */
+  /* event requests even when oev == nev */
 
-  if ((oev ^ nev) & EV_WRITE)
-    {
-      if (nev & EV_WRITE)
-        kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_ADD, NOTE_EOF);
-      else
-        kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_DELETE, 0);
-    }
+  if (oev & EV_READ)
+    kqueue_change (EV_A_ fd, EVFILT_READ, EV_DELETE, 0);
+
+  if (oev & EV_WRITE)
+    kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_DELETE, 0);
+
+  if (nev & EV_READ)
+    kqueue_change (EV_A_ fd, EVFILT_READ, EV_ADD, NOTE_EOF);
+
+  if (nev & EV_WRITE)
+    kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_ADD, NOTE_EOF);
 }
 
 static void
@@ -78,6 +77,14 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
 {
   int res, i;
   struct timespec ts;
+
+  /* need to resize so there is enough space for errors */
+  if (kqueue_changecnt > kqueue_eventmax)
+    {
+      ev_free (kqueue_events);
+      kqueue_eventmax = array_roundsize (struct kevent, kqueue_changecnt);
+      kqueue_events = ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
+    }
 
   ts.tv_sec  = (time_t)timeout;
   ts.tv_nsec = (long)(timeout - (ev_tstamp)ts.tv_sec) * 1e9;
@@ -94,27 +101,42 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
 
   for (i = 0; i < res; ++i)
     {
+      int fd = kqueue_events [i].ident;
+
       if (kqueue_events [i].flags & EV_ERROR)
         {
+	  int err = kqueue_events [i].data;
+
           /* 
-           * Error messages that can happen, when a delete fails.
+           * errors that may happen
            *   EBADF happens when the file discriptor has been
            *   closed,
-           *   ENOENT when the file discriptor was closed and
+           *   ENOENT when the file descriptor was closed and
            *   then reopened.
            *   EINVAL for some reasons not understood; EINVAL
            *   should not be returned ever; but FreeBSD does :-\
-           * An error is also indicated when a callback deletes
-           * an event we are still processing.  In that case
-           * the data field is set to ENOENT.
            */
-          if (kqueue_events [i].data == EBADF)
-            fd_kill (EV_A_ kqueue_events [i].ident);
+
+          /* we are only interested in errors for fds that we are interested in :) */
+          if (anfds [fd].events)
+	    {
+              if (err == ENOENT) /* resubmit changes on ENOENT */
+                kqueue_modify (EV_A_ fd, 0, anfds [fd].events);
+              else if (err == EBADF) /* on EBADF, we re-check the fd */
+                {
+                  if (fd_valid (fd))
+                    kqueue_modify (EV_A_ fd, 0, anfds [fd].events);
+                  else
+                    fd_kill (EV_A_ fd);
+                }
+              else /* on all other errors, we error out on the fd */
+                fd_kill (EV_A_ fd);
+	    }
         }
       else
         fd_event (
           EV_A_
-          kqueue_events [i].ident,
+          fd,
           kqueue_events [i].filter == EVFILT_READ ? EV_READ
           : kqueue_events [i].filter == EVFILT_WRITE ? EV_WRITE
           : 0
@@ -124,7 +146,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
   if (expect_false (res == kqueue_eventmax))
     {
       ev_free (kqueue_events);
-      kqueue_eventmax = array_roundsize (kqueue_events, kqueue_eventmax << 1);
+      kqueue_eventmax = array_roundsize (struct kevent, kqueue_eventmax << 1);
       kqueue_events = ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
     }
 }

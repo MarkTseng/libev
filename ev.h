@@ -158,9 +158,6 @@ struct ev_io
 struct ev_signal
 {
   EV_WATCHER_LIST (ev_signal);
-#if EV_MULTIPLICITY
-  struct ev_loop *loop;
-#endif
 
   int signum; /* ro */
 };

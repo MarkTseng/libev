@@ -144,7 +144,12 @@ x_cb (struct event *ev, int revents)
 static void
 x_cb_sig (EV_P_ struct ev_signal *w, int revents)
 {
-  x_cb ((struct event *)(((char *)w) - offsetof (struct event, iosig.sig)), revents);
+  struct event *ev = (struct event *)(((char *)w) - offsetof (struct event, iosig.sig));
+
+  if (revents & EV_ERROR)
+    event_del (ev);
+
+  x_cb (ev, revents);
 }
 
 static void
@@ -152,7 +157,9 @@ x_cb_io (EV_P_ struct ev_io *w, int revents)
 {
   struct event *ev = (struct event *)(((char *)w) - offsetof (struct event, iosig.io));
 
-  if (!(ev->ev_events & EV_PERSIST) && ev_is_active (w))
+  if (revents & EV_ERROR)
+    event_del (ev);
+  else if (!(ev->ev_events & EV_PERSIST) && ev_is_active (w))
     ev_io_stop (EV_A_ w);
 
   x_cb (ev, revents);
