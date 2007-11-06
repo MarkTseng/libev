@@ -46,14 +46,14 @@ poll_modify (EV_P_ int fd, int oev, int nev)
   if (oev == nev)
     return;
 
-  array_needsize (pollidxs, pollidxmax, fd + 1, pollidx_init);
+  array_needsize (int, pollidxs, pollidxmax, fd + 1, pollidx_init);
 
   idx = pollidxs [fd];
 
   if (idx < 0) /* need to allocate a new pollfd */
     {
       idx = pollcnt++;
-      array_needsize (polls, pollmax, pollcnt, );
+      array_needsize (struct pollfd, polls, pollmax, pollcnt, );
       polls [idx].fd = fd;
     }
 
@@ -118,3 +118,4 @@ poll_destroy (EV_P)
   ev_free (pollidxs);
   ev_free (polls);
 }
+

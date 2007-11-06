@@ -68,7 +68,7 @@ perl -ne '
    s/\bepoll_sub.c\b//g;
    s/\bevent-internal.h\b//g;
    s/\bevsignal.h\b//g;
-   s/^(EXTRA_DIST\s*=\s*)/$1 ev.h ev_vars.h ev_wrap.h event_compat.h ev_epoll.c ev_select.c ev_poll.c ev_kqueue.c /;
+   s/^(EXTRA_DIST\s*=\s*)/$1 ev.h ev_vars.h ev_wrap.h event_compat.h ev_epoll.c ev_select.c ev_poll.c ev_kqueue.c ev_win32.c /;
    s/^(include_HEADERS\s*=\s*)/$1 ev.h event_compat.h /;
    s/^(libevent_la_SOURCES\s*=\s*)/$1 ev.c /;
    s/^(libevent_la_LIBADD\s*=\s*)/$1 -lm /;
