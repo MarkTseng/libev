@@ -185,15 +185,10 @@ kqueue_destroy (EV_P)
 static void
 kqueue_fork (EV_P)
 {
-  for (;;)
-    {
-      kqueue_fd = kqueue ();
+  close (kqueue_fd);
 
-      if (kqueue_fd >= 0)
-        break;
-
-      syserr ("(libev) kqueue");
-    }
+  while ((kqueue_fd = kqueue ()) < 0)
+    syserr ("(libev) kqueue");
 
   fcntl (kqueue_fd, F_SETFD, FD_CLOEXEC);
 

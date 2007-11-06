@@ -110,15 +110,10 @@ epoll_destroy (EV_P)
 static void
 epoll_fork (EV_P)
 {
-  for (;;)
-    {
-      epoll_fd = epoll_create (256);
+  close (epoll_fd);
 
-      if (epoll_fd >= 0)
-        break;
-
-      syserr ("(libev) epoll_create");
-    }
+  while ((epoll_fd = epoll_create (256)) < 0)
+    syserr ("(libev) epoll_create");
 
   fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
 
