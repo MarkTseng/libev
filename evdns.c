@@ -80,7 +80,6 @@
 
 #include <string.h>
 #include <fcntl.h>
-#include <sys/time.h>
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -88,7 +87,6 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <unistd.h>
 #include <limits.h>
 #include <sys/stat.h>
 #include <ctype.h>

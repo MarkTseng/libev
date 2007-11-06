@@ -14,6 +14,10 @@ perl -ne '
       print "#ifndef EV_STANDALONE\n$_#endif\n";
       next;
    }
+   if (/#include "(unistd.h|sys/time.h)"/) {
+      print "#ifndef WIN32\n$_#endif\n";
+      next;
+   }
    next if /#include "log.h"/;
 
    print;
