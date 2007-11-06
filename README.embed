@@ -27,6 +27,8 @@ FILESETS
         ev.c
         ev_vars.h
         ev_wrap.h
+        ev_win32.c
+
         ev_select.c     only when select backend is enabled (which is by default)
         ev_poll.c       only when poll backend is enabled (disabled by default)
         ev_epoll.c      only when the epoll backend is enabled (disabled by default)

@@ -150,64 +150,7 @@ typedef struct ev_watcher_time *WT;
 
 static int have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
 
-#if WIN32
-/* note: the comment below could not be substantiated, but what would I care */
-/* MSDN says this is required to handle SIGFPE */
-volatile double SIGFPE_REQ = 0.0f; 
-
-static int
-ev_socketpair_tcp (int filedes [2])
-{
-  struct sockaddr_in addr = { 0 };
-  int addr_size = sizeof (addr);
-  SOCKET listener;
-  SOCKET sock [2] = { -1, -1 };
-
-  if ((listener = socket (AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) 
-    return -1;
-
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-  addr.sin_port = 0;
-
-  if (bind (listener, (struct sockaddr *)&addr, addr_size))
-    goto fail;
-
-  if (getsockname(listener, (struct sockaddr *)&addr, &addr_size))
-    goto fail;
-
-  if (listen (listener, 1))
-    goto fail;
-
-  if ((sock [0] = socket (AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) 
-    goto fail;
-
-  if (connect (sock[0], (struct sockaddr *)&addr, addr_size))
-    goto fail;
-
-  if ((sock[1] = accept (listener, 0, 0)) < 0)
-    goto fail;
-
-  closesocket (listener);
-
-  filedes [0] = sock [0];
-  filedes [1] = sock [1];
-
-  return 0;
-
-fail:
-  closesocket (listener);
-
-  if (sock [0] != INVALID_SOCKET) closesocket (sock [0]);
-  if (sock [1] != INVALID_SOCKET) closesocket (sock [1]);
-
-  return -1;
-}
-
-# define ev_pipe(filedes) ev_socketpair_tcp (filedes)
-#else
-# define ev_pipe(filedes) pipe (filedes)
-#endif
+#include "ev_win32.c"
 
 /*****************************************************************************/
 
@@ -830,7 +773,7 @@ loop_fork (EV_P)
       close (sigpipe [0]);
       close (sigpipe [1]);
 
-      while (ev_pipe (sigpipe))
+      while (pipe (sigpipe))
         syserr ("(libev) error creating pipe");
 
       siginit (EV_A);
@@ -883,7 +826,7 @@ int
 ev_default_loop (int methods)
 {
   if (sigpipe [0] == sigpipe [1])
-    if (ev_pipe (sigpipe))
+    if (pipe (sigpipe))
       return 0;
 
   if (!default_loop)
