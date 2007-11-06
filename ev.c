@@ -543,7 +543,11 @@ sighandler (int signum)
     {
       int old_errno = errno;
       gotsig = 1;
+#ifdef WIN32
+      send (sigpipe [1], &signum, 1, MSG_DONTWAIT);
+#else
       write (sigpipe [1], &signum, 1);
+#endif
       errno = old_errno;
     }
 }
@@ -554,7 +558,11 @@ sigcb (EV_P_ struct ev_io *iow, int revents)
   WL w;
   int signum;
 
+#ifdef WIN32
+  recv (sigpipe [0], &revents, 1, MSG_DONTWAIT);
+#else
   read (sigpipe [0], &revents, 1);
+#endif
   gotsig = 0;
 
   for (signum = signalmax; signum--; )
