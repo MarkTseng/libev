@@ -56,9 +56,7 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include <signal.h>
 #include <stddef.h>
 
 #include <stdio.h>
@@ -66,12 +64,17 @@
 #include <assert.h>
 #include <errno.h>
 #include <sys/types.h>
-#ifndef WIN32
-# include <sys/wait.h>
-#endif
-#include <sys/time.h>
 #include <time.h>
 
+#ifndef PERL
+# include <signal.h>
+#endif
+
+#ifndef WIN32
+# include <unistd.h>
+# include <sys/time.h>
+# include <sys/wait.h>
+#endif
 /**/
 
 #ifndef EV_USE_MONOTONIC
@@ -96,7 +99,9 @@
 
 #ifndef EV_USE_WIN32
 # ifdef WIN32
-#  define EV_USE_WIN32 1
+#  define EV_USE_WIN32 0 /* it does not exist, use select */
+#  undef EV_USE_SELECT
+#  define EV_USE_SELECT 1
 # else
 #  define EV_USE_WIN32 0
 # endif
@@ -296,6 +301,11 @@ ev_now (EV_P)
       fprintf (stderr, "slimmed down " # stem " to %d\n", stem ## max);/*D*/\
     }
 
+/* microsoft's pseudo-c is quite far from C as the rest of the world and the standard knows it */
+/* bringing us everlasting joy in form of stupid extra macros that are not required in C */
+#define array_free_microshit(stem) \
+  ev_free (stem ## s); stem ## cnt = stem ## max = 0;
+
 #define array_free(stem, idx) \
   ev_free (stem ## s idx); stem ## cnt idx = stem ## max idx = 0;
 
@@ -324,7 +334,7 @@ event (EV_P_ W w, int events)
     }
 
   w->pending = ++pendingcnt [ABSPRI (w)];
-  array_needsize (pendings [ABSPRI (w)], pendingmax [ABSPRI (w)], pendingcnt [ABSPRI (w)], );
+  array_needsize (pendings [ABSPRI (w)], pendingmax [ABSPRI (w)], pendingcnt [ABSPRI (w)], (void));
   pendings [ABSPRI (w)][w->pending - 1].w      = w;
   pendings [ABSPRI (w)][w->pending - 1].events = events;
 }
@@ -389,7 +399,7 @@ fd_change (EV_P_ int fd)
   anfds [fd].reify = 1;
 
   ++fdchangecnt;
-  array_needsize (fdchanges, fdchangemax, fdchangecnt, );
+  array_needsize (fdchanges, fdchangemax, fdchangecnt, (void));
   fdchanges [fdchangecnt - 1] = fd;
 }
 
@@ -405,6 +415,16 @@ fd_kill (EV_P_ int fd)
     }
 }
 
+static int
+fd_valid (int fd)
+{
+#ifdef WIN32
+  return !!win32_get_osfhandle (fd);
+#else
+  return fcntl (fd, F_GETFD) != -1;
+#endif
+}
+
 /* called on EBADF to verify fds */
 static void
 fd_ebadf (EV_P)
@@ -413,7 +433,7 @@ fd_ebadf (EV_P)
 
   for (fd = 0; fd < anfdmax; ++fd)
     if (anfds [fd].events)
-      if (fcntl (fd, F_GETFD) == -1 && errno == EBADF)
+      if (!fd_valid (fd) == -1 && errno == EBADF)
         fd_kill (EV_A_ fd);
 }
 
@@ -572,9 +592,10 @@ siginit (EV_P)
 
 /*****************************************************************************/
 
+static struct ev_child *childs [PID_HASHSIZE];
+
 #ifndef WIN32
 
-static struct ev_child *childs [PID_HASHSIZE];
 static struct ev_signal childev;
 
 #ifndef WCONTINUED
@@ -728,12 +749,13 @@ loop_destroy (EV_P)
   for (i = NUMPRI; i--; )
     array_free (pending, [i]);
 
-  array_free (fdchange, );
-  array_free (timer, );
-  array_free (periodic, );
-  array_free (idle, );
-  array_free (prepare, );
-  array_free (check, );
+  /* have to use the microsoft-never-gets-it-right macro */
+  array_free_microshit (fdchange);
+  array_free_microshit (timer);
+  array_free_microshit (periodic);
+  array_free_microshit (idle);
+  array_free_microshit (prepare);
+  array_free_microshit (check);
 
   method = 0;
 }
@@ -848,8 +870,10 @@ ev_default_destroy (void)
   struct ev_loop *loop = default_loop;
 #endif
 
+#ifndef WIN32
   ev_ref (EV_A); /* child watcher */
   ev_signal_stop (EV_A_ &childev);
+#endif
 
   ev_ref (EV_A); /* signal watcher */
   ev_io_stop (EV_A_ &sigev);
@@ -1223,7 +1247,7 @@ ev_timer_start (EV_P_ struct ev_timer *w)
   assert (("ev_timer_start called with negative timer repeat value", w->repeat >= 0.));
 
   ev_start (EV_A_ (W)w, ++timercnt);
-  array_needsize (timers, timermax, timercnt, );
+  array_needsize (timers, timermax, timercnt, (void));
   timers [timercnt - 1] = w;
   upheap ((WT *)timers, timercnt - 1);
 
@@ -1280,7 +1304,7 @@ ev_periodic_start (EV_P_ struct ev_periodic *w)
     ((WT)w)->at += ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
 
   ev_start (EV_A_ (W)w, ++periodiccnt);
-  array_needsize (periodics, periodicmax, periodiccnt, );
+  array_needsize (periodics, periodicmax, periodiccnt, (void));
   periodics [periodiccnt - 1] = w;
   upheap ((WT *)periodics, periodiccnt - 1);
 
@@ -1312,7 +1336,7 @@ ev_idle_start (EV_P_ struct ev_idle *w)
     return;
 
   ev_start (EV_A_ (W)w, ++idlecnt);
-  array_needsize (idles, idlemax, idlecnt, );
+  array_needsize (idles, idlemax, idlecnt, (void));
   idles [idlecnt - 1] = w;
 }
 
@@ -1334,7 +1358,7 @@ ev_prepare_start (EV_P_ struct ev_prepare *w)
     return;
 
   ev_start (EV_A_ (W)w, ++preparecnt);
-  array_needsize (prepares, preparemax, preparecnt, );
+  array_needsize (prepares, preparemax, preparecnt, (void));
   prepares [preparecnt - 1] = w;
 }
 
@@ -1356,7 +1380,7 @@ ev_check_start (EV_P_ struct ev_check *w)
     return;
 
   ev_start (EV_A_ (W)w, ++checkcnt);
-  array_needsize (checks, checkmax, checkcnt, );
+  array_needsize (checks, checkmax, checkcnt, (void));
   checks [checkcnt - 1] = w;
 }
 

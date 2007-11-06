@@ -31,8 +31,11 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <assert.h>
+
+#ifndef WIN32
+# include <sys/time.h>
+#endif
 
 #include "ev.h"
 #include "event.h"
@@ -240,9 +243,9 @@ int event_del (struct event *ev)
 
 int event_pending (struct event *ev, short events, struct timeval *tv)
 {
+  short revents = 0;
   dLOOPev;
 
-  short revents = 0;
 
   if (ev->ev_events & EV_SIGNAL)
     {
@@ -311,8 +314,8 @@ x_loopexit_cb (int revents, void *base)
 
 int event_base_loopexit (struct event_base *base, struct timeval *tv)
 {
-  dLOOPbase;
   ev_tstamp after = tv_get (tv);
+  dLOOPbase;
 
   ev_once (EV_A_ -1, 0, after >= 0. ? after : 0., x_loopexit_cb, (void *)base);
 
@@ -337,8 +340,8 @@ x_once_cb (int revents, void *arg)
 
 int event_base_once (struct event_base *base, int fd, short events, void (*cb)(int, short, void *), void *arg, struct timeval *tv)
 {
-  dLOOPbase;
   struct x_once *once = malloc (sizeof (struct x_once));
+  dLOOPbase;
 
   if (!once)
     return -1;

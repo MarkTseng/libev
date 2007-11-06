@@ -29,18 +29,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* for broken bsd's */
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 /* for unix systems */
-#ifndef WIN32
+#ifdef WIN32
+typedef unsigned int uint32_t;
+#else
 # include <sys/select.h>
+# include <inttypes.h>
 #endif
 
 #include <string.h>
-#include <inttypes.h>
 
 static void
 select_modify (EV_P_ int fd, int oev, int nev)

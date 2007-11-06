@@ -100,7 +100,7 @@ struct ev_loop;
   int pending; /* private */			\
   int priority; /* private */			\
   EV_COMMON; /* rw */				\
-  void (*cb)(EV_P_ struct type *, int revents); /* private */ /* gets invoked with an eventmask */
+  void (*cb)(EV_P_ struct type *, int revents) /* private */ /* gets invoked with an eventmask */
 
 #define EV_WATCHER_LIST(type)			\
   EV_WATCHER (type);				\
