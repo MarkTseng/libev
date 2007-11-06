@@ -10,6 +10,10 @@ met:
       disclaimer in the documentation and/or other materials provided
       with the distribution.
 
+    * The name of the author may not be used to endorse or promote
+      products derived from this software without specific prior written
+      permission.
+
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -22,8 +26,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NOTE: some parts of this library are under a different license, namely the
-3-clause BSD style license, which is compatible with this one, but carries
-the additional restriction that you must not use the name of the author(s)
-of those parts to endorse any product.
+NOTE: the core parts of this library are under the so-called 2-clause
+BSD style license, which is compatible with this one, but lacks the
+restriction that you must not use the name of the author(s) of those parts
+to endorse any product. So feel free to use the authors name and any
+others that helped write the core parts :)
 
