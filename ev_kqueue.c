@@ -59,17 +59,17 @@ kqueue_modify (EV_P_ int fd, int oev, int nev)
   if ((oev ^ nev) & EV_READ)
     {
       if (nev & EV_READ)
-        kqueue_change (fd, EVFILT_READ, EV_ADD, NOTE_EOF);
+        kqueue_change (EV_A_ fd, EVFILT_READ, EV_ADD, NOTE_EOF);
       else
-        kqueue_change (fd, EVFILT_READ, EV_DELETE, 0);
+        kqueue_change (EV_A_ fd, EVFILT_READ, EV_DELETE, 0);
     }
 
   if ((oev ^ nev) & EV_WRITE)
     {
       if (nev & EV_WRITE)
-        kqueue_change (fd, EVFILT_WRITE, EV_ADD, NOTE_EOF);
+        kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_ADD, NOTE_EOF);
       else
-        kqueue_change (fd, EVFILT_WRITE, EV_DELETE, 0);
+        kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_DELETE, 0);
     }
 }
 
