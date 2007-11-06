@@ -126,7 +126,7 @@ PREPROCESSOR SYMBOLS
 
            #define EV_COMMON                       \
              SV *self; /* contains this struct */  \
-             SV *cb_sv, *fh;
+             SV *cb_sv, *fh /* note no trailing ";" */
 
     EV_PROTOTYPES
 
