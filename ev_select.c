@@ -30,12 +30,20 @@
  */
 
 /* for unix systems */
-#ifdef WIN32
+#if WIN32
 typedef unsigned int uint32_t;
-# define EV_SELECT_USE_FD_SET 1
+# ifndef EV_SELECT_USE_FD_SET
+#  define EV_SELECT_USE_FD_SET 1
+# endif
 #else
 # include <sys/select.h>
 # include <inttypes.h>
+#endif
+
+#if EV_SELECT_USE_WIN32_HANDLES
+# undef EV_SELECT_USE_FD_SET
+# define EV_SELECT_USE_FD_SET 1
+#else
 #endif
 
 #include <string.h>
@@ -47,6 +55,12 @@ select_modify (EV_P_ int fd, int oev, int nev)
     return;
 
 #if EV_SELECT_USE_FD_SET
+# if EV_SELECT_USE_WIN32_HANDLES
+  fd = _get_osfhandle (fd);
+  if (fd < 0)
+    return;
+# endif
+
   if (nev & EV_READ)
     FD_SET (fd, (struct fd_set *)vec_ri);
   else
@@ -124,6 +138,26 @@ select_poll (EV_P_ ev_tstamp timeout)
     }
 
 #if EV_SELECT_USE_FD_SET
+# if EV_SELECT_USE_WIN32_HANDLES
+  for (word = 0; word < anfdmax; ++word)
+    {
+      if (!anfd [word].events)
+        {
+          int fd = _get_osfhandle (word);
+
+          if (fd >= 0)
+            {
+              int events = 0;
+
+              if (FD_ISSET (fd, (struct fd_set *)vec_ro)) events |= EV_READ;
+              if (FD_ISSET (fd, (struct fd_set *)vec_wo)) events |= EV_WRITE;
+
+              if (events)
+                fd_event (EV_A_ word, events);
+            }
+        }
+    }
+# else
   for (word = 0; word < FD_SETSIZE; ++word)
     {
       int events = 0;
@@ -133,6 +167,7 @@ select_poll (EV_P_ ev_tstamp timeout)
       if (events)
         fd_event (EV_A_ word, events);
     }
+# endif
 #else
   for (word = vec_max; word--; )
     {
