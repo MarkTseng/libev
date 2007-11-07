@@ -899,6 +899,18 @@ ev_default_fork (void)
 
 /*****************************************************************************/
 
+static int
+any_pending (EV_P)
+{
+  int pri;
+
+  for (pri = NUMPRI; pri--; )
+    if (pendingcnt [pri])
+      return 1;
+
+  return 0;
+}
+
 static void
 call_pending (EV_P)
 {
@@ -1091,7 +1103,7 @@ ev_loop (EV_P_ int flags)
 
       /* calculate blocking time */
 
-      /* we only need this for !monotonic clockor timers, but as we basically
+      /* we only need this for !monotonic clock or timers, but as we basically
          always have timers, we just calculate it always */
 #if EV_USE_MONOTONIC
       if (expect_true (have_monotonic))
@@ -1134,7 +1146,7 @@ ev_loop (EV_P_ int flags)
       periodics_reify (EV_A); /* absolute timers called first */
 
       /* queue idle watchers unless io or timers are pending */
-      if (!pendingcnt)
+      if (idlecnt && !any_pending (EV_A))
         queue_events (EV_A_ (W *)idles, idlecnt, EV_IDLE);
 
       /* queue check watchers, to be executed first */
