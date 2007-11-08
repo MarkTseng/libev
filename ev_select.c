@@ -43,7 +43,6 @@ typedef unsigned int uint32_t;
 #if EV_SELECT_USE_WIN32_HANDLES
 # undef EV_SELECT_USE_FD_SET
 # define EV_SELECT_USE_FD_SET 1
-#else
 #endif
 
 #include <string.h>

@@ -92,6 +92,15 @@ PREPROCESSOR SYMBOLS
        done: if no other method takes over, select will be it. Otherwise
        the select backend will not be compiled in.
 
+    EV_SELECT_USE_WIN32_HANDLES
+
+       When defined to 1, the select backend will assume that select
+       doesn't understand file descriptors but wants osf handles on
+       win32 (this is the case when the select to be used is the winsock
+       select). This means that it will call _get_osfhandle on the fd to
+       convert it to an OS handle. Should not be defined on non-win32
+       platforms.
+
     EV_USE_POLL
 
        If defined to be "1", libev will compile in support for the poll(2)
