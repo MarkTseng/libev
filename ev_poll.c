@@ -52,10 +52,12 @@ poll_modify (EV_P_ int fd, int oev, int nev)
 
   if (idx < 0) /* need to allocate a new pollfd */
     {
-      idx = pollcnt++;
+      pollidxs [fd] = idx = pollcnt++;
       array_needsize (struct pollfd, polls, pollmax, pollcnt, );
       polls [idx].fd = fd;
     }
+
+  assert (polls [idx].fd == fd);
 
   if (nev)
     polls [idx].events =
@@ -63,9 +65,10 @@ poll_modify (EV_P_ int fd, int oev, int nev)
         | (nev & EV_WRITE ? POLLOUT : 0);
   else /* remove pollfd */
     {
-      if (idx < pollcnt--)
+      pollidxs [fd] = -1;
+
+      if (idx < --pollcnt)
         {
-          pollidxs [fd] = -1;
           polls [idx] = polls [pollcnt];
           pollidxs [polls [idx].fd] = idx;
         }
