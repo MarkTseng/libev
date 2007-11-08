@@ -1,6 +1,6 @@
 EMBEDDING THE LIBEV CODE INTO YOUR OWN PROGRAMS
 
-    Instead of building the libev library you cna also include the code
+    Instead of building the libev library you can also include the code
     as-is into your programs. To update, you only have to copy a few files
     into your source tree.
 
