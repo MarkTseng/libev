@@ -962,7 +962,14 @@ periodics_reify (EV_P)
       assert (("inactive timer on periodic heap detected", ev_is_active (w)));
 
       /* first reschedule or stop timer */
-      if (w->interval)
+      if (w->reschedule_cb)
+        {
+          ev_tstamp at = ((WT)w)->at = w->reschedule_cb (w, rt_now + 0.0001);
+
+          assert (("ev_periodic reschedule callback returned time in the past", ((WT)w)->at > rt_now));
+          downheap ((WT *)periodics, periodiccnt, 0);
+        }
+      else if (w->interval)
         {
           ((WT)w)->at += floor ((rt_now - ((WT)w)->at) / w->interval + 1.) * w->interval;
           assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ((WT)w)->at > rt_now));
@@ -985,19 +992,15 @@ periodics_reschedule (EV_P)
     {
       struct ev_periodic *w = periodics [i];
 
-      if (w->interval)
-        {
-          ev_tstamp diff = ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
-
-          if (fabs (diff) >= 1e-4)
-            {
-              ev_periodic_stop (EV_A_ w);
-              ev_periodic_start (EV_A_ w);
-
-              i = 0; /* restart loop, inefficient, but time jumps should be rare */
-            }
-        }
+      if (w->reschedule_cb)
+        ((WT)w)->at = w->reschedule_cb (w, rt_now);
+      else if (w->interval)
+        ((WT)w)->at += ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
     }
+
+  /* now rebuild the heap */
+  for (i = periodiccnt >> 1; i--; )
+    downheap ((WT *)periodics, periodiccnt, i);
 }
 
 inline int
@@ -1311,11 +1314,14 @@ ev_periodic_start (EV_P_ struct ev_periodic *w)
   if (ev_is_active (w))
     return;
 
-  assert (("ev_periodic_start called with negative interval value", w->interval >= 0.));
-
-  /* this formula differs from the one in periodic_reify because we do not always round up */
-  if (w->interval)
-    ((WT)w)->at += ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
+  if (w->reschedule_cb)
+    ((WT)w)->at = w->reschedule_cb (w, rt_now);
+  else if (w->interval)
+    {
+      assert (("ev_periodic_start called with negative interval value", w->interval >= 0.));
+      /* this formula differs from the one in periodic_reify because we do not always round up */
+      ((WT)w)->at += ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
+    }
 
   ev_start (EV_A_ (W)w, ++periodiccnt);
   array_needsize (struct ev_periodic *, periodics, periodicmax, periodiccnt, (void));
@@ -1341,6 +1347,13 @@ ev_periodic_stop (EV_P_ struct ev_periodic *w)
     }
 
   ev_stop (EV_A_ (W)w);
+}
+
+void
+ev_periodic_again (EV_P_ struct ev_periodic *w)
+{
+  ev_periodic_stop (EV_A_ w);
+  ev_periodic_start (EV_A_ w);
 }
 
 void

@@ -141,6 +141,7 @@ struct ev_periodic
   EV_WATCHER_TIME (ev_periodic);
 
   ev_tstamp interval; /* rw */
+  ev_tstamp (*reschedule_cb)(struct ev_periodic *w, ev_tstamp now); /* rw */
 };
 
 /* invoked when fd is either EV_READable or EV_WRITEable */
@@ -298,7 +299,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 
 #define ev_io_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
 #define ev_timer_set(ev,after_,repeat_)     do { (ev)->at = (after_); (ev)->repeat = (repeat_); } while (0)
-#define ev_periodic_set(ev,at_,interval_)   do { (ev)->at = (at_); (ev)->interval = (interval_); } while (0)
+#define ev_periodic_set(ev,at_,ival_,res_)  do { (ev)->at = (at_); (ev)->interval = (ival_); (ev)->reschedule_cb= (res_); } while (0)
 #define ev_signal_set(ev,signum_)           do { (ev)->signum = (signum_); } while (0)
 #define ev_idle_set(ev)                     /* nop, yes, this is a serious in-joke */
 #define ev_prepare_set(ev)                  /* nop, yes, this is a serious in-joke */
@@ -307,7 +308,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 
 #define ev_io_init(ev,cb,fd,events)         do { ev_watcher_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
 #define ev_timer_init(ev,cb,after,repeat)   do { ev_watcher_init ((ev), (cb)); ev_timer_set ((ev),(after),(repeat)); } while (0)
-#define ev_periodic_init(ev,cb,at,interval) do { ev_watcher_init ((ev), (cb)); ev_periodic_set ((ev),(at),(interval)); } while (0)
+#define ev_periodic_init(ev,cb,at,ival,res) do { ev_watcher_init ((ev), (cb)); ev_periodic_set ((ev),(at),(ival),(res)); } while (0)
 #define ev_signal_init(ev,cb,signum)        do { ev_watcher_init ((ev), (cb)); ev_signal_set ((ev), (signum)); } while (0)
 #define ev_idle_init(ev,cb)                 do { ev_watcher_init ((ev), (cb)); ev_idle_set ((ev)); } while (0)
 #define ev_prepare_init(ev,cb)              do { ev_watcher_init ((ev), (cb)); ev_prepare_set ((ev)); } while (0)
@@ -335,6 +336,7 @@ void ev_timer_again    (EV_P_ struct ev_timer *w);
 
 void ev_periodic_start (EV_P_ struct ev_periodic *w);
 void ev_periodic_stop  (EV_P_ struct ev_periodic *w);
+void ev_periodic_again (EV_P_ struct ev_periodic *w);
 
 void ev_idle_start     (EV_P_ struct ev_idle *w);
 void ev_idle_stop      (EV_P_ struct ev_idle *w);
