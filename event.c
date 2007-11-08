@@ -248,6 +248,18 @@ int event_del (struct event *ev)
   return 0;
 }
 
+void event_active (struct event *ev, int res, short ncalls)
+{
+  if (res & EV_TIMEOUT)
+    ev_feed_event (&iosig.to, res & EV_TIMEOUT);
+
+  if (res & EV_SIGNAL)
+    ev_feed_event (&iosig.sig, res & EV_SIGNAL);
+
+  if (res & (EV_READ | EV_WRITE))
+    ev_feed_event (&iosig.io, res & (EV_READ | EV_WRITE));
+}
+
 int event_pending (struct event *ev, short events, struct timeval *tv)
 {
   short revents = 0;
