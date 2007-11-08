@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#include <sys/types.h>
 #include <sys/time.h>
 #include <stdint.h>
 #include <stdarg.h>
