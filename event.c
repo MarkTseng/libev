@@ -250,14 +250,16 @@ int event_del (struct event *ev)
 
 void event_active (struct event *ev, int res, short ncalls)
 {
+  dLOOPev;
+
   if (res & EV_TIMEOUT)
-    ev_feed_event (&ev->to, res & EV_TIMEOUT);
+    ev_feed_event (EV_A_ &ev->to, res & EV_TIMEOUT);
 
   if (res & EV_SIGNAL)
-    ev_feed_event (&ev->iosig.sig, res & EV_SIGNAL);
+    ev_feed_event (EV_A_ &ev->iosig.sig, res & EV_SIGNAL);
 
   if (res & (EV_READ | EV_WRITE))
-    ev_feed_event (&ev->iosig.io, res & (EV_READ | EV_WRITE));
+    ev_feed_event (EV_A_ &ev->iosig.io, res & (EV_READ | EV_WRITE));
 }
 
 int event_pending (struct event *ev, short events, struct timeval *tv)

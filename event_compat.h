@@ -28,7 +28,9 @@
 extern "C" {
 #endif
 
+#ifndef WIN32
 #include <sys/types.h>
+#endif
 #include <sys/time.h>
 #include <stdint.h>
 #include <stdarg.h>
