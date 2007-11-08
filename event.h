@@ -121,7 +121,7 @@ int event_base_once (struct event_base *base, int fd, short events, void (*cb)(i
 int event_base_priority_init (struct event_base *base, int fd);
 
 #ifndef EV_STANDALONE
-# include "event_compat.h"
+# include <event_compat.h>
 #endif
 
 #ifdef __cplusplus
