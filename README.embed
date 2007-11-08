@@ -33,7 +33,7 @@ FILESETS
         ev_wrap.h
         ev_win32.c
 
-        ev_select.c     only when select backend is enabled (which is by default)
+        ev_select.c     only when select backend is enabled (which is is by default)
         ev_poll.c       only when poll backend is enabled (disabled by default)
         ev_epoll.c      only when the epoll backend is enabled (disabled by default)
         ev_kqueue.c     only when the kqueue backend is enabled (disabled by default)
