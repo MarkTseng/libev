@@ -17,7 +17,9 @@ FILESETS
 
     This will automatically include ev.h, too, and should be done in a
     single C source file only to provide the function implementations. To
-    use it, do the same for ev.h in all users:
+    use it, do the same for ev.h in all files wishing to use this API
+    (best done by writing a wrapper around ev.h that you can include
+    instead and where you can put other configuration options):
 
         #define EV_STANDALONE   1
         #include "ev.h"
