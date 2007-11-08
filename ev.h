@@ -197,6 +197,7 @@ struct ev_child
   int rstatus; /* rw, holds the exit status, use the macros from sys/wait.h */
 };
 
+/* the presence of this union forces similar struct layout */
 union ev_any_watcher
 {
   struct ev_watcher w;
@@ -326,6 +327,11 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 /* stopping (enabling, adding) a watcher does nothing if it is already running */
 /* stopping (disabling, deleting) a watcher does nothing unless its already running */
 #if EV_PROTOTYPES
+
+/* feeds an event into a watcher as if the event actually occured */
+/* accepts any ev_watcher type */
+void ev_feed_event     (EV_P_ void *w, int revents);
+
 void ev_io_start       (EV_P_ struct ev_io *w);
 void ev_io_stop        (EV_P_ struct ev_io *w);
 

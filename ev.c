@@ -318,19 +318,21 @@ anfds_init (ANFD *base, int count)
     }
 }
 
-static void
-event (EV_P_ W w, int events)
+void
+ev_feed_event (EV_P_ void *w, int revents)
 {
-  if (w->pending)
+  W w_ = (W)w;
+
+  if (w_->pending)
     {
-      pendings [ABSPRI (w)][w->pending - 1].events |= events;
+      pendings [ABSPRI (w_)][w_->pending - 1].events |= revents;
       return;
     }
 
-  w->pending = ++pendingcnt [ABSPRI (w)];
-  array_needsize (ANPENDING, pendings [ABSPRI (w)], pendingmax [ABSPRI (w)], pendingcnt [ABSPRI (w)], (void));
-  pendings [ABSPRI (w)][w->pending - 1].w      = w;
-  pendings [ABSPRI (w)][w->pending - 1].events = events;
+  w_->pending = ++pendingcnt [ABSPRI (w_)];
+  array_needsize (ANPENDING, pendings [ABSPRI (w_)], pendingmax [ABSPRI (w_)], pendingcnt [ABSPRI (w_)], (void));
+  pendings [ABSPRI (w_)][w_->pending - 1].w      = w_;
+  pendings [ABSPRI (w_)][w_->pending - 1].events = revents;
 }
 
 static void
@@ -339,7 +341,7 @@ queue_events (EV_P_ W *events, int eventcnt, int type)
   int i;
 
   for (i = 0; i < eventcnt; ++i)
-    event (EV_A_ events [i], type);
+    ev_feed_event (EV_A_ events [i], type);
 }
 
 static void
@@ -353,7 +355,7 @@ fd_event (EV_P_ int fd, int events)
       int ev = w->events & events;
 
       if (ev)
-        event (EV_A_ (W)w, ev);
+        ev_feed_event (EV_A_ (W)w, ev);
     }
 }
 
@@ -405,7 +407,7 @@ fd_kill (EV_P_ int fd)
   while ((w = (struct ev_io *)anfds [fd].head))
     {
       ev_io_stop (EV_A_ w);
-      event (EV_A_ (W)w, EV_ERROR | EV_READ | EV_WRITE);
+      ev_feed_event (EV_A_ (W)w, EV_ERROR | EV_READ | EV_WRITE);
     }
 }
 
@@ -571,7 +573,7 @@ sigcb (EV_P_ struct ev_io *iow, int revents)
         signals [signum].gotsig = 0;
 
         for (w = signals [signum].head; w; w = w->next)
-          event (EV_A_ (W)w, EV_SIGNAL);
+          ev_feed_event (EV_A_ (W)w, EV_SIGNAL);
       }
 }
 
@@ -615,7 +617,7 @@ child_reap (EV_P_ struct ev_signal *sw, int chain, int pid, int status)
         ev_priority (w) = ev_priority (sw); /* need to do it *now* */
         w->rpid         = pid;
         w->rstatus      = status;
-        event (EV_A_ (W)w, EV_CHILD);
+        ev_feed_event (EV_A_ (W)w, EV_CHILD);
       }
 }
 
@@ -627,7 +629,7 @@ childcb (EV_P_ struct ev_signal *sw, int revents)
   if (0 < (pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)))
     {
       /* make sure we are called again until all childs have been reaped */
-      event (EV_A_ (W)sw, EV_SIGNAL);
+      ev_feed_event (EV_A_ (W)sw, EV_SIGNAL);
 
       child_reap (EV_A_ sw, pid, pid, status);
       child_reap (EV_A_ sw,   0, pid, status); /* this might trigger a watcher twice, but event catches that */
@@ -948,7 +950,7 @@ timers_reify (EV_P)
       else
         ev_timer_stop (EV_A_ w); /* nonrepeating: stop timer */
 
-      event (EV_A_ (W)w, EV_TIMEOUT);
+      ev_feed_event (EV_A_ (W)w, EV_TIMEOUT);
     }
 }
 
@@ -978,7 +980,7 @@ periodics_reify (EV_P)
       else
         ev_periodic_stop (EV_A_ w); /* nonrepeating: stop timer */
 
-      event (EV_A_ (W)w, EV_PERIODIC);
+      ev_feed_event (EV_A_ (W)w, EV_PERIODIC);
     }
 }
 

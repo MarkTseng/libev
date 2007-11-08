@@ -104,6 +104,7 @@ int event_once (int fd, short events, void (*cb)(int, short, void *), void *arg,
 
 int event_add (struct event *ev, struct timeval *tv);
 int event_del (struct event *ev);
+void event_active(struct event *ev, int res, short ncalls); /* ncalls is being ignored */
 
 int event_pending (struct event *ev, short, struct timeval *tv);
 
