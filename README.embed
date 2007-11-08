@@ -24,6 +24,10 @@ FILESETS
         #define EV_STANDALONE   1
         #include "ev.h"
 
+    Both header files and implementation files can be compiled with a C++
+    compiler (at least, thats a stated goal, and breakage will be treated
+    as a bug).
+
     You need the following files in your source tree, or in a directory
     in your include path (e.g. in libev/ when using -Ilibev):
 
