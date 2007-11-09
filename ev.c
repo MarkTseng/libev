@@ -753,7 +753,7 @@ loop_init (EV_P_ int methods)
       if (!method && (methods & EVMETHOD_SELECT)) method = select_init (EV_A_ methods);
 #endif
 
-      ev_watcher_init (&sigev, sigcb);
+      ev_init (&sigev, sigcb);
       ev_set_priority (&sigev, EV_MAXPRI);
     }
 }
@@ -1566,14 +1566,14 @@ ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, vo
       once->cb  = cb;
       once->arg = arg;
 
-      ev_watcher_init (&once->io, once_cb_io);
+      ev_init (&once->io, once_cb_io);
       if (fd >= 0)
         {
           ev_io_set (&once->io, fd, events);
           ev_io_start (EV_A_ &once->io);
         }
 
-      ev_watcher_init (&once->to, once_cb_to);
+      ev_init (&once->to, once_cb_to);
       if (timeout >= 0.)
         {
           ev_timer_set (&once->to, timeout, 0.);

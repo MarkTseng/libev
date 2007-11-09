@@ -181,11 +181,11 @@ x_cb_to (EV_P_ struct ev_timer *w, int revents)
 void event_set (struct event *ev, int fd, short events, void (*cb)(int, short, void *), void *arg)
 {
   if (events & EV_SIGNAL)
-    ev_watcher_init (&ev->iosig.sig, x_cb_sig);
+    ev_init (&ev->iosig.sig, x_cb_sig);
   else
-    ev_watcher_init (&ev->iosig.io, x_cb_io);
+    ev_init (&ev->iosig.io, x_cb_io);
 
-  ev_watcher_init (&ev->to, x_cb_to);
+  ev_init (&ev->to, x_cb_to);
 
   ev->ev_base     = x_cur; /* not threadsafe, but its like libevent works */
   ev->ev_fd       = fd;

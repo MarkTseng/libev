@@ -300,12 +300,12 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #endif
 
 /* these may evaluate ev multiple times, and the other arguments at most once */
-/* either use ev_watcher_init + ev_TYPE_set, or the ev_TYPE_init macro, below, to first initialise a watcher */
-#define ev_watcher_init(ev,cb_) do {		\
+/* either use ev_init + ev_TYPE_set, or the ev_TYPE_init macro, below, to first initialise a watcher */
+#define ev_init(ev,cb_) do {				\
   ((struct ev_watcher *)(void *)(ev))->active   =	\
   ((struct ev_watcher *)(void *)(ev))->pending  =	\
   ((struct ev_watcher *)(void *)(ev))->priority = 0;	\
-  (ev)->cb = (cb_);				\
+  ev_set_cb ((ev), cb_);					\
 } while (0)
 
 #define ev_io_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
@@ -317,14 +317,14 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_check_set(ev)                    /* nop, yes, this is a serious in-joke */
 #define ev_child_set(ev,pid_)               do { (ev)->pid = (pid_); } while (0)
 
-#define ev_io_init(ev,cb,fd,events)         do { ev_watcher_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
-#define ev_timer_init(ev,cb,after,repeat)   do { ev_watcher_init ((ev), (cb)); ev_timer_set ((ev),(after),(repeat)); } while (0)
-#define ev_periodic_init(ev,cb,at,ival,res) do { ev_watcher_init ((ev), (cb)); ev_periodic_set ((ev),(at),(ival),(res)); } while (0)
-#define ev_signal_init(ev,cb,signum)        do { ev_watcher_init ((ev), (cb)); ev_signal_set ((ev), (signum)); } while (0)
-#define ev_idle_init(ev,cb)                 do { ev_watcher_init ((ev), (cb)); ev_idle_set ((ev)); } while (0)
-#define ev_prepare_init(ev,cb)              do { ev_watcher_init ((ev), (cb)); ev_prepare_set ((ev)); } while (0)
-#define ev_check_init(ev,cb)                do { ev_watcher_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
-#define ev_child_init(ev,cb,pid)            do { ev_watcher_init ((ev), (cb)); ev_child_set ((ev),(pid)); } while (0)
+#define ev_io_init(ev,cb,fd,events)         do { ev_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
+#define ev_timer_init(ev,cb,after,repeat)   do { ev_init ((ev), (cb)); ev_timer_set ((ev),(after),(repeat)); } while (0)
+#define ev_periodic_init(ev,cb,at,ival,res) do { ev_init ((ev), (cb)); ev_periodic_set ((ev),(at),(ival),(res)); } while (0)
+#define ev_signal_init(ev,cb,signum)        do { ev_init ((ev), (cb)); ev_signal_set ((ev), (signum)); } while (0)
+#define ev_idle_init(ev,cb)                 do { ev_init ((ev), (cb)); ev_idle_set ((ev)); } while (0)
+#define ev_prepare_init(ev,cb)              do { ev_init ((ev), (cb)); ev_prepare_set ((ev)); } while (0)
+#define ev_check_init(ev,cb)                do { ev_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
+#define ev_child_init(ev,cb,pid)            do { ev_init ((ev), (cb)); ev_child_set ((ev),(pid)); } while (0)
 
 #define ev_is_pending(ev)                   (0 + ((struct ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
 #define ev_is_active(ev)                    (0 + ((struct ev_watcher *)(void *)(ev))->active) /* ro, true when the watcher has been started */
@@ -332,7 +332,10 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_priority(ev)                     ((struct ev_watcher *)(void *)(ev))->priority /* rw */
 #define ev_cb(ev)                           (ev)->cb /* rw */
 #define ev_set_priority(ev,pri)             ev_priority (ev) = (pri)
-#define ev_set_cb(ev,cb_)                   ev_cb (ev) = (cb_)
+
+#ifndef ev_set_cb
+# define ev_set_cb(ev,cb_)                  ev_cb (ev) = (cb_)
+#endif
 
 /* stopping (enabling, adding) a watcher does nothing if it is already running */
 /* stopping (disabling, deleting) a watcher does nothing unless its already running */
