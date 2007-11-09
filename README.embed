@@ -85,7 +85,7 @@ PREPROCESSOR SYMBOLS
     EV_EVENT_H
 
         Similarly to EV_H, this macro cna be used to override event.c's idea
-        of where the event.h header can be found.
+        of how the event.h header can be found.
 
     EV_USE_MONOTONIC
 
