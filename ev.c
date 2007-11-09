@@ -344,19 +344,25 @@ queue_events (EV_P_ W *events, int eventcnt, int type)
     ev_feed_event (EV_A_ events [i], type);
 }
 
-static void
-fd_event (EV_P_ int fd, int events)
+inline void
+fd_event (EV_P_ int fd, int revents)
 {
   ANFD *anfd = anfds + fd;
   struct ev_io *w;
 
   for (w = (struct ev_io *)anfd->head; w; w = (struct ev_io *)((WL)w)->next)
     {
-      int ev = w->events & events;
+      int ev = w->events & revents;
 
       if (ev)
         ev_feed_event (EV_A_ (W)w, ev);
     }
+}
+
+void
+ev_feed_fd_event (EV_P_ int fd, int revents)
+{
+  fd_event (EV_A_ fd, revents);
 }
 
 /*****************************************************************************/
@@ -554,6 +560,24 @@ sighandler (int signum)
     }
 }
 
+void
+ev_feed_signal_event (EV_P_ int signum)
+{
+#if EV_MULTIPLICITY
+  assert (("feeding signal events is only supported in the default loop", loop == default_loop));
+#endif
+
+  --signum;
+
+  if (signum < 0 || signum >= signalmax)
+    return;
+
+  signals [signum].gotsig = 0;
+
+  for (w = signals [signum].head; w; w = w->next)
+    ev_feed_event (EV_A_ (W)w, EV_SIGNAL);
+}
+
 static void
 sigcb (EV_P_ struct ev_io *iow, int revents)
 {
@@ -569,12 +593,7 @@ sigcb (EV_P_ struct ev_io *iow, int revents)
 
   for (signum = signalmax; signum--; )
     if (signals [signum].gotsig)
-      {
-        signals [signum].gotsig = 0;
-
-        for (w = signals [signum].head; w; w = w->next)
-          ev_feed_event (EV_A_ (W)w, EV_SIGNAL);
-      }
+      sigevent (EV_A_ signum + 1);
 }
 
 static void

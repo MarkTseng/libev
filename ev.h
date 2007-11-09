@@ -331,6 +331,8 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 /* feeds an event into a watcher as if the event actually occured */
 /* accepts any ev_watcher type */
 void ev_feed_event     (EV_P_ void *w, int revents);
+void ev_feed_fd_event  (EV_P_ int fd, int revents);
+void ev_feed_signal_event (EV_P_ int signum);
 
 void ev_io_start       (EV_P_ struct ev_io *w);
 void ev_io_stop        (EV_P_ struct ev_io *w);
