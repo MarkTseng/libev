@@ -37,8 +37,11 @@
 # include <sys/time.h>
 #endif
 
-#include "ev.h"
-#include "event.h"
+#ifdef EV_EVENT_H
+# include EV_EVENT_H
+#else
+# include "event.h"
+#endif
 
 #if EV_MULTIPLICITY
 # define dLOOPev struct ev_loop *loop = (struct ev_loop *)ev->ev_base

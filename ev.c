@@ -128,7 +128,11 @@
 #define PID_HASHSIZE  16 /* size of pid hash table, must be power of two */
 /*#define CLEANUP_INTERVAL 300. /* how often to try to free memory and re-check fds */
 
-#include "ev.h"
+#ifdef EV_H
+# include EV_H
+#else
+# include "ev.h"
+#endif
 
 #if __GNUC__ >= 3
 # define expect(expr,value)         __builtin_expect ((expr),(value))

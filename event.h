@@ -31,11 +31,17 @@
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
-#include <ev.h>
+#ifdef EV_H
+# include EV_H
+#else
+# include <ev.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct event_base;
 
 struct event
 {
@@ -110,8 +116,6 @@ int event_pending (struct event *ev, short, struct timeval *tv);
 
 int event_priority_init (int npri);
 int event_priority_set (struct event *ev, int pri);
-
-struct event_base;
 
 int event_base_set (struct event_base *base, struct event *ev);
 int event_base_loop (struct event_base *base, int);

@@ -75,6 +75,12 @@ PREPROCESSOR SYMBOLS
         will also not define any of the structs usually found in "event.h"
         that are not directly supported by libev code alone.
 
+    EV_H
+
+        The name of the ev.h header file used to include it. The default
+        if undefined is <ev.h> in event.h and "ev.h" in ev.c. This can be used
+        to virtually rename the ev.h header file
+
     EV_USE_MONOTONIC
 
         If undefined or defined to be "1", libev will try to detect the
