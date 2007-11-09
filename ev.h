@@ -27,8 +27,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EV_H
-#define EV_H
+#ifndef EV_H__
+#define EV_H__
 
 #ifdef __cplusplus
 extern "C" {
