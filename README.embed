@@ -78,8 +78,14 @@ PREPROCESSOR SYMBOLS
     EV_H
 
         The name of the ev.h header file used to include it. The default
-        if undefined is <ev.h> in event.h and "ev.h" in ev.c. This can be used
-        to virtually rename the ev.h header file
+        if undefined is <ev.h> in event.h and "ev.h" in ev.c. This can
+        be used to virtually rename the ev.h header file in case of
+        conflicts.
+
+    EV_EVENT_H
+
+        Similarly to EV_H, this macro cna be used to override event.c's idea
+        of where the event.h header can be found.
 
     EV_USE_MONOTONIC
 
