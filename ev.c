@@ -520,6 +520,18 @@ downheap (WT *heap, int N, int k)
   ((W)heap [k])->active = k + 1;
 }
 
+inline void
+adjustheap (WT *heap, int N, int k, ev_tstamp at)
+{
+  ev_tstamp old_at = heap [k]->at;
+  heap [k]->at = at;
+
+  if (old_at < at)
+    downheap (heap, N, k);
+  else
+    upheap (heap, k);
+}
+
 /*****************************************************************************/
 
 typedef struct
@@ -1323,10 +1335,7 @@ ev_timer_again (EV_P_ struct ev_timer *w)
   if (ev_is_active (w))
     {
       if (w->repeat)
-        {
-          ((WT)w)->at = mn_now + w->repeat;
-          downheap ((WT *)timers, timercnt, ((W)w)->active - 1);
-        }
+        adjustheap ((WT *)timers, timercnt, ((W)w)->active - 1, mn_now + w->repeat);
       else
         ev_timer_stop (EV_A_ w);
     }
@@ -1378,6 +1387,7 @@ ev_periodic_stop (EV_P_ struct ev_periodic *w)
 void
 ev_periodic_again (EV_P_ struct ev_periodic *w)
 {
+  /* TODO: use adjustheap and recalculation */
   ev_periodic_stop (EV_A_ w);
   ev_periodic_start (EV_A_ w);
 }
