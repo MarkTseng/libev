@@ -75,18 +75,6 @@ PREPROCESSOR SYMBOLS
         will also not define any of the structs usually found in "event.h"
         that are not directly supported by libev code alone.
 
-    EV_H
-
-        The name of the ev.h header file used to include it. The default
-        if undefined is <ev.h> in event.h and "ev.h" in ev.c. This can
-        be used to virtually rename the ev.h header file in case of
-        conflicts.
-
-    EV_EVENT_H
-
-        Similarly to EV_H, this macro cna be used to override event.c's idea
-        of how the event.h header can be found.
-
     EV_USE_MONOTONIC
 
         If undefined or defined to be "1", libev will try to detect the
@@ -142,6 +130,18 @@ PREPROCESSOR SYMBOLS
        will be detected at runtime and routed around by disabling this
        backend.
 
+    EV_H
+
+        The name of the ev.h header file used to include it. The default
+        if undefined is <ev.h> in event.h and "ev.h" in ev.c. This can
+        be used to virtually rename the ev.h header file in case of
+        conflicts.
+
+    EV_EVENT_H
+
+        Similarly to EV_H, this macro cna be used to override event.c's idea
+        of how the event.h header can be found.
+
     EV_COMMON
  
        By default, all watchers have a "void *data" member. By redefining
@@ -169,6 +169,14 @@ PREPROCESSOR SYMBOLS
        will be no support for multiple event loops and there is no first
        event loop pointer argument. Instead, all functions act on the
        single default loop.
+
+    EV_CB_DECLARE(type)
+    EV_CB_INVOKE(watcher,revents)
+
+       Can be used to change the callback member declaration in each
+       watcher, and the way callbacks are invoked. Must expand to a struct
+       member definition and a statement, respectively. See the ev.v
+       header file for their default definitions.
 
 EXAMPLES
 

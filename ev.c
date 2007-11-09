@@ -950,7 +950,7 @@ call_pending (EV_P)
         if (p->w)
           {
             p->w->pending = 0;
-            p->w->cb (EV_A_ p->w, p->events);
+            EV_CB_INVOKE (p->w, p->events);
           }
       }
 }

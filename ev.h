@@ -87,6 +87,13 @@ struct ev_loop;
 #define EV_VERSION_MAJOR 1
 #define EV_VERSION_MINOR 1
 
+#ifndef EV_CB_DECLARE
+# define EV_CB_DECLARE(type) void (*cb)(EV_P_ struct type *w, int revents)
+#endif
+#ifndef EV_CB_INVOKE
+# define EV_CB_INVOKE(watcher,revents) (watcher)->cb (EV_A_ (watcher), (revents))
+#endif
+
 /*
  * struct member types:
  * private: you can look at them, but not change them, and they might not mean anything to you.
@@ -100,7 +107,7 @@ struct ev_loop;
   int pending; /* private */			\
   int priority; /* private */			\
   EV_COMMON; /* rw */				\
-  void (*cb)(EV_P_ struct type *, int revents) /* private */ /* gets invoked with an eventmask */
+  EV_CB_DECLARE (type) /* private */
 
 #define EV_WATCHER_LIST(type)			\
   EV_WATCHER (type);				\
@@ -111,17 +118,20 @@ struct ev_loop;
   ev_tstamp at     /* private */
 
 /* base class, nothing to see here unless you subclass */
-struct ev_watcher {
+struct ev_watcher
+{
   EV_WATCHER (ev_watcher);
 };
 
 /* base class, nothing to see here unless you subclass */
-struct ev_watcher_list {
+struct ev_watcher_list
+{
   EV_WATCHER_LIST (ev_watcher_list);
 };
 
 /* base class, nothing to see here unless you subclass */
-struct ev_watcher_time {
+struct ev_watcher_time
+{
   EV_WATCHER_TIME (ev_watcher_time);
 };
 
