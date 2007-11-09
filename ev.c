@@ -217,19 +217,24 @@ typedef struct
 
 #if EV_MULTIPLICITY
 
-struct ev_loop
-{
-# define VAR(name,decl) decl;
-# include "ev_vars.h"
-};
-# undef VAR
-# include "ev_wrap.h"
+  struct ev_loop
+  {
+    #define VAR(name,decl) decl;
+      #include "ev_vars.h"
+    #undef VAR
+  };
+  #include "ev_wrap.h"
+
+  struct ev_loop default_loop_struct;
+  static struct ev_loop *default_loop;
 
 #else
 
-# define VAR(name,decl) static decl;
-# include "ev_vars.h"
-# undef VAR
+  #define VAR(name,decl) static decl;
+    #include "ev_vars.h"
+  #undef VAR
+
+  static int default_loop;
 
 #endif
 
@@ -563,6 +568,8 @@ sighandler (int signum)
 void
 ev_feed_signal_event (EV_P_ int signum)
 {
+  WL w;
+
 #if EV_MULTIPLICITY
   assert (("feeding signal events is only supported in the default loop", loop == default_loop));
 #endif
@@ -581,7 +588,6 @@ ev_feed_signal_event (EV_P_ int signum)
 static void
 sigcb (EV_P_ struct ev_io *iow, int revents)
 {
-  WL w;
   int signum;
 
 #ifdef WIN32
@@ -593,7 +599,7 @@ sigcb (EV_P_ struct ev_io *iow, int revents)
 
   for (signum = signalmax; signum--; )
     if (signals [signum].gotsig)
-      sigevent (EV_A_ signum + 1);
+      ev_feed_signal_event (EV_A_ signum + 1);
 }
 
 static void
@@ -843,13 +849,8 @@ ev_loop_fork (EV_P)
 #endif
 
 #if EV_MULTIPLICITY
-struct ev_loop default_loop_struct;
-static struct ev_loop *default_loop;
-
 struct ev_loop *
 #else
-static int default_loop;
-
 int
 #endif
 ev_default_loop (int methods)
