@@ -1294,6 +1294,8 @@ ev_io_stop (EV_P_ struct ev_io *w)
   if (!ev_is_active (w))
     return;
 
+  assert (("ev_io_start called with illegal fd (must stay constant after start!)", w->fd >= 0 && w->fd < anfdmax));
+
   wlist_del ((WL *)&anfds[w->fd].head, (WL)w);
   ev_stop (EV_A_ (W)w);
 
