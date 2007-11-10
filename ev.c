@@ -53,7 +53,7 @@ extern "C" {
 #  define EV_USE_EPOLL 1
 # endif
 
-# if HAVE_KQUEUE && HAVE_WORKING_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H
+# if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H
 #  define EV_USE_KQUEUE 1
 # endif
 
