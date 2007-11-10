@@ -2,7 +2,7 @@
 
 VARx(ev_tstamp, now_floor) /* last time we refreshed rt_time */
 VARx(ev_tstamp, mn_now)    /* monotonic clock "now" */
-VARx(ev_tstamp, rt_now)
+VARx(ev_tstamp, ev_rt_now)
 VARx(ev_tstamp, rtmn_diff)      /* difference realtime - monotonic time */
 VARx(int, method)
 

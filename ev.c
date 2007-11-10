@@ -273,11 +273,13 @@ get_clock (void)
   return ev_time ();
 }
 
+#if EV_MULTIPLICITY
 ev_tstamp
 ev_now (EV_P)
 {
-  return rt_now;
+  return ev_rt_now;
 }
+#endif
 
 #define array_roundsize(type,n) ((n) | 4 & ~3)
 
@@ -737,10 +739,10 @@ loop_init (EV_P_ int methods)
       }
 #endif
 
-      rt_now    = ev_time ();
+      ev_rt_now = ev_time ();
       mn_now    = get_clock ();
       now_floor = mn_now;
-      rtmn_diff = rt_now - mn_now;
+      rtmn_diff = ev_rt_now - mn_now;
 
       if (methods == EVMETHOD_AUTO)
         if (!enable_secure () && getenv ("LIBEV_METHODS"))
@@ -993,7 +995,7 @@ timers_reify (EV_P)
 static void
 periodics_reify (EV_P)
 {
-  while (periodiccnt && ((WT)periodics [0])->at <= rt_now)
+  while (periodiccnt && ((WT)periodics [0])->at <= ev_rt_now)
     {
       struct ev_periodic *w = periodics [0];
 
@@ -1002,15 +1004,15 @@ periodics_reify (EV_P)
       /* first reschedule or stop timer */
       if (w->reschedule_cb)
         {
-          ev_tstamp at = ((WT)w)->at = w->reschedule_cb (w, rt_now + 0.0001);
+          ev_tstamp at = ((WT)w)->at = w->reschedule_cb (w, ev_rt_now + 0.0001);
 
-          assert (("ev_periodic reschedule callback returned time in the past", ((WT)w)->at > rt_now));
+          assert (("ev_periodic reschedule callback returned time in the past", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
       else if (w->interval)
         {
-          ((WT)w)->at += floor ((rt_now - ((WT)w)->at) / w->interval + 1.) * w->interval;
-          assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ((WT)w)->at > rt_now));
+          ((WT)w)->at += floor ((ev_rt_now - ((WT)w)->at) / w->interval + 1.) * w->interval;
+          assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
       else
@@ -1031,9 +1033,9 @@ periodics_reschedule (EV_P)
       struct ev_periodic *w = periodics [i];
 
       if (w->reschedule_cb)
-        ((WT)w)->at = w->reschedule_cb (w, rt_now);
+        ((WT)w)->at = w->reschedule_cb (w, ev_rt_now);
       else if (w->interval)
-        ((WT)w)->at += ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
+        ((WT)w)->at += ceil ((ev_rt_now - ((WT)w)->at) / w->interval) * w->interval;
     }
 
   /* now rebuild the heap */
@@ -1048,13 +1050,13 @@ time_update_monotonic (EV_P)
 
   if (expect_true (mn_now - now_floor < MIN_TIMEJUMP * .5))
     {
-      rt_now = rtmn_diff + mn_now;
+      ev_rt_now = rtmn_diff + mn_now;
       return 0;
     }
   else
     {
       now_floor = mn_now;
-      rt_now = ev_time ();
+      ev_rt_now = ev_time ();
       return 1;
     }
 }
@@ -1073,12 +1075,12 @@ time_update (EV_P)
 
           for (i = 4; --i; ) /* loop a few times, before making important decisions */
             {
-              rtmn_diff = rt_now - mn_now;
+              rtmn_diff = ev_rt_now - mn_now;
 
               if (fabs (odiff - rtmn_diff) < MIN_TIMEJUMP)
                 return; /* all is well */
 
-              rt_now    = ev_time ();
+              ev_rt_now = ev_time ();
               mn_now    = get_clock ();
               now_floor = mn_now;
             }
@@ -1091,18 +1093,18 @@ time_update (EV_P)
   else
 #endif
     {
-      rt_now = ev_time ();
+      ev_rt_now = ev_time ();
 
-      if (expect_false (mn_now > rt_now || mn_now < rt_now - MAX_BLOCKTIME - MIN_TIMEJUMP))
+      if (expect_false (mn_now > ev_rt_now || mn_now < ev_rt_now - MAX_BLOCKTIME - MIN_TIMEJUMP))
         {
           periodics_reschedule (EV_A);
 
           /* adjust timers. this is easy, as the offset is the same for all */
           for (i = 0; i < timercnt; ++i)
-            ((WT)timers [i])->at += rt_now - mn_now;
+            ((WT)timers [i])->at += ev_rt_now - mn_now;
         }
 
-      mn_now = rt_now;
+      mn_now = ev_rt_now;
     }
 }
 
@@ -1152,8 +1154,8 @@ ev_loop (EV_P_ int flags)
       else
 #endif
         {
-          rt_now = ev_time ();
-          mn_now = rt_now;
+          ev_rt_now = ev_time ();
+          mn_now    = ev_rt_now;
         }
 
       if (flags & EVLOOP_NONBLOCK || idlecnt)
@@ -1170,7 +1172,7 @@ ev_loop (EV_P_ int flags)
 
           if (periodiccnt)
             {
-              ev_tstamp to = ((WT)periodics [0])->at - rt_now + method_fudge;
+              ev_tstamp to = ((WT)periodics [0])->at - ev_rt_now + method_fudge;
               if (block > to) block = to;
             }
 
@@ -1179,7 +1181,7 @@ ev_loop (EV_P_ int flags)
 
       method_poll (EV_A_ block);
 
-      /* update rt_now, do magic */
+      /* update ev_rt_now, do magic */
       time_update (EV_A);
 
       /* queue pending timers and reschedule them */
@@ -1350,12 +1352,12 @@ ev_periodic_start (EV_P_ struct ev_periodic *w)
     return;
 
   if (w->reschedule_cb)
-    ((WT)w)->at = w->reschedule_cb (w, rt_now);
+    ((WT)w)->at = w->reschedule_cb (w, ev_rt_now);
   else if (w->interval)
     {
       assert (("ev_periodic_start called with negative interval value", w->interval >= 0.));
       /* this formula differs from the one in periodic_reify because we do not always round up */
-      ((WT)w)->at += ceil ((rt_now - ((WT)w)->at) / w->interval) * w->interval;
+      ((WT)w)->at += ceil ((ev_rt_now - ((WT)w)->at) / w->interval) * w->interval;
     }
 
   ev_start (EV_A_ (W)w, ++periodiccnt);

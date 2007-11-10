@@ -262,8 +262,20 @@ struct ev_loop *ev_default_loop (int methods); /* returns default loop */
 struct ev_loop *ev_loop_new (int methods);
 void ev_loop_destroy (EV_P);
 void ev_loop_fork (EV_P);
+
+ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after each poll */
+
 # else
+
 int ev_default_loop (int methods); /* returns true when successful */
+
+static ev_tstamp
+ev_now ()
+{
+  extern ev_rt_now;
+
+  return ev_rt_now;
+}
 # endif
 
 void ev_default_destroy (void); /* destroy the default loop */
@@ -284,8 +296,6 @@ int ev_method (EV_P);
 #if EV_PROTOTYPES
 void ev_loop (EV_P_ int flags);
 void ev_unloop (EV_P_ int how); /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
-
-ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after each poll */
 
 /*
  * ref/unref can be used to add or remove a refcount on the mainloop. every watcher
