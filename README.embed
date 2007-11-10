@@ -64,7 +64,7 @@ FILESETS
 AUTOCONF SUPPORT
 
     Instead of using EV_STANDALONE=1 and providing your config in whatever
-    way you want, you can also m4_include([ev.m4]) in your configure.ac
+    way you want, you can also m4_include([libev.m4]) in your configure.ac
     and leave EV_STANDALONE off. ev.c will then include "config.h" and
     configure itself accordingly.
 
