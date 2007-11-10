@@ -55,11 +55,15 @@ struct ev_loop;
 # define EV_P_ EV_P,
 # define EV_A loop
 # define EV_A_ EV_A,
+# define EV_DEFAULT_A ev_default_loop (0)
+# define EV_DEFAULT_A_ EV_DEFAULT_A,
 #else
 # define EV_P void
 # define EV_P_
 # define EV_A
 # define EV_A_
+# define EV_DEFAULT_A
+# define EV_DEFAULT_A_
 #endif
 
 /* eventmask, revents, events... */
