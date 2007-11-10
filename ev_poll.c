@@ -79,7 +79,7 @@ static void
 poll_poll (EV_P_ ev_tstamp timeout)
 {
   int i;
-  int res = poll (polls, pollcnt, ceil (timeout * 1000.));
+  int res = poll (polls, pollcnt, (int)ceil (timeout * 1000.));
 
   if (res < 0)
     {
