@@ -61,10 +61,17 @@ FILESETS
         event.h
         event.c
 
+AUTOCONF SUPPORT
+
+    Instead of using EV_STANDALONE=1 and providing your config in whatever
+    way you want, you can also m4_include([ev.m4]) in your configure.ac
+    and leave EV_STANDALONE off. ev.c will then include "config.h" and
+    configure itself accordingly.
+
 PREPROCESSOR SYMBOLS
 
     Libev can be configured via a variety of preprocessor symbols you have to define
-    before including any of its files. The default is not to build for mulciplicity
+    before including any of its files. The default is not to build for multiplicity
     and only include the select backend.
 
     EV_STANDALONE
