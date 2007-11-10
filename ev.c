@@ -28,6 +28,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef EV_STANDALONE
 # include "config.h"
 
@@ -1595,4 +1600,8 @@ ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, vo
         }
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
