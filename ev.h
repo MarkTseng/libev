@@ -272,7 +272,7 @@ int ev_default_loop (int methods); /* returns true when successful */
 static ev_tstamp
 ev_now ()
 {
-  extern ev_rt_now;
+  extern ev_tstamp ev_rt_now;
 
   return ev_rt_now;
 }

@@ -223,6 +223,7 @@ typedef struct
 
   struct ev_loop
   {
+    ev_tstamp ev_rt_now;
     #define VAR(name,decl) decl;
       #include "ev_vars.h"
     #undef VAR
@@ -234,6 +235,7 @@ typedef struct
 
 #else
 
+  ev_tstamp ev_rt_now;
   #define VAR(name,decl) static decl;
     #include "ev_vars.h"
   #undef VAR
