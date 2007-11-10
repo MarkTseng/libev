@@ -88,7 +88,7 @@ struct ev_loop;
 #define EV_VERSION_MINOR 1
 
 #ifndef EV_CB_DECLARE
-# define EV_CB_DECLARE(type) void (*cb)(EV_P_ struct type *w, int revents)
+# define EV_CB_DECLARE(type) void (*cb)(EV_P_ struct type *w, int revents);
 #endif
 #ifndef EV_CB_INVOKE
 # define EV_CB_INVOKE(watcher,revents) (watcher)->cb (EV_A_ (watcher), (revents))
@@ -212,14 +212,15 @@ union ev_any_watcher
 {
   struct ev_watcher w;
   struct ev_watcher_list wl;
+
   struct ev_io io;
   struct ev_timer timer;
   struct ev_periodic periodic;
-  struct ev_signal signal;
   struct ev_idle idle;
-  struct ev_child child;
   struct ev_prepare prepare;
   struct ev_check check;
+  struct ev_signal signal;
+  struct ev_child child;
 };
 
 #define EVMETHOD_AUTO     0 /* consults environment */
