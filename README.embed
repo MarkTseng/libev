@@ -134,7 +134,7 @@ PREPROCESSOR SYMBOLS
        If defined to be "1", libev will compile in support for the BSD
        style kqueue backend. Its availability will be detected at runtime,
        otherwise another method will be used as fallback. This is the
-       preferred backend for BSD and BSd-like systems. Darwin brokenness
+       preferred backend for BSD and BSD-like systems. Darwin brokenness
        will be detected at runtime and routed around by disabling this
        backend.
 

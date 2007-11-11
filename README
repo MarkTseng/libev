@@ -72,7 +72,7 @@ at http://libev.schmorp.de/bench.html).
 whats missing?
 
 - no event-like priority support at the moment (the ev priorities
-  are not yet finished and work differently, but you cna use idle watchers
+  are not yet finished and work differently, but you can use idle watchers
   to get a similar effect).
 
 
