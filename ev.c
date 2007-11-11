@@ -251,7 +251,7 @@ typedef struct
 
 /*****************************************************************************/
 
-inline ev_tstamp
+ev_tstamp
 ev_time (void)
 {
 #if EV_USE_REALTIME
