@@ -235,6 +235,7 @@ typedef struct
   struct ev_loop
   {
     ev_tstamp ev_rt_now;
+    #define ev_rt_now ((loop)->ev_rt_now)
     #define VAR(name,decl) decl;
       #include "ev_vars.h"
     #undef VAR
@@ -536,15 +537,10 @@ downheap (WT *heap, int N, int k)
 }
 
 inline void
-adjustheap (WT *heap, int N, int k, ev_tstamp at)
+adjustheap (WT *heap, int N, int k)
 {
-  ev_tstamp old_at = heap [k]->at;
-  heap [k]->at = at;
-
-  if (old_at < at)
-    downheap (heap, N, k);
-  else
-    upheap (heap, k);
+  upheap (heap, k);
+  downheap (heap, N, k);
 }
 
 /*****************************************************************************/
@@ -1354,7 +1350,7 @@ ev_timer_stop (EV_P_ struct ev_timer *w)
   if (((W)w)->active < timercnt--)
     {
       timers [((W)w)->active - 1] = timers [timercnt];
-      downheap ((WT *)timers, timercnt, ((W)w)->active - 1);
+      adjustheap ((WT *)timers, timercnt, ((W)w)->active - 1);
     }
 
   ((WT)w)->at -= mn_now;
@@ -1368,7 +1364,10 @@ ev_timer_again (EV_P_ struct ev_timer *w)
   if (ev_is_active (w))
     {
       if (w->repeat)
-        adjustheap ((WT *)timers, timercnt, ((W)w)->active - 1, mn_now + w->repeat);
+        {
+          ((WT)w)->at = mn_now + w->repeat;
+          adjustheap ((WT *)timers, timercnt, ((W)w)->active - 1);
+        }
       else
         ev_timer_stop (EV_A_ w);
     }
@@ -1412,7 +1411,7 @@ ev_periodic_stop (EV_P_ struct ev_periodic *w)
   if (((W)w)->active < periodiccnt--)
     {
       periodics [((W)w)->active - 1] = periodics [periodiccnt];
-      downheap ((WT *)periodics, periodiccnt, ((W)w)->active - 1);
+      adjustheap ((WT *)periodics, periodiccnt, ((W)w)->active - 1);
     }
 
   ev_stop (EV_A_ (W)w);
