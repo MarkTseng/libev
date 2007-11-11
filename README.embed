@@ -149,19 +149,6 @@ PREPROCESSOR SYMBOLS
         Similarly to EV_H, this macro cna be used to override event.c's idea
         of how the event.h header can be found.
 
-    EV_COMMON
- 
-       By default, all watchers have a "void *data" member. By redefining
-       this macro to a something else you can include more and other types
-       of members. You have to define it each time you include one of the
-       files, though, and it must be identical each time.
-
-       For example, the perl EV module uses this:
-
-           #define EV_COMMON                       \
-             SV *self; /* contains this struct */  \
-             SV *cb_sv, *fh /* note no trailing ";" */
-
     EV_PROTOTYPES
 
        If defined to be "0", then "ev.h" will not define any function
@@ -176,6 +163,24 @@ PREPROCESSOR SYMBOLS
        will be no support for multiple event loops and there is no first
        event loop pointer argument. Instead, all functions act on the
        single default loop.
+
+    EV_PERIODICS
+
+       If undefined or defined to be "1", then periodic timers are
+       supported, otherwise not. This saves a few kb of code.
+
+    EV_COMMON
+ 
+       By default, all watchers have a "void *data" member. By redefining
+       this macro to a something else you can include more and other types
+       of members. You have to define it each time you include one of the
+       files, though, and it must be identical each time.
+
+       For example, the perl EV module uses this:
+
+           #define EV_COMMON                       \
+             SV *self; /* contains this struct */  \
+             SV *cb_sv, *fh /* note no trailing ";" */
 
     EV_CB_DECLARE(type)
     EV_CB_INVOKE(watcher,revents)

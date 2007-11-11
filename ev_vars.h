@@ -59,9 +59,11 @@ VARx(struct ev_timer **, timers)
 VARx(int, timermax)
 VARx(int, timercnt)
 
+#if EV_PERIODICS || EV_GENWRAP
 VARx(struct ev_periodic **, periodics)
 VARx(int, periodicmax)
 VARx(int, periodiccnt)
+#endif
 
 VARx(struct ev_idle **, idles)
 VARx(int, idlemax)

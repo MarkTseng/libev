@@ -806,7 +806,9 @@ loop_destroy (EV_P)
   /* have to use the microsoft-never-gets-it-right macro */
   array_free_microshit (fdchange);
   array_free_microshit (timer);
+#if EV_PERIODICS
   array_free_microshit (periodic);
+#endif
   array_free_microshit (idle);
   array_free_microshit (prepare);
   array_free_microshit (check);
@@ -1003,6 +1005,7 @@ timers_reify (EV_P)
     }
 }
 
+#if EV_PERIODICS
 static void
 periodics_reify (EV_P)
 {
@@ -1053,6 +1056,7 @@ periodics_reschedule (EV_P)
   for (i = periodiccnt >> 1; i--; )
     downheap ((WT *)periodics, periodiccnt, i);
 }
+#endif
 
 inline int
 time_update_monotonic (EV_P)
@@ -1096,7 +1100,9 @@ time_update (EV_P)
               now_floor = mn_now;
             }
 
+# if EV_PERIODICS
           periodics_reschedule (EV_A);
+# endif
           /* no timer adjustment, as the monotonic clock doesn't jump */
           /* timers_reschedule (EV_A_ rtmn_diff - odiff) */
         }
@@ -1108,7 +1114,9 @@ time_update (EV_P)
 
       if (expect_false (mn_now > ev_rt_now || mn_now < ev_rt_now - MAX_BLOCKTIME - MIN_TIMEJUMP))
         {
+#if EV_PERIODICS
           periodics_reschedule (EV_A);
+#endif
 
           /* adjust timers. this is easy, as the offset is the same for all */
           for (i = 0; i < timercnt; ++i)
@@ -1181,11 +1189,13 @@ ev_loop (EV_P_ int flags)
               if (block > to) block = to;
             }
 
+#if EV_PERIODICS
           if (periodiccnt)
             {
               ev_tstamp to = ((WT)periodics [0])->at - ev_rt_now + method_fudge;
               if (block > to) block = to;
             }
+#endif
 
           if (block < 0.) block = 0.;
         }
@@ -1197,7 +1207,9 @@ ev_loop (EV_P_ int flags)
 
       /* queue pending timers and reschedule them */
       timers_reify (EV_A); /* relative timers called last */
+#if EV_PERIODICS
       periodics_reify (EV_A); /* absolute timers called first */
+#endif
 
       /* queue idle watchers unless io or timers are pending */
       if (idlecnt && !any_pending (EV_A))
@@ -1358,6 +1370,7 @@ ev_timer_again (EV_P_ struct ev_timer *w)
     ev_timer_start (EV_A_ w);
 }
 
+#if EV_PERIODICS
 void
 ev_periodic_start (EV_P_ struct ev_periodic *w)
 {
@@ -1406,6 +1419,7 @@ ev_periodic_again (EV_P_ struct ev_periodic *w)
   ev_periodic_stop (EV_A_ w);
   ev_periodic_start (EV_A_ w);
 }
+#endif
 
 void
 ev_idle_start (EV_P_ struct ev_idle *w)

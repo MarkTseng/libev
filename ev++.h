@@ -129,6 +129,11 @@ namespace ev {
       return call (this, events);                                                       \
     }                                                                                   \
                                                                                         \
+    ~cppstem ()                                                                         \
+    {                                                                                   \
+      stop ();                                                                          \
+    }                                                                                   \
+                                                                                        \
   private:                                                                              \
                                                                                         \
     cppstem (const cppstem &o)								\
@@ -183,6 +188,7 @@ namespace ev {
     }
   };
 
+  #if EV_PERIODICS
   EV_DECLARE_WATCHER (periodic, periodic)
     void set (ev_tstamp at, ev_tstamp interval = 0.)
     {
@@ -203,6 +209,7 @@ namespace ev {
       ev_periodic_again (EV_A_ static_cast<ev_periodic *>(this));
     }
   };
+  #endif
 
   EV_DECLARE_WATCHER (idle, idle)
   };

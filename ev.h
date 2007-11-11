@@ -48,6 +48,10 @@ typedef double ev_tstamp;
 # define EV_MULTIPLICITY 1
 #endif
 
+#ifndef EV_PERIODICS
+# define EV_PERIODICS 1
+#endif
+
 /* support multiple event loops? */
 #if EV_MULTIPLICITY
 struct ev_loop;
@@ -370,9 +374,11 @@ void ev_timer_stop     (EV_P_ struct ev_timer *w);
 /* stops if active and no repeat, restarts if active and repeating, starts if inactive and repeating */
 void ev_timer_again    (EV_P_ struct ev_timer *w);
 
+#if EV_PERIODICS
 void ev_periodic_start (EV_P_ struct ev_periodic *w);
 void ev_periodic_stop  (EV_P_ struct ev_periodic *w);
 void ev_periodic_again (EV_P_ struct ev_periodic *w);
+#endif
 
 void ev_idle_start     (EV_P_ struct ev_idle *w);
 void ev_idle_stop      (EV_P_ struct ev_idle *w);
