@@ -1436,7 +1436,7 @@ void
 ev_idle_stop (EV_P_ struct ev_idle *w)
 {
   ev_clear_pending (EV_A_ (W)w);
-  if (ev_is_active (w))
+  if (!ev_is_active (w))
     return;
 
   idles [((W)w)->active - 1] = idles [--idlecnt];
@@ -1458,7 +1458,7 @@ void
 ev_prepare_stop (EV_P_ struct ev_prepare *w)
 {
   ev_clear_pending (EV_A_ (W)w);
-  if (ev_is_active (w))
+  if (!ev_is_active (w))
     return;
 
   prepares [((W)w)->active - 1] = prepares [--preparecnt];
@@ -1480,7 +1480,7 @@ void
 ev_check_stop (EV_P_ struct ev_check *w)
 {
   ev_clear_pending (EV_A_ (W)w);
-  if (ev_is_active (w))
+  if (!ev_is_active (w))
     return;
 
   checks [((W)w)->active - 1] = checks [--checkcnt];
