@@ -73,18 +73,18 @@ struct ev_loop;
 /* eventmask, revents, events... */
 #define EV_UNDEF          -1 /* guaranteed to be invalid */
 #define EV_NONE         0x00
-#define EV_READ         0x01
-#define EV_WRITE        0x02
-#define EV_TIMEOUT  0x000100
-#define EV_PERIODIC 0x000200
-#define EV_SIGNAL   0x000400
-#define EV_IDLE     0x000800
-#define EV_CHECK    0x001000
-#define EV_PREPARE  0x002000
-#define EV_CHILD    0x004000
+#define EV_READ         0x01 /* io only */
+#define EV_WRITE        0x02 /* io only */
+#define EV_TIMEOUT  0x000100 /* timer only */
+#define EV_PERIODIC 0x000200 /* periodic timer only */
+#define EV_SIGNAL   0x000400 /* signal only */
+#define EV_IDLE     0x000800 /* idle only */
+#define EV_CHECK    0x001000 /* check only */
+#define EV_PREPARE  0x002000 /* prepare only */
+#define EV_CHILD    0x004000 /* child/pid only */
 #define EV_ERROR    0x800000 /* sent when an error occurs */
 
-/* can be used to add custom fields to all watchers */
+/* can be used to add custom fields to all watchers, while losing binary compatibility */
 #ifndef EV_COMMON
 # define EV_COMMON void *data
 #endif
