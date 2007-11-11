@@ -138,6 +138,11 @@ PREPROCESSOR SYMBOLS
        will be detected at runtime and routed around by disabling this
        backend.
 
+    EV_USE_DEVPOLL
+    EV_USE_PORTS
+    
+       reserved for future expansion, works like the USE symbols above.
+
     EV_H
 
         The name of the ev.h header file used to include it. The default

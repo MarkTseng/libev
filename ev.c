@@ -53,7 +53,7 @@ extern "C" {
 #  define EV_USE_POLL 1
 # endif
 
-# if HAVE_EPOLL && HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H && !defined (EV_USE_EPOLL)
+# if HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H && !defined (EV_USE_EPOLL)
 #  define EV_USE_EPOLL 1
 # endif
 
