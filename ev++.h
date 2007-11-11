@@ -93,9 +93,9 @@ namespace ev {
 
   /* using a template here would require quite a bit more lines,
    * so a macro solution was chosen */
-  #define EV_DECLARE_WATCHER(cppstem,cstem)	                                        \
+  #define EV_BEGIN_WATCHER(cppstem,cstem)	                                        \
                                                                                         \
-  extern "C" void cb_ ## cppstem (struct ev_ ## cstem *w, int revents);                 \
+  static void cb_ ## cppstem (struct ev_ ## cstem *w, int revents);                     \
                                                                                         \
   struct cppstem : ev_ ## cstem, callback<cppstem>                                      \
   {                                                                                     \
@@ -143,7 +143,15 @@ namespace ev {
                                                                                         \
   public:
 
-  EV_DECLARE_WATCHER (io, io)
+  #define EV_END_WATCHER(cppstem,cstem)	                                                \
+  };                                                                                    \
+                                                                                        \
+  static void cb_ ## cppstem (struct ev_ ## cstem *w, int revents)                      \
+  {                                                                                     \
+    (*static_cast<cppstem *>(w))(revents);                                              \
+  }
+
+  EV_BEGIN_WATCHER (io, io)
     void set (int fd, int events)
     {
       int active = is_active ();
@@ -165,9 +173,9 @@ namespace ev {
       set (fd, events);
       start ();
     }
-  };
+  EV_END_WATCHER (io, io)
 
-  EV_DECLARE_WATCHER (timer, timer)
+  EV_BEGIN_WATCHER (timer, timer)
     void set (ev_tstamp after, ev_tstamp repeat = 0.)
     {
       int active = is_active ();
@@ -186,10 +194,10 @@ namespace ev {
     {
       ev_timer_again (EV_A_ static_cast<ev_timer *>(this));
     }
-  };
+  EV_END_WATCHER (timer, timer)
 
   #if EV_PERIODICS
-  EV_DECLARE_WATCHER (periodic, periodic)
+  EV_BEGIN_WATCHER (periodic, periodic)
     void set (ev_tstamp at, ev_tstamp interval = 0.)
     {
       int active = is_active ();
@@ -208,19 +216,19 @@ namespace ev {
     {
       ev_periodic_again (EV_A_ static_cast<ev_periodic *>(this));
     }
-  };
+  EV_END_WATCHER (periodic, periodic)
   #endif
 
-  EV_DECLARE_WATCHER (idle, idle)
-  };
+  EV_BEGIN_WATCHER (idle, idle)
+  EV_END_WATCHER (idle, idle)
 
-  EV_DECLARE_WATCHER (prepare, prepare)
-  };
+  EV_BEGIN_WATCHER (prepare, prepare)
+  EV_END_WATCHER (prepare, prepare)
 
-  EV_DECLARE_WATCHER (check, check)
-  };
+  EV_BEGIN_WATCHER (check, check)
+  EV_END_WATCHER (check, check)
 
-  EV_DECLARE_WATCHER (sig, signal)
+  EV_BEGIN_WATCHER (sig, signal)
     void set (int signum)
     {
       int active = is_active ();
@@ -234,9 +242,9 @@ namespace ev {
       set (signum);
       start ();
     }
-  };
+  EV_END_WATCHER (sig, signal)
 
-  EV_DECLARE_WATCHER (child, child)
+  EV_BEGIN_WATCHER (child, child)
     void set (int pid)
     {
       int active = is_active ();
@@ -250,10 +258,10 @@ namespace ev {
       set (pid);
       start ();
     }
-  };
+  EV_END_WATCHER (child, child)
 
   #undef EV_CONSTRUCT
-  #undef EV_DECLARE_WATCHER
+  #undef EV_BEGIN_WATCHER
 }
 
 #endif
