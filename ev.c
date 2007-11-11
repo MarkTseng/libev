@@ -1441,7 +1441,7 @@ void
 ev_idle_stop (EV_P_ struct ev_idle *w)
 {
   ev_clear_pending (EV_A_ (W)w);
-  if (ev_is_active (w))
+  if (!ev_is_active (w))
     return;
 
   idles [((W)w)->active - 1] = idles [--idlecnt];
