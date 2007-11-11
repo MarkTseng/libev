@@ -163,7 +163,9 @@ typedef struct ev_watcher_time *WT;
 
 static int have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
 
-#include "ev_win32.c"
+#ifdef WIN32
+# include "ev_win32.c"
+#endif
 
 /*****************************************************************************/
 
