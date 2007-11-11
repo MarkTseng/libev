@@ -989,7 +989,11 @@ timers_reify (EV_P)
       if (w->repeat)
         {
           assert (("negative ev_timer repeat value found while processing timers", w->repeat > 0.));
-          ((WT)w)->at = mn_now + w->repeat;
+
+          ((WT)w)->at += w->repeat;
+          if (((WT)w)->at < mn_now)
+            ((WT)w)->at = mn_now;
+
           downheap ((WT *)timers, timercnt, 0);
         }
       else
