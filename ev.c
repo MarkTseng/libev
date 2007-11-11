@@ -41,19 +41,19 @@ extern "C" {
 #  define EV_USE_REALTIME  1
 # endif
 
-# if HAVE_SELECT && HAVE_SYS_SELECT_H
+# if HAVE_SELECT && HAVE_SYS_SELECT_H && !defined (EV_USE_SELECT)
 #  define EV_USE_SELECT 1
 # endif
 
-# if HAVE_POLL && HAVE_POLL_H
+# if HAVE_POLL && HAVE_POLL_H && !defined (EV_USE_POLL)
 #  define EV_USE_POLL 1
 # endif
 
-# if HAVE_EPOLL && HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H
+# if HAVE_EPOLL && HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H && !defined (EV_USE_EPOLL)
 #  define EV_USE_EPOLL 1
 # endif
 
-# if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H
+# if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H && !defined (EV_USE_KQUEUE)
 #  define EV_USE_KQUEUE 1
 # endif
 
