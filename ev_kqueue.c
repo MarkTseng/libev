@@ -83,7 +83,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
     {
       ev_free (kqueue_events);
       kqueue_eventmax = array_roundsize (struct kevent, kqueue_changecnt);
-      kqueue_events = ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
+      kqueue_events = (struct kevent *)ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
     }
 
   ts.tv_sec  = (time_t)timeout;
@@ -147,7 +147,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
     {
       ev_free (kqueue_events);
       kqueue_eventmax = array_roundsize (struct kevent, kqueue_eventmax << 1);
-      kqueue_events = ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
+      kqueue_events = (struct kevent *)ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
     }
 }
 
@@ -186,7 +186,7 @@ kqueue_init (EV_P_ int flags)
   method_poll   = kqueue_poll;
 
   kqueue_eventmax = 64; /* intiial number of events receivable per poll */
-  kqueue_events = ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
+  kqueue_events = (struct kevent *)ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
 
   kqueue_changes   = 0;
   kqueue_changemax = 0;
