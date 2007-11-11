@@ -1339,7 +1339,7 @@ ev_timer_stop (EV_P_ struct ev_timer *w)
       downheap ((WT *)timers, timercnt, ((W)w)->active - 1);
     }
 
-  ((WT)w)->at = w->repeat;
+  ((WT)w)->at -= mn_now;
 
   ev_stop (EV_A_ (W)w);
 }

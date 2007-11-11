@@ -46,6 +46,21 @@ namespace ev {
 
   #include "ev.h"
 
+  enum {
+    UNDEF    = EV_UNDEF,
+    NONE     = EV_NONE,
+    READ     = EV_READ,
+    WRITE    = EV_WRITE,
+    TIMEOUT  = EV_TIMEOUT,
+    PERIODIC = EV_PERIODIC,
+    SIGNAL   = EV_SIGNAL,
+    IDLE     = EV_IDLE,
+    CHECK    = EV_CHECK,
+    PREPARE  = EV_PREPARE,
+    CHILD    = EV_CHILD,
+    ERROR    = EV_ERROR,
+  };
+
   typedef ev_tstamp tstamp;
 
   inline ev_tstamp now (EV_P)
