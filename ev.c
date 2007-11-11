@@ -37,8 +37,12 @@ extern "C" {
 # include "config.h"
 
 # if HAVE_CLOCK_GETTIME
-#  define EV_USE_MONOTONIC 1
-#  define EV_USE_REALTIME  1
+#  ifndef EV_USE_MONOTONIC
+#   define EV_USE_MONOTONIC 1
+#  endif
+#  ifndef EV_USE_REALTIME
+#   define EV_USE_REALTIME  1
+#  endif
 # endif
 
 # if HAVE_SELECT && HAVE_SYS_SELECT_H && !defined (EV_USE_SELECT)
