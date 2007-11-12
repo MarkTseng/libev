@@ -406,7 +406,7 @@ have been omitted....
 This section describes each watcher in detail, but will not repeat
 information given in the last section.
 
-=head2 C<ev_io> - is this file descriptor readable or writable
+=head2 C<ev_io> - is my file descriptor readable or writable
 
 I/O watchers check whether a file descriptor is readable or writable
 in each iteration of the event loop (This behaviour is called
