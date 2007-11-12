@@ -1384,7 +1384,10 @@ ev_timer_again (EV_P_ struct ev_timer *w)
         ev_timer_stop (EV_A_ w);
     }
   else if (w->repeat)
-    ev_timer_start (EV_A_ w);
+    {
+      w->at = w->repeat;
+      ev_timer_start (EV_A_ w);
+    }
 }
 
 #if EV_PERIODICS
