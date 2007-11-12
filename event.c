@@ -347,7 +347,7 @@ x_loopexit_cb (int revents, void *base)
 {
   dLOOPbase;
 
-  ev_unloop (EV_A_ EVUNLOOP_ONCE);
+  ev_unloop (EV_A_ EVUNLOOP_ONE);
 }
 
 int event_base_loopexit (struct event_base *base, struct timeval *tv)

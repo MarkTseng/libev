@@ -243,7 +243,7 @@ more generic mechanism.
 
 Can be used to make a call to C<ev_loop> return early (but only after it
 has processed all outstanding events). The C<how> argument must be either
-C<EVUNLOOP_ONCE>, which will make the innermost C<ev_loop> call return, or
+C<EVUNLOOP_ONE>, which will make the innermost C<ev_loop> call return, or
 C<EVUNLOOP_ALL>, which will make all nested C<ev_loop> calls return.
 
 =item ev_ref (loop)

@@ -303,7 +303,7 @@ unsigned int ev_method (EV_P);
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */
 #define EVLOOP_ONESHOT	2 /* block *once* only */
-#define EVUNLOOP_ONCE   1 /* unloop once */
+#define EVUNLOOP_ONE    1 /* unloop once */
 #define EVUNLOOP_ALL    2 /* unloop all loops */
 
 #if EV_PROTOTYPES
