@@ -77,11 +77,18 @@ extern "C" {
 
 #include <signal.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 # include <unistd.h>
 # include <sys/time.h>
 # include <sys/wait.h>
+#else
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# ifndef EV_SELECT_IS_WINSOCKET
+#  define EV_SELECT_IS_WINSOCKET 1
+# endif
 #endif
+
 /**/
 
 #ifndef EV_USE_MONOTONIC
@@ -104,16 +111,6 @@ extern "C" {
 # define EV_USE_KQUEUE 0
 #endif
 
-#ifndef EV_USE_WIN32
-# ifdef WIN32
-#  define EV_USE_WIN32 0 /* it does not exist, use select */
-#  undef EV_USE_SELECT
-#  define EV_USE_SELECT 1
-# else
-#  define EV_USE_WIN32 0
-# endif
-#endif
-
 #ifndef EV_USE_REALTIME
 # define EV_USE_REALTIME 1
 #endif
@@ -128,6 +125,10 @@ extern "C" {
 #ifndef CLOCK_REALTIME
 # undef EV_USE_REALTIME
 # define EV_USE_REALTIME 0
+#endif
+
+#if EV_SELECT_IS_WINSOCKET
+# include <winsock.h>
 #endif
 
 /**/
@@ -157,13 +158,15 @@ extern "C" {
 #define NUMPRI    (EV_MAXPRI - EV_MINPRI + 1)
 #define ABSPRI(w) ((w)->priority - EV_MINPRI)
 
+#define EMPTY /* required for microsofts broken pseudo-c compiler */
+
 typedef struct ev_watcher *W;
 typedef struct ev_watcher_list *WL;
 typedef struct ev_watcher_time *WT;
 
 static int have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
 
-#ifdef WIN32
+#ifdef _WIN32
 # include "ev_win32.c"
 #endif
 
@@ -222,6 +225,9 @@ typedef struct
   WL head;
   unsigned char events;
   unsigned char reify;
+#if EV_SELECT_IS_WINSOCKET
+  SOCKET handle;
+#endif
 } ANFD;
 
 typedef struct
@@ -320,11 +326,6 @@ ev_now (EV_P)
       fprintf (stderr, "slimmed down " # stem " to %d\n", stem ## max);/*D*/\
     }
 
-/* microsoft's pseudo-c is quite far from C as the rest of the world and the standard knows it */
-/* bringing us everlasting joy in form of stupid extra macros that are not required in C */
-#define array_free_microshit(stem) \
-  ev_free (stem ## s); stem ## cnt = stem ## max = 0;
-
 #define array_free(stem, idx) \
   ev_free (stem ## s idx); stem ## cnt idx = stem ## max idx = 0;
 
@@ -408,6 +409,15 @@ fd_reify (EV_P)
       for (w = (struct ev_io *)anfd->head; w; w = (struct ev_io *)((WL)w)->next)
         events |= w->events;
 
+#if EV_SELECT_IS_WINSOCKET
+      if (events)
+        {
+          unsigned long argp;
+          anfd->handle = _get_osfhandle (fd);
+          assert (("libev only supports socket fds in this configuration", ioctlsocket (anfd->handle, FIONREAD, &argp) == 0));
+        }
+#endif
+
       anfd->reify = 0;
 
       method_modify (EV_A_ fd, anfd->events, events);
@@ -445,8 +455,8 @@ fd_kill (EV_P_ int fd)
 static int
 fd_valid (int fd)
 {
-#ifdef WIN32
-  return !!win32_get_osfhandle (fd);
+#ifdef _WIN32
+  return _get_osfhandle (fd) != -1;
 #else
   return fcntl (fd, F_GETFD) != -1;
 #endif
@@ -573,7 +583,7 @@ signals_init (ANSIG *base, int count)
 static void
 sighandler (int signum)
 {
-#if WIN32
+#if _WIN32
   signal (signum, sighandler);
 #endif
 
@@ -583,11 +593,7 @@ sighandler (int signum)
     {
       int old_errno = errno;
       gotsig = 1;
-#ifdef WIN32
-      send (sigpipe [1], &signum, 1, MSG_DONTWAIT);
-#else
       write (sigpipe [1], &signum, 1);
-#endif
       errno = old_errno;
     }
 }
@@ -617,11 +623,7 @@ sigcb (EV_P_ struct ev_io *iow, int revents)
 {
   int signum;
 
-#ifdef WIN32
-  recv (sigpipe [0], &revents, 1, MSG_DONTWAIT);
-#else
   read (sigpipe [0], &revents, 1);
-#endif
   gotsig = 0;
 
   for (signum = signalmax; signum--; )
@@ -629,17 +631,23 @@ sigcb (EV_P_ struct ev_io *iow, int revents)
       ev_feed_signal_event (EV_A_ signum + 1);
 }
 
+inline void
+fd_intern (int fd)
+{
+#ifdef _WIN32
+  int arg = 1;
+  ioctlsocket (_get_osfhandle (fd), FIONBIO, &arg);
+#else
+  fcntl (fd, F_SETFD, FD_CLOEXEC);
+  fcntl (fd, F_SETFL, O_NONBLOCK);
+#endif
+}
+
 static void
 siginit (EV_P)
 {
-#ifndef WIN32
-  fcntl (sigpipe [0], F_SETFD, FD_CLOEXEC);
-  fcntl (sigpipe [1], F_SETFD, FD_CLOEXEC);
-
-  /* rather than sort out wether we really need nb, set it */
-  fcntl (sigpipe [0], F_SETFL, O_NONBLOCK);
-  fcntl (sigpipe [1], F_SETFL, O_NONBLOCK);
-#endif
+  fd_intern (sigpipe [0]);
+  fd_intern (sigpipe [1]);
 
   ev_io_set (&sigev, sigpipe [0], EV_READ);
   ev_io_start (EV_A_ &sigev);
@@ -650,7 +658,7 @@ siginit (EV_P)
 
 static struct ev_child *childs [PID_HASHSIZE];
 
-#ifndef WIN32
+#ifndef _WIN32
 
 static struct ev_signal childev;
 
@@ -721,7 +729,7 @@ ev_version_minor (void)
 static int
 enable_secure (void)
 {
-#ifdef WIN32
+#ifdef _WIN32
   return 0;
 #else
   return getuid () != geteuid ()
@@ -760,9 +768,6 @@ loop_init (EV_P_ int methods)
           methods = EVMETHOD_ANY;
 
       method = 0;
-#if EV_USE_WIN32
-      if (!method && (methods & EVMETHOD_WIN32 )) method = win32_init  (EV_A_ methods);
-#endif
 #if EV_USE_KQUEUE
       if (!method && (methods & EVMETHOD_KQUEUE)) method = kqueue_init (EV_A_ methods);
 #endif
@@ -786,9 +791,6 @@ loop_destroy (EV_P)
 {
   int i;
 
-#if EV_USE_WIN32
-  if (method == EVMETHOD_WIN32 ) win32_destroy  (EV_A);
-#endif
 #if EV_USE_KQUEUE
   if (method == EVMETHOD_KQUEUE) kqueue_destroy (EV_A);
 #endif
@@ -806,14 +808,14 @@ loop_destroy (EV_P)
     array_free (pending, [i]);
 
   /* have to use the microsoft-never-gets-it-right macro */
-  array_free_microshit (fdchange);
-  array_free_microshit (timer);
+  array_free (fdchange, EMPTY);
+  array_free (timer, EMPTY);
 #if EV_PERIODICS
-  array_free_microshit (periodic);
+  array_free (periodic, EMPTY);
 #endif
-  array_free_microshit (idle);
-  array_free_microshit (prepare);
-  array_free_microshit (check);
+  array_free (idle, EMPTY);
+  array_free (prepare, EMPTY);
+  array_free (check, EMPTY);
 
   method = 0;
 }
@@ -902,7 +904,7 @@ ev_default_loop (int methods)
         {
           siginit (EV_A);
 
-#ifndef WIN32
+#ifndef _WIN32
           ev_signal_init (&childev, childcb, SIGCHLD);
           ev_set_priority (&childev, EV_MAXPRI);
           ev_signal_start (EV_A_ &childev);
@@ -923,7 +925,7 @@ ev_default_destroy (void)
   struct ev_loop *loop = default_loop;
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
   ev_ref (EV_A); /* child watcher */
   ev_signal_stop (EV_A_ &childev);
 #endif
@@ -1513,7 +1515,7 @@ ev_signal_start (EV_P_ struct ev_signal *w)
 
   if (!((WL)w)->next)
     {
-#if WIN32
+#if _WIN32
       signal (w->signum, sighandler);
 #else
       struct sigaction sa;

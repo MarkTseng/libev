@@ -13,10 +13,10 @@ VARx(int, postfork)  /* true if we need to recreate kernel state after fork */
 VARx(int, activecnt) /* number of active events */
 
 #if EV_USE_SELECT || EV_GENWRAP
-VARx(unsigned char *, vec_ri)
-VARx(unsigned char *, vec_ro)
-VARx(unsigned char *, vec_wi)
-VARx(unsigned char *, vec_wo)
+VARx(void *, vec_ri)
+VARx(void *, vec_ro)
+VARx(void *, vec_wi)
+VARx(void *, vec_wo)
 VARx(int, vec_max)
 #endif
 

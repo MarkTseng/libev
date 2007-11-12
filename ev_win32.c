@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <sys/timeb.h>
 
@@ -104,6 +104,7 @@ ev_gettimeofday (struct timeval *tv, struct timezone *tz)
 }
 
 #undef gettimeofday
-#define gettimeofdy(tv,tz) ev_gettimeofday (tv, tz)
+#define gettimeofday(tv,tz) ev_gettimeofday (tv, tz)
 
 #endif
+

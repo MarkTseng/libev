@@ -141,7 +141,7 @@ x_cb (struct event *ev, int revents)
   revents &= EV_READ | EV_WRITE | EV_TIMEOUT | EV_SIGNAL;
 
   ev->ev_res = revents;
-  ev->ev_callback (ev->ev_fd, revents, ev->ev_arg);
+  ev->ev_callback (ev->ev_fd, (short)revents, ev->ev_arg);
 }
 
 static void
@@ -358,7 +358,7 @@ x_once_cb (int revents, void *arg)
 {
   struct x_once *once = (struct x_once *)arg;
 
-  once->cb (once->fd, revents, once->arg);
+  once->cb (once->fd, (short)revents, once->arg);
   free (once);
 }
 

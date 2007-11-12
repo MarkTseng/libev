@@ -86,7 +86,7 @@ struct ev_loop;
 
 /* can be used to add custom fields to all watchers, while losing binary compatibility */
 #ifndef EV_COMMON
-# define EV_COMMON void *data
+# define EV_COMMON void *data;
 #endif
 #ifndef EV_PROTOTYPES
 # define EV_PROTOTYPES 1
@@ -114,40 +114,40 @@ struct ev_loop;
   int active; /* private */			\
   int pending; /* private */			\
   int priority; /* private */			\
-  EV_COMMON; /* rw */				\
+  EV_COMMON /* rw */				\
   EV_CB_DECLARE (type) /* private */
 
 #define EV_WATCHER_LIST(type)			\
-  EV_WATCHER (type);				\
-  struct ev_watcher_list *next /* private */
+  EV_WATCHER (type)				\
+  struct ev_watcher_list *next; /* private */
 
 #define EV_WATCHER_TIME(type)			\
-  EV_WATCHER (type);				\
-  ev_tstamp at     /* private */
+  EV_WATCHER (type)				\
+  ev_tstamp at;     /* private */
 
 /* base class, nothing to see here unless you subclass */
 struct ev_watcher
 {
-  EV_WATCHER (ev_watcher);
+  EV_WATCHER (ev_watcher)
 };
 
 /* base class, nothing to see here unless you subclass */
 struct ev_watcher_list
 {
-  EV_WATCHER_LIST (ev_watcher_list);
+  EV_WATCHER_LIST (ev_watcher_list)
 };
 
 /* base class, nothing to see here unless you subclass */
 struct ev_watcher_time
 {
-  EV_WATCHER_TIME (ev_watcher_time);
+  EV_WATCHER_TIME (ev_watcher_time)
 };
 
 /* invoked after a specific time, repeatable (based on monotonic clock) */
 /* revent EV_TIMEOUT */
 struct ev_timer
 {
-  EV_WATCHER_TIME (ev_timer);
+  EV_WATCHER_TIME (ev_timer)
 
   ev_tstamp repeat; /* rw */
 };
@@ -156,7 +156,7 @@ struct ev_timer
 /* revent EV_PERIODIC */
 struct ev_periodic
 {
-  EV_WATCHER_TIME (ev_periodic);
+  EV_WATCHER_TIME (ev_periodic)
 
   ev_tstamp interval; /* rw */
   ev_tstamp (*reschedule_cb)(struct ev_periodic *w, ev_tstamp now); /* rw */
@@ -166,7 +166,7 @@ struct ev_periodic
 /* revent EV_READ, EV_WRITE */
 struct ev_io
 {
-  EV_WATCHER_LIST (ev_io);
+  EV_WATCHER_LIST (ev_io)
 
   int fd;     /* ro */
   int events; /* ro */
@@ -176,7 +176,7 @@ struct ev_io
 /* revent EV_SIGNAL */
 struct ev_signal
 {
-  EV_WATCHER_LIST (ev_signal);
+  EV_WATCHER_LIST (ev_signal)
 
   int signum; /* ro */
 };
@@ -185,7 +185,7 @@ struct ev_signal
 /* revent EV_IDLE */
 struct ev_idle
 {
-  EV_WATCHER (ev_idle);
+  EV_WATCHER (ev_idle)
 };
 
 /* invoked for each run of the mainloop, just before the blocking call */
@@ -193,14 +193,14 @@ struct ev_idle
 /* revent EV_PREPARE */
 struct ev_prepare
 {
-  EV_WATCHER (ev_prepare);
+  EV_WATCHER (ev_prepare)
 };
 
 /* invoked for each run of the mainloop, just after the blocking call */
 /* revent EV_CHECK */
 struct ev_check
 {
-  EV_WATCHER (ev_check);
+  EV_WATCHER (ev_check)
 };
 
 /* invoked when sigchld is received and waitpid indicates the givne pid */
@@ -208,7 +208,7 @@ struct ev_check
 /* does not support priorities */
 struct ev_child
 {
-  EV_WATCHER_LIST (ev_child);
+  EV_WATCHER_LIST (ev_child)
 
   int pid;     /* ro */
   int rpid;    /* rw, holds the received pid */
@@ -278,7 +278,7 @@ ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after 
 int ev_default_loop (int methods); /* returns true when successful */
 
 static ev_tstamp
-ev_now ()
+ev_now (void)
 {
   extern ev_tstamp ev_rt_now;
 
