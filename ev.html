@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:47:14 2007" />
+	<meta name="created" content="Mon Nov 12 09:57:02 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -19,7 +19,8 @@
 <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
 <li><a href="#FEATURES">FEATURES</a></li>
 <li><a href="#CONVENTIONS">CONVENTIONS</a></li>
-<li><a href="#TIME_AND_OTHER_GLOBAL_FUNCTIONS">TIME AND OTHER GLOBAL FUNCTIONS</a></li>
+<li><a href="#TIME_REPRESENTATION">TIME REPRESENTATION</a></li>
+<li><a href="#GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</a></li>
 <li><a href="#FUNCTIONS_CONTROLLING_THE_EVENT_LOOP">FUNCTIONS CONTROLLING THE EVENT LOOP</a></li>
 <li><a href="#ANATOMY_OF_A_WATCHER">ANATOMY OF A WATCHER</a>
 <ul><li><a href="#ASSOCIATING_CUSTOM_DATA_WITH_A_WATCH">ASSOCIATING CUSTOM DATA WITH A WATCHER</a></li>
@@ -89,13 +90,17 @@ argument of name <code>loop</code> (which is always of type <code>struct ev_loop
 will not have this argument.</p>
 
 </div>
-<h1 id="TIME_AND_OTHER_GLOBAL_FUNCTIONS">TIME AND OTHER GLOBAL FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
-<div id="TIME_AND_OTHER_GLOBAL_FUNCTIONS_CONT">
+<h1 id="TIME_REPRESENTATION">TIME REPRESENTATION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="TIME_REPRESENTATION_CONTENT">
 <p>Libev represents time as a single floating point number, representing the
 (fractional) number of seconds since the (POSIX) epoch (somewhere near
 the beginning of 1970, details are complicated, don't ask). This type is
 called <code>ev_tstamp</code>, which is what you should use too. It usually aliases
 to the double type in C.</p>
+
+</div>
+<h1 id="GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="GLOBAL_FUNCTIONS_CONTENT">
 <dl>
 	<dt>ev_tstamp ev_time ()</dt>
 	<dd>
@@ -144,7 +149,7 @@ requested operation, or, if the condition doesn't go away, do bad stuff
 types of such loops, the <i>default</i> loop, which supports signals and child
 events, and dynamically created loops which do not.</p>
 <p>If you use threads, a common model is to run the default event loop
-in your main thread (or in a separate thrad) and for each thread you
+in your main thread (or in a separate thread) and for each thread you
 create, you also create another event loop. Libev itself does no locking
 whatsoever, so if you mix calls to the same event loop in different
 threads, make sure you lock (this is usually a bad idea, though, even if

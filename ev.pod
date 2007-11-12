@@ -51,6 +51,9 @@ to the double type in C.
 
 =head1 GLOBAL FUNCTIONS
 
+These functions can be called anytime, even before initialising the
+library in any way.
+
 =over 4
 
 =item ev_tstamp ev_time ()
@@ -562,12 +565,10 @@ ignored. Instead, each time the periodic watcher gets scheduled, the
 reschedule callback will be called with the watcher as first, and the
 current time as second argument.
 
-NOTE: I<This callback MUST NOT stop or destroy the periodic or any other
-periodic watcher, ever, or make any event loop modifications>. If you need
-to stop it, return C<now + 1e30> (or so, fudge fudge) and stop it afterwards.
-
-Also, I<< this callback must always return a time that is later than the
-passed C<now> value >>. Not even C<now> itself will be ok.
+NOTE: I<This callback MUST NOT stop or destroy any periodic watcher,
+ever, or make any event loop modifications>. If you need to stop it,
+return C<now + 1e30> (or so, fudge fudge) and stop it afterwards (e.g. by
+starting a prepare watcher).
 
 Its prototype is C<ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
 ev_tstamp now)>, e.g.:
@@ -581,6 +582,9 @@ It must return the next time to trigger, based on the passed time value
 (that is, the lowest time value larger than to the second argument). It
 will usually be called just before the callback will be triggered, but
 might be called at other times, too.
+
+NOTE: I<< This callback must always return a time that is later than the
+passed C<now> value >>. Not even C<now> itself will do, it must be larger.
 
 This can be used to create very complex timers, such as a timer that
 triggers on each midnight, local time. To do this, you would calculate the
