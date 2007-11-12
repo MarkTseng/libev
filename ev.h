@@ -280,7 +280,7 @@ ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after 
 
 # else
 
-int ev_default_loop (int methods); /* returns true when successful */
+int ev_default_loop (unsigned int flags); /* returns true when successful */
 
 static ev_tstamp
 ev_now (void)

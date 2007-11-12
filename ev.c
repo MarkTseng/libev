@@ -895,7 +895,7 @@ struct ev_loop *
 #else
 int
 #endif
-ev_default_loop (unsigned int methods)
+ev_default_loop (unsigned int flags)
 {
   if (sigpipe [0] == sigpipe [1])
     if (pipe (sigpipe))
