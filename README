@@ -1,3 +1,6 @@
+Homepage: http://software.schmorp.de/pkg/libev
+E-Mail: libev@schmorp.de
+
 libev is a high-performance event loop/event model with lots of features.
 
 It is modelled (very losely) after libevent
@@ -75,4 +78,6 @@ whats missing?
   are not yet finished and work differently, but you can use idle watchers
   to get a similar effect).
 
+AUTHOR
 
+libev was written and designed by Marc Lehmann and Emanuele Giaquinta.

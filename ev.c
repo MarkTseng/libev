@@ -122,7 +122,7 @@ extern "C" {
 
 /**/
 
-/* darwin simply cnanot be helped */
+/* darwin simply cannot be helped */
 #ifdef __APPLE__
 # undef EV_USE_POLL
 # undef EV_USE_KQUEUE
