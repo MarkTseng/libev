@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:35:17 2007" />
+	<meta name="created" content="Mon Nov 12 09:35:36 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -567,10 +567,10 @@ current time as second argument.</p>
 					<p>NOTE: <i>This callback MUST NOT stop or destroy the periodic or any other
 periodic watcher, ever, or make any event loop modifications</i>. If you need
 to stop it, return <code>now + 1e30</code> (or so, fudge fudge) and stop it afterwards.</p>
-					<p>Also, <i>&lt;this callback must always return a time that is later than the
-passed <code>now</code> value </i>&gt;. Not even <code>now</code> itself will be ok.</p>
-					<p>Its prototype is c&lt;ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
-ev_tstamp now)&gt;, e.g.:</p>
+					<p>Also, <i>this callback must always return a time that is later than the
+passed <code>now</code> value</i>. Not even <code>now</code> itself will be ok.</p>
+					<p>Its prototype is <code>ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
+ev_tstamp now)</code>, e.g.:</p>
 <pre>   static ev_tstamp my_rescheduler (struct ev_periodic *w, ev_tstamp now)
    {
      return now + 60.;
