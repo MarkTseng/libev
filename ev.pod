@@ -406,7 +406,7 @@ have been omitted....
 This section describes each watcher in detail, but will not repeat
 information given in the last section.
 
-=head2 C<ev_io> - is my file descriptor readable or writable
+=head2 C<ev_io> - is this file descriptor readable or writable
 
 I/O watchers check whether a file descriptor is readable or writable
 in each iteration of the event loop (This behaviour is called
@@ -546,7 +546,7 @@ time:
 
 This doesn't mean there will always be 3600 seconds in between triggers,
 but only that the the callback will be called when the system time shows a
-full hour (UTC), or more correct, when the system time is evenly divisible
+full hour (UTC), or more correctly, when the system time is evenly divisible
 by 3600.
 
 Another way to think about it (for the mathematically inclined) is that
@@ -561,8 +561,11 @@ reschedule callback will be called with the watcher as first, and the
 current time as second argument.
 
 NOTE: I<This callback MUST NOT stop or destroy the periodic or any other
-periodic watcher, ever, or make any event loop modificstions>. If you need
-to stop it, return 1e30 (or so, fudge fudge) and stop it afterwards.
+periodic watcher, ever, or make any event loop modifications>. If you need
+to stop it, return C<now + 1e30> (or so, fudge fudge) and stop it afterwards.
+
+Also, I<<this callback must always return a time that is later than the
+passed C<now> value >>. Not even C<now> itself will be ok.
 
 Its prototype is c<ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
 ev_tstamp now)>, e.g.:

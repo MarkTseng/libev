@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:29:10 2007" />
+	<meta name="created" content="Mon Nov 12 09:32:26 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -26,12 +26,12 @@
 </ul>
 </li>
 <li><a href="#WATCHER_TYPES">WATCHER TYPES</a>
-<ul><li><a href="#struct_ev_io_is_my_file_descriptor_r">struct ev_io - is my file descriptor readable or writable</a></li>
-<li><a href="#struct_ev_timer_relative_and_optiona">struct ev_timer - relative and optionally recurring timeouts</a></li>
-<li><a href="#ev_periodic_to_cron_or_not_to_cron_i">ev_periodic - to cron or not to cron it</a></li>
-<li><a href="#ev_signal_signal_me_when_a_signal_ge">ev_signal - signal me when a signal gets signalled</a></li>
-<li><a href="#ev_child_wait_for_pid_status_changes">ev_child - wait for pid status changes</a></li>
-<li><a href="#ev_idle_when_you_ve_got_nothing_bett">ev_idle - when you've got nothing better to do</a></li>
+<ul><li><a href="#code_ev_io_code_is_my_file_descripto"><code>ev_io</code> - is my file descriptor readable or writable</a></li>
+<li><a href="#code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally recurring timeouts</a></li>
+<li><a href="#code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron it</a></li>
+<li><a href="#code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled</a></li>
+<li><a href="#code_ev_child_code_wait_for_pid_stat"><code>ev_child</code> - wait for pid status changes</a></li>
+<li><a href="#code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do</a></li>
 <li><a href="#prepare_and_check_your_hooks_into_th">prepare and check - your hooks into the event loop</a></li>
 </ul>
 </li>
@@ -163,12 +163,12 @@ backends to use, and is usually specified as 0 (or EVFLAG_AUTO).</p>
 		<p>It supports the following flags:</p>
 		<p>
 			<dl>
-				<dt>EVFLAG_AUTO</dt>
+				<dt><code>EVFLAG_AUTO</code></dt>
 				<dd>
 					<p>The default flags value. Use this if you have no clue (it's the right
 thing, believe me).</p>
 				</dd>
-				<dt>EVFLAG_NOENV</dt>
+				<dt><code>EVFLAG_NOENV</code></dt>
 				<dd>
 					<p>If this flag bit is ored into the flag value (or the program runs setuid
 or setgid) then libev will <i>not</i> look at the environment variable
@@ -177,12 +177,12 @@ override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.</p>
 				</dd>
-				<dt>EVMETHOD_SELECT  (portable select backend)</dt>
-				<dt>EVMETHOD_POLL    (poll backend, available everywhere except on windows)</dt>
-				<dt>EVMETHOD_EPOLL   (linux only)</dt>
-				<dt>EVMETHOD_KQUEUE  (some bsds only)</dt>
-				<dt>EVMETHOD_DEVPOLL (solaris 8 only)</dt>
-				<dt>EVMETHOD_PORT    (solaris 10 only)</dt>
+				<dt><code>EVMETHOD_SELECT</code>  (portable select backend)</dt>
+				<dt><code>EVMETHOD_POLL</code>    (poll backend, available everywhere except on windows)</dt>
+				<dt><code>EVMETHOD_EPOLL</code>   (linux only)</dt>
+				<dt><code>EVMETHOD_KQUEUE</code>  (some bsds only)</dt>
+				<dt><code>EVMETHOD_DEVPOLL</code> (solaris 8 only)</dt>
+				<dt><code>EVMETHOD_PORT</code>    (solaris 10 only)</dt>
 				<dd>
 					<p>If one or more of these are ored into the flags value, then only these
 backends will be tried (in the reverse order as given here). If one are
@@ -290,7 +290,7 @@ libraries. Just remember to <i>unref after start</i> and <i>ref before stop</i>.
 <div id="ANATOMY_OF_A_WATCHER_CONTENT">
 <p>A watcher is a structure that you create and register to record your
 interest in some event. For instance, if you want to wait for STDIN to
-become readable, you would create an ev_io watcher for that:</p>
+become readable, you would create an <code>ev_io</code> watcher for that:</p>
 <pre>  static void my_cb (struct ev_loop *loop, struct ev_io *w, int revents)
   {
     ev_io_stop (w);
@@ -335,44 +335,44 @@ third argument.</p>
 (you can receive multiple events at the same time). The possible bit masks
 are:</p>
 <dl>
-	<dt>EV_READ</dt>
-	<dt>EV_WRITE</dt>
+	<dt><code>EV_READ</code></dt>
+	<dt><code>EV_WRITE</code></dt>
 	<dd>
-		<p>The file descriptor in the ev_io watcher has become readable and/or
+		<p>The file descriptor in the <code>ev_io</code> watcher has become readable and/or
 writable.</p>
 	</dd>
-	<dt>EV_TIMEOUT</dt>
+	<dt><code>EV_TIMEOUT</code></dt>
 	<dd>
-		<p>The ev_timer watcher has timed out.</p>
+		<p>The <code>ev_timer</code> watcher has timed out.</p>
 	</dd>
-	<dt>EV_PERIODIC</dt>
+	<dt><code>EV_PERIODIC</code></dt>
 	<dd>
-		<p>The ev_periodic watcher has timed out.</p>
+		<p>The <code>ev_periodic</code> watcher has timed out.</p>
 	</dd>
-	<dt>EV_SIGNAL</dt>
+	<dt><code>EV_SIGNAL</code></dt>
 	<dd>
-		<p>The signal specified in the ev_signal watcher has been received by a thread.</p>
+		<p>The signal specified in the <code>ev_signal</code> watcher has been received by a thread.</p>
 	</dd>
-	<dt>EV_CHILD</dt>
+	<dt><code>EV_CHILD</code></dt>
 	<dd>
-		<p>The pid specified in the ev_child watcher has received a status change.</p>
+		<p>The pid specified in the <code>ev_child</code> watcher has received a status change.</p>
 	</dd>
-	<dt>EV_IDLE</dt>
+	<dt><code>EV_IDLE</code></dt>
 	<dd>
-		<p>The ev_idle watcher has determined that you have nothing better to do.</p>
+		<p>The <code>ev_idle</code> watcher has determined that you have nothing better to do.</p>
 	</dd>
-	<dt>EV_PREPARE</dt>
-	<dt>EV_CHECK</dt>
+	<dt><code>EV_PREPARE</code></dt>
+	<dt><code>EV_CHECK</code></dt>
 	<dd>
-		<p>All ev_prepare watchers are invoked just <i>before</i> <code>ev_loop</code> starts
-to gather new events, and all ev_check watchers are invoked just after
+		<p>All <code>ev_prepare</code> watchers are invoked just <i>before</i> <code>ev_loop</code> starts
+to gather new events, and all <code>ev_check</code> watchers are invoked just after
 <code>ev_loop</code> has gathered them, but before it invokes any callbacks for any
 received events. Callbacks of both watcher types can start and stop as
 many watchers as they want, and all of them will be taken into account
-(for example, a ev_prepare watcher might start an idle watcher to keep
+(for example, a <code>ev_prepare</code> watcher might start an idle watcher to keep
 <code>ev_loop</code> from blocking).</p>
 	</dd>
-	<dt>EV_ERROR</dt>
+	<dt><code>EV_ERROR</code></dt>
 	<dd>
 		<p>An unspecified error has occured, the watcher has been stopped. This might
 happen because the watcher could not be properly started because libev
@@ -428,8 +428,8 @@ have been omitted....</p>
 information given in the last section.</p>
 
 </div>
-<h2 id="struct_ev_io_is_my_file_descriptor_r">struct ev_io - is my file descriptor readable or writable</h2>
-<div id="struct_ev_io_is_my_file_descriptor_r-2">
+<h2 id="code_ev_io_code_is_my_file_descripto"><code>ev_io</code> - is my file descriptor readable or writable</h2>
+<div id="code_ev_io_code_is_my_file_descripto-2">
 <p>I/O watchers check whether a file descriptor is readable or writable
 in each iteration of the event loop (This behaviour is called
 level-triggering because you keep receiving events as long as the
@@ -450,15 +450,15 @@ EVMETHOD_POLL).</p>
 	<dt>ev_io_init (ev_io *, callback, int fd, int events)</dt>
 	<dt>ev_io_set (ev_io *, int fd, int events)</dt>
 	<dd>
-		<p>Configures an ev_io watcher. The fd is the file descriptor to rceeive
+		<p>Configures an <code>ev_io</code> watcher. The fd is the file descriptor to rceeive
 events for and events is either <code>EV_READ</code>, <code>EV_WRITE</code> or <code>EV_READ |
 EV_WRITE</code> to receive the given events.</p>
 	</dd>
 </dl>
 
 </div>
-<h2 id="struct_ev_timer_relative_and_optiona">struct ev_timer - relative and optionally recurring timeouts</h2>
-<div id="struct_ev_timer_relative_and_optiona-2">
+<h2 id="code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally recurring timeouts</h2>
+<div id="code_ev_timer_code_relative_and_opti-2">
 <p>Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.</p>
 <p>The timers are based on real time, that is, if you register an event that
@@ -499,7 +499,7 @@ value), or reset the running timer to the repeat value.</p>
 example: Imagine you have a tcp connection and you want a so-called idle
 timeout, that is, you want to be called when there have been, say, 60
 seconds of inactivity on the socket. The easiest way to do this is to
-configure an ev_timer with after=repeat=60 and calling ev_timer_again each
+configure an <code>ev_timer</code> with after=repeat=60 and calling ev_timer_again each
 time you successfully read or write some data. If you go into an idle
 state where you do not expect data to travel on the socket, you can stop
 the timer, and again will automatically restart it if need be.</p>
@@ -507,16 +507,16 @@ the timer, and again will automatically restart it if need be.</p>
 </dl>
 
 </div>
-<h2 id="ev_periodic_to_cron_or_not_to_cron_i">ev_periodic - to cron or not to cron it</h2>
-<div id="ev_periodic_to_cron_or_not_to_cron_i-2">
+<h2 id="code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron it</h2>
+<div id="code_ev_periodic_code_to_cron_or_not-2">
 <p>Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).</p>
-<p>Unlike ev_timer's, they are not based on real time (or relative time)
+<p>Unlike <code>ev_timer</code>'s, they are not based on real time (or relative time)
 but on wallclock time (absolute time). You can tell a periodic watcher
 to trigger &quot;at&quot; some specific point in time. For example, if you tell a
 periodic watcher to trigger in 10 seconds (by specifiying e.g. c&lt;ev_now ()
 + 10.&gt;) and then reset your system clock to the last year, then it will
-take a year to trigger the event (unlike an ev_timer, which would trigger
+take a year to trigger the event (unlike an <code>ev_timer</code>, which would trigger
 roughly 10 seconds later and of course not if you reset your system time
 again).</p>
 <p>They can also be used to implement vastly more complex timers, such as
@@ -555,7 +555,7 @@ but only that the the callback will be called when the system time shows a
 full hour (UTC), or more correct, when the system time is evenly divisible
 by 3600.</p>
 					<p>Another way to think about it (for the mathematically inclined) is that
-ev_periodic will try to run the callback in this mode at the next possible
+<code>ev_periodic</code> will try to run the callback in this mode at the next possible
 time where <code>time = at (mod interval)</code>, regardless of any time jumps.</p>
 				</dd>
 				<dt>* manual reschedule mode (reschedule_cb = callback)</dt>
@@ -597,8 +597,8 @@ program when the crontabs have changed).</p>
 </dl>
 
 </div>
-<h2 id="ev_signal_signal_me_when_a_signal_ge">ev_signal - signal me when a signal gets signalled</h2>
-<div id="ev_signal_signal_me_when_a_signal_ge-2">
+<h2 id="code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled</h2>
+<div id="code_ev_signal_code_signal_me_when_a-2">
 <p>Signal watchers will trigger an event when the process receives a specific
 signal one or more times. Even though signals are very asynchronous, libev
 will try it's best to deliver signals synchronously, i.e. as part of the
@@ -619,8 +619,8 @@ of the <code>SIGxxx</code> constants).</p>
 </dl>
 
 </div>
-<h2 id="ev_child_wait_for_pid_status_changes">ev_child - wait for pid status changes</h2>
-<div id="ev_child_wait_for_pid_status_changes-2">
+<h2 id="code_ev_child_code_wait_for_pid_stat"><code>ev_child</code> - wait for pid status changes</h2>
+<div id="code_ev_child_code_wait_for_pid_stat-2">
 <p>Child watchers trigger when your process receives a SIGCHLD in response to
 some child status changes (most typically when a child of yours dies).</p>
 <dl>
@@ -636,8 +636,8 @@ contains the pid of the process causing the status change.</p>
 </dl>
 
 </div>
-<h2 id="ev_idle_when_you_ve_got_nothing_bett">ev_idle - when you've got nothing better to do</h2>
-<div id="ev_idle_when_you_ve_got_nothing_bett-2">
+<h2 id="code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do</h2>
+<div id="code_ev_idle_code_when_you_ve_got_no-2">
 <p>Idle watchers trigger events when there are no other I/O or timer (or
 periodic) events pending. That is, as long as your process is busy
 handling sockets or timeouts it will not be called. But when your process
@@ -668,8 +668,8 @@ watchers afterwards.</p>
 could be used, for example, to track variable changes, implement your own
 watchers, integrate net-snmp or a coroutine library and lots more.</p>
 <p>This is done by examining in each prepare call which file descriptors need
-to be watched by the other library, registering ev_io watchers for them
-and starting an ev_timer watcher for any timeouts (many libraries provide
+to be watched by the other library, registering <code>ev_io</code> watchers for them
+and starting an <code>ev_timer</code> watcher for any timeouts (many libraries provide
 just this functionality). Then, in the check watcher you check for any
 events that occured (by making your callbacks set soem flags for example)
 and call back into the library.</p>
@@ -700,14 +700,14 @@ watchers. This is useful if you want to wait for a single event on an fd
 or timeout without havign to allocate/configure/start/stop/free one or
 more watchers yourself.</p>
 		<p>If <code>fd</code> is less than 0, then no I/O watcher will be started and events is
-ignored. Otherwise, an ev_io watcher for the given <code>fd</code> and <code>events</code> set
+ignored. Otherwise, an <code>ev_io</code> watcher for the given <code>fd</code> and <code>events</code> set
 will be craeted and started.</p>
 		<p>If <code>timeout</code> is less than 0, then no timeout watcher will be
-started. Otherwise an ev_timer watcher with after = <code>timeout</code> (and repeat
+started. Otherwise an <code>ev_timer</code> watcher with after = <code>timeout</code> (and repeat
 = 0) will be started.</p>
 		<p>The callback has the type <code>void (*cb)(int revents, void *arg)</code> and
-gets passed an events set (normally a combination of EV_ERROR, EV_READ,
-EV_WRITE or EV_TIMEOUT) and the <code>arg</code> value passed to <code>ev_once</code>:</p>
+gets passed an events set (normally a combination of <code>EV_ERROR</code>, <code>EV_READ</code>,
+<code>EV_WRITE</code> or <code>EV_TIMEOUT</code>) and the <code>arg</code> value passed to <code>ev_once</code>:</p>
 <pre>  static void stdin_ready (int revents, void *arg)
   {
     if (revents &amp; EV_TIMEOUT)
