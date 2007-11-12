@@ -126,12 +126,12 @@ It supports the following flags:
 
 =over 4
 
-=item EVFLAG_AUTO
+=item C<EVFLAG_AUTO>
 
 The default flags value. Use this if you have no clue (it's the right
 thing, believe me).
 
-=item EVFLAG_NOENV
+=item C<EVFLAG_NOENV>
 
 If this flag bit is ored into the flag value (or the program runs setuid
 or setgid) then libev will I<not> look at the environment variable
@@ -140,17 +140,17 @@ override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.
 
-=item EVMETHOD_SELECT  (portable select backend)
+=item C<EVMETHOD_SELECT>  (portable select backend)
 
-=item EVMETHOD_POLL    (poll backend, available everywhere except on windows)
+=item C<EVMETHOD_POLL>    (poll backend, available everywhere except on windows)
 
-=item EVMETHOD_EPOLL   (linux only)
+=item C<EVMETHOD_EPOLL>   (linux only)
 
-=item EVMETHOD_KQUEUE  (some bsds only)
+=item C<EVMETHOD_KQUEUE>  (some bsds only)
 
-=item EVMETHOD_DEVPOLL (solaris 8 only)
+=item C<EVMETHOD_DEVPOLL> (solaris 8 only)
 
-=item EVMETHOD_PORT    (solaris 10 only)
+=item C<EVMETHOD_PORT>    (solaris 10 only)
 
 If one or more of these are ored into the flags value, then only these
 backends will be tried (in the reverse order as given here). If one are
@@ -262,7 +262,7 @@ libraries. Just remember to I<unref after start> and I<ref before stop>.
 
 A watcher is a structure that you create and register to record your
 interest in some event. For instance, if you want to wait for STDIN to
-become readable, you would create an ev_io watcher for that:
+become readable, you would create an C<ev_io> watcher for that:
 
   static void my_cb (struct ev_loop *loop, struct ev_io *w, int revents)
   {
@@ -316,46 +316,46 @@ are:
 
 =over 4
 
-=item EV_READ
+=item C<EV_READ>
 
-=item EV_WRITE
+=item C<EV_WRITE>
 
-The file descriptor in the ev_io watcher has become readable and/or
+The file descriptor in the C<ev_io> watcher has become readable and/or
 writable.
 
-=item EV_TIMEOUT
+=item C<EV_TIMEOUT>
 
-The ev_timer watcher has timed out.
+The C<ev_timer> watcher has timed out.
 
-=item EV_PERIODIC
+=item C<EV_PERIODIC>
 
-The ev_periodic watcher has timed out.
+The C<ev_periodic> watcher has timed out.
 
-=item EV_SIGNAL
+=item C<EV_SIGNAL>
 
-The signal specified in the ev_signal watcher has been received by a thread.
+The signal specified in the C<ev_signal> watcher has been received by a thread.
 
-=item EV_CHILD
+=item C<EV_CHILD>
 
-The pid specified in the ev_child watcher has received a status change.
+The pid specified in the C<ev_child> watcher has received a status change.
 
-=item EV_IDLE
+=item C<EV_IDLE>
 
-The ev_idle watcher has determined that you have nothing better to do.
+The C<ev_idle> watcher has determined that you have nothing better to do.
 
-=item EV_PREPARE
+=item C<EV_PREPARE>
 
-=item EV_CHECK
+=item C<EV_CHECK>
 
-All ev_prepare watchers are invoked just I<before> C<ev_loop> starts
-to gather new events, and all ev_check watchers are invoked just after
+All C<ev_prepare> watchers are invoked just I<before> C<ev_loop> starts
+to gather new events, and all C<ev_check> watchers are invoked just after
 C<ev_loop> has gathered them, but before it invokes any callbacks for any
 received events. Callbacks of both watcher types can start and stop as
 many watchers as they want, and all of them will be taken into account
-(for example, a ev_prepare watcher might start an idle watcher to keep
+(for example, a C<ev_prepare> watcher might start an idle watcher to keep
 C<ev_loop> from blocking).
 
-=item EV_ERROR
+=item C<EV_ERROR>
 
 An unspecified error has occured, the watcher has been stopped. This might
 happen because the watcher could not be properly started because libev
@@ -406,7 +406,7 @@ have been omitted....
 This section describes each watcher in detail, but will not repeat
 information given in the last section.
 
-=head2 struct ev_io - is my file descriptor readable or writable
+=head2 C<ev_io> - is this file descriptor readable or writable
 
 I/O watchers check whether a file descriptor is readable or writable
 in each iteration of the event loop (This behaviour is called
@@ -434,13 +434,13 @@ EVMETHOD_POLL).
 
 =item ev_io_set (ev_io *, int fd, int events)
 
-Configures an ev_io watcher. The fd is the file descriptor to rceeive
+Configures an C<ev_io> watcher. The fd is the file descriptor to rceeive
 events for and events is either C<EV_READ>, C<EV_WRITE> or C<EV_READ |
 EV_WRITE> to receive the given events.
 
 =back
 
-=head2 struct ev_timer - relative and optionally recurring timeouts
+=head2 C<ev_timer> - relative and optionally recurring timeouts
 
 Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.
@@ -490,24 +490,24 @@ This sounds a bit complicated, but here is a useful and typical
 example: Imagine you have a tcp connection and you want a so-called idle
 timeout, that is, you want to be called when there have been, say, 60
 seconds of inactivity on the socket. The easiest way to do this is to
-configure an ev_timer with after=repeat=60 and calling ev_timer_again each
+configure an C<ev_timer> with after=repeat=60 and calling ev_timer_again each
 time you successfully read or write some data. If you go into an idle
 state where you do not expect data to travel on the socket, you can stop
 the timer, and again will automatically restart it if need be.
 
 =back
 
-=head2 ev_periodic - to cron or not to cron it
+=head2 C<ev_periodic> - to cron or not to cron it
 
 Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).
 
-Unlike ev_timer's, they are not based on real time (or relative time)
+Unlike C<ev_timer>'s, they are not based on real time (or relative time)
 but on wallclock time (absolute time). You can tell a periodic watcher
 to trigger "at" some specific point in time. For example, if you tell a
 periodic watcher to trigger in 10 seconds (by specifiying e.g. c<ev_now ()
 + 10.>) and then reset your system clock to the last year, then it will
-take a year to trigger the event (unlike an ev_timer, which would trigger
+take a year to trigger the event (unlike an C<ev_timer>, which would trigger
 roughly 10 seconds later and of course not if you reset your system time
 again).
 
@@ -550,7 +550,7 @@ full hour (UTC), or more correct, when the system time is evenly divisible
 by 3600.
 
 Another way to think about it (for the mathematically inclined) is that
-ev_periodic will try to run the callback in this mode at the next possible
+C<ev_periodic> will try to run the callback in this mode at the next possible
 time where C<time = at (mod interval)>, regardless of any time jumps.
 
 =item * manual reschedule mode (reschedule_cb = callback)
@@ -593,7 +593,7 @@ program when the crontabs have changed).
 
 =back
 
-=head2 ev_signal - signal me when a signal gets signalled
+=head2 C<ev_signal> - signal me when a signal gets signalled
 
 Signal watchers will trigger an event when the process receives a specific
 signal one or more times. Even though signals are very asynchronous, libev
@@ -618,7 +618,7 @@ of the C<SIGxxx> constants).
 
 =back
 
-=head2 ev_child - wait for pid status changes
+=head2 C<ev_child> - wait for pid status changes
 
 Child watchers trigger when your process receives a SIGCHLD in response to
 some child status changes (most typically when a child of yours dies).
@@ -637,7 +637,7 @@ contains the pid of the process causing the status change.
 
 =back
 
-=head2 ev_idle - when you've got nothing better to do
+=head2 C<ev_idle> - when you've got nothing better to do
 
 Idle watchers trigger events when there are no other I/O or timer (or
 periodic) events pending. That is, as long as your process is busy
@@ -674,8 +674,8 @@ could be used, for example, to track variable changes, implement your own
 watchers, integrate net-snmp or a coroutine library and lots more.
 
 This is done by examining in each prepare call which file descriptors need
-to be watched by the other library, registering ev_io watchers for them
-and starting an ev_timer watcher for any timeouts (many libraries provide
+to be watched by the other library, registering C<ev_io> watchers for them
+and starting an C<ev_timer> watcher for any timeouts (many libraries provide
 just this functionality). Then, in the check watcher you check for any
 events that occured (by making your callbacks set soem flags for example)
 and call back into the library.
@@ -712,16 +712,16 @@ or timeout without havign to allocate/configure/start/stop/free one or
 more watchers yourself.
 
 If C<fd> is less than 0, then no I/O watcher will be started and events is
-ignored. Otherwise, an ev_io watcher for the given C<fd> and C<events> set
+ignored. Otherwise, an C<ev_io> watcher for the given C<fd> and C<events> set
 will be craeted and started.
 
 If C<timeout> is less than 0, then no timeout watcher will be
-started. Otherwise an ev_timer watcher with after = C<timeout> (and repeat
+started. Otherwise an C<ev_timer> watcher with after = C<timeout> (and repeat
 = 0) will be started.
 
 The callback has the type C<void (*cb)(int revents, void *arg)> and
-gets passed an events set (normally a combination of EV_ERROR, EV_READ,
-EV_WRITE or EV_TIMEOUT) and the C<arg> value passed to C<ev_once>:
+gets passed an events set (normally a combination of C<EV_ERROR>, C<EV_READ>,
+C<EV_WRITE> or C<EV_TIMEOUT>) and the C<arg> value passed to C<ev_once>:
 
   static void stdin_ready (int revents, void *arg)
   {

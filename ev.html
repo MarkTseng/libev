@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:20:02 2007" />
+	<meta name="created" content="Mon Nov 12 09:29:10 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -109,7 +109,7 @@ you linked against by calling the functions <code>ev_version_major</code> and
 <code>ev_version_minor</code>. If you want, you can compare against the global
 symbols <code>EV_VERSION_MAJOR</code> and <code>EV_VERSION_MINOR</code>, which specify the
 version of the library your program was compiled against.</p>
-		<p>Usually, its a good idea to terminate if the major versions mismatch,
+		<p>Usually, it's a good idea to terminate if the major versions mismatch,
 as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.</p>
@@ -148,7 +148,7 @@ in your main thread (or in a separate thrad) and for each thread you
 create, you also create another event loop. Libev itself does no locking
 whatsoever, so if you mix calls to the same event loop in different
 threads, make sure you lock (this is usually a bad idea, though, even if
-done correctly, because its hideous and inefficient).</p>
+done correctly, because it's hideous and inefficient).</p>
 <dl>
 	<dt>struct ev_loop *ev_default_loop (unsigned int flags)</dt>
 	<dd>
@@ -165,7 +165,7 @@ backends to use, and is usually specified as 0 (or EVFLAG_AUTO).</p>
 			<dl>
 				<dt>EVFLAG_AUTO</dt>
 				<dd>
-					<p>The default flags value. Use this if you have no clue (its the right
+					<p>The default flags value. Use this if you have no clue (it's the right
 thing, believe me).</p>
 				</dd>
 				<dt>EVFLAG_NOENV</dt>
@@ -177,12 +177,12 @@ override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.</p>
 				</dd>
-				<dt>EVMETHOD_SELECT  portable select backend</dt>
-				<dt>EVMETHOD_POLL    poll backend (everywhere except windows)</dt>
-				<dt>EVMETHOD_EPOLL   linux only</dt>
-				<dt>EVMETHOD_KQUEUE  some bsds only</dt>
-				<dt>EVMETHOD_DEVPOLL solaris 8 only</dt>
-				<dt>EVMETHOD_PORT    solaris 10 only</dt>
+				<dt>EVMETHOD_SELECT  (portable select backend)</dt>
+				<dt>EVMETHOD_POLL    (poll backend, available everywhere except on windows)</dt>
+				<dt>EVMETHOD_EPOLL   (linux only)</dt>
+				<dt>EVMETHOD_KQUEUE  (some bsds only)</dt>
+				<dt>EVMETHOD_DEVPOLL (solaris 8 only)</dt>
+				<dt>EVMETHOD_PORT    (solaris 10 only)</dt>
 				<dd>
 					<p>If one or more of these are ored into the flags value, then only these
 backends will be tried (in the reverse order as given here). If one are
@@ -202,7 +202,7 @@ undefined behaviour (or a failed assertion if assertions are enabled).</p>
 	<dd>
 		<p>Destroys the default loop again (frees all memory and kernel state
 etc.). This stops all registered event watchers (by not touching them in
-any way whatsoever, although you cnanot rely on this :).</p>
+any way whatsoever, although you cannot rely on this :).</p>
 	</dd>
 	<dt>ev_loop_destroy (loop)</dt>
 	<dd>
@@ -218,7 +218,7 @@ again makes little sense).</p>
 		<p>You <i>must</i> call this function after forking if and only if you want to
 use the event library in both processes. If you just fork+exec, you don't
 have to call it.</p>
-		<p>The function itself is quite fast and its usually not a problem to call
+		<p>The function itself is quite fast and it's usually not a problem to call
 it just in case after a fork. To make this easy, the function will fit in
 quite nicely into a call to <code>pthread_atfork</code>:</p>
 <pre>    pthread_atfork (0, 0, ev_default_fork);
@@ -236,7 +236,7 @@ after fork, and how you do this is entirely your own problem.</p>
 		<p>Returns one of the <code>EVMETHOD_*</code> flags indicating the event backend in
 use.</p>
 	</dd>
-	<dt>ev_tstamp = ev_now (loop)</dt>
+	<dt>ev_tstamp ev_now (loop)</dt>
 	<dd>
 		<p>Returns the current &quot;event loop time&quot;, which is the time the event loop
 got events and started processing them. This timestamp does not change
@@ -253,33 +253,35 @@ events.</p>
 no event watchers are active anymore or <code>ev_unloop</code> was called.</p>
 		<p>A flags value of <code>EVLOOP_NONBLOCK</code> will look for new events, will handle
 those events and any outstanding ones, but will not block your process in
-case there are no events.</p>
+case there are no events and will return after one iteration of the loop.</p>
 		<p>A flags value of <code>EVLOOP_ONESHOT</code> will look for new events (waiting if
 neccessary) and will handle those and any outstanding ones. It will block
-your process until at least one new event arrives.</p>
+your process until at least one new event arrives, and will return after
+one iteration of the loop.</p>
 		<p>This flags value could be used to implement alternative looping
 constructs, but the <code>prepare</code> and <code>check</code> watchers provide a better and
 more generic mechanism.</p>
 	</dd>
 	<dt>ev_unloop (loop, how)</dt>
 	<dd>
-		<p>Can be used to make a call to <code>ev_loop</code> return early. The <code>how</code> argument
-must be either <code>EVUNLOOP_ONCE</code>, which will make the innermost <code>ev_loop</code>
-call return, or <code>EVUNLOOP_ALL</code>, which will make all nested <code>ev_loop</code>
-calls return.</p>
+		<p>Can be used to make a call to <code>ev_loop</code> return early (but only after it
+has processed all outstanding events). The <code>how</code> argument must be either
+<code>EVUNLOOP_ONCE</code>, which will make the innermost <code>ev_loop</code> call return, or
+<code>EVUNLOOP_ALL</code>, which will make all nested <code>ev_loop</code> calls return.</p>
 	</dd>
 	<dt>ev_ref (loop)</dt>
 	<dt>ev_unref (loop)</dt>
 	<dd>
-		<p>Ref/unref can be used to add or remove a refcount on the event loop: Every
-watcher keeps one reference. If you have a long-runing watcher you never
-unregister that should not keep ev_loop from running, ev_unref() after
-starting, and ev_ref() before stopping it. Libev itself uses this for
-example for its internal signal pipe: It is not visible to you as a user
-and should not keep <code>ev_loop</code> from exiting if the work is done. It is
-also an excellent way to do this for generic recurring timers or from
-within third-party libraries. Just remember to unref after start and ref
-before stop.</p>
+		<p>Ref/unref can be used to add or remove a reference count on the event
+loop: Every watcher keeps one reference, and as long as the reference
+count is nonzero, <code>ev_loop</code> will not return on its own. If you have
+a watcher you never unregister that should not keep <code>ev_loop</code> from
+returning, ev_unref() after starting, and ev_ref() before stopping it. For
+example, libev itself uses this for its internal signal pipe: It is not
+visible to the libev user and should not keep <code>ev_loop</code> from exiting if
+no event watchers registered by it are active. It is also an excellent
+way to do this for generic recurring timers or from within third-party
+libraries. Just remember to <i>unref after start</i> and <i>ref before stop</i>.</p>
 	</dd>
 </dl>
 
@@ -464,6 +466,14 @@ times out after an hour and youreset your system clock to last years
 time, it will still time out after (roughly) and hour. &quot;Roughly&quot; because
 detecting time jumps is hard, and soem inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).</p>
+<p>The relative timeouts are calculated relative to the <code>ev_now ()</code>
+time. This is usually the right thing as this timestamp refers to the time
+of the event triggering whatever timeout you are modifying/starting.  If
+you suspect event processing to be delayed and you *need* to base the timeout
+ion the current time, use something like this to adjust for this:</p>
+<pre>   ev_timer_set (&amp;timer, after + ev_now () - ev_time (), 0.);
+
+</pre>
 <dl>
 	<dt>ev_timer_init (ev_timer *, callback, ev_tstamp after, ev_tstamp repeat)</dt>
 	<dt>ev_timer_set (ev_timer *, ev_tstamp after, ev_tstamp repeat)</dt>
@@ -591,7 +601,7 @@ program when the crontabs have changed).</p>
 <div id="ev_signal_signal_me_when_a_signal_ge-2">
 <p>Signal watchers will trigger an event when the process receives a specific
 signal one or more times. Even though signals are very asynchronous, libev
-will try its best to deliver signals synchronously, i.e. as part of the
+will try it's best to deliver signals synchronously, i.e. as part of the
 normal event processing, like any other event.</p>
 <p>You cna configure as many watchers as you like per signal. Only when the
 first watcher gets started will libev actually register a signal watcher
