@@ -301,16 +301,16 @@ As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
 reinitialise it or call its set method.
 
-You cna check whether an event is active by calling the C<ev_is_active
+You can check whether an event is active by calling the C<ev_is_active
 (watcher *)> macro. To see whether an event is outstanding (but the
-callback for it has not been called yet) you cna use the C<ev_is_pending
+callback for it has not been called yet) you can use the C<ev_is_pending
 (watcher *)> macro.
 
 Each and every callback receives the event loop pointer as first, the
 registered watcher structure as second, and a bitset of received events as
 third argument.
 
-The rceeived events usually include a single bit per event type received
+The received events usually include a single bit per event type received
 (you can receive multiple events at the same time). The possible bit masks
 are:
 
@@ -374,7 +374,7 @@ programs, though, so beware.
 =head2 ASSOCIATING CUSTOM DATA WITH A WATCHER
 
 Each watcher has, by default, a member C<void *data> that you can change
-and read at any time, libev will completely ignore it. This cna be used
+and read at any time, libev will completely ignore it. This can be used
 to associate arbitrary data with your watcher. If you need more data and
 don't want to allocate memory and store a pointer to it in that data
 member, you can also "subclass" the watcher type and provide your own
@@ -411,7 +411,7 @@ information given in the last section.
 I/O watchers check whether a file descriptor is readable or writable
 in each iteration of the event loop (This behaviour is called
 level-triggering because you keep receiving events as long as the
-condition persists. Remember you cna stop the watcher if you don't want to
+condition persists. Remember you can stop the watcher if you don't want to
 act on the event and neither want to receive future events).
 
 In general you can register as many read and/or write event watchers oer
@@ -497,7 +497,7 @@ the timer, and again will automatically restart it if need be.
 
 =back
 
-=head2 C<ev_periodic> - to cron or not to cron it
+=head2 C<ev_periodic> - to cron or not to cron
 
 Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).
@@ -603,7 +603,7 @@ signal one or more times. Even though signals are very asynchronous, libev
 will try it's best to deliver signals synchronously, i.e. as part of the
 normal event processing, like any other event.
 
-You cna configure as many watchers as you like per signal. Only when the
+You can configure as many watchers as you like per signal. Only when the
 first watcher gets started will libev actually register a signal watcher
 with the kernel (thus it coexists with your own signal handlers as long
 as you don't register any with libev). Similarly, when the last signal
@@ -635,18 +635,21 @@ some child status changes (most typically when a child of yours dies).
 Configures the watcher to wait for status changes of process C<pid> (or
 I<any> process if C<pid> is specified as C<0>). The callback can look
 at the C<rstatus> member of the C<ev_child> watcher structure to see
-the status word (use the macros from C<sys/wait.h>). The C<rpid> member
-contains the pid of the process causing the status change.
+the status word (use the macros from C<sys/wait.h> and see your systems
+C<waitpid> documentation). The C<rpid> member contains the pid of the
+process causing the status change.
 
 =back
 
 =head2 C<ev_idle> - when you've got nothing better to do
 
-Idle watchers trigger events when there are no other I/O or timer (or
-periodic) events pending. That is, as long as your process is busy
-handling sockets or timeouts it will not be called. But when your process
-is idle all idle watchers are being called again and again - until
-stopped, that is, or your process receives more events.
+Idle watchers trigger events when there are no other events are pending
+(prepare, check and other idle watchers do not count). That is, as long
+as your process is busy handling sockets or timeouts (or even signals,
+imagine) it will not be triggered. But when your process is idle all idle
+watchers are being called again and again, once per event loop iteration -
+until stopped, that is, or your process receives more events and becomes
+busy.
 
 The most noteworthy effect is that as long as any idle watchers are
 active, the process will not block when waiting for new events.
@@ -668,25 +671,31 @@ believe me.
 
 =head2 prepare and check - your hooks into the event loop
 
-Prepare and check watchers usually (but not always) are used in
-tandom. Prepare watchers get invoked before the process blocks and check
-watchers afterwards.
+Prepare and check watchers are usually (but not always) used in tandem:
+Prepare watchers get invoked before the process blocks and check watchers
+afterwards.
 
 Their main purpose is to integrate other event mechanisms into libev. This
 could be used, for example, to track variable changes, implement your own
 watchers, integrate net-snmp or a coroutine library and lots more.
 
 This is done by examining in each prepare call which file descriptors need
-to be watched by the other library, registering C<ev_io> watchers for them
-and starting an C<ev_timer> watcher for any timeouts (many libraries provide
-just this functionality). Then, in the check watcher you check for any
-events that occured (by making your callbacks set soem flags for example)
-and call back into the library.
+to be watched by the other library, registering C<ev_io> watchers for
+them and starting an C<ev_timer> watcher for any timeouts (many libraries
+provide just this functionality). Then, in the check watcher you check for
+any events that occured (by checking the pending status of all watchers
+and stopping them) and call back into the library. The I/O and timer
+callbacks will never actually be called (but must be valid neverthelles,
+because you never know, you know?).
 
-As another example, the perl Coro module uses these hooks to integrate
+As another example, the Perl Coro module uses these hooks to integrate
 coroutines into libev programs, by yielding to other active coroutines
 during each prepare and only letting the process block if no coroutines
-are ready to run.
+are ready to run (its actually more complicated, it only runs coroutines
+with priority higher than the event loop and one lower priority once,
+using idle watchers to keep the event loop from blocking if lower-priority
+coroutines exist, thus mapping low-priority coroutines to idle/background
+tasks).
 
 =over 4
 
@@ -696,13 +705,13 @@ are ready to run.
 
 Initialises and configures the prepare or check watcher - they have no
 parameters of any kind. There are C<ev_prepare_set> and C<ev_check_set>
-macros, but using them is utterly, utterly pointless.
+macros, but using them is utterly, utterly and completely pointless.
 
 =back
 
 =head1 OTHER FUNCTIONS
 
-There are some other fucntions of possible interest. Described. Here. Now.
+There are some other functions of possible interest. Described. Here. Now.
 
 =over 4
 
@@ -714,37 +723,40 @@ watchers. This is useful if you want to wait for a single event on an fd
 or timeout without havign to allocate/configure/start/stop/free one or
 more watchers yourself.
 
-If C<fd> is less than 0, then no I/O watcher will be started and events is
-ignored. Otherwise, an C<ev_io> watcher for the given C<fd> and C<events> set
-will be craeted and started.
+If C<fd> is less than 0, then no I/O watcher will be started and events
+is being ignored. Otherwise, an C<ev_io> watcher for the given C<fd> and
+C<events> set will be craeted and started.
 
 If C<timeout> is less than 0, then no timeout watcher will be
-started. Otherwise an C<ev_timer> watcher with after = C<timeout> (and repeat
-= 0) will be started.
+started. Otherwise an C<ev_timer> watcher with after = C<timeout> (and
+repeat = 0) will be started. While C<0> is a valid timeout, it is of
+dubious value.
 
-The callback has the type C<void (*cb)(int revents, void *arg)> and
-gets passed an events set (normally a combination of C<EV_ERROR>, C<EV_READ>,
-C<EV_WRITE> or C<EV_TIMEOUT>) and the C<arg> value passed to C<ev_once>:
+The callback has the type C<void (*cb)(int revents, void *arg)> and gets
+passed an events set like normal event callbacks (with a combination of
+C<EV_ERROR>, C<EV_READ>, C<EV_WRITE> or C<EV_TIMEOUT>) and the C<arg>
+value passed to C<ev_once>:
 
   static void stdin_ready (int revents, void *arg)
   {
     if (revents & EV_TIMEOUT)
-      /* doh, nothing entered */
+      /* doh, nothing entered */;
     else if (revents & EV_READ)
-      /* stdin might have data for us, joy! */
+      /* stdin might have data for us, joy! */;
   }
 
-  ev_once (STDIN_FILENO, EV_READm 10., stdin_ready, 0);
+  ev_once (STDIN_FILENO, EV_READ, 10., stdin_ready, 0);
 
 =item ev_feed_event (loop, watcher, int events)
 
 Feeds the given event set into the event loop, as if the specified event
-has happened for the specified watcher (which must be a pointer to an
-initialised but not necessarily active event watcher).
+had happened for the specified watcher (which must be a pointer to an
+initialised but not necessarily started event watcher).
 
 =item ev_feed_fd_event (loop, int fd, int revents)
 
-Feed an event on the given fd, as if a file descriptor backend detected it.
+Feed an event on the given fd, as if a file descriptor backend detected
+the given events it.
 
 =item ev_feed_signal_event (loop, int signum)
 
