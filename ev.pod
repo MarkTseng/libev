@@ -564,10 +564,10 @@ NOTE: I<This callback MUST NOT stop or destroy the periodic or any other
 periodic watcher, ever, or make any event loop modifications>. If you need
 to stop it, return C<now + 1e30> (or so, fudge fudge) and stop it afterwards.
 
-Also, I<<this callback must always return a time that is later than the
+Also, I<< this callback must always return a time that is later than the
 passed C<now> value >>. Not even C<now> itself will be ok.
 
-Its prototype is c<ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
+Its prototype is C<ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
 ev_tstamp now)>, e.g.:
 
    static ev_tstamp my_rescheduler (struct ev_periodic *w, ev_tstamp now)
