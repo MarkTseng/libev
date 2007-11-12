@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:16:01 2007" />
+	<meta name="created" content="Mon Nov 12 09:20:02 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -159,7 +159,7 @@ flags).</p>
 		<p>If you don't know what event loop to use, use the one returned from this
 function.</p>
 		<p>The flags argument can be used to specify special behaviour or specific
-backends to use, and is usually specified as 0 (or EVFLAG_AUTO)</p>
+backends to use, and is usually specified as 0 (or EVFLAG_AUTO).</p>
 		<p>It supports the following flags:</p>
 		<p>
 			<dl>
@@ -170,11 +170,12 @@ thing, believe me).</p>
 				</dd>
 				<dt>EVFLAG_NOENV</dt>
 				<dd>
-					<p>If this flag bit is ored into the flag value then libev will <i>not</i> look
-at the environment variable <code>LIBEV_FLAGS</code>. Otherwise (the default), this
-environment variable will override the flags completely. This is useful
-to try out specific backends to tets their performance, or to work around
-bugs.</p>
+					<p>If this flag bit is ored into the flag value (or the program runs setuid
+or setgid) then libev will <i>not</i> look at the environment variable
+<code>LIBEV_FLAGS</code>. Otherwise (the default), this environment variable will
+override the flags completely if it is found in the environment. This is
+useful to try out specific backends to test their performance, or to work
+around bugs.</p>
 				</dd>
 				<dt>EVMETHOD_SELECT  portable select backend</dt>
 				<dt>EVMETHOD_POLL    poll backend (everywhere except windows)</dt>
@@ -432,6 +433,17 @@ in each iteration of the event loop (This behaviour is called
 level-triggering because you keep receiving events as long as the
 condition persists. Remember you cna stop the watcher if you don't want to
 act on the event and neither want to receive future events).</p>
+<p>In general you can register as many read and/or write event watchers oer
+fd as you want (as long as you don't confuse yourself). Setting all file
+descriptors to non-blocking mode is also usually a good idea (but not
+required if you know what you are doing).</p>
+<p>You have to be careful with dup'ed file descriptors, though. Some backends
+(the linux epoll backend is a notable example) cannot handle dup'ed file
+descriptors correctly if you register interest in two or more fds pointing
+to the same file/socket etc. description.</p>
+<p>If you must do this, then force the use of a known-to-be-good backend
+(at the time of this writing, this includes only EVMETHOD_SELECT and
+EVMETHOD_POLL).</p>
 <dl>
 	<dt>ev_io_init (ev_io *, callback, int fd, int events)</dt>
 	<dt>ev_io_set (ev_io *, int fd, int events)</dt>
