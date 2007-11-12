@@ -584,12 +584,13 @@ will usually be called just before the callback will be triggered, but
 might be called at other times, too.
 
 NOTE: I<< This callback must always return a time that is later than the
-passed C<now> value >>. Not even C<now> itself will do, it must be larger.
+passed C<now> value >>. Not even C<now> itself will do, it I<must> be larger.
 
 This can be used to create very complex timers, such as a timer that
 triggers on each midnight, local time. To do this, you would calculate the
-next midnight after C<now> and return the timestamp value for this. How you do this
-is, again, up to you (but it is not trivial).
+next midnight after C<now> and return the timestamp value for this. How
+you do this is, again, up to you (but it is not trivial, which is the main
+reason I omitted it as an example).
 
 =back
 
