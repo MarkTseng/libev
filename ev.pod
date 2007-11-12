@@ -41,13 +41,15 @@ support for multiple event loops, then all functions taking an initial
 argument of name C<loop> (which is always of type C<struct ev_loop *>)
 will not have this argument.
 
-=head1 TIME AND OTHER GLOBAL FUNCTIONS
+=head1 TIME REPRESENTATION
 
 Libev represents time as a single floating point number, representing the
 (fractional) number of seconds since the (POSIX) epoch (somewhere near
 the beginning of 1970, details are complicated, don't ask). This type is
 called C<ev_tstamp>, which is what you should use too. It usually aliases
 to the double type in C.
+
+=head1 GLOBAL FUNCTIONS
 
 =over 4
 
@@ -101,7 +103,7 @@ types of such loops, the I<default> loop, which supports signals and child
 events, and dynamically created loops which do not.
 
 If you use threads, a common model is to run the default event loop
-in your main thread (or in a separate thrad) and for each thread you
+in your main thread (or in a separate thread) and for each thread you
 create, you also create another event loop. Libev itself does no locking
 whatsoever, so if you mix calls to the same event loop in different
 threads, make sure you lock (this is usually a bad idea, though, even if
