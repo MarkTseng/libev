@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 10:07:10 2007" />
+	<meta name="created" content="Mon Nov 12 19:49:15 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -444,14 +444,15 @@ in each iteration of the event loop (This behaviour is called
 level-triggering because you keep receiving events as long as the
 condition persists. Remember you can stop the watcher if you don't want to
 act on the event and neither want to receive future events).</p>
-<p>In general you can register as many read and/or write event watchers oer
+<p>In general you can register as many read and/or write event watchers per
 fd as you want (as long as you don't confuse yourself). Setting all file
 descriptors to non-blocking mode is also usually a good idea (but not
 required if you know what you are doing).</p>
 <p>You have to be careful with dup'ed file descriptors, though. Some backends
 (the linux epoll backend is a notable example) cannot handle dup'ed file
 descriptors correctly if you register interest in two or more fds pointing
-to the same file/socket etc. description.</p>
+to the same file/socket etc. description (that is, they share the same
+underlying &quot;file open&quot;).</p>
 <p>If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only EVMETHOD_SELECT and
 EVMETHOD_POLL).</p>
@@ -471,7 +472,7 @@ EV_WRITE</code> to receive the given events.</p>
 <p>Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.</p>
 <p>The timers are based on real time, that is, if you register an event that
-times out after an hour and youreset your system clock to last years
+times out after an hour and you reset your system clock to last years
 time, it will still time out after (roughly) and hour. &quot;Roughly&quot; because
 detecting time jumps is hard, and soem inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).</p>
@@ -479,7 +480,7 @@ monotonic clock option helps a lot here).</p>
 time. This is usually the right thing as this timestamp refers to the time
 of the event triggering whatever timeout you are modifying/starting.  If
 you suspect event processing to be delayed and you *need* to base the timeout
-ion the current time, use something like this to adjust for this:</p>
+on the current time, use something like this to adjust for this:</p>
 <pre>   ev_timer_set (&amp;timer, after + ev_now () - ev_time (), 0.);
 
 </pre>
@@ -494,7 +495,7 @@ later, again, and again, until stopped manually.</p>
 		<p>The timer itself will do a best-effort at avoiding drift, that is, if you
 configure a timer to trigger every 10 seconds, then it will trigger at
 exactly 10 second intervals. If, however, your program cannot keep up with
-the timer (ecause it takes longer than those 10 seconds to do stuff) the
+the timer (because it takes longer than those 10 seconds to do stuff) the
 timer will not fire more than once per event loop iteration.</p>
 	</dd>
 	<dt>ev_timer_again (loop)</dt>
@@ -719,7 +720,7 @@ macros, but using them is utterly, utterly and completely pointless.</p>
 		<p>This function combines a simple timer and an I/O watcher, calls your
 callback on whichever event happens first and automatically stop both
 watchers. This is useful if you want to wait for a single event on an fd
-or timeout without havign to allocate/configure/start/stop/free one or
+or timeout without having to allocate/configure/start/stop/free one or
 more watchers yourself.</p>
 		<p>If <code>fd</code> is less than 0, then no I/O watcher will be started and events
 is being ignored. Otherwise, an <code>ev_io</code> watcher for the given <code>fd</code> and

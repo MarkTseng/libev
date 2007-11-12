@@ -28,20 +28,19 @@
 extern "C" {
 #endif
 
-#ifndef WIN32
-#include <sys/types.h>
-#endif
-#include <sys/time.h>
-#include <inttypes.h>
-#include <stdarg.h>
-
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#undef WIN32_LEAN_AND_MEAN
+#ifdef _WIN32
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# undef WIN32_LEAN_AND_MEAN
 typedef unsigned char u_char;
 typedef unsigned short u_short;
+#else
+# include <sys/types.h>
+# include <sys/time.h>
+# include <inttypes.h>
 #endif
+
+#include <stdarg.h>
 
 /* Fix so that ppl dont have to run with <sys/queue.h> */
 #ifndef TAILQ_ENTRY
