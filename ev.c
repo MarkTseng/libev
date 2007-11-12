@@ -748,7 +748,7 @@ enable_secure (void)
 #endif
 }
 
-int
+unsigned int
 ev_method (EV_P)
 {
   return method;

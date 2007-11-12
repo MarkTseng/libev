@@ -233,7 +233,7 @@ union ev_any_watcher
 
 /* bits for ev_default_loop and ev_loop_new */
 /* the default */
-#define EVMETHOD_AUTO    0x00000000 /* not quite a mask */
+#define EVFLAG_AUTO      0x00000000 /* not quite a mask */
 
 /* method bits to be ored together */
 #define EVMETHOD_SELECT  0x00000001 /* about anywhere */
@@ -244,7 +244,7 @@ union ev_any_watcher
 #define EVMETHOD_PORT    0x00000020 /* solaris 10 */ /* NYI */
 
 /* flag bits */
-#define EVMETHOD_NOENV   0x01000000 /* do NOT consult environment */
+#define EVFLAG_NOENV     0x01000000 /* do NOT consult environment */
 
 #if EV_PROTOTYPES
 int ev_version_major (void);
@@ -298,7 +298,7 @@ void ev_default_destroy (void); /* destroy the default loop */
 /* you can actually call it at any time, anywhere :) */
 void ev_default_fork (void);
 
-int ev_method (EV_P);
+unsigned int ev_method (EV_P);
 #endif
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */
