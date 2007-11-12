@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:02:48 2007" />
+	<meta name="created" content="Mon Nov 12 09:11:00 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -28,7 +28,7 @@
 <li><a href="#WATCHER_TYPES">WATCHER TYPES</a>
 <ul><li><a href="#struct_ev_io_is_my_file_descriptor_r">struct ev_io - is my file descriptor readable or writable</a></li>
 <li><a href="#struct_ev_timer_relative_and_optiona">struct ev_timer - relative and optionally recurring timeouts</a></li>
-<li><a href="#ev_periodic">ev_periodic</a></li>
+<li><a href="#ev_periodic_to_cron_or_not_to_cron_i">ev_periodic - to cron or not to cron it</a></li>
 <li><a href="#ev_signal_signal_me_when_a_signal_ge">ev_signal - signal me when a signal gets signalled</a></li>
 <li><a href="#ev_child_wait_for_pid_status_changes">ev_child - wait for pid status changes</a></li>
 <li><a href="#ev_idle_when_you_ve_got_nothing_bett">ev_idle - when you've got nothing better to do</a></li>
@@ -57,7 +57,7 @@
 <div id="DESCRIPTION_CONTENT">
 <p>Libev is an event loop: you register interest in certain events (such as a
 file descriptor being readable or a timeout occuring), and it will manage
-these event sources and provide your program events.</p>
+these event sources and provide your program with events.</p>
 <p>To do this, it must take more or less complete control over your process
 (or thread) by executing the <i>event loop</i> handler, and will then
 communicate events via a callback mechanism.</p>
@@ -318,8 +318,8 @@ corresponding stop function (<code>ev_&lt;type&gt;_stop (loop, watcher *)</code>
 <p>As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
 reinitialise it or call its set method.</p>
-<p>You cna check wether an event is active by calling the <code>ev_is_active
-(watcher *)</code> macro. To see wether an event is outstanding (but the
+<p>You cna check whether an event is active by calling the <code>ev_is_active
+(watcher *)</code> macro. To see whether an event is outstanding (but the
 callback for it has not been called yet) you cna use the <code>ev_is_pending
 (watcher *)</code> macro.</p>
 <p>Each and every callback receives the event loop pointer as first, the
@@ -424,7 +424,7 @@ information given in the last section.</p>
 </div>
 <h2 id="struct_ev_io_is_my_file_descriptor_r">struct ev_io - is my file descriptor readable or writable</h2>
 <div id="struct_ev_io_is_my_file_descriptor_r-2">
-<p>I/O watchers check wether a file descriptor is readable or writable
+<p>I/O watchers check whether a file descriptor is readable or writable
 in each iteration of the event loop (This behaviour is called
 level-triggering because you keep receiving events as long as the
 condition persists. Remember you cna stop the watcher if you don't want to
@@ -482,8 +482,8 @@ the timer, and again will automatically restart it if need be.</p>
 </dl>
 
 </div>
-<h2 id="ev_periodic">ev_periodic</h2>
-<div id="ev_periodic_CONTENT">
+<h2 id="ev_periodic_to_cron_or_not_to_cron_i">ev_periodic - to cron or not to cron it</h2>
+<div id="ev_periodic_to_cron_or_not_to_cron_i-2">
 <p>Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).</p>
 <p>Unlike ev_timer's, they are not based on real time (or relative time)

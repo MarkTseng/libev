@@ -27,7 +27,9 @@ Libev supports select, poll, the linux-specific epoll and the bsd-specific
 kqueue mechanisms for file descriptor events, relative timers, absolute
 timers with customised rescheduling, signal events, process status change
 events (related to SIGCHLD), and event watchers dealing with the event
-loop mechanism itself (idle, prepare and check watchers).
+loop mechanism itself (idle, prepare and check watchers). It also is quite
+fast (see a L<benchmark|http://libev.schmorp.de/bench.html> comparing it
+to libevent).
 
 =head1 CONVENTIONS
 
