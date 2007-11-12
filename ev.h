@@ -231,15 +231,20 @@ union ev_any_watcher
   struct ev_child child;
 };
 
-#define EVMETHOD_AUTO     0 /* consults environment */
-#define EVMETHOD_SELECT   1
-#define EVMETHOD_POLL     2
-#define EVMETHOD_EPOLL    4
-#define EVMETHOD_KQUEUE   8
-#define EVMETHOD_DEVPOLL 16 /* NYI */
-#define EVMETHOD_PORT    32 /* NYI */
-#define EVMETHOD_WIN32   64 /* NYI */
-#define EVMETHOD_ANY     ~0 /* any method, do not consult env */
+/* bits for ev_default_loop and ev_loop_new */
+/* the default */
+#define EVMETHOD_AUTO    0x00000000 /* not quite a mask */
+
+/* method bits to be ored together */
+#define EVMETHOD_SELECT  0x00000001 /* about anywhere */
+#define EVMETHOD_POLL    0x00000002 /* !win */
+#define EVMETHOD_EPOLL   0x00000004 /* linux */
+#define EVMETHOD_KQUEUE  0x00000008 /* bsd */
+#define EVMETHOD_DEVPOLL 0x00000010 /* solaris 8 */ /* NYI */
+#define EVMETHOD_PORT    0x00000020 /* solaris 10 */ /* NYI */
+
+/* flag bits */
+#define EVMETHOD_NOENV   0x01000000 /* do NOT consult environment */
 
 #if EV_PROTOTYPES
 int ev_version_major (void);
@@ -264,10 +269,10 @@ void ev_set_syserr_cb (void (*cb)(const char *msg));
 # if EV_MULTIPLICITY
 /* the default loop is the only one that handles signals and child watchers */
 /* you can call this as often as you like */
-struct ev_loop *ev_default_loop (int methods); /* returns default loop */
+struct ev_loop *ev_default_loop (unsigned int flags); /* returns default loop */
 
 /* create and destroy alternative loops that don't handle signals */
-struct ev_loop *ev_loop_new (int methods);
+struct ev_loop *ev_loop_new (unsigned int flags);
 void ev_loop_destroy (EV_P);
 void ev_loop_fork (EV_P);
 

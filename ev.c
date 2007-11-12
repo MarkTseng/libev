@@ -312,7 +312,7 @@ ev_now (EV_P)
 }
 #endif
 
-#define array_roundsize(type,n) ((n) | 4 & ~3)
+#define array_roundsize(type,n) (((n) | 4) & ~3)
 
 #define array_needsize(type,base,cur,cnt,init)			\
   if (expect_false ((cnt) > cur))				\
@@ -755,7 +755,7 @@ ev_method (EV_P)
 }
 
 static void
-loop_init (EV_P_ int methods)
+loop_init (EV_P_ unsigned int flags)
 {
   if (!method)
     {
@@ -772,24 +772,24 @@ loop_init (EV_P_ int methods)
       now_floor = mn_now;
       rtmn_diff = ev_rt_now - mn_now;
 
-      if (methods == EVMETHOD_AUTO)
-        if (!enable_secure () && getenv ("LIBEV_METHODS"))
-          methods = atoi (getenv ("LIBEV_METHODS"));
-        else
-          methods = EVMETHOD_ANY;
+      if (!(flags & EVMETHOD_NOENV) && !enable_secure () && getenv ("LIBEV_FLAGS"))
+        flags = atoi (getenv ("LIBEV_FLAGS"));
+
+      if (!(flags & 0x0000ffff))
+        flags |= 0x0000ffff;
 
       method = 0;
 #if EV_USE_KQUEUE
-      if (!method && (methods & EVMETHOD_KQUEUE)) method = kqueue_init (EV_A_ methods);
+      if (!method && (flags & EVMETHOD_KQUEUE)) method = kqueue_init (EV_A_ flags);
 #endif
 #if EV_USE_EPOLL
-      if (!method && (methods & EVMETHOD_EPOLL )) method = epoll_init  (EV_A_ methods);
+      if (!method && (flags & EVMETHOD_EPOLL )) method = epoll_init  (EV_A_ flags);
 #endif
 #if EV_USE_POLL
-      if (!method && (methods & EVMETHOD_POLL  )) method = poll_init   (EV_A_ methods);
+      if (!method && (flags & EVMETHOD_POLL  )) method = poll_init   (EV_A_ flags);
 #endif
 #if EV_USE_SELECT
-      if (!method && (methods & EVMETHOD_SELECT)) method = select_init (EV_A_ methods);
+      if (!method && (flags & EVMETHOD_SELECT)) method = select_init (EV_A_ flags);
 #endif
 
       ev_init (&sigev, sigcb);
@@ -861,13 +861,13 @@ loop_fork (EV_P)
 
 #if EV_MULTIPLICITY
 struct ev_loop *
-ev_loop_new (int methods)
+ev_loop_new (unsigned int flags)
 {
   struct ev_loop *loop = (struct ev_loop *)ev_malloc (sizeof (struct ev_loop));
 
   memset (loop, 0, sizeof (struct ev_loop));
 
-  loop_init (EV_A_ methods);
+  loop_init (EV_A_ flags);
 
   if (ev_method (EV_A))
     return loop;
@@ -895,7 +895,7 @@ struct ev_loop *
 #else
 int
 #endif
-ev_default_loop (int methods)
+ev_default_loop (unsigned int methods)
 {
   if (sigpipe [0] == sigpipe [1])
     if (pipe (sigpipe))
@@ -1033,8 +1033,7 @@ periodics_reify (EV_P)
       /* first reschedule or stop timer */
       if (w->reschedule_cb)
         {
-          ev_tstamp at = ((WT)w)->at = w->reschedule_cb (w, ev_rt_now + 0.0001);
-
+          ((WT)w)->at = w->reschedule_cb (w, ev_rt_now + 0.0001);
           assert (("ev_periodic reschedule callback returned time in the past", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
