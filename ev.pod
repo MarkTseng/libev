@@ -28,14 +28,14 @@ kqueue mechanisms for file descriptor events, relative timers, absolute
 timers with customised rescheduling, signal events, process status change
 events (related to SIGCHLD), and event watchers dealing with the event
 loop mechanism itself (idle, prepare and check watchers). It also is quite
-fast (see a L<benchmark|http://libev.schmorp.de/bench.html> comparing it
-to libevent).
+fast (see this L<benchmark|http://libev.schmorp.de/bench.html> comparing
+it to libevent for example).
 
 =head1 CONVENTIONS
 
 Libev is very configurable. In this manual the default configuration
 will be described, which supports multiple event loops. For more info
-about various configuraiton options please have a look at the file
+about various configuration options please have a look at the file
 F<README.embed> in the libev distribution. If libev was configured without
 support for multiple event loops, then all functions taking an initial
 argument of name C<loop> (which is always of type C<struct ev_loop *>)
@@ -73,10 +73,10 @@ not a problem.
 =item ev_set_allocator (void *(*cb)(void *ptr, long size))
 
 Sets the allocation function to use (the prototype is similar to the
-realloc function). It is used to allocate and free memory (no surprises
-here). If it returns zero when memory needs to be allocated, the library
-might abort or take some potentially destructive action. The default is
-your system realloc function.
+realloc C function, the semantics are identical). It is used to allocate
+and free memory (no surprises here). If it returns zero when memory
+needs to be allocated, the library might abort or take some potentially
+destructive action. The default is your system realloc function.
 
 You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
@@ -88,7 +88,7 @@ Set the callback function to call on a retryable syscall error (such
 as failed select, poll, epoll_wait). The message is a printable string
 indicating the system call or subsystem causing the problem. If this
 callback is set, then libev will expect it to remedy the sitution, no
-matter what, when it returns. That is, libev will geenrally retry the
+matter what, when it returns. That is, libev will generally retry the
 requested operation, or, if the condition doesn't go away, do bad stuff
 (such as abort).
 
@@ -102,9 +102,10 @@ events, and dynamically created loops which do not.
 
 If you use threads, a common model is to run the default event loop
 in your main thread (or in a separate thrad) and for each thread you
-create, you also create another event loop. Libev itself does no lockign
-whatsoever, so if you mix calls to different event loops, make sure you
-lock (this is usually a bad idea, though, even if done right).
+create, you also create another event loop. Libev itself does no locking
+whatsoever, so if you mix calls to the same event loop in different
+threads, make sure you lock (this is usually a bad idea, though, even if
+done correctly, because its hideous and inefficient).
 
 =over 4
 
