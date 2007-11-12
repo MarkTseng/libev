@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:58:27 2007" />
+	<meta name="created" content="Mon Nov 12 10:01:12 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -101,6 +101,8 @@ to the double type in C.</p>
 </div>
 <h1 id="GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="GLOBAL_FUNCTIONS_CONTENT">
+<p>These functions can be called anytime, even before initialising the
+library in any way.</p>
 <dl>
 	<dt>ev_tstamp ev_time ()</dt>
 	<dd>
@@ -569,11 +571,10 @@ time where <code>time = at (mod interval)</code>, regardless of any time jumps.<
 ignored. Instead, each time the periodic watcher gets scheduled, the
 reschedule callback will be called with the watcher as first, and the
 current time as second argument.</p>
-					<p>NOTE: <i>This callback MUST NOT stop or destroy the periodic or any other
-periodic watcher, ever, or make any event loop modifications</i>. If you need
-to stop it, return <code>now + 1e30</code> (or so, fudge fudge) and stop it afterwards.</p>
-					<p>Also, <i>this callback must always return a time that is later than the
-passed <code>now</code> value</i>. Not even <code>now</code> itself will be ok.</p>
+					<p>NOTE: <i>This callback MUST NOT stop or destroy any periodic watcher,
+ever, or make any event loop modifications</i>. If you need to stop it,
+return <code>now + 1e30</code> (or so, fudge fudge) and stop it afterwards (e.g. by
+starting a prepare watcher).</p>
 					<p>Its prototype is <code>ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
 ev_tstamp now)</code>, e.g.:</p>
 <pre>   static ev_tstamp my_rescheduler (struct ev_periodic *w, ev_tstamp now)
@@ -586,6 +587,8 @@ ev_tstamp now)</code>, e.g.:</p>
 (that is, the lowest time value larger than to the second argument). It
 will usually be called just before the callback will be triggered, but
 might be called at other times, too.</p>
+					<p>NOTE: <i>This callback must always return a time that is later than the
+passed <code>now</code> value</i>. Not even <code>now</code> itself will do, it must be larger.</p>
 					<p>This can be used to create very complex timers, such as a timer that
 triggers on each midnight, local time. To do this, you would calculate the
 next midnight after <code>now</code> and return the timestamp value for this. How you do this
