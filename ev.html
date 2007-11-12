@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:35:36 2007" />
+	<meta name="created" content="Mon Nov 12 09:45:48 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -28,7 +28,7 @@
 <li><a href="#WATCHER_TYPES">WATCHER TYPES</a>
 <ul><li><a href="#code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable</a></li>
 <li><a href="#code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally recurring timeouts</a></li>
-<li><a href="#code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron it</a></li>
+<li><a href="#code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron</a></li>
 <li><a href="#code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled</a></li>
 <li><a href="#code_ev_child_code_wait_for_pid_stat"><code>ev_child</code> - wait for pid status changes</a></li>
 <li><a href="#code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do</a></li>
@@ -324,14 +324,14 @@ corresponding stop function (<code>ev_&lt;type&gt;_stop (loop, watcher *)</code>
 <p>As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
 reinitialise it or call its set method.</p>
-<p>You cna check whether an event is active by calling the <code>ev_is_active
+<p>You can check whether an event is active by calling the <code>ev_is_active
 (watcher *)</code> macro. To see whether an event is outstanding (but the
-callback for it has not been called yet) you cna use the <code>ev_is_pending
+callback for it has not been called yet) you can use the <code>ev_is_pending
 (watcher *)</code> macro.</p>
 <p>Each and every callback receives the event loop pointer as first, the
 registered watcher structure as second, and a bitset of received events as
 third argument.</p>
-<p>The rceeived events usually include a single bit per event type received
+<p>The received events usually include a single bit per event type received
 (you can receive multiple events at the same time). The possible bit masks
 are:</p>
 <dl>
@@ -391,7 +391,7 @@ programs, though, so beware.</p>
 <h2 id="ASSOCIATING_CUSTOM_DATA_WITH_A_WATCH">ASSOCIATING CUSTOM DATA WITH A WATCHER</h2>
 <div id="ASSOCIATING_CUSTOM_DATA_WITH_A_WATCH-2">
 <p>Each watcher has, by default, a member <code>void *data</code> that you can change
-and read at any time, libev will completely ignore it. This cna be used
+and read at any time, libev will completely ignore it. This can be used
 to associate arbitrary data with your watcher. If you need more data and
 don't want to allocate memory and store a pointer to it in that data
 member, you can also &quot;subclass&quot; the watcher type and provide your own
@@ -433,7 +433,7 @@ information given in the last section.</p>
 <p>I/O watchers check whether a file descriptor is readable or writable
 in each iteration of the event loop (This behaviour is called
 level-triggering because you keep receiving events as long as the
-condition persists. Remember you cna stop the watcher if you don't want to
+condition persists. Remember you can stop the watcher if you don't want to
 act on the event and neither want to receive future events).</p>
 <p>In general you can register as many read and/or write event watchers oer
 fd as you want (as long as you don't confuse yourself). Setting all file
@@ -507,7 +507,7 @@ the timer, and again will automatically restart it if need be.</p>
 </dl>
 
 </div>
-<h2 id="code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron it</h2>
+<h2 id="code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron</h2>
 <div id="code_ev_periodic_code_to_cron_or_not-2">
 <p>Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).</p>
@@ -605,7 +605,7 @@ program when the crontabs have changed).</p>
 signal one or more times. Even though signals are very asynchronous, libev
 will try it's best to deliver signals synchronously, i.e. as part of the
 normal event processing, like any other event.</p>
-<p>You cna configure as many watchers as you like per signal. Only when the
+<p>You can configure as many watchers as you like per signal. Only when the
 first watcher gets started will libev actually register a signal watcher
 with the kernel (thus it coexists with your own signal handlers as long
 as you don't register any with libev). Similarly, when the last signal
@@ -632,19 +632,22 @@ some child status changes (most typically when a child of yours dies).</p>
 		<p>Configures the watcher to wait for status changes of process <code>pid</code> (or
 <i>any</i> process if <code>pid</code> is specified as <code>0</code>). The callback can look
 at the <code>rstatus</code> member of the <code>ev_child</code> watcher structure to see
-the status word (use the macros from <code>sys/wait.h</code>). The <code>rpid</code> member
-contains the pid of the process causing the status change.</p>
+the status word (use the macros from <code>sys/wait.h</code> and see your systems
+<code>waitpid</code> documentation). The <code>rpid</code> member contains the pid of the
+process causing the status change.</p>
 	</dd>
 </dl>
 
 </div>
 <h2 id="code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do</h2>
 <div id="code_ev_idle_code_when_you_ve_got_no-2">
-<p>Idle watchers trigger events when there are no other I/O or timer (or
-periodic) events pending. That is, as long as your process is busy
-handling sockets or timeouts it will not be called. But when your process
-is idle all idle watchers are being called again and again - until
-stopped, that is, or your process receives more events.</p>
+<p>Idle watchers trigger events when there are no other events are pending
+(prepare, check and other idle watchers do not count). That is, as long
+as your process is busy handling sockets or timeouts (or even signals,
+imagine) it will not be triggered. But when your process is idle all idle
+watchers are being called again and again, once per event loop iteration -
+until stopped, that is, or your process receives more events and becomes
+busy.</p>
 <p>The most noteworthy effect is that as long as any idle watchers are
 active, the process will not block when waiting for new events.</p>
 <p>Apart from keeping your process non-blocking (which is a useful
@@ -663,36 +666,42 @@ believe me.</p>
 </div>
 <h2 id="prepare_and_check_your_hooks_into_th">prepare and check - your hooks into the event loop</h2>
 <div id="prepare_and_check_your_hooks_into_th-2">
-<p>Prepare and check watchers usually (but not always) are used in
-tandom. Prepare watchers get invoked before the process blocks and check
-watchers afterwards.</p>
+<p>Prepare and check watchers are usually (but not always) used in tandem:
+Prepare watchers get invoked before the process blocks and check watchers
+afterwards.</p>
 <p>Their main purpose is to integrate other event mechanisms into libev. This
 could be used, for example, to track variable changes, implement your own
 watchers, integrate net-snmp or a coroutine library and lots more.</p>
 <p>This is done by examining in each prepare call which file descriptors need
-to be watched by the other library, registering <code>ev_io</code> watchers for them
-and starting an <code>ev_timer</code> watcher for any timeouts (many libraries provide
-just this functionality). Then, in the check watcher you check for any
-events that occured (by making your callbacks set soem flags for example)
-and call back into the library.</p>
-<p>As another example, the perl Coro module uses these hooks to integrate
+to be watched by the other library, registering <code>ev_io</code> watchers for
+them and starting an <code>ev_timer</code> watcher for any timeouts (many libraries
+provide just this functionality). Then, in the check watcher you check for
+any events that occured (by checking the pending status of all watchers
+and stopping them) and call back into the library. The I/O and timer
+callbacks will never actually be called (but must be valid neverthelles,
+because you never know, you know?).</p>
+<p>As another example, the Perl Coro module uses these hooks to integrate
 coroutines into libev programs, by yielding to other active coroutines
 during each prepare and only letting the process block if no coroutines
-are ready to run.</p>
+are ready to run (its actually more complicated, it only runs coroutines
+with priority higher than the event loop and one lower priority once,
+using idle watchers to keep the event loop from blocking if lower-priority
+coroutines exist, thus mapping low-priority coroutines to idle/background
+tasks).</p>
 <dl>
 	<dt>ev_prepare_init (ev_prepare *, callback)</dt>
 	<dt>ev_check_init (ev_check *, callback)</dt>
 	<dd>
 		<p>Initialises and configures the prepare or check watcher - they have no
 parameters of any kind. There are <code>ev_prepare_set</code> and <code>ev_check_set</code>
-macros, but using them is utterly, utterly pointless.</p>
+macros, but using them is utterly, utterly and completely pointless.</p>
 	</dd>
 </dl>
 
 </div>
 <h1 id="OTHER_FUNCTIONS">OTHER FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="OTHER_FUNCTIONS_CONTENT">
-<p>There are some other fucntions of possible interest. Described. Here. Now.</p>
+<p>There are some other functions of possible interest. Described. Here. Now.</p>
 <dl>
 	<dt>ev_once (loop, int fd, int events, ev_tstamp timeout, callback)</dt>
 	<dd>
@@ -701,36 +710,39 @@ callback on whichever event happens first and automatically stop both
 watchers. This is useful if you want to wait for a single event on an fd
 or timeout without havign to allocate/configure/start/stop/free one or
 more watchers yourself.</p>
-		<p>If <code>fd</code> is less than 0, then no I/O watcher will be started and events is
-ignored. Otherwise, an <code>ev_io</code> watcher for the given <code>fd</code> and <code>events</code> set
-will be craeted and started.</p>
+		<p>If <code>fd</code> is less than 0, then no I/O watcher will be started and events
+is being ignored. Otherwise, an <code>ev_io</code> watcher for the given <code>fd</code> and
+<code>events</code> set will be craeted and started.</p>
 		<p>If <code>timeout</code> is less than 0, then no timeout watcher will be
-started. Otherwise an <code>ev_timer</code> watcher with after = <code>timeout</code> (and repeat
-= 0) will be started.</p>
-		<p>The callback has the type <code>void (*cb)(int revents, void *arg)</code> and
-gets passed an events set (normally a combination of <code>EV_ERROR</code>, <code>EV_READ</code>,
-<code>EV_WRITE</code> or <code>EV_TIMEOUT</code>) and the <code>arg</code> value passed to <code>ev_once</code>:</p>
+started. Otherwise an <code>ev_timer</code> watcher with after = <code>timeout</code> (and
+repeat = 0) will be started. While <code>0</code> is a valid timeout, it is of
+dubious value.</p>
+		<p>The callback has the type <code>void (*cb)(int revents, void *arg)</code> and gets
+passed an events set like normal event callbacks (with a combination of
+<code>EV_ERROR</code>, <code>EV_READ</code>, <code>EV_WRITE</code> or <code>EV_TIMEOUT</code>) and the <code>arg</code>
+value passed to <code>ev_once</code>:</p>
 <pre>  static void stdin_ready (int revents, void *arg)
   {
     if (revents &amp; EV_TIMEOUT)
-      /* doh, nothing entered */
+      /* doh, nothing entered */;
     else if (revents &amp; EV_READ)
-      /* stdin might have data for us, joy! */
+      /* stdin might have data for us, joy! */;
   }
 
-  ev_once (STDIN_FILENO, EV_READm 10., stdin_ready, 0);
+  ev_once (STDIN_FILENO, EV_READ, 10., stdin_ready, 0);
 
 </pre>
 	</dd>
 	<dt>ev_feed_event (loop, watcher, int events)</dt>
 	<dd>
 		<p>Feeds the given event set into the event loop, as if the specified event
-has happened for the specified watcher (which must be a pointer to an
-initialised but not necessarily active event watcher).</p>
+had happened for the specified watcher (which must be a pointer to an
+initialised but not necessarily started event watcher).</p>
 	</dd>
 	<dt>ev_feed_fd_event (loop, int fd, int revents)</dt>
 	<dd>
-		<p>Feed an event on the given fd, as if a file descriptor backend detected it.</p>
+		<p>Feed an event on the given fd, as if a file descriptor backend detected
+the given events it.</p>
 	</dd>
 	<dt>ev_feed_signal_event (loop, int signum)</dt>
 	<dd>

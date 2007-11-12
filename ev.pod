@@ -669,7 +669,7 @@ believe me.
 
 =back
 
-=head2 prepare and check - your hooks into the event loop
+=head2 C<ev_prepare> and C<ev_check> - your hooks into the event loop
 
 Prepare and check watchers are usually (but not always) used in tandem:
 Prepare watchers get invoked before the process blocks and check watchers
