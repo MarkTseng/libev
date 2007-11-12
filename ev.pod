@@ -10,7 +10,7 @@ libev - a high performance full-featured event loop written in C
 
 Libev is an event loop: you register interest in certain events (such as a
 file descriptor being readable or a timeout occuring), and it will manage
-these event sources and provide your program events.
+these event sources and provide your program with events.
 
 To do this, it must take more or less complete control over your process
 (or thread) by executing the I<event loop> handler, and will then
@@ -295,8 +295,8 @@ As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
 reinitialise it or call its set method.
 
-You cna check wether an event is active by calling the C<ev_is_active
-(watcher *)> macro. To see wether an event is outstanding (but the
+You cna check whether an event is active by calling the C<ev_is_active
+(watcher *)> macro. To see whether an event is outstanding (but the
 callback for it has not been called yet) you cna use the C<ev_is_pending
 (watcher *)> macro.
 
@@ -402,7 +402,7 @@ information given in the last section.
 
 =head2 struct ev_io - is my file descriptor readable or writable
 
-I/O watchers check wether a file descriptor is readable or writable
+I/O watchers check whether a file descriptor is readable or writable
 in each iteration of the event loop (This behaviour is called
 level-triggering because you keep receiving events as long as the
 condition persists. Remember you cna stop the watcher if you don't want to
