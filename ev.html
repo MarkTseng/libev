@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 10:06:08 2007" />
+	<meta name="created" content="Mon Nov 12 10:07:10 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -729,7 +729,7 @@ started. Otherwise an <code>ev_timer</code> watcher with after = <code>timeout</
 repeat = 0) will be started. While <code>0</code> is a valid timeout, it is of
 dubious value.</p>
 		<p>The callback has the type <code>void (*cb)(int revents, void *arg)</code> and gets
-passed an events set like normal event callbacks (with a combination of
+passed an <code>revents</code> set like normal event callbacks (a combination of
 <code>EV_ERROR</code>, <code>EV_READ</code>, <code>EV_WRITE</code> or <code>EV_TIMEOUT</code>) and the <code>arg</code>
 value passed to <code>ev_once</code>:</p>
 <pre>  static void stdin_ready (int revents, void *arg)
