@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 19:49:15 2007" />
+	<meta name="created" content="Mon Nov 12 20:19:59 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -451,8 +451,8 @@ required if you know what you are doing).</p>
 <p>You have to be careful with dup'ed file descriptors, though. Some backends
 (the linux epoll backend is a notable example) cannot handle dup'ed file
 descriptors correctly if you register interest in two or more fds pointing
-to the same file/socket etc. description (that is, they share the same
-underlying &quot;file open&quot;).</p>
+to the same underlying file/socket etc. description (that is, they share
+the same underlying &quot;file open&quot;).</p>
 <p>If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only EVMETHOD_SELECT and
 EVMETHOD_POLL).</p>
@@ -765,7 +765,22 @@ the given events it.</p>
 </div>
 <h1 id="LIBEVENT_EMULATION">LIBEVENT EMULATION</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="LIBEVENT_EMULATION_CONTENT">
-<p>TBD.</p>
+<p>Libev offers a compatibility emulation layer for libevent. It cannot
+emulate the internals of libevent, so here are some usage hints:</p>
+<dl>
+	<dt>* Use it by including &lt;event.h&gt;, as usual.</dt>
+	<dt>* The following members are fully supported: ev_base, ev_callback,
+ev_arg, ev_fd, ev_res, ev_events.</dt>
+	<dt>* Avoid using ev_flags and the EVLIST_*-macros, while it is
+maintained by libev, it does not work exactly the same way as in libevent (consider
+it a private API).</dt>
+	<dt>* Priorities are not currently supported. Initialising priorities
+will fail and all watchers will have the same priority, even though there
+is an ev_pri field.</dt>
+	<dt>* Other members are not supported.</dt>
+	<dt>* The libev emulation is <i>not</i> ABI compatible to libevent, you need
+to use the libev header file and library.</dt>
+</dl>
 
 </div>
 <h1 id="C_SUPPORT">C++ SUPPORT</h1><p><a href="#TOP" class="toplink">Top</a></p>

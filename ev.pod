@@ -427,8 +427,8 @@ required if you know what you are doing).
 You have to be careful with dup'ed file descriptors, though. Some backends
 (the linux epoll backend is a notable example) cannot handle dup'ed file
 descriptors correctly if you register interest in two or more fds pointing
-to the same file/socket etc. description (that is, they share the same
-underlying "file open").
+to the same underlying file/socket etc. description (that is, they share
+the same underlying "file open").
 
 If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only EVMETHOD_SELECT and
@@ -774,7 +774,30 @@ Feed an event as if the given signal occured (loop must be the default loop!).
 
 =head1 LIBEVENT EMULATION
 
-TBD.
+Libev offers a compatibility emulation layer for libevent. It cannot
+emulate the internals of libevent, so here are some usage hints:
+
+=over 4
+
+=item * Use it by including <event.h>, as usual.
+
+=item * The following members are fully supported: ev_base, ev_callback,
+ev_arg, ev_fd, ev_res, ev_events.
+
+=item * Avoid using ev_flags and the EVLIST_*-macros, while it is
+maintained by libev, it does not work exactly the same way as in libevent (consider
+it a private API).
+
+=item * Priorities are not currently supported. Initialising priorities
+will fail and all watchers will have the same priority, even though there
+is an ev_pri field.
+
+=item * Other members are not supported.
+
+=item * The libev emulation is I<not> ABI compatible to libevent, you need
+to use the libev header file and library.
+
+=back
 
 =head1 C++ SUPPORT
 
