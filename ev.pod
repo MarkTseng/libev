@@ -419,7 +419,7 @@ level-triggering because you keep receiving events as long as the
 condition persists. Remember you can stop the watcher if you don't want to
 act on the event and neither want to receive future events).
 
-In general you can register as many read and/or write event watchers oer
+In general you can register as many read and/or write event watchers per
 fd as you want (as long as you don't confuse yourself). Setting all file
 descriptors to non-blocking mode is also usually a good idea (but not
 required if you know what you are doing).
