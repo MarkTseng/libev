@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 10:02:16 2007" />
+	<meta name="created" content="Mon Nov 12 10:06:08 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -37,6 +37,8 @@
 </ul>
 </li>
 <li><a href="#OTHER_FUNCTIONS">OTHER FUNCTIONS</a></li>
+<li><a href="#LIBEVENT_EMULATION">LIBEVENT EMULATION</a></li>
+<li><a href="#C_SUPPORT">C++ SUPPORT</a></li>
 <li><a href="#AUTHOR">AUTHOR</a>
 </li>
 </ul><hr />
@@ -676,7 +678,7 @@ believe me.</p>
 <h2 id="code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop</h2>
 <div id="code_ev_prepare_code_and_code_ev_che-2">
 <p>Prepare and check watchers are usually (but not always) used in tandem:
-Prepare watchers get invoked before the process blocks and check watchers
+prepare watchers get invoked before the process blocks and check watchers
 afterwards.</p>
 <p>Their main purpose is to integrate other event mechanisms into libev. This
 could be used, for example, to track variable changes, implement your own
@@ -687,16 +689,16 @@ them and starting an <code>ev_timer</code> watcher for any timeouts (many librar
 provide just this functionality). Then, in the check watcher you check for
 any events that occured (by checking the pending status of all watchers
 and stopping them) and call back into the library. The I/O and timer
-callbacks will never actually be called (but must be valid neverthelles,
+callbacks will never actually be called (but must be valid nevertheless,
 because you never know, you know?).</p>
 <p>As another example, the Perl Coro module uses these hooks to integrate
 coroutines into libev programs, by yielding to other active coroutines
 during each prepare and only letting the process block if no coroutines
-are ready to run (its actually more complicated, it only runs coroutines
-with priority higher than the event loop and one lower priority once,
-using idle watchers to keep the event loop from blocking if lower-priority
-coroutines exist, thus mapping low-priority coroutines to idle/background
-tasks).</p>
+are ready to run (it's actually more complicated: it only runs coroutines
+with priority higher than or equal to the event loop and one coroutine
+of lower priority, but only once, using idle watchers to keep the event
+loop from blocking if lower-priority coroutines are active, thus mapping
+low-priority coroutines to idle/background tasks).</p>
 <dl>
 	<dt>ev_prepare_init (ev_prepare *, callback)</dt>
 	<dt>ev_check_init (ev_check *, callback)</dt>
@@ -758,6 +760,16 @@ the given events it.</p>
 		<p>Feed an event as if the given signal occured (loop must be the default loop!).</p>
 	</dd>
 </dl>
+
+</div>
+<h1 id="LIBEVENT_EMULATION">LIBEVENT EMULATION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="LIBEVENT_EMULATION_CONTENT">
+<p>TBD.</p>
+
+</div>
+<h1 id="C_SUPPORT">C++ SUPPORT</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="C_SUPPORT_CONTENT">
+<p>TBD.</p>
 
 </div>
 <h1 id="AUTHOR">AUTHOR</h1><p><a href="#TOP" class="toplink">Top</a></p>

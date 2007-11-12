@@ -740,7 +740,7 @@ repeat = 0) will be started. While C<0> is a valid timeout, it is of
 dubious value.
 
 The callback has the type C<void (*cb)(int revents, void *arg)> and gets
-passed an events set like normal event callbacks (with a combination of
+passed an C<revents> set like normal event callbacks (a combination of
 C<EV_ERROR>, C<EV_READ>, C<EV_WRITE> or C<EV_TIMEOUT>) and the C<arg>
 value passed to C<ev_once>:
 
