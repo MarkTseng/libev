@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:32:51 2007" />
+	<meta name="created" content="Mon Nov 12 09:35:17 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -552,7 +552,7 @@ time:</p>
 </pre>
 					<p>This doesn't mean there will always be 3600 seconds in between triggers,
 but only that the the callback will be called when the system time shows a
-full hour (UTC), or more correct, when the system time is evenly divisible
+full hour (UTC), or more correctly, when the system time is evenly divisible
 by 3600.</p>
 					<p>Another way to think about it (for the mathematically inclined) is that
 <code>ev_periodic</code> will try to run the callback in this mode at the next possible
@@ -565,8 +565,10 @@ ignored. Instead, each time the periodic watcher gets scheduled, the
 reschedule callback will be called with the watcher as first, and the
 current time as second argument.</p>
 					<p>NOTE: <i>This callback MUST NOT stop or destroy the periodic or any other
-periodic watcher, ever, or make any event loop modificstions</i>. If you need
-to stop it, return 1e30 (or so, fudge fudge) and stop it afterwards.</p>
+periodic watcher, ever, or make any event loop modifications</i>. If you need
+to stop it, return <code>now + 1e30</code> (or so, fudge fudge) and stop it afterwards.</p>
+					<p>Also, <i>&lt;this callback must always return a time that is later than the
+passed <code>now</code> value </i>&gt;. Not even <code>now</code> itself will be ok.</p>
 					<p>Its prototype is c&lt;ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
 ev_tstamp now)&gt;, e.g.:</p>
 <pre>   static ev_tstamp my_rescheduler (struct ev_periodic *w, ev_tstamp now)
