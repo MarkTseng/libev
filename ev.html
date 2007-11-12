@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 10:01:12 2007" />
+	<meta name="created" content="Mon Nov 12 10:02:16 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -588,11 +588,12 @@ ev_tstamp now)</code>, e.g.:</p>
 will usually be called just before the callback will be triggered, but
 might be called at other times, too.</p>
 					<p>NOTE: <i>This callback must always return a time that is later than the
-passed <code>now</code> value</i>. Not even <code>now</code> itself will do, it must be larger.</p>
+passed <code>now</code> value</i>. Not even <code>now</code> itself will do, it <i>must</i> be larger.</p>
 					<p>This can be used to create very complex timers, such as a timer that
 triggers on each midnight, local time. To do this, you would calculate the
-next midnight after <code>now</code> and return the timestamp value for this. How you do this
-is, again, up to you (but it is not trivial).</p>
+next midnight after <code>now</code> and return the timestamp value for this. How
+you do this is, again, up to you (but it is not trivial, which is the main
+reason I omitted it as an example).</p>
 				</dd>
 			</dl>
 		</p>
