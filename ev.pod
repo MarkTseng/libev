@@ -41,7 +41,9 @@ will not have this argument.
 
 =head1 TIME AND OTHER GLOBAL FUNCTIONS
 
-Libev represents time as a single floating point number. This type is
+Libev represents time as a single floating point number, representing the
+(fractional) number of seconds since the (POSIX) epoch (somewhere near
+the beginning of 1970, details are complicated, don't ask). This type is
 called C<ev_tstamp>, which is what you should use too. It usually aliases
 to the double type in C.
 
