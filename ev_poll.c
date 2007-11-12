@@ -94,12 +94,15 @@ poll_poll (EV_P_ ev_tstamp timeout)
     }
 
   for (i = 0; i < pollcnt; ++i)
-    fd_event (
-      EV_A_
-      polls [i].fd,
-      (polls [i].revents & (POLLOUT | POLLERR | POLLHUP) ? EV_WRITE : 0)
-      | (polls [i].revents & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
-    );
+    if (polls [i].revents & POLLNVAL)
+      fd_kill (EV_A_ polls [i].fd);
+    else
+      fd_event (
+        EV_A_
+        polls [i].fd,
+        (polls [i].revents & (POLLOUT | POLLERR | POLLHUP) ? EV_WRITE : 0)
+        | (polls [i].revents & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
+      );
 }
 
 static int
