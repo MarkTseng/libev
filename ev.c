@@ -49,7 +49,7 @@ extern "C" {
 #  define EV_USE_SELECT 1
 # endif
 
-# if HAVE_POLL && HAVE_POLL_H && !defined (EV_USE_POLL)
+# if HAVE_POLL && HAVE_POLL_H && !defined (EV_USE_POLL) && !defined (__APPLE__)
 #  define EV_USE_POLL 1
 # endif
 
@@ -57,7 +57,7 @@ extern "C" {
 #  define EV_USE_EPOLL 1
 # endif
 
-# if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H && !defined (EV_USE_KQUEUE)
+# if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H && !defined (EV_USE_KQUEUE) && !defined (__APPLE__)
 #  define EV_USE_KQUEUE 1
 # endif
 
