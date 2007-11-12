@@ -39,7 +39,8 @@ kqueue_change (EV_P_ int fd, int filter, int flags, int fflags)
 {
   struct kevent *ke;
 
-  array_needsize (struct kevent, kqueue_changes, kqueue_changemax, ++kqueue_changecnt, );
+  ++kqueue_changecnt;
+  array_needsize (struct kevent, kqueue_changes, kqueue_changemax, kqueue_changecnt, );
 
   ke = &kqueue_changes [kqueue_changecnt - 1];
   memset (ke, 0, sizeof (struct kevent));
