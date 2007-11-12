@@ -163,7 +163,10 @@ x_cb_io (EV_P_ struct ev_io *w, int revents)
   if (revents & EV_ERROR)
     event_del (ev);
   else if (!(ev->ev_events & EV_PERSIST) && ev_is_active (w))
-    ev_io_stop (EV_A_ w);
+    {
+      ev_io_stop (EV_A_ w);
+      ev->ev_flags &= ~EVLIST_INSERTED;
+    }
 
   x_cb (ev, revents);
 }
@@ -194,6 +197,7 @@ void event_set (struct event *ev, int fd, short events, void (*cb)(int, short, v
   ev->ev_callback = cb;
   ev->ev_arg      = arg;
   ev->ev_res      = 0;
+  ev->ev_flags    = EVLIST_INIT;
 }
 
 int event_once (int fd, short events, void (*cb)(int, short, void *), void *arg, struct timeval *tv)
@@ -212,18 +216,26 @@ int event_add (struct event *ev, struct timeval *tv)
     {
       ev_signal_set (&ev->iosig.sig, ev->ev_fd);
       ev_signal_start (EV_A_ &ev->iosig.sig);
+
+      ev->ev_flags |= EVLIST_SIGNAL;
     }
   else if (ev->ev_events & (EV_READ | EV_WRITE))
     {
       ev_io_set (&ev->iosig.io, ev->ev_fd, ev->ev_events & (EV_READ | EV_WRITE));
       ev_io_start (EV_A_ &ev->iosig.io);
+
+      ev->ev_flags |= EVLIST_INSERTED;
     }
 
   if (tv)
     {
       ev_timer_set (&ev->to, tv_get (tv), 0.);
       ev_timer_start (EV_A_ &ev->to);
+
+      ev->ev_flags |= EVLIST_TIMEOUT;
     }
+
+  ev->ev_flags |= EVLIST_ACTIVE;
 
   return 0;
 }
@@ -247,6 +259,8 @@ int event_del (struct event *ev)
 
   if (ev_is_active (&ev->to))
     ev_timer_stop (EV_A_ &ev->to);
+
+  ev->ev_flags = EVLIST_INIT;
 
   return 0;
 }

@@ -43,6 +43,13 @@ extern "C" {
 
 struct event_base;
 
+#define EVLIST_TIMEOUT  0x01
+#define EVLIST_INSERTED 0x02
+#define EVLIST_SIGNAL   0x04
+#define EVLIST_ACTIVE   0x08
+#define EVLIST_INTERNAL 0x10
+#define EVLIST_INIT     0x80
+
 struct event
 {
   /* libev watchers we map onto */
@@ -59,6 +66,7 @@ struct event
   int ev_fd;
   int ev_pri;
   int ev_res;
+  int ev_flags;
   short ev_events;
 };
 
@@ -67,7 +75,7 @@ struct event
 #define EVENT_SIGNAL(ev)           ((int) (ev)->ev_fd)
 #define EVENT_FD(ev)               ((int) (ev)->ev_fd)
 
-#define event_initialized(ev)      1
+#define event_initialized(ev)      ((ev)->ev_flags & EVLIST_INIT)
 
 #define evtimer_add(ev,tv)         event_add (ev, tv)
 #define evtimer_set(ev,cb,data)    event_set (ev, -1, 0, cb, data)
