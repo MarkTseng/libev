@@ -427,7 +427,8 @@ required if you know what you are doing).
 You have to be careful with dup'ed file descriptors, though. Some backends
 (the linux epoll backend is a notable example) cannot handle dup'ed file
 descriptors correctly if you register interest in two or more fds pointing
-to the same file/socket etc. description.
+to the same file/socket etc. description (that is, they share the same
+underlying "file open").
 
 If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only EVMETHOD_SELECT and
@@ -451,7 +452,7 @@ Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.
 
 The timers are based on real time, that is, if you register an event that
-times out after an hour and youreset your system clock to last years
+times out after an hour and you reset your system clock to last years
 time, it will still time out after (roughly) and hour. "Roughly" because
 detecting time jumps is hard, and soem inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).
@@ -460,7 +461,7 @@ The relative timeouts are calculated relative to the C<ev_now ()>
 time. This is usually the right thing as this timestamp refers to the time
 of the event triggering whatever timeout you are modifying/starting.  If
 you suspect event processing to be delayed and you *need* to base the timeout
-ion the current time, use something like this to adjust for this:
+on the current time, use something like this to adjust for this:
 
    ev_timer_set (&timer, after + ev_now () - ev_time (), 0.);
 
@@ -478,7 +479,7 @@ later, again, and again, until stopped manually.
 The timer itself will do a best-effort at avoiding drift, that is, if you
 configure a timer to trigger every 10 seconds, then it will trigger at
 exactly 10 second intervals. If, however, your program cannot keep up with
-the timer (ecause it takes longer than those 10 seconds to do stuff) the
+the timer (because it takes longer than those 10 seconds to do stuff) the
 timer will not fire more than once per event loop iteration.
 
 =item ev_timer_again (loop)
@@ -727,7 +728,7 @@ There are some other functions of possible interest. Described. Here. Now.
 This function combines a simple timer and an I/O watcher, calls your
 callback on whichever event happens first and automatically stop both
 watchers. This is useful if you want to wait for a single event on an fd
-or timeout without havign to allocate/configure/start/stop/free one or
+or timeout without having to allocate/configure/start/stop/free one or
 more watchers yourself.
 
 If C<fd> is less than 0, then no I/O watcher will be started and events
