@@ -97,10 +97,15 @@ extern "C" {
 
 #ifndef EV_USE_SELECT
 # define EV_USE_SELECT 1
+# define EV_SELECT_USE_FD_SET 1
 #endif
 
 #ifndef EV_USE_POLL
-# define EV_USE_POLL 0 /* poll is usually slower than select, and not as well tested */
+# ifdef _WIN32
+#  define EV_USE_POLL 0
+# else
+#  define EV_USE_POLL 1
+# endif
 #endif
 
 #ifndef EV_USE_EPOLL

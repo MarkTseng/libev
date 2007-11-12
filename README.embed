@@ -106,7 +106,17 @@ PREPROCESSOR SYMBOLS
        done: if no other method takes over, select will be it. Otherwise
        the select backend will not be compiled in.
 
-    EV_SELECT_USE_WIN32_HANDLES
+    EV_SELECT_USE_FD_SET
+
+       If defined to 1, then the select backend will use the system fd_set
+       structure. This is useful if libev doesn't compile due to a missing
+       NFDBITS or fd_mask definition or it misguesses the bitset layout on
+       exotic systems. This usually limits the range of file descriptors
+       to some low limit such as 1024 or might have other limitations
+       (winsocket only allows 64 sockets). The FD_SETSIZE macro, set
+       before compilation, might influence the size of the fd_set used.
+
+    EV_SELECT_IS_WINSOCKET
 
        When defined to 1, the select backend will assume that select
        doesn't understand file descriptors but wants osf handles on
@@ -118,9 +128,8 @@ PREPROCESSOR SYMBOLS
     EV_USE_POLL
 
        If defined to be "1", libev will compile in support for the poll(2)
-       backend. No attempt at autodetection will be done. poll usually
-       performs worse than select, so its not enabled by default (it is
-       also slightly less portable).
+       backend. Otherwise it will be enabled on non-win32 platforms. It
+       takes precedence over select.
 
     EV_USE_EPOLL
 
