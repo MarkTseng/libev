@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 12 09:12:14 2007" />
+	<meta name="created" content="Mon Nov 12 09:16:01 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -74,15 +74,15 @@ kqueue mechanisms for file descriptor events, relative timers, absolute
 timers with customised rescheduling, signal events, process status change
 events (related to SIGCHLD), and event watchers dealing with the event
 loop mechanism itself (idle, prepare and check watchers). It also is quite
-fast (see a <a href="http://libev.schmorp.de/bench.html">benchmark</a> comparing it
-to libevent).</p>
+fast (see this <a href="http://libev.schmorp.de/bench.html">benchmark</a> comparing
+it to libevent for example).</p>
 
 </div>
 <h1 id="CONVENTIONS">CONVENTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="CONVENTIONS_CONTENT">
 <p>Libev is very configurable. In this manual the default configuration
 will be described, which supports multiple event loops. For more info
-about various configuraiton options please have a look at the file
+about various configuration options please have a look at the file
 <cite>README.embed</cite> in the libev distribution. If libev was configured without
 support for multiple event loops, then all functions taking an initial
 argument of name <code>loop</code> (which is always of type <code>struct ev_loop *</code>)
@@ -117,10 +117,10 @@ not a problem.</p>
 	<dt>ev_set_allocator (void *(*cb)(void *ptr, long size))</dt>
 	<dd>
 		<p>Sets the allocation function to use (the prototype is similar to the
-realloc function). It is used to allocate and free memory (no surprises
-here). If it returns zero when memory needs to be allocated, the library
-might abort or take some potentially destructive action. The default is
-your system realloc function.</p>
+realloc C function, the semantics are identical). It is used to allocate
+and free memory (no surprises here). If it returns zero when memory
+needs to be allocated, the library might abort or take some potentially
+destructive action. The default is your system realloc function.</p>
 		<p>You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.</p>
@@ -131,7 +131,7 @@ or even to sleep a while and retry until some memory is available.</p>
 as failed select, poll, epoll_wait). The message is a printable string
 indicating the system call or subsystem causing the problem. If this
 callback is set, then libev will expect it to remedy the sitution, no
-matter what, when it returns. That is, libev will geenrally retry the
+matter what, when it returns. That is, libev will generally retry the
 requested operation, or, if the condition doesn't go away, do bad stuff
 (such as abort).</p>
 	</dd>
@@ -145,9 +145,10 @@ types of such loops, the <i>default</i> loop, which supports signals and child
 events, and dynamically created loops which do not.</p>
 <p>If you use threads, a common model is to run the default event loop
 in your main thread (or in a separate thrad) and for each thread you
-create, you also create another event loop. Libev itself does no lockign
-whatsoever, so if you mix calls to different event loops, make sure you
-lock (this is usually a bad idea, though, even if done right).</p>
+create, you also create another event loop. Libev itself does no locking
+whatsoever, so if you mix calls to the same event loop in different
+threads, make sure you lock (this is usually a bad idea, though, even if
+done correctly, because its hideous and inefficient).</p>
 <dl>
 	<dt>struct ev_loop *ev_default_loop (unsigned int flags)</dt>
 	<dd>
