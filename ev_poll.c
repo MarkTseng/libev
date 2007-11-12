@@ -53,7 +53,7 @@ poll_modify (EV_P_ int fd, int oev, int nev)
   if (idx < 0) /* need to allocate a new pollfd */
     {
       pollidxs [fd] = idx = pollcnt++;
-      array_needsize (struct pollfd, polls, pollmax, pollcnt, (void));
+      array_needsize (struct pollfd, polls, pollmax, pollcnt, EMPTY2);
       polls [idx].fd = fd;
     }
 
