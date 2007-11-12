@@ -108,7 +108,7 @@ void event_base_free (struct event_base *base)
   dLOOPbase;
 
 #if EV_MULTIPLICITY
-  if (ev_default_loop (EVMETHOD_AUTO) != loop)
+  if (ev_default_loop (EVFLAG_AUTO) != loop)
     ev_loop_destroy (loop);
 #endif
 }

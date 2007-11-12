@@ -469,7 +469,7 @@ the timer, and again will automatically restart it if need be.
 
 =back
 
-=head2 ev_periodic
+=head2 ev_periodic - to cron or not to cron it
 
 Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).

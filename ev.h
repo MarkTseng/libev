@@ -203,7 +203,7 @@ struct ev_check
   EV_WATCHER (ev_check)
 };
 
-/* invoked when sigchld is received and waitpid indicates the givne pid */
+/* invoked when sigchld is received and waitpid indicates the given pid */
 /* revent EV_CHILD */
 /* does not support priorities */
 struct ev_child
