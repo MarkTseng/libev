@@ -909,7 +909,7 @@ ev_default_loop (unsigned int flags)
       default_loop = 1;
 #endif
 
-      loop_init (EV_A_ methods);
+      loop_init (EV_A_ flags);
 
       if (ev_method (EV_A))
         {
