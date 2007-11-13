@@ -58,7 +58,9 @@ library in any way.
 
 =item ev_tstamp ev_time ()
 
-Returns the current time as libev would use it.
+Returns the current time as libev would use it. Please note that the
+C<ev_now> function is usually faster and also often returns the timestamp
+you actually want to know.
 
 =item int ev_version_major ()
 
