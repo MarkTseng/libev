@@ -241,6 +241,24 @@ This flags value could be used to implement alternative looping
 constructs, but the C<prepare> and C<check> watchers provide a better and
 more generic mechanism.
 
+Here are the gory details of what ev_loop does:
+
+   1. If there are no active watchers (reference count is zero), return.
+   2. Queue and immediately call all prepare watchers.
+   3. If we have been forked, recreate the kernel state.
+   4. Update the kernel state with all outstanding changes.
+   5. Update the "event loop time".
+   6. Calculate for how long to block.
+   7. Block the process, waiting for events.
+   8. Update the "event loop time" and do time jump handling.
+   9. Queue all outstanding timers.
+  10. Queue all outstanding periodics.
+  11. If no events are pending now, queue all idle watchers.
+  12. Queue all check watchers.
+  13. Call all queued watchers in reverse order (i.e. check watchers first).
+  14. If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
+      was used, return, otherwise continue with step #1.
+
 =item ev_unloop (loop, how)
 
 Can be used to make a call to C<ev_loop> return early (but only after it
