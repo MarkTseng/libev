@@ -95,7 +95,7 @@ namespace ev {
    * so a macro solution was chosen */
   #define EV_BEGIN_WATCHER(cppstem,cstem)	                                        \
                                                                                         \
-  static void cb_ ## cppstem (struct ev_ ## cstem *w, int revents);                     \
+  static void cb_ ## cppstem (EV_P_ struct ev_ ## cstem *w, int revents);               \
                                                                                         \
   struct cppstem : ev_ ## cstem, callback<cppstem>                                      \
   {                                                                                     \
@@ -146,7 +146,7 @@ namespace ev {
   #define EV_END_WATCHER(cppstem,cstem)	                                                \
   };                                                                                    \
                                                                                         \
-  static void cb_ ## cppstem (struct ev_ ## cstem *w, int revents)                      \
+  static void cb_ ## cppstem (EV_P_ struct ev_ ## cstem *w, int revents)                \
   {                                                                                     \
     (*static_cast<cppstem *>(w))(revents);                                              \
   }
