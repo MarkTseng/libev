@@ -95,13 +95,11 @@ namespace ev {
    * so a macro solution was chosen */
   #define EV_BEGIN_WATCHER(cppstem,cstem)	                                        \
                                                                                         \
-  static void cb_ ## cppstem (EV_P_ struct ev_ ## cstem *w, int revents);               \
-                                                                                        \
   struct cppstem : ev_ ## cstem, callback<cppstem>                                      \
   {                                                                                     \
     EV_CONSTRUCT (cppstem)                                                              \
     {                                                                                   \
-      ev_init (static_cast<ev_ ## cstem *>(this), cb_ ## cppstem);                      \
+      ev_init (static_cast<ev_ ## cstem *>(this), thunk);                               \
     }                                                                                   \
                                                                                         \
     bool is_active () const                                                             \
@@ -139,17 +137,18 @@ namespace ev {
     cppstem (const cppstem &o)								\
     : callback<cppstem> (this, (void (cppstem::*)(cppstem &, int))0)                    \
     { /* disabled */ }                                        				\
+                                                                                        \
     void operator =(const cppstem &o) { /* disabled */ }                                \
+                                                                                        \
+    static void thunk (EV_P_ struct ev_ ## cstem *w, int revents)                       \
+    {                                                                                   \
+      (*static_cast<cppstem *>(w))(revents);                                            \
+    }                                                                                   \
                                                                                         \
   public:
 
   #define EV_END_WATCHER(cppstem,cstem)	                                                \
-  };                                                                                    \
-                                                                                        \
-  static void cb_ ## cppstem (EV_P_ struct ev_ ## cstem *w, int revents)                \
-  {                                                                                     \
-    (*static_cast<cppstem *>(w))(revents);                                              \
-  }
+  };
 
   EV_BEGIN_WATCHER (io, io)
     void set (int fd, int events)
