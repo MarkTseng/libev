@@ -1162,7 +1162,7 @@ ev_loop (EV_P_ int flags)
   double block;
   loop_done = flags & (EVLOOP_ONESHOT | EVLOOP_NONBLOCK) ? 1 : 0;
 
-  do
+  while (activecnt)
     {
       /* queue check watchers (and execute them) */
       if (expect_false (preparecnt))
@@ -1235,8 +1235,10 @@ ev_loop (EV_P_ int flags)
         queue_events (EV_A_ (W *)checks, checkcnt, EV_CHECK);
 
       call_pending (EV_A);
+
+      if (loop_done)
+        break;
     }
-  while (activecnt && !loop_done);
 
   if (loop_done != 2)
     loop_done = 0;
