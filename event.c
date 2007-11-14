@@ -209,31 +209,36 @@ int event_add (struct event *ev, struct timeval *tv)
 {
   dLOOPev;
 
-  /* disable all watchers */
-  event_del (ev);
-
   if (ev->ev_events & EV_SIGNAL)
     {
-      ev_signal_set (&ev->iosig.sig, ev->ev_fd);
-      ev_signal_start (EV_A_ &ev->iosig.sig);
+      if (!ev_is_active (&ev->iosig.sig))
+        {
+          ev_signal_set (&ev->iosig.sig, ev->ev_fd);
+          ev_signal_start (EV_A_ &ev->iosig.sig);
 
-      ev->ev_flags |= EVLIST_SIGNAL;
+          ev->ev_flags |= EVLIST_SIGNAL;
+        }
     }
   else if (ev->ev_events & (EV_READ | EV_WRITE))
     {
-      ev_io_set (&ev->iosig.io, ev->ev_fd, ev->ev_events & (EV_READ | EV_WRITE));
-      ev_io_start (EV_A_ &ev->iosig.io);
+      if (!ev_is_active (&ev->iosig.io))
+        {
+          ev_io_set (&ev->iosig.io, ev->ev_fd, ev->ev_events & (EV_READ | EV_WRITE));
+          ev_io_start (EV_A_ &ev->iosig.io);
 
-      ev->ev_flags |= EVLIST_INSERTED;
+          ev->ev_flags |= EVLIST_INSERTED;
+        }
     }
 
   if (tv)
     {
-      ev_timer_set (&ev->to, tv_get (tv), 0.);
-      ev_timer_start (EV_A_ &ev->to);
-
+      ev->to.repeat = tv_get (tv);
+      ev_timer_again (EV_A_ &ev->to);
       ev->ev_flags |= EVLIST_TIMEOUT;
     }
+  else
+    if (ev_is_active (&ev->to))
+      ev_timer_stop (EV_A_ &ev->to);
 
   ev->ev_flags |= EVLIST_ACTIVE;
 
