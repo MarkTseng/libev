@@ -260,8 +260,8 @@ typedef struct
   };
   #include "ev_wrap.h"
 
-  struct ev_loop default_loop_struct;
-  static struct ev_loop *default_loop;
+  static struct ev_loop default_loop_struct;
+  struct ev_loop *ev_default_loop_ptr;
 
 #else
 
@@ -270,7 +270,7 @@ typedef struct
     #include "ev_vars.h"
   #undef VAR
 
-  static int default_loop;
+  static int ev_default_loop_ptr;
 
 #endif
 
@@ -616,7 +616,7 @@ ev_feed_signal_event (EV_P_ int signum)
   WL w;
 
 #if EV_MULTIPLICITY
-  assert (("feeding signal events is only supported in the default loop", loop == default_loop));
+  assert (("feeding signal events is only supported in the default loop", loop == ev_default_loop_ptr));
 #endif
 
   --signum;
@@ -893,21 +893,22 @@ ev_loop_fork (EV_P)
 
 #if EV_MULTIPLICITY
 struct ev_loop *
+ev_default_loop_ (unsigned int flags)
 #else
 int
-#endif
 ev_default_loop (unsigned int flags)
+#endif
 {
   if (sigpipe [0] == sigpipe [1])
     if (pipe (sigpipe))
       return 0;
 
-  if (!default_loop)
+  if (!ev_default_loop_ptr)
     {
 #if EV_MULTIPLICITY
-      struct ev_loop *loop = default_loop = &default_loop_struct;
+      struct ev_loop *loop = ev_default_loop_ptr = &default_loop_struct;
 #else
-      default_loop = 1;
+      ev_default_default_loop_ptr = 1;
 #endif
 
       loop_init (EV_A_ flags);
@@ -924,17 +925,17 @@ ev_default_loop (unsigned int flags)
 #endif
         }
       else
-        default_loop = 0;
+        ev_default_loop_ptr = 0;
     }
 
-  return default_loop;
+  return ev_default_loop_ptr;
 }
 
 void
 ev_default_destroy (void)
 {
 #if EV_MULTIPLICITY
-  struct ev_loop *loop = default_loop;
+  struct ev_loop *loop = ev_default_loop_ptr;
 #endif
 
 #ifndef _WIN32
@@ -955,7 +956,7 @@ void
 ev_default_fork (void)
 {
 #if EV_MULTIPLICITY
-  struct ev_loop *loop = default_loop;
+  struct ev_loop *loop = ev_default_loop_ptr;
 #endif
 
   if (method)
@@ -1518,7 +1519,7 @@ void
 ev_signal_start (EV_P_ struct ev_signal *w)
 {
 #if EV_MULTIPLICITY
-  assert (("signal watchers are only supported in the default loop", loop == default_loop));
+  assert (("signal watchers are only supported in the default loop", loop == ev_default_loop_ptr));
 #endif
   if (ev_is_active (w))
     return;
@@ -1561,7 +1562,7 @@ void
 ev_child_start (EV_P_ struct ev_child *w)
 {
 #if EV_MULTIPLICITY
-  assert (("child watchers are only supported in the default loop", loop == default_loop));
+  assert (("child watchers are only supported in the default loop", loop == ev_default_loop_ptr));
 #endif
   if (ev_is_active (w))
     return;
