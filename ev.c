@@ -908,7 +908,7 @@ ev_default_loop (unsigned int flags)
 #if EV_MULTIPLICITY
       struct ev_loop *loop = ev_default_loop_ptr = &default_loop_struct;
 #else
-      ev_default_default_loop_ptr = 1;
+      ev_default_loop_ptr = 1;
 #endif
 
       loop_init (EV_A_ flags);
