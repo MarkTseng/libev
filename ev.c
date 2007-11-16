@@ -96,16 +96,15 @@ extern "C" {
 /**/
 
 #ifndef EV_USE_MONOTONIC
-# define EV_USE_MONOTONIC 1
+# define EV_USE_MONOTONIC 0
 #endif
 
 #ifndef EV_USE_REALTIME
-# define EV_USE_REALTIME 1
+# define EV_USE_REALTIME 0
 #endif
 
 #ifndef EV_USE_SELECT
 # define EV_USE_SELECT 1
-# define EV_SELECT_USE_FD_SET 1
 #endif
 
 #ifndef EV_USE_POLL

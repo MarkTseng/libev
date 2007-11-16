@@ -42,6 +42,7 @@ FILESETS
         ev_poll.c       only when poll backend is enabled (disabled by default)
         ev_epoll.c      only when the epoll backend is enabled (disabled by default)
         ev_kqueue.c     only when the kqueue backend is enabled (disabled by default)
+        ev_port.c       only when the solaris port backend is enabled (disabled by default)
 
     "ev.c" includes the backend files directly when enabled.
 
@@ -85,10 +86,12 @@ PREPROCESSOR SYMBOLS
 
     EV_USE_MONOTONIC
 
-        If undefined or defined to be "1", libev will try to detect the
-        availability of the monotonic clock option at both compiletime and
+        If defined to be "1", libev will try to detect the availability
+        of the monotonic clock option at both compiletime and
         runtime. Otherwise no use of the monotonic clock option will be
-        attempted.
+        attempted. If you enable this, you usually have to link against
+        librt or something similar. Enabling it when the functionality
+        isn't available is safe, though.
 
     EV_USE_REALTIME
 
