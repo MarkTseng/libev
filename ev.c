@@ -153,9 +153,9 @@ extern "C" {
 /**/
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
-#define MAX_BLOCKTIME 59.731 /* never wait longer than this time (to detect time jumps) */
+#define MAX_BLOCKTIME 59.743 /* never wait longer than this time (to detect time jumps) */
 #define PID_HASHSIZE  16 /* size of pid hash table, must be power of two */
-/*#define CLEANUP_INTERVAL 300. /* how often to try to free memory and re-check fds */
+/*#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds */
 
 #ifdef EV_H
 # include EV_H
