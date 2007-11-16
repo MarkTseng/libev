@@ -61,6 +61,10 @@ extern "C" {
 #  define EV_USE_KQUEUE 1
 # endif
 
+# if HAVE_PORT_H && HAVE_PORT_H && HAVE_PORT_CREATE && !defined (EV_USE_PORT)
+#  define EV_USE_PORT 1
+# endif
+
 #endif
 
 #include <math.h>
@@ -95,6 +99,10 @@ extern "C" {
 # define EV_USE_MONOTONIC 1
 #endif
 
+#ifndef EV_USE_REALTIME
+# define EV_USE_REALTIME 1
+#endif
+
 #ifndef EV_USE_SELECT
 # define EV_USE_SELECT 1
 # define EV_SELECT_USE_FD_SET 1
@@ -116,8 +124,8 @@ extern "C" {
 # define EV_USE_KQUEUE 0
 #endif
 
-#ifndef EV_USE_REALTIME
-# define EV_USE_REALTIME 1
+#ifndef EV_USE_PORT
+# define EV_USE_PORT 0
 #endif
 
 /**/
@@ -712,6 +720,9 @@ childcb (EV_P_ struct ev_signal *sw, int revents)
 
 /*****************************************************************************/
 
+#if EV_USE_PORT
+# include "ev_port.c"
+#endif
 #if EV_USE_KQUEUE
 # include "ev_kqueue.c"
 #endif
@@ -780,6 +791,9 @@ loop_init (EV_P_ unsigned int flags)
         flags |= 0x0000ffff;
 
       method = 0;
+#if EV_USE_PORT
+      if (!method && (flags & EVMETHOD_PORT  )) method = port_init   (EV_A_ flags);
+#endif
 #if EV_USE_KQUEUE
       if (!method && (flags & EVMETHOD_KQUEUE)) method = kqueue_init (EV_A_ flags);
 #endif
@@ -803,6 +817,9 @@ loop_destroy (EV_P)
 {
   int i;
 
+#if EV_USE_PORT
+  if (method == EVMETHOD_PORT  ) port_destroy   (EV_A);
+#endif
 #if EV_USE_KQUEUE
   if (method == EVMETHOD_KQUEUE) kqueue_destroy (EV_A);
 #endif
@@ -835,11 +852,14 @@ loop_destroy (EV_P)
 static void
 loop_fork (EV_P)
 {
-#if EV_USE_EPOLL
-  if (method == EVMETHOD_EPOLL ) epoll_fork  (EV_A);
+#if EV_USE_PORT
+  if (method == EVMETHOD_PORT  ) port_fork   (EV_A);
 #endif
 #if EV_USE_KQUEUE
   if (method == EVMETHOD_KQUEUE) kqueue_fork (EV_A);
+#endif
+#if EV_USE_EPOLL
+  if (method == EVMETHOD_EPOLL ) epoll_fork  (EV_A);
 #endif
 
   if (ev_is_active (&sigev))

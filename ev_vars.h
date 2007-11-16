@@ -44,6 +44,12 @@ VARx(struct kevent *, kqueue_events)
 VARx(int, kqueue_eventmax)
 #endif
 
+#if EV_USE_PORT || EV_GENWRAP
+VARx(int, port_fd)
+VARx(struct port_event *, port_events)
+VARx(int, port_eventmax)
+#endif
+
 VARx(ANFD *, anfds)
 VARx(int, anfdmax)
 

@@ -147,8 +147,14 @@ PREPROCESSOR SYMBOLS
        will be detected at runtime and routed around by disabling this
        backend.
 
+    EV_USE_PORT
+
+       If defined to be "1", libev will compile in support for the Solaris
+       10 port style backend. Its availability will be detected at runtime,
+       otherwise another method will be used as fallback. This is the
+       preferred backend for Solaris 10 systems.
+
     EV_USE_DEVPOLL
-    EV_USE_PORTS
     
        reserved for future expansion, works like the USE symbols above.
 
