@@ -61,7 +61,7 @@ extern "C" {
 #  define EV_USE_KQUEUE 1
 # endif
 
-# if HAVE_PORT_H && HAVE_PORT_H && HAVE_PORT_CREATE && !defined (EV_USE_PORT)
+# if HAVE_PORT_H && HAVE_PORT_CREATE && !defined (EV_USE_PORT)
 #  define EV_USE_PORT 1
 # endif
 
