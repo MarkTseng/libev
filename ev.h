@@ -276,7 +276,7 @@ ev_default_loop (unsigned int flags)
   extern struct ev_loop *ev_default_loop_ (unsigned int flags);
 
   if (!ev_default_loop_ptr)
-    ev_default_loop_ (flags);
+    ev_default_loop_init (flags);
 
   return ev_default_loop_ptr;
 }
