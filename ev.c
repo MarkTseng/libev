@@ -811,7 +811,7 @@ loop_init (EV_P_ unsigned int flags)
     }
 }
 
-void
+static void
 loop_destroy (EV_P)
 {
   int i;
