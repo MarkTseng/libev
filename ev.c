@@ -912,7 +912,7 @@ ev_loop_fork (EV_P)
 
 #if EV_MULTIPLICITY
 struct ev_loop *
-ev_default_loop_ (unsigned int flags)
+ev_default_loop_init (unsigned int flags)
 #else
 int
 ev_default_loop (unsigned int flags)
