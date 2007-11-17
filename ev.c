@@ -996,7 +996,7 @@ any_pending (EV_P)
   return 0;
 }
 
-static void
+inline void
 call_pending (EV_P)
 {
   int pri;
@@ -1006,7 +1006,7 @@ call_pending (EV_P)
       {
         ANPENDING *p = pendings [pri] + --pendingcnt [pri];
 
-        if (p->w)
+        if (expect_true (p->w))
           {
             p->w->pending = 0;
             EV_CB_INVOKE (p->w, p->events);

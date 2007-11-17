@@ -474,16 +474,20 @@ given time, and optionally repeating in regular intervals after that.
 The timers are based on real time, that is, if you register an event that
 times out after an hour and you reset your system clock to last years
 time, it will still time out after (roughly) and hour. "Roughly" because
-detecting time jumps is hard, and soem inaccuracies are unavoidable (the
+detecting time jumps is hard, and some inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).
 
 The relative timeouts are calculated relative to the C<ev_now ()>
 time. This is usually the right thing as this timestamp refers to the time
-of the event triggering whatever timeout you are modifying/starting.  If
-you suspect event processing to be delayed and you *need* to base the timeout
+of the event triggering whatever timeout you are modifying/starting. If
+you suspect event processing to be delayed and you I<need> to base the timeout
 on the current time, use something like this to adjust for this:
 
    ev_timer_set (&timer, after + ev_now () - ev_time (), 0.);
+
+The callback is guarenteed to be invoked only when its timeout has passed,
+but if multiple timers become ready during the same loop iteration then
+order of execution is undefined.
 
 =over 4
 
@@ -540,6 +544,10 @@ again).
 They can also be used to implement vastly more complex timers, such as
 triggering an event on eahc midnight, local time.
 
+As with timers, the callback is guarenteed to be invoked only when the
+time (C<at>) has been passed, but if multiple periodic timers become ready
+during the same loop iteration then order of execution is undefined.
+
 =over 4
 
 =item ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)
@@ -548,7 +556,6 @@ triggering an event on eahc midnight, local time.
 
 Lots of arguments, lets sort it out... There are basically three modes of
 operation, and we will explain them from simplest to complex:
-
 
 =over 4
 
