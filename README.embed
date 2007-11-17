@@ -121,12 +121,13 @@ PREPROCESSOR SYMBOLS
 
     EV_SELECT_IS_WINSOCKET
 
-       When defined to 1, the select backend will assume that select
-       doesn't understand file descriptors but wants osf handles on
-       win32 (this is the case when the select to be used is the winsock
-       select). This means that it will call _get_osfhandle on the fd to
-       convert it to an OS handle. Should not be defined on non-win32
-       platforms.
+       When defined to 1, the select backend will assume that
+       select/socket/connect etc. don't understand file descriptors but
+       wants osf handles on win32 (this is the case when the select to
+       be used is the winsock select). This means that it will call
+       _get_osfhandle on the fd to convert it to an OS handle. Otherwise,
+       it is assumed that all these functions actually work on fds, even
+       on win32. Should not be defined on non-win32 platforms.
 
     EV_USE_POLL
 
