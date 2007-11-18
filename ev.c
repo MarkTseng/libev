@@ -52,34 +52,44 @@ extern "C" {
 #  endif
 # endif
 
-# if HAVE_SELECT && HAVE_SYS_SELECT_H && !defined (EV_USE_SELECT)
-#  define EV_USE_SELECT 1
-# else
-#  define EV_USE_SELECT 0
+# ifndef EV_USE_SELECT
+#  if HAVE_SELECT && HAVE_SYS_SELECT_H
+#   define EV_USE_SELECT 1
+#  else
+#   define EV_USE_SELECT 0
+#  endif
 # endif
 
-# if HAVE_POLL && HAVE_POLL_H && !defined (EV_USE_POLL)
-#  define EV_USE_POLL 1
-# else
-#  define EV_USE_POLL 0
+# ifndef EV_USE_POLL
+#  if HAVE_POLL && HAVE_POLL_H
+#   define EV_USE_POLL 1
+#  else
+#   define EV_USE_POLL 0
+#  endif
 # endif
-
-# if HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H && !defined (EV_USE_EPOLL)
-#  define EV_USE_EPOLL 1
-# else
-#  define EV_USE_EPOLL 0
+   
+# ifndef EV_USE_EPOLL
+#  if HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H
+#   define EV_USE_EPOLL 1
+#  else
+#   define EV_USE_EPOLL 0
+#  endif
 # endif
-
-# if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H && !defined (EV_USE_KQUEUE)
-#  define EV_USE_KQUEUE 1
-# else
-#  define EV_USE_KQUEUE 0
+   
+# ifndef EV_USE_KQUEUE
+#  if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H
+#   define EV_USE_KQUEUE 1
+#  else
+#   define EV_USE_KQUEUE 0
+#  endif
 # endif
-
-# if HAVE_PORT_H && HAVE_PORT_CREATE && !defined (EV_USE_PORT)
-#  define EV_USE_PORT 1
-# else
-#  define EV_USE_PORT 0
+   
+# ifndef EV_USE_PORT
+#  if HAVE_PORT_H && HAVE_PORT_CREATE
+#   define EV_USE_PORT 1
+#  else
+#   define EV_USE_PORT 0
+#  endif
 # endif
 
 #endif
