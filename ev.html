@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Tue Nov 13 04:04:09 2007" />
+	<meta name="created" content="Sun Nov 18 04:43:20 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -108,7 +108,9 @@ library in any way.</p>
 <dl>
 	<dt>ev_tstamp ev_time ()</dt>
 	<dd>
-		<p>Returns the current time as libev would use it.</p>
+		<p>Returns the current time as libev would use it. Please note that the
+<code>ev_now</code> function is usually faster and also often returns the timestamp
+you actually want to know.</p>
 	</dd>
 	<dt>int ev_version_major ()</dt>
 	<dt>int ev_version_minor ()</dt>
@@ -270,6 +272,24 @@ one iteration of the loop.</p>
 		<p>This flags value could be used to implement alternative looping
 constructs, but the <code>prepare</code> and <code>check</code> watchers provide a better and
 more generic mechanism.</p>
+		<p>Here are the gory details of what ev_loop does:</p>
+<pre>   1. If there are no active watchers (reference count is zero), return.
+   2. Queue and immediately call all prepare watchers.
+   3. If we have been forked, recreate the kernel state.
+   4. Update the kernel state with all outstanding changes.
+   5. Update the &quot;event loop time&quot;.
+   6. Calculate for how long to block.
+   7. Block the process, waiting for events.
+   8. Update the &quot;event loop time&quot; and do time jump handling.
+   9. Queue all outstanding timers.
+  10. Queue all outstanding periodics.
+  11. If no events are pending now, queue all idle watchers.
+  12. Queue all check watchers.
+  13. Call all queued watchers in reverse order (i.e. check watchers first).
+  14. If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
+      was used, return, otherwise continue with step #1.
+
+</pre>
 	</dd>
 	<dt>ev_unloop (loop, how)</dt>
 	<dd>
@@ -474,16 +494,19 @@ given time, and optionally repeating in regular intervals after that.</p>
 <p>The timers are based on real time, that is, if you register an event that
 times out after an hour and you reset your system clock to last years
 time, it will still time out after (roughly) and hour. &quot;Roughly&quot; because
-detecting time jumps is hard, and soem inaccuracies are unavoidable (the
+detecting time jumps is hard, and some inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).</p>
 <p>The relative timeouts are calculated relative to the <code>ev_now ()</code>
 time. This is usually the right thing as this timestamp refers to the time
-of the event triggering whatever timeout you are modifying/starting.  If
-you suspect event processing to be delayed and you *need* to base the timeout
+of the event triggering whatever timeout you are modifying/starting. If
+you suspect event processing to be delayed and you <i>need</i> to base the timeout
 on the current time, use something like this to adjust for this:</p>
 <pre>   ev_timer_set (&amp;timer, after + ev_now () - ev_time (), 0.);
 
 </pre>
+<p>The callback is guarenteed to be invoked only when its timeout has passed,
+but if multiple timers become ready during the same loop iteration then
+order of execution is undefined.</p>
 <dl>
 	<dt>ev_timer_init (ev_timer *, callback, ev_tstamp after, ev_tstamp repeat)</dt>
 	<dt>ev_timer_set (ev_timer *, ev_tstamp after, ev_tstamp repeat)</dt>
@@ -531,16 +554,15 @@ roughly 10 seconds later and of course not if you reset your system time
 again).</p>
 <p>They can also be used to implement vastly more complex timers, such as
 triggering an event on eahc midnight, local time.</p>
+<p>As with timers, the callback is guarenteed to be invoked only when the
+time (<code>at</code>) has been passed, but if multiple periodic timers become ready
+during the same loop iteration then order of execution is undefined.</p>
 <dl>
 	<dt>ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)</dt>
 	<dt>ev_periodic_set (ev_periodic *, ev_tstamp after, ev_tstamp repeat, reschedule_cb)</dt>
 	<dd>
 		<p>Lots of arguments, lets sort it out... There are basically three modes of
 operation, and we will explain them from simplest to complex:</p>
-
-
-
-
 		<p>
 			<dl>
 				<dt>* absolute timer (interval = reschedule_cb = 0)</dt>

@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-11-13" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-11-18" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -182,7 +182,9 @@ These functions can be called anytime, even before initialising the
 library in any way.
 .IP "ev_tstamp ev_time ()" 4
 .IX Item "ev_tstamp ev_time ()"
-Returns the current time as libev would use it.
+Returns the current time as libev would use it. Please note that the
+\&\f(CW\*(C`ev_now\*(C'\fR function is usually faster and also often returns the timestamp
+you actually want to know.
 .IP "int ev_version_major ()" 4
 .IX Item "int ev_version_major ()"
 .PD 0
@@ -356,6 +358,26 @@ one iteration of the loop.
 This flags value could be used to implement alternative looping
 constructs, but the \f(CW\*(C`prepare\*(C'\fR and \f(CW\*(C`check\*(C'\fR watchers provide a better and
 more generic mechanism.
+.Sp
+Here are the gory details of what ev_loop does:
+.Sp
+.Vb 15
+\&   1. If there are no active watchers (reference count is zero), return.
+\&   2. Queue and immediately call all prepare watchers.
+\&   3. If we have been forked, recreate the kernel state.
+\&   4. Update the kernel state with all outstanding changes.
+\&   5. Update the "event loop time".
+\&   6. Calculate for how long to block.
+\&   7. Block the process, waiting for events.
+\&   8. Update the "event loop time" and do time jump handling.
+\&   9. Queue all outstanding timers.
+\&  10. Queue all outstanding periodics.
+\&  11. If no events are pending now, queue all idle watchers.
+\&  12. Queue all check watchers.
+\&  13. Call all queued watchers in reverse order (i.e. check watchers first).
+\&  14. If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
+\&      was used, return, otherwise continue with step #1.
+.Ve
 .IP "ev_unloop (loop, how)" 4
 .IX Item "ev_unloop (loop, how)"
 Can be used to make a call to \f(CW\*(C`ev_loop\*(C'\fR return early (but only after it
@@ -573,18 +595,22 @@ given time, and optionally repeating in regular intervals after that.
 The timers are based on real time, that is, if you register an event that
 times out after an hour and you reset your system clock to last years
 time, it will still time out after (roughly) and hour. \*(L"Roughly\*(R" because
-detecting time jumps is hard, and soem inaccuracies are unavoidable (the
+detecting time jumps is hard, and some inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).
 .PP
 The relative timeouts are calculated relative to the \f(CW\*(C`ev_now ()\*(C'\fR
 time. This is usually the right thing as this timestamp refers to the time
-of the event triggering whatever timeout you are modifying/starting.  If
-you suspect event processing to be delayed and you *need* to base the timeout
+of the event triggering whatever timeout you are modifying/starting. If
+you suspect event processing to be delayed and you \fIneed\fR to base the timeout
 on the current time, use something like this to adjust for this:
 .PP
 .Vb 1
 \&   ev_timer_set (&timer, after + ev_now () - ev_time (), 0.);
 .Ve
+.PP
+The callback is guarenteed to be invoked only when its timeout has passed,
+but if multiple timers become ready during the same loop iteration then
+order of execution is undefined.
 .IP "ev_timer_init (ev_timer *, callback, ev_tstamp after, ev_tstamp repeat)" 4
 .IX Item "ev_timer_init (ev_timer *, callback, ev_tstamp after, ev_tstamp repeat)"
 .PD 0
@@ -636,6 +662,10 @@ again).
 .PP
 They can also be used to implement vastly more complex timers, such as
 triggering an event on eahc midnight, local time.
+.PP
+As with timers, the callback is guarenteed to be invoked only when the
+time (\f(CW\*(C`at\*(C'\fR) has been passed, but if multiple periodic timers become ready
+during the same loop iteration then order of execution is undefined.
 .IP "ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)" 4
 .IX Item "ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)"
 .PD 0
