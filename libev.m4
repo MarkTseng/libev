@@ -8,8 +8,8 @@ AC_CHECK_FUNCS(epoll_ctl kqueue port_create poll select)
  
 AC_CHECK_FUNC(clock_gettime, [], [ 
    if test -z "$LIBEV_M4_AVOID_LIBRT"; then
-      AC_CHECK_LIB(rt, clock_gettime) 
-      AC_CHECK_FUNCS(clock_gettime)
+     AC_CHECK_LIB(rt, clock_gettime) 
+     AC_CHECK_FUNCS(clock_gettime)
    fi
 ])
 
