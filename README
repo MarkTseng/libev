@@ -1,92 +1,125 @@
-Homepage: http://software.schmorp.de/pkg/libev
-E-Mail: libev@schmorp.de
-
 libev is a high-performance event loop/event model with lots of features.
+(see benchmark at http://libev.schmorp.de/bench.html)
 
-It is modelled (very losely) after libevent
-(http://monkey.org/~provos/libevent/) and the Event perl module, but aims
-to be faster and more correct, and also more featureful.
+   Homepage: http://software.schmorp.de/pkg/libev
+   E-Mail: libev@lists.schmorp.de
 
-DIFFERENCES AND COMPARISON TO LIBEVENT:
+   It is modelled (very losely) after libevent
+   (http://monkey.org/~provos/libevent/) and the Event perl module, but aims
+   to be faster and more correct, and also more featureful.
 
-(comparisons relative to libevent-1.3e and libev-0.00, see also the benchmark
-at http://libev.schmorp.de/bench.html).
+ABOUT THIS DISTRIBUTION
 
-- multiple watchers can wait for the same event without deregistering others,
-  both for file descriptors as well as signals.
-  (registering two read events on fd 10 and unregistering one will not
-  break the other).
+   If you downloaded a distribution of libev, you will find it looks
+   very much like libevent. In fact, the distributed libev tarballs are
+   indeed libevent tarballs patched up with the libev event core, taking
+   the evbuffer, evtag, evdns and evhttpd parts from libevent (they use
+   the libevent emulation inside libev). Configure and Makefile stuff is
+   also a more or less direct copy of libevent, and are maintained by the
+   libevent authors.
 
-- fork() is supported and can be handled
-  (there is no way to recover from a fork when libevent is active).
+   If you are looking for an easily embeddable version, I recommend using
+   the CVS repository (linked from the homepage, above), which contains
+   only the libev core parts.
 
-- timers are handled as a priority queue (important operations are O(1))
-  (libevent uses a much less efficient but more complex red-black tree).
+   Examples of programs that embed libev: the EV perl module,
+   rxvt-unicode, gvpe (GNU Virtual Private Ethernet) and deliantra
+   (http://www.deliantra.net).
 
-- supports absolute (wallclock-based) timers in addition to relative ones,
-  i.e. can schedule timers to occur after n seconds, or at a specific time.
+DIFFERENCES AND COMPARISON TO LIBEVENT
 
-- timers can be repeating (both absolute and relative ones).
+   The comparisons below are relative to libevent-1.3e.
 
-- detects time jumps and adjusts timers
-  (works for both forward and backward time jumps and also for absolute timers).
+   - multiple watchers can wait for the same event without deregistering others,
+     both for file descriptors as well as signals.
+     (registering two read events on fd 10 and unregistering one will not
+     break the other).
 
-- race-free signal processing
-  (libevent may delay processing signals till after the next event).
+   - fork() is supported and can be handled
+     (there is no way to recover from a fork with libevent).
 
-- less calls to epoll_ctl
-  (stopping and starting an io watcher between two loop iterations will now
-  result in spuriois epoll_ctl calls).
+   - timers are handled as a priority queue (important operations are O(1))
+     (libevent uses a much less efficient but more complex red-black tree).
 
-- usually less calls to gettimeofday and clock_gettime
-  (libevent calls it on every timer event change, libev twice per iteration).
+   - supports absolute (wallclock-based) timers in addition to relative ones,
+     i.e. can schedule timers to occur after n seconds, or at a specific time.
 
-- watchers use less memory
-  (libevent on amd64: 152 bytes, libev: <= 56 bytes).
+   - timers can be repeating (both absolute and relative ones).
 
-- library uses less memory
-  (libevent allocates large data structures wether used or not, libev
-  scales all its data structures dynamically).
+   - absolute timers can have customised rescheduling hooks (suitable for cron-like
+     applications).
 
-- no hardcoded arbitrary limits
-  (libevent contains an off-by-one bug and sometimes hardcodes a limit of
-  32000 fds).
+   - detects time jumps and adjusts timers
+     (works for both forward and backward time jumps and also for absolute timers).
 
-- libev separates timer, signal and io watchers from each other
-  (libevent combines them, but with libev you can combine them yourself
-  by reusing the same callback and still save memory).
+   - race-free signal processing
+     (libevent may delay processing signals till after the next event).
 
-- simpler design, backends are potentially much simpler
-  (in libevent, backends have to deal with watchers, thus the problems)
-  (epoll backend in libevent: 366 lines, libev: 90 lines, and more features).
+   - more efficient epoll backend
+     (stopping and starting an io watcher between two loop iterations will not
+     result in spurious epoll_ctl calls).
 
-- libev handles EBADF gracefully by removing the offending fds.
+   - usually less calls to gettimeofday and clock_gettime
+     (libevent calls it on every timer event change, libev twice per iteration).
 
-- doesn't rely on nonportable BSD header files.
+   - watchers use less memory
+     (libevent watcher on amd64: 152 bytes, libev native: <= 56 bytes, libevent emulation: 144 bytes).
 
-- a event.h compatibility header exists, and can be used to run a wide
-  range of libevent programs unchanged (such as evdns.c).
+   - library uses less memory
+     (libevent allocates large data structures wether used or not, libev
+     scales all its data structures dynamically).
 
-- win32 compatibility for the core parts.
+   - no hardcoded arbitrary limits
+     (libevent contains an off-by-one bug and sometimes hardcodes limits).
 
-- the event core library (ev and event layer) compiles and works both as
-  C and C++.
+   - libev separates timer, signal and io watchers from each other
+     (libevent combines them, but with libev you can combine them yourself
+     by reusing the same callback and still save memory).
 
-whats missing?
+   - simpler design, backends are potentially much simpler
+     (in libevent, backends have to deal with watchers, thus the problems with
+     wildly different semantics between diferent backends)
+     (epoll backend in libevent: 366 lines no caching, libev: 90 lines full caching).
 
-- no event-like priority support at the moment (the ev priorities
-  are not yet finished and work differently, but you can use idle watchers
-  to get a similar effect).
+   - libev handles EBADF gracefully by removing the offending fds.
+
+   - libev communicates errors to the callback, libevent to the
+     event adder or not at all.
+
+   - doesn't rely on nonportable BSD header files.
+
+   - an event.h compatibility header exists, and can be used to run a wide
+     range of libevent programs unchanged (such as evdns.c).
+
+   - win32 compatibility for the core parts.
+     (the backend is fd-based as documented and on other platforms,
+     not handle-based like libevent, and can be used for both winscoket environments
+     and unix-like ones).
+
+   - libev can be embedded easily with or without autoconf support into
+     other programs, with no changes to the source code necessary.
+
+   - the event core library (ev and event layer) compiles and works both as
+     C and C++.
+
+   - a simple C++ wrapper that supports methods as callbacks exists.
+
+   - a full featured and widely used perl module is available.
+
+   whats missing?
+
+   - no event-like priority support at the moment (the ev priorities work
+     differently, but you can use idle watchers to get a similar effect).
 
 AUTHOR
 
-libev was written and designed by Marc Lehmann and Emanuele Giaquinta.
+   libev was written and designed by Marc Lehmann and Emanuele Giaquinta.
 
-The following people sent in patches or made other noteworthy
-contributions (if I forgot to include you, please shout at me, it was an
-accident):
+   The following people sent in patches or made other noteworthy
+   contributions to the design (if I forgot to include you, please shout
+   at me, it was an accident):
 
-W.C.A. Wijngaards
-Christopher Layne
-Chris Brody
+   W.C.A. Wijngaards
+   Christopher Layne
+   Chris Brody
 
