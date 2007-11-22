@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-11-18" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-11-22" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -262,31 +262,69 @@ or setgid) then libev will \fInot\fR look at the environment variable
 override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.
-.ie n .IP """EVMETHOD_SELECT""  (portable select backend)" 4
-.el .IP "\f(CWEVMETHOD_SELECT\fR  (portable select backend)" 4
-.IX Item "EVMETHOD_SELECT  (portable select backend)"
-.PD 0
-.ie n .IP """EVMETHOD_POLL""    (poll backend, available everywhere except on windows)" 4
-.el .IP "\f(CWEVMETHOD_POLL\fR    (poll backend, available everywhere except on windows)" 4
-.IX Item "EVMETHOD_POLL    (poll backend, available everywhere except on windows)"
-.ie n .IP """EVMETHOD_EPOLL""   (linux only)" 4
-.el .IP "\f(CWEVMETHOD_EPOLL\fR   (linux only)" 4
-.IX Item "EVMETHOD_EPOLL   (linux only)"
-.ie n .IP """EVMETHOD_KQUEUE""  (some bsds only)" 4
-.el .IP "\f(CWEVMETHOD_KQUEUE\fR  (some bsds only)" 4
-.IX Item "EVMETHOD_KQUEUE  (some bsds only)"
-.ie n .IP """EVMETHOD_DEVPOLL"" (solaris 8 only)" 4
-.el .IP "\f(CWEVMETHOD_DEVPOLL\fR (solaris 8 only)" 4
-.IX Item "EVMETHOD_DEVPOLL (solaris 8 only)"
-.ie n .IP """EVMETHOD_PORT""    (solaris 10 only)" 4
-.el .IP "\f(CWEVMETHOD_PORT\fR    (solaris 10 only)" 4
-.IX Item "EVMETHOD_PORT    (solaris 10 only)"
-.PD
-If one or more of these are ored into the flags value, then only these
-backends will be tried (in the reverse order as given here). If one are
-specified, any backend will do.
+.ie n .IP """EVMETHOD_SELECT""  (value 1, portable select backend)" 4
+.el .IP "\f(CWEVMETHOD_SELECT\fR  (value 1, portable select backend)" 4
+.IX Item "EVMETHOD_SELECT  (value 1, portable select backend)"
+This is your standard \fIselect\fR\|(2) backend. Not \fIcompletely\fR standard, as
+libev tries to roll its own fd_set with no limits on the number of fds,
+but if that fails, expect a fairly low limit on the number of fds when
+using this backend. It doesn't scale too well (O(highest_fd)), but its usually
+the fastest backend for a low number of fds.
+.ie n .IP """EVMETHOD_POLL""    (value 2, poll backend, available everywhere except on windows)" 4
+.el .IP "\f(CWEVMETHOD_POLL\fR    (value 2, poll backend, available everywhere except on windows)" 4
+.IX Item "EVMETHOD_POLL    (value 2, poll backend, available everywhere except on windows)"
+And this is your standard \fIpoll\fR\|(2) backend. It's more complicated than
+select, but handles sparse fds better and has no artificial limit on the
+number of fds you can use (except it will slow down considerably with a
+lot of inactive fds). It scales similarly to select, i.e. O(total_fds).
+.ie n .IP """EVMETHOD_EPOLL""   (value 4, Linux)" 4
+.el .IP "\f(CWEVMETHOD_EPOLL\fR   (value 4, Linux)" 4
+.IX Item "EVMETHOD_EPOLL   (value 4, Linux)"
+For few fds, this backend is a bit little slower than poll and select,
+but it scales phenomenally better. While poll and select usually scale like
+O(total_fds) where n is the total number of fds (or the highest fd), epoll scales
+either O(1) or O(active_fds).
+.Sp
+While stopping and starting an I/O watcher in the same iteration will
+result in some caching, there is still a syscall per such incident
+(because the fd could point to a different file description now), so its
+best to avoid that. Also, \fIdup()\fRed file descriptors might not work very
+well if you register events for both fds.
+.ie n .IP """EVMETHOD_KQUEUE""  (value 8, most \s-1BSD\s0 clones)" 4
+.el .IP "\f(CWEVMETHOD_KQUEUE\fR  (value 8, most \s-1BSD\s0 clones)" 4
+.IX Item "EVMETHOD_KQUEUE  (value 8, most BSD clones)"
+Kqueue deserves special mention, as at the time of this writing, it
+was broken on all BSDs except NetBSD (usually it doesn't work with
+anything but sockets and pipes, except on Darwin, where of course its
+completely useless). For this reason its not being \*(L"autodetected\*(R" unless
+you explicitly specify the flags (i.e. you don't use \s-1EVFLAG_AUTO\s0).
+.Sp
+It scales in the same way as the epoll backend, but the interface to the
+kernel is more efficient (which says nothing about its actual speed, of
+course). While starting and stopping an I/O watcher does not cause an
+extra syscall as with epoll, it still adds up to four event changes per
+incident, so its best to avoid that.
+.ie n .IP """EVMETHOD_DEVPOLL"" (value 16, Solaris 8)" 4
+.el .IP "\f(CWEVMETHOD_DEVPOLL\fR (value 16, Solaris 8)" 4
+.IX Item "EVMETHOD_DEVPOLL (value 16, Solaris 8)"
+This is not implemented yet (and might never be).
+.ie n .IP """EVMETHOD_PORT""    (value 32, Solaris 10)" 4
+.el .IP "\f(CWEVMETHOD_PORT\fR    (value 32, Solaris 10)" 4
+.IX Item "EVMETHOD_PORT    (value 32, Solaris 10)"
+This uses the Solaris 10 port mechanism. As with everything on Solaris,
+it's really slow, but it still scales very well (O(active_fds)).
+.ie n .IP """EVMETHOD_ALL""" 4
+.el .IP "\f(CWEVMETHOD_ALL\fR" 4
+.IX Item "EVMETHOD_ALL"
+Try all backends (even potentially broken ones). Since this is a mask, you
+can do stuff like \f(CW\*(C`EVMETHOD_ALL & ~EVMETHOD_KQUEUE\*(C'\fR.
 .RE
 .RS 4
+.Sp
+If one or more of these are ored into the flags value, then only these
+backends will be tried (in the reverse order as given here). If none are
+specified, most compiled-in backend will be tried, usually in reverse
+order of their flag values :)
 .RE
 .IP "struct ev_loop *ev_loop_new (unsigned int flags)" 4
 .IX Item "struct ev_loop *ev_loop_new (unsigned int flags)"

@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sun Nov 18 04:43:20 2007" />
+	<meta name="created" content="Thu Nov 22 13:26:17 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -188,19 +188,66 @@ override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.</p>
 				</dd>
-				<dt><code>EVMETHOD_SELECT</code>  (portable select backend)</dt>
-				<dt><code>EVMETHOD_POLL</code>    (poll backend, available everywhere except on windows)</dt>
-				<dt><code>EVMETHOD_EPOLL</code>   (linux only)</dt>
-				<dt><code>EVMETHOD_KQUEUE</code>  (some bsds only)</dt>
-				<dt><code>EVMETHOD_DEVPOLL</code> (solaris 8 only)</dt>
-				<dt><code>EVMETHOD_PORT</code>    (solaris 10 only)</dt>
+				<dt><code>EVMETHOD_SELECT</code>  (value 1, portable select backend)</dt>
 				<dd>
-					<p>If one or more of these are ored into the flags value, then only these
-backends will be tried (in the reverse order as given here). If one are
-specified, any backend will do.</p>
+					<p>This is your standard select(2) backend. Not <i>completely</i> standard, as
+libev tries to roll its own fd_set with no limits on the number of fds,
+but if that fails, expect a fairly low limit on the number of fds when
+using this backend. It doesn't scale too well (O(highest_fd)), but its usually
+the fastest backend for a low number of fds.</p>
+				</dd>
+				<dt><code>EVMETHOD_POLL</code>    (value 2, poll backend, available everywhere except on windows)</dt>
+				<dd>
+					<p>And this is your standard poll(2) backend. It's more complicated than
+select, but handles sparse fds better and has no artificial limit on the
+number of fds you can use (except it will slow down considerably with a
+lot of inactive fds). It scales similarly to select, i.e. O(total_fds).</p>
+				</dd>
+				<dt><code>EVMETHOD_EPOLL</code>   (value 4, Linux)</dt>
+				<dd>
+					<p>For few fds, this backend is a bit little slower than poll and select,
+but it scales phenomenally better. While poll and select usually scale like
+O(total_fds) where n is the total number of fds (or the highest fd), epoll scales
+either O(1) or O(active_fds).</p>
+					<p>While stopping and starting an I/O watcher in the same iteration will
+result in some caching, there is still a syscall per such incident
+(because the fd could point to a different file description now), so its
+best to avoid that. Also, dup()ed file descriptors might not work very
+well if you register events for both fds.</p>
+				</dd>
+				<dt><code>EVMETHOD_KQUEUE</code>  (value 8, most BSD clones)</dt>
+				<dd>
+					<p>Kqueue deserves special mention, as at the time of this writing, it
+was broken on all BSDs except NetBSD (usually it doesn't work with
+anything but sockets and pipes, except on Darwin, where of course its
+completely useless). For this reason its not being &quot;autodetected&quot; unless
+you explicitly specify the flags (i.e. you don't use EVFLAG_AUTO).</p>
+					<p>It scales in the same way as the epoll backend, but the interface to the
+kernel is more efficient (which says nothing about its actual speed, of
+course). While starting and stopping an I/O watcher does not cause an
+extra syscall as with epoll, it still adds up to four event changes per
+incident, so its best to avoid that.</p>
+				</dd>
+				<dt><code>EVMETHOD_DEVPOLL</code> (value 16, Solaris 8)</dt>
+				<dd>
+					<p>This is not implemented yet (and might never be).</p>
+				</dd>
+				<dt><code>EVMETHOD_PORT</code>    (value 32, Solaris 10)</dt>
+				<dd>
+					<p>This uses the Solaris 10 port mechanism. As with everything on Solaris,
+it's really slow, but it still scales very well (O(active_fds)).</p>
+				</dd>
+				<dt><code>EVMETHOD_ALL</code></dt>
+				<dd>
+					<p>Try all backends (even potentially broken ones). Since this is a mask, you
+can do stuff like <code>EVMETHOD_ALL &amp; ~EVMETHOD_KQUEUE</code>.</p>
 				</dd>
 			</dl>
 		</p>
+		<p>If one or more of these are ored into the flags value, then only these
+backends will be tried (in the reverse order as given here). If none are
+specified, most compiled-in backend will be tried, usually in reverse
+order of their flag values :)</p>
 	</dd>
 	<dt>struct ev_loop *ev_loop_new (unsigned int flags)</dt>
 	<dd>
