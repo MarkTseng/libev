@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Thu Nov 22 13:26:17 2007" />
+	<meta name="created" content="Thu Nov 22 13:28:34 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -239,8 +239,9 @@ it's really slow, but it still scales very well (O(active_fds)).</p>
 				</dd>
 				<dt><code>EVMETHOD_ALL</code></dt>
 				<dd>
-					<p>Try all backends (even potentially broken ones). Since this is a mask, you
-can do stuff like <code>EVMETHOD_ALL &amp; ~EVMETHOD_KQUEUE</code>.</p>
+					<p>Try all backends (even potentially broken ones that wouldn't be tried
+with <code>EVFLAG_AUTO</code>). Since this is a mask, you can do stuff such as
+<code>EVMETHOD_ALL &amp; ~EVMETHOD_KQUEUE</code>.</p>
 				</dd>
 			</dl>
 		</p>

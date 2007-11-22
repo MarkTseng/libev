@@ -147,23 +147,69 @@ override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.
 
-=item C<EVMETHOD_SELECT>  (portable select backend)
+=item C<EVMETHOD_SELECT>  (value 1, portable select backend)
 
-=item C<EVMETHOD_POLL>    (poll backend, available everywhere except on windows)
+This is your standard select(2) backend. Not I<completely> standard, as
+libev tries to roll its own fd_set with no limits on the number of fds,
+but if that fails, expect a fairly low limit on the number of fds when
+using this backend. It doesn't scale too well (O(highest_fd)), but its usually
+the fastest backend for a low number of fds.
 
-=item C<EVMETHOD_EPOLL>   (linux only)
+=item C<EVMETHOD_POLL>    (value 2, poll backend, available everywhere except on windows)
 
-=item C<EVMETHOD_KQUEUE>  (some bsds only)
+And this is your standard poll(2) backend. It's more complicated than
+select, but handles sparse fds better and has no artificial limit on the
+number of fds you can use (except it will slow down considerably with a
+lot of inactive fds). It scales similarly to select, i.e. O(total_fds).
 
-=item C<EVMETHOD_DEVPOLL> (solaris 8 only)
+=item C<EVMETHOD_EPOLL>   (value 4, Linux)
 
-=item C<EVMETHOD_PORT>    (solaris 10 only)
+For few fds, this backend is a bit little slower than poll and select,
+but it scales phenomenally better. While poll and select usually scale like
+O(total_fds) where n is the total number of fds (or the highest fd), epoll scales
+either O(1) or O(active_fds).
 
-If one or more of these are ored into the flags value, then only these
-backends will be tried (in the reverse order as given here). If one are
-specified, any backend will do.
+While stopping and starting an I/O watcher in the same iteration will
+result in some caching, there is still a syscall per such incident
+(because the fd could point to a different file description now), so its
+best to avoid that. Also, dup()ed file descriptors might not work very
+well if you register events for both fds.
+
+=item C<EVMETHOD_KQUEUE>  (value 8, most BSD clones)
+
+Kqueue deserves special mention, as at the time of this writing, it
+was broken on all BSDs except NetBSD (usually it doesn't work with
+anything but sockets and pipes, except on Darwin, where of course its
+completely useless). For this reason its not being "autodetected" unless
+you explicitly specify the flags (i.e. you don't use EVFLAG_AUTO).
+
+It scales in the same way as the epoll backend, but the interface to the
+kernel is more efficient (which says nothing about its actual speed, of
+course). While starting and stopping an I/O watcher does not cause an
+extra syscall as with epoll, it still adds up to four event changes per
+incident, so its best to avoid that.
+
+=item C<EVMETHOD_DEVPOLL> (value 16, Solaris 8)
+
+This is not implemented yet (and might never be).
+
+=item C<EVMETHOD_PORT>    (value 32, Solaris 10)
+
+This uses the Solaris 10 port mechanism. As with everything on Solaris,
+it's really slow, but it still scales very well (O(active_fds)).
+
+=item C<EVMETHOD_ALL>
+
+Try all backends (even potentially broken ones that wouldn't be tried
+with C<EVFLAG_AUTO>). Since this is a mask, you can do stuff such as
+C<EVMETHOD_ALL & ~EVMETHOD_KQUEUE>.
 
 =back
+
+If one or more of these are ored into the flags value, then only these
+backends will be tried (in the reverse order as given here). If none are
+specified, most compiled-in backend will be tried, usually in reverse
+order of their flag values :)
 
 =item struct ev_loop *ev_loop_new (unsigned int flags)
 

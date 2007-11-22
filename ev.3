@@ -316,8 +316,9 @@ it's really slow, but it still scales very well (O(active_fds)).
 .ie n .IP """EVMETHOD_ALL""" 4
 .el .IP "\f(CWEVMETHOD_ALL\fR" 4
 .IX Item "EVMETHOD_ALL"
-Try all backends (even potentially broken ones). Since this is a mask, you
-can do stuff like \f(CW\*(C`EVMETHOD_ALL & ~EVMETHOD_KQUEUE\*(C'\fR.
+Try all backends (even potentially broken ones that wouldn't be tried
+with \f(CW\*(C`EVFLAG_AUTO\*(C'\fR). Since this is a mask, you can do stuff such as
+\&\f(CW\*(C`EVMETHOD_ALL & ~EVMETHOD_KQUEUE\*(C'\fR.
 .RE
 .RS 4
 .Sp

@@ -242,6 +242,7 @@ union ev_any_watcher
 #define EVMETHOD_KQUEUE  0x00000008 /* bsd */
 #define EVMETHOD_DEVPOLL 0x00000010 /* solaris 8 */ /* NYI */
 #define EVMETHOD_PORT    0x00000020 /* solaris 10 */
+#define EVMETHOD_ALL     0x0000ffff /* all methods, also future ones, or so */
 
 /* flag bits */
 #define EVFLAG_NOENV     0x01000000 /* do NOT consult environment */

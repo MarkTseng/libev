@@ -810,11 +810,20 @@ loop_init (EV_P_ unsigned int flags)
       now_floor = mn_now;
       rtmn_diff = ev_rt_now - mn_now;
 
-      if (!(flags & EVFLAG_NOENV) && !enable_secure () && getenv ("LIBEV_FLAGS"))
+      if (!(flags & EVFLAG_NOENV)
+          && !enable_secure ()
+          && getenv ("LIBEV_FLAGS"))
         flags = atoi (getenv ("LIBEV_FLAGS"));
 
-      if (!(flags & 0x0000ffff))
-        flags |= 0x0000ffff;
+      if (!(flags & EVMETHOD_ALL))
+        {
+          flags |= EVMETHOD_ALL;
+#if EV_USE_KQUEUE && !defined (__NetBSD__)
+          /* kqueue is borked on everything but netbsd apparently */
+          /* it usually doesn't work correctly on anything but sockets and pipes */
+          flags &= ~EVMETHOD_KQUEUE;
+#endif
+        }
 
       method = 0;
 #if EV_USE_PORT
