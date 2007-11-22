@@ -89,7 +89,6 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
 
   ts.tv_sec  = (time_t)timeout;
   ts.tv_nsec = (long)((timeout - (ev_tstamp)ts.tv_sec) * 1e9);
-  fprintf (stderr, "to %ld:%09ld %f\n", ts.tv_sec, ts.tv_nsec, res);//D
   res = kevent (kqueue_fd, kqueue_changes, kqueue_changecnt, kqueue_events, kqueue_eventmax, &ts);
   kqueue_changecnt = 0;
 
