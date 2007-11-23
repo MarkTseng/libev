@@ -102,7 +102,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
     {
       int fd = kqueue_events [i].ident;
 
-      if (kqueue_events [i].flags & EV_ERROR)
+      if (expect_false (kqueue_events [i].flags & EV_ERROR))
         {
 	  int err = kqueue_events [i].data;
 
