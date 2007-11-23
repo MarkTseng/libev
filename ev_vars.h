@@ -8,6 +8,7 @@ VARx(int, backend)
 VARx(ev_tstamp, backend_fudge) /* assumed typical timer resolution */
 VAR (backend_modify, void (*backend_modify)(EV_P_ int fd, int oev, int nev))
 VAR (backend_poll  , void (*backend_poll)(EV_P_ ev_tstamp timeout))
+VARx(int, backend_fd)
 
 VARx(int, postfork)  /* true if we need to recreate kernel state after fork */
 VARx(int, activecnt) /* number of active events */
@@ -29,14 +30,11 @@ VARx(int, pollidxmax)
 #endif
 
 #if EV_USE_EPOLL || EV_GENWRAP
-VARx(int, epoll_fd)
-
 VARx(struct epoll_event *, epoll_events)
 VARx(int, epoll_eventmax)
 #endif
 
 #if EV_USE_KQUEUE || EV_GENWRAP
-VARx(int, kqueue_fd)
 VARx(struct kevent *, kqueue_changes)
 VARx(int, kqueue_changemax)
 VARx(int, kqueue_changecnt)
@@ -45,7 +43,6 @@ VARx(int, kqueue_eventmax)
 #endif
 
 #if EV_USE_PORT || EV_GENWRAP
-VARx(int, port_fd)
 VARx(struct port_event *, port_events)
 VARx(int, port_eventmax)
 #endif

@@ -82,6 +82,7 @@ struct ev_loop;
 #define EV_CHECK    0x001000L /* check only */
 #define EV_PREPARE  0x002000L /* prepare only */
 #define EV_CHILD    0x004000L /* child/pid only */
+#define EV_EMBED    0x008000L /* embedded event loop */
 #define EV_ERROR    0x800000L /* sent when an error occurs */
 
 /* can be used to add custom fields to all watchers, while losing binary compatibility */
@@ -215,6 +216,18 @@ struct ev_child
   int rstatus; /* rw, holds the exit status, use the macros from sys/wait.h */
 };
 
+#if EV_MULTIPLICITY
+/* used to embed an event loop inside another */
+/* the callback gets invoked when the event loop has handled events, and can be 0 */
+struct ev_embed
+{
+  EV_WATCHER (ev_embed)
+
+  struct ev_io io; /* private */
+  struct ev_loop *loop; /* ro */
+};
+#endif
+
 /* the presence of this union forces similar struct layout */
 union ev_any_watcher
 {
@@ -229,6 +242,7 @@ union ev_any_watcher
   struct ev_check check;
   struct ev_signal signal;
   struct ev_child child;
+  struct ev_embed embed;
 };
 
 /* bits for ev_default_loop and ev_loop_new */
@@ -250,6 +264,7 @@ int ev_version_minor (void);
 
 unsigned int ev_supported_backends (void);
 unsigned int ev_recommended_backends (void);
+unsigned int ev_embeddable_backends (void);
 
 ev_tstamp ev_time (void);
 
@@ -351,6 +366,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_prepare_set(ev)                  /* nop, yes, this is a serious in-joke */
 #define ev_check_set(ev)                    /* nop, yes, this is a serious in-joke */
 #define ev_child_set(ev,pid_)               do { (ev)->pid = (pid_); } while (0)
+#define ev_embed_set(ev,loop_)              do { (ev)->loop = (loop_); } while (0)
 
 #define ev_io_init(ev,cb,fd,events)         do { ev_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
 #define ev_timer_init(ev,cb,after,repeat)   do { ev_init ((ev), (cb)); ev_timer_set ((ev),(after),(repeat)); } while (0)
@@ -360,6 +376,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_prepare_init(ev,cb)              do { ev_init ((ev), (cb)); ev_prepare_set ((ev)); } while (0)
 #define ev_check_init(ev,cb)                do { ev_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
 #define ev_child_init(ev,cb,pid)            do { ev_init ((ev), (cb)); ev_child_set ((ev),(pid)); } while (0)
+#define ev_embed_init(ev,cb,loop)           do { ev_init ((ev), (cb)); ev_embed_set ((ev),(loop)); } while (0)
 
 #define ev_is_pending(ev)                   (0 + ((struct ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
 #define ev_is_active(ev)                    (0 + ((struct ev_watcher *)(void *)(ev))->active) /* ro, true when the watcher has been started */
@@ -412,6 +429,13 @@ void ev_signal_stop    (EV_P_ struct ev_signal *w);
 /* only supported in the default loop */
 void ev_child_start    (EV_P_ struct ev_child *w);
 void ev_child_stop     (EV_P_ struct ev_child *w);
+
+# if EV_MULTIPLICITY
+/* only supported when loop to be embedded is in fact embeddable */
+void ev_embed_start    (EV_P_ struct ev_embed *w);
+void ev_embed_stop     (EV_P_ struct ev_embed *w);
+# endif
+
 #endif
 
 #ifdef __cplusplus

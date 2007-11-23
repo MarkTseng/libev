@@ -87,7 +87,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
 
   ts.tv_sec  = (time_t)timeout;
   ts.tv_nsec = (long)((timeout - (ev_tstamp)ts.tv_sec) * 1e9);
-  res = kevent (kqueue_fd, kqueue_changes, kqueue_changecnt, kqueue_events, kqueue_eventmax, &ts);
+  res = kevent (backend_fd, kqueue_changes, kqueue_changecnt, kqueue_events, kqueue_eventmax, &ts);
   kqueue_changecnt = 0;
 
   if (res < 0)
@@ -156,10 +156,10 @@ kqueue_init (EV_P_ int flags)
   struct kevent ch, ev;
 
   /* Initalize the kernel queue */
-  if ((kqueue_fd = kqueue ()) < 0)
+  if ((backend_fd = kqueue ()) < 0)
     return 0;
 
-  fcntl (kqueue_fd, F_SETFD, FD_CLOEXEC); /* not sure if necessary, hopefully doesn't hurt */
+  fcntl (backend_fd, F_SETFD, FD_CLOEXEC); /* not sure if necessary, hopefully doesn't hurt */
 
   /* Check for Mac OS X kqueue bug. */
   ch.ident  = -1;
@@ -171,12 +171,12 @@ kqueue_init (EV_P_ int flags)
    * stick an error in ev. If kqueue is broken, then
    * kevent will fail.
    */
-  if (kevent (kqueue_fd, &ch, 1, &ev, 1, 0) != 1
+  if (kevent (backend_fd, &ch, 1, &ev, 1, 0) != 1
       || ev.ident != -1
       || ev.flags != EV_ERROR)
     {
       /* detected broken kqueue */
-      close (kqueue_fd);
+      close (backend_fd);
       return 0;
     }
 
@@ -197,7 +197,7 @@ kqueue_init (EV_P_ int flags)
 static void
 kqueue_destroy (EV_P)
 {
-  close (kqueue_fd);
+  close (backend_fd);
 
   ev_free (kqueue_events);
   ev_free (kqueue_changes);
@@ -206,12 +206,12 @@ kqueue_destroy (EV_P)
 static void
 kqueue_fork (EV_P)
 {
-  close (kqueue_fd);
+  close (backend_fd);
 
-  while ((kqueue_fd = kqueue ()) < 0)
+  while ((backend_fd = kqueue ()) < 0)
     syserr ("(libev) kqueue");
 
-  fcntl (kqueue_fd, F_SETFD, FD_CLOEXEC);
+  fcntl (backend_fd, F_SETFD, FD_CLOEXEC);
 
   /* re-register interest in fds */
   fd_rearm_all (EV_A);

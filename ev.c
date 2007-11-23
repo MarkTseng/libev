@@ -399,6 +399,9 @@ ev_feed_event (EV_P_ void *w, int revents)
       return;
     }
 
+  if (expect_false (!w_->cb))
+    return;
+
   w_->pending = ++pendingcnt [ABSPRI (w_)];
   array_needsize (ANPENDING, pendings [ABSPRI (w_)], pendingmax [ABSPRI (w_)], pendingcnt [ABSPRI (w_)], EMPTY2);
   pendings [ABSPRI (w_)][w_->pending - 1].w      = w_;
@@ -815,6 +818,14 @@ ev_recommended_backends (void)
 #endif
 
   return flags;
+}
+
+unsigned int
+ev_embeddable_backends (void)
+{
+  return EVBACKEND_EPOLL
+       | EVBACKEND_KQUEUE
+       | EVBACKEND_PORT;
 }
 
 unsigned int
@@ -1660,6 +1671,44 @@ ev_child_stop (EV_P_ struct ev_child *w)
   wlist_del ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
   ev_stop (EV_A_ (W)w);
 }
+
+#if EV_MULTIPLICITY
+static void
+embed_cb (EV_P_ struct ev_io *io, int revents)
+{
+  struct ev_embed *w = (struct ev_embed *)(((char *)io) - offsetof (struct ev_embed, io));
+
+  ev_feed_event (EV_A_ (W)w, EV_EMBED);
+  ev_loop (w->loop, EVLOOP_NONBLOCK);
+}
+
+void
+ev_embed_start (EV_P_ struct ev_embed *w)
+{
+  if (expect_false (ev_is_active (w)))
+    return;
+
+  {
+    struct ev_loop *loop = w->loop;
+    assert (("loop to be embedded is not embeddable", backend & ev_embeddable_backends ()));
+    ev_io_init (&w->io, embed_cb, backend_fd, EV_READ);
+  }
+
+  ev_io_start (EV_A_ &w->io);
+  ev_start (EV_A_ (W)w, 1);
+}
+
+void
+ev_embed_stop (EV_P_ struct ev_embed *w)
+{
+  ev_clear_pending (EV_A_ (W)w);
+  if (expect_false (!ev_is_active (w)))
+    return;
+
+  ev_io_stop (EV_A_ &w->io);
+  ev_stop (EV_A_ (W)w);
+}
+#endif
 
 /*****************************************************************************/
 

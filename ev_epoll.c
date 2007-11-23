@@ -42,9 +42,9 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
       (nev & EV_READ ? EPOLLIN : 0)
       | (nev & EV_WRITE ? EPOLLOUT : 0);
 
-  if (epoll_ctl (epoll_fd, mode, fd, &ev))
+  if (epoll_ctl (backend_fd, mode, fd, &ev))
     if (errno != ENOENT /* on ENOENT the fd went away, so try to do the right thing */
-        || (nev && epoll_ctl (epoll_fd, EPOLL_CTL_ADD, fd, &ev)))
+        || (nev && epoll_ctl (backend_fd, EPOLL_CTL_ADD, fd, &ev)))
       fd_kill (EV_A_ fd);
 }
 
@@ -52,7 +52,7 @@ static void
 epoll_poll (EV_P_ ev_tstamp timeout)
 {
   int i;
-  int eventcnt = epoll_wait (epoll_fd, epoll_events, epoll_eventmax, (int)ceil (timeout * 1000.));
+  int eventcnt = epoll_wait (backend_fd, epoll_events, epoll_eventmax, (int)ceil (timeout * 1000.));
 
   if (eventcnt < 0)
     {
@@ -82,12 +82,12 @@ epoll_poll (EV_P_ ev_tstamp timeout)
 static int
 epoll_init (EV_P_ int flags)
 {
-  epoll_fd = epoll_create (256);
+  backend_fd = epoll_create (256);
 
-  if (epoll_fd < 0)
+  if (backend_fd < 0)
     return 0;
 
-  fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
+  fcntl (backend_fd, F_SETFD, FD_CLOEXEC);
 
   backend_fudge  = 1e-3; /* needed to compensate for epoll returning early */
   backend_modify = epoll_modify;
@@ -102,7 +102,7 @@ epoll_init (EV_P_ int flags)
 static void
 epoll_destroy (EV_P)
 {
-  close (epoll_fd);
+  close (backend_fd);
 
   ev_free (epoll_events);
 }
@@ -110,12 +110,12 @@ epoll_destroy (EV_P)
 static void
 epoll_fork (EV_P)
 {
-  close (epoll_fd);
+  close (backend_fd);
 
-  while ((epoll_fd = epoll_create (256)) < 0)
+  while ((backend_fd = epoll_create (256)) < 0)
     syserr ("(libev) epoll_create");
 
-  fcntl (epoll_fd, F_SETFD, FD_CLOEXEC);
+  fcntl (backend_fd, F_SETFD, FD_CLOEXEC);
 
   fd_rearm_all (EV_A);
 }

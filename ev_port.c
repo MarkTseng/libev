@@ -39,11 +39,11 @@ port_modify (EV_P_ int fd, int oev, int nev)
   if (!nev)
     {
       if (oev)
-        port_dissociate (port_fd, PORT_SOURCE_FD, fd);
+        port_dissociate (backend_fd, PORT_SOURCE_FD, fd);
     }
   else if (0 >
       port_associate (
-         port_fd, PORT_SOURCE_FD, fd,
+         backend_fd, PORT_SOURCE_FD, fd,
          (nev & EV_READ ? POLLIN : 0)
          | (nev & EV_WRITE ? POLLOUT : 0),
          0
@@ -66,7 +66,7 @@ port_poll (EV_P_ ev_tstamp timeout)
 
   ts.tv_sec  = (time_t)timeout;
   ts.tv_nsec = (long)(timeout - (ev_tstamp)ts.tv_sec) * 1e9;
-  res = port_getn (port_fd, port_events, port_eventmax, &nget, &ts);
+  res = port_getn (backend_fd, port_events, port_eventmax, &nget, &ts);
 
   if (res < 0)
     { 
@@ -106,10 +106,10 @@ static int
 port_init (EV_P_ int flags)
 {
   /* Initalize the kernel queue */
-  if ((port_fd = port_create ()) < 0)
+  if ((backend_fd = port_create ()) < 0)
     return 0;
 
-  fcntl (port_fd, F_SETFD, FD_CLOEXEC); /* not sure if necessary, hopefully doesn't hurt */
+  fcntl (backend_fd, F_SETFD, FD_CLOEXEC); /* not sure if necessary, hopefully doesn't hurt */
 
   backend_fudge  = 1e-3; /* needed to compensate for port_getn returning early */
   backend_modify = port_modify;
@@ -124,7 +124,7 @@ port_init (EV_P_ int flags)
 static void
 port_destroy (EV_P)
 {
-  close (port_fd);
+  close (backend_fd);
 
   ev_free (port_events);
 }
@@ -132,12 +132,12 @@ port_destroy (EV_P)
 static void
 port_fork (EV_P)
 {
-  close (port_fd);
+  close (backend_fd);
 
-  while ((port_fd = port_create ()) < 0)
+  while ((backend_fd = port_create ()) < 0)
     syserr ("(libev) port");
 
-  fcntl (port_fd, F_SETFD, FD_CLOEXEC);
+  fcntl (backend_fd, F_SETFD, FD_CLOEXEC);
 
   /* re-register interest in fds */
   fd_rearm_all (EV_A);
