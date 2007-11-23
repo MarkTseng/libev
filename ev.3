@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-11-22" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-11-23" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -349,9 +349,9 @@ one. Despite the name, you can call it anytime, but it makes most sense
 after forking, in either the parent or child process (or both, but that
 again makes little sense).
 .Sp
-You \fImust\fR call this function after forking if and only if you want to
-use the event library in both processes. If you just fork+exec, you don't
-have to call it.
+You \fImust\fR call this function in the child process after forking if and
+only if you want to use the event library in both processes. If you just
+fork+exec, you don't have to call it.
 .Sp
 The function itself is quite fast and it's usually not a problem to call
 it just in case after a fork. To make this easy, the function will fit in

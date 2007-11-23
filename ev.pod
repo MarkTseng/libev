@@ -236,9 +236,9 @@ one. Despite the name, you can call it anytime, but it makes most sense
 after forking, in either the parent or child process (or both, but that
 again makes little sense).
 
-You I<must> call this function after forking if and only if you want to
-use the event library in both processes. If you just fork+exec, you don't
-have to call it.
+You I<must> call this function in the child process after forking if and
+only if you want to use the event library in both processes. If you just
+fork+exec, you don't have to call it.
 
 The function itself is quite fast and it's usually not a problem to call
 it just in case after a fork. To make this easy, the function will fit in
