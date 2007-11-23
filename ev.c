@@ -460,7 +460,7 @@ fd_reify (EV_P)
 
       anfd->reify = 0;
 
-      method_modify (EV_A_ fd, anfd->events, events);
+      backend_modify (EV_A_ fd, anfd->events, events);
       anfd->events = events;
     }
 
@@ -528,7 +528,7 @@ fd_enomem (EV_P)
       }
 }
 
-/* usually called after fork if method needs to re-arm all fds from scratch */
+/* usually called after fork if backend needs to re-arm all fds from scratch */
 static void
 fd_rearm_all (EV_P)
 {
@@ -783,12 +783,7 @@ enable_secure (void)
 unsigned int
 ev_supported_backends (void)
 {
-}
-
-unsigned int
-ev_recommended_backends (void)
-{
-  unsigned int flags;
+  unsigned int flags = 0;
 
   if (EV_USE_PORT  ) flags |= EVBACKEND_PORT;
   if (EV_USE_KQUEUE) flags |= EVBACKEND_KQUEUE;
@@ -800,7 +795,7 @@ ev_recommended_backends (void)
 }
 
 unsigned int
-ev_backend (EV_P)
+ev_recommended_backends (void)
 {
   unsigned int flags = ev_recommended_backends ();
 
@@ -817,10 +812,16 @@ ev_backend (EV_P)
   return flags;
 }
 
+unsigned int
+ev_backend (EV_P)
+{
+  return backend;
+}
+
 static void
 loop_init (EV_P_ unsigned int flags)
 {
-  if (!method)
+  if (!backend)
     {
 #if EV_USE_MONOTONIC
       {
@@ -843,21 +844,21 @@ loop_init (EV_P_ unsigned int flags)
       if (!(flags & 0x0000ffffUL))
         flags |= ev_recommended_backends ();
 
-      method = 0;
+      backend = 0;
 #if EV_USE_PORT
-      if (!method && (flags & EVBACKEND_PORT  )) method = port_init   (EV_A_ flags);
+      if (!backend && (flags & EVBACKEND_PORT  )) backend = port_init   (EV_A_ flags);
 #endif
 #if EV_USE_KQUEUE
-      if (!method && (flags & EVBACKEND_KQUEUE)) method = kqueue_init (EV_A_ flags);
+      if (!backend && (flags & EVBACKEND_KQUEUE)) backend = kqueue_init (EV_A_ flags);
 #endif
 #if EV_USE_EPOLL
-      if (!method && (flags & EVBACKEND_EPOLL )) method = epoll_init  (EV_A_ flags);
+      if (!backend && (flags & EVBACKEND_EPOLL )) backend = epoll_init  (EV_A_ flags);
 #endif
 #if EV_USE_POLL
-      if (!method && (flags & EVBACKEND_POLL  )) method = poll_init   (EV_A_ flags);
+      if (!backend && (flags & EVBACKEND_POLL  )) backend = poll_init   (EV_A_ flags);
 #endif
 #if EV_USE_SELECT
-      if (!method && (flags & EVBACKEND_SELECT)) method = select_init (EV_A_ flags);
+      if (!backend && (flags & EVBACKEND_SELECT)) backend = select_init (EV_A_ flags);
 #endif
 
       ev_init (&sigev, sigcb);
@@ -871,19 +872,19 @@ loop_destroy (EV_P)
   int i;
 
 #if EV_USE_PORT
-  if (method == EVBACKEND_PORT  ) port_destroy   (EV_A);
+  if (backend == EVBACKEND_PORT  ) port_destroy   (EV_A);
 #endif
 #if EV_USE_KQUEUE
-  if (method == EVBACKEND_KQUEUE) kqueue_destroy (EV_A);
+  if (backend == EVBACKEND_KQUEUE) kqueue_destroy (EV_A);
 #endif
 #if EV_USE_EPOLL
-  if (method == EVBACKEND_EPOLL ) epoll_destroy  (EV_A);
+  if (backend == EVBACKEND_EPOLL ) epoll_destroy  (EV_A);
 #endif
 #if EV_USE_POLL
-  if (method == EVBACKEND_POLL  ) poll_destroy   (EV_A);
+  if (backend == EVBACKEND_POLL  ) poll_destroy   (EV_A);
 #endif
 #if EV_USE_SELECT
-  if (method == EVBACKEND_SELECT) select_destroy (EV_A);
+  if (backend == EVBACKEND_SELECT) select_destroy (EV_A);
 #endif
 
   for (i = NUMPRI; i--; )
@@ -899,20 +900,20 @@ loop_destroy (EV_P)
   array_free (prepare, EMPTY0);
   array_free (check, EMPTY0);
 
-  method = 0;
+  backend = 0;
 }
 
 static void
 loop_fork (EV_P)
 {
 #if EV_USE_PORT
-  if (method == EVBACKEND_PORT  ) port_fork   (EV_A);
+  if (backend == EVBACKEND_PORT  ) port_fork   (EV_A);
 #endif
 #if EV_USE_KQUEUE
-  if (method == EVBACKEND_KQUEUE) kqueue_fork (EV_A);
+  if (backend == EVBACKEND_KQUEUE) kqueue_fork (EV_A);
 #endif
 #if EV_USE_EPOLL
-  if (method == EVBACKEND_EPOLL ) epoll_fork  (EV_A);
+  if (backend == EVBACKEND_EPOLL ) epoll_fork  (EV_A);
 #endif
 
   if (ev_is_active (&sigev))
@@ -943,7 +944,7 @@ ev_loop_new (unsigned int flags)
 
   loop_init (EV_A_ flags);
 
-  if (ev_method (EV_A))
+  if (ev_backend (EV_A))
     return loop;
 
   return 0;
@@ -986,7 +987,7 @@ ev_default_loop (unsigned int flags)
 
       loop_init (EV_A_ flags);
 
-      if (ev_method (EV_A))
+      if (ev_backend (EV_A))
         {
           siginit (EV_A);
 
@@ -1032,7 +1033,7 @@ ev_default_fork (void)
   struct ev_loop *loop = ev_default_loop_ptr;
 #endif
 
-  if (method)
+  if (backend)
     postfork = 1;
 }
 
@@ -1274,14 +1275,14 @@ ev_loop (EV_P_ int flags)
 
           if (timercnt)
             {
-              ev_tstamp to = ((WT)timers [0])->at - mn_now + method_fudge;
+              ev_tstamp to = ((WT)timers [0])->at - mn_now + backend_fudge;
               if (block > to) block = to;
             }
 
 #if EV_PERIODICS
           if (periodiccnt)
             {
-              ev_tstamp to = ((WT)periodics [0])->at - ev_rt_now + method_fudge;
+              ev_tstamp to = ((WT)periodics [0])->at - ev_rt_now + backend_fudge;
               if (block > to) block = to;
             }
 #endif
@@ -1289,7 +1290,7 @@ ev_loop (EV_P_ int flags)
           if (expect_false (block < 0.)) block = 0.;
         }
 
-      method_poll (EV_A_ block);
+      backend_poll (EV_A_ block);
 
       /* update ev_rt_now, do magic */
       time_update (EV_A);

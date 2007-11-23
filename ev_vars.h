@@ -3,11 +3,11 @@
 VARx(ev_tstamp, now_floor) /* last time we refreshed rt_time */
 VARx(ev_tstamp, mn_now)    /* monotonic clock "now" */
 VARx(ev_tstamp, rtmn_diff)      /* difference realtime - monotonic time */
-VARx(int, method)
+VARx(int, backend)
 
-VARx(ev_tstamp, method_fudge) /* assumed typical timer resolution */
-VAR (method_modify, void (*method_modify)(EV_P_ int fd, int oev, int nev))
-VAR (method_poll  , void (*method_poll)(EV_P_ ev_tstamp timeout))
+VARx(ev_tstamp, backend_fudge) /* assumed typical timer resolution */
+VAR (backend_modify, void (*backend_modify)(EV_P_ int fd, int oev, int nev))
+VAR (backend_poll  , void (*backend_poll)(EV_P_ ev_tstamp timeout))
 
 VARx(int, postfork)  /* true if we need to recreate kernel state after fork */
 VARx(int, activecnt) /* number of active events */

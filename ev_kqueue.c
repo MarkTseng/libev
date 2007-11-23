@@ -182,9 +182,9 @@ kqueue_init (EV_P_ int flags)
       return 0;
     }
 
-  method_fudge  = 1e-3; /* needed to compensate for kevent returning early */
-  method_modify = kqueue_modify;
-  method_poll   = kqueue_poll;
+  backend_fudge  = 1e-3; /* needed to compensate for kevent returning early */
+  backend_modify = kqueue_modify;
+  backend_poll   = kqueue_poll;
 
   kqueue_eventmax = 64; /* intiial number of events receivable per poll */
   kqueue_events = (struct kevent *)ev_malloc (sizeof (struct kevent) * kqueue_eventmax);

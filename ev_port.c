@@ -111,9 +111,9 @@ port_init (EV_P_ int flags)
 
   fcntl (port_fd, F_SETFD, FD_CLOEXEC); /* not sure if necessary, hopefully doesn't hurt */
 
-  method_fudge  = 1e-3; /* needed to compensate for port_getn returning early */
-  method_modify = port_modify;
-  method_poll   = port_poll;
+  backend_fudge  = 1e-3; /* needed to compensate for port_getn returning early */
+  backend_modify = port_modify;
+  backend_poll   = port_poll;
 
   port_eventmax = 64; /* intiial number of events receivable per poll */
   port_events = (port_event_t *)ev_malloc (sizeof (port_event_t) * port_eventmax);

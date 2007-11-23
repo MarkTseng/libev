@@ -108,9 +108,9 @@ poll_poll (EV_P_ ev_tstamp timeout)
 static int
 poll_init (EV_P_ int flags)
 {
-  method_fudge  = 1e-3; /* needed to compensate for select returning early, very conservative */
-  method_modify = poll_modify;
-  method_poll   = poll_poll;
+  backend_fudge  = 1e-3; /* needed to compensate for select returning early, very conservative */
+  backend_modify = poll_modify;
+  backend_poll   = poll_poll;
 
   pollidxs = 0; pollidxmax = 0;
   polls    = 0; pollmax    = 0; pollcnt = 0;
