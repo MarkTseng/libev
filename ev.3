@@ -175,7 +175,8 @@ Libev represents time as a single floating point number, representing the
 (fractional) number of seconds since the (\s-1POSIX\s0) epoch (somewhere near
 the beginning of 1970, details are complicated, don't ask). This type is
 called \f(CW\*(C`ev_tstamp\*(C'\fR, which is what you should use too. It usually aliases
-to the double type in C.
+to the \f(CW\*(C`double\*(C'\fR type in C, and when you need to do any calculations on
+it, you should treat it as such.
 .SH "GLOBAL FUNCTIONS"
 .IX Header "GLOBAL FUNCTIONS"
 These functions can be called anytime, even before initialising the
@@ -201,12 +202,29 @@ Usually, it's a good idea to terminate if the major versions mismatch,
 as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.
+.Sp
+Example: make sure we haven't accidentally been linked against the wrong
+version:
+.Sp
+.Vb 3
+\&  assert (("libev version mismatch",
+\&           ev_version_major () == EV_VERSION_MAJOR
+\&           && ev_version_minor () >= EV_VERSION_MINOR));
+.Ve
 .IP "unsigned int ev_supported_backends ()" 4
 .IX Item "unsigned int ev_supported_backends ()"
 Return the set of all backends (i.e. their corresponding \f(CW\*(C`EV_BACKEND_*\*(C'\fR
 value) compiled into this binary of libev (independent of their
 availability on the system you are running on). See \f(CW\*(C`ev_default_loop\*(C'\fR for
 a description of the set values.
+.Sp
+Example: make sure we have the epoll method, because yeah this is cool and
+a must have and can we have a torrent of it please!!!11
+.Sp
+.Vb 2
+\&  assert (("sorry, no epoll, no sex",
+\&           ev_supported_backends () & EVBACKEND_EPOLL));
+.Ve
 .IP "unsigned int ev_recommended_backends ()" 4
 .IX Item "unsigned int ev_recommended_backends ()"
 Return the set of all backends compiled into this binary of libev and also
@@ -226,6 +244,34 @@ destructive action. The default is your system realloc function.
 You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.
+.Sp
+Example: replace the libev allocator with one that waits a bit and then
+retries: better than mine).
+.Sp
+.Vb 6
+\&   static void *
+\&   persistent_realloc (void *ptr, long size)
+\&   {
+\&     for (;;)
+\&       {
+\&         void *newptr = realloc (ptr, size);
+.Ve
+.Sp
+.Vb 2
+\&         if (newptr)
+\&           return newptr;
+.Ve
+.Sp
+.Vb 3
+\&         sleep (60);
+\&       }
+\&   }
+.Ve
+.Sp
+.Vb 2
+\&   ...
+\&   ev_set_allocator (persistent_realloc);
+.Ve
 .IP "ev_set_syserr_cb (void (*cb)(const char *msg));" 4
 .IX Item "ev_set_syserr_cb (void (*cb)(const char *msg));"
 Set the callback function to call on a retryable syscall error (such
@@ -235,6 +281,22 @@ callback is set, then libev will expect it to remedy the sitution, no
 matter what, when it returns. That is, libev will generally retry the
 requested operation, or, if the condition doesn't go away, do bad stuff
 (such as abort).
+.Sp
+Example: do the same thing as libev does internally:
+.Sp
+.Vb 6
+\&   static void
+\&   fatal_error (const char *msg)
+\&   {
+\&     perror (msg);
+\&     abort ();
+\&   }
+.Ve
+.Sp
+.Vb 2
+\&   ...
+\&   ev_set_syserr_cb (fatal_error);
+.Ve
 .SH "FUNCTIONS CONTROLLING THE EVENT LOOP"
 .IX Header "FUNCTIONS CONTROLLING THE EVENT LOOP"
 An event loop is described by a \f(CW\*(C`struct ev_loop *\*(C'\fR. The library knows two
@@ -378,6 +440,14 @@ Similar to \f(CW\*(C`ev_default_loop\*(C'\fR, but always creates a new event loo
 always distinct from the default loop. Unlike the default loop, it cannot
 handle signal and child watchers, and attempts to do so will be greeted by
 undefined behaviour (or a failed assertion if assertions are enabled).
+.Sp
+Example: try to create a event loop that uses epoll and nothing else.
+.Sp
+.Vb 3
+\&  struct ev_loop *epoller = ev_loop_new (EVBACKEND_EPOLL | EVFLAG_NOENV);
+\&  if (!epoller)
+\&    fatal ("no epoll found here, maybe it hides under your chair");
+.Ve
 .IP "ev_default_destroy ()" 4
 .IX Item "ev_default_destroy ()"
 Destroys the default loop again (frees all memory and kernel state
@@ -421,10 +491,10 @@ use.
 .IP "ev_tstamp ev_now (loop)" 4
 .IX Item "ev_tstamp ev_now (loop)"
 Returns the current \*(L"event loop time\*(R", which is the time the event loop
-got events and started processing them. This timestamp does not change
-as long as callbacks are being processed, and this is also the base time
-used for relative timers. You can treat it as the timestamp of the event
-occuring (or more correctly, the mainloop finding out about it).
+received events and started processing them. This timestamp does not
+change as long as callbacks are being processed, and this is also the base
+time used for relative timers. You can treat it as the timestamp of the
+event occuring (or more correctly, libev finding out about it).
 .IP "ev_loop (loop, int flags)" 4
 .IX Item "ev_loop (loop, int flags)"
 Finally, this is it, the event handler. This function usually is called
@@ -433,6 +503,12 @@ events.
 .Sp
 If the flags argument is specified as \f(CW0\fR, it will not return until
 either no event watchers are active anymore or \f(CW\*(C`ev_unloop\*(C'\fR was called.
+.Sp
+Please note that an explicit \f(CW\*(C`ev_unloop\*(C'\fR is usually better than
+relying on all watchers to be stopped when deciding when a program has
+finished (especially in interactive programs), but having a program that
+automatically loops as long as it has to and no longer by virtue of
+relying on its watchers stopping correctly is a thing of beauty.
 .Sp
 A flags value of \f(CW\*(C`EVLOOP_NONBLOCK\*(C'\fR will look for new events, will handle
 those events and any outstanding ones, but will not block your process in
@@ -468,6 +544,16 @@ Here are the gory details of what \f(CW\*(C`ev_loop\*(C'\fR does:
 \&   - If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
 \&     were used, return, otherwise continue with step *.
 .Ve
+.Sp
+Example: queue some jobs and then loop until no events are outsanding
+anymore.
+.Sp
+.Vb 4
+\&   ... queue jobs here, make sure they register event watchers as long
+\&   ... as they still have work to do (even an idle watcher will do..)
+\&   ev_loop (my_loop, 0);
+\&   ... jobs done. yeah!
+.Ve
 .IP "ev_unloop (loop, how)" 4
 .IX Item "ev_unloop (loop, how)"
 Can be used to make a call to \f(CW\*(C`ev_loop\*(C'\fR return early (but only after it
@@ -490,6 +576,23 @@ visible to the libev user and should not keep \f(CW\*(C`ev_loop\*(C'\fR from exi
 no event watchers registered by it are active. It is also an excellent
 way to do this for generic recurring timers or from within third-party
 libraries. Just remember to \fIunref after start\fR and \fIref before stop\fR.
+.Sp
+Example: create a signal watcher, but keep it from keeping \f(CW\*(C`ev_loop\*(C'\fR
+running when nothing else is active.
+.Sp
+.Vb 4
+\&  struct dv_signal exitsig;
+\&  ev_signal_init (&exitsig, sig_cb, SIGINT);
+\&  ev_signal_start (myloop, &exitsig);
+\&  evf_unref (myloop);
+.Ve
+.Sp
+Example: for some weird reason, unregister the above signal handler again.
+.Sp
+.Vb 2
+\&  ev_ref (myloop);
+\&  ev_signal_stop (myloop, &exitsig);
+.Ve
 .SH "ANATOMY OF A WATCHER"
 .IX Header "ANATOMY OF A WATCHER"
 A watcher is a structure that you create and register to record your
@@ -687,6 +790,28 @@ problem. Also note that it is quite easy to have your callback invoked
 when the readyness condition is no longer valid even when employing
 typical ways of handling events, so its a good idea to use non-blocking
 I/O unconditionally.
+.PP
+Example: call \f(CW\*(C`stdin_readable_cb\*(C'\fR when \s-1STDIN_FILENO\s0 has become, well
+readable, but only once. Since it is likely line\-buffered, you could
+attempt to read a whole line in the callback:
+.PP
+.Vb 6
+\&  static void
+\&  stdin_readable_cb (struct ev_loop *loop, struct ev_io *w, int revents)
+\&  {
+\&     ev_io_stop (loop, w);
+\&    .. read from stdin here (or from w->fd) and haqndle any I/O errors
+\&  }
+.Ve
+.PP
+.Vb 6
+\&  ...
+\&  struct ev_loop *loop = ev_default_init (0);
+\&  struct ev_io stdin_readable;
+\&  ev_io_init (&stdin_readable, stdin_readable_cb, STDIN_FILENO, EV_READ);
+\&  ev_io_start (loop, &stdin_readable);
+\&  ev_loop (loop, 0);
+.Ve
 .ie n .Sh """ev_timer"" \- relative and optionally recurring timeouts"
 .el .Sh "\f(CWev_timer\fP \- relative and optionally recurring timeouts"
 .IX Subsection "ev_timer - relative and optionally recurring timeouts"
@@ -746,6 +871,46 @@ configure an \f(CW\*(C`ev_timer\*(C'\fR with after=repeat=60 and calling ev_time
 time you successfully read or write some data. If you go into an idle
 state where you do not expect data to travel on the socket, you can stop
 the timer, and again will automatically restart it if need be.
+.PP
+Example: create a timer that fires after 60 seconds.
+.PP
+.Vb 5
+\&  static void
+\&  one_minute_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
+\&  {
+\&    .. one minute over, w is actually stopped right here
+\&  }
+.Ve
+.PP
+.Vb 3
+\&  struct ev_timer mytimer;
+\&  ev_timer_init (&mytimer, one_minute_cb, 60., 0.);
+\&  ev_timer_start (loop, &mytimer);
+.Ve
+.PP
+Example: create a timeout timer that times out after 10 seconds of
+inactivity.
+.PP
+.Vb 5
+\&  static void
+\&  timeout_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
+\&  {
+\&    .. ten seconds without any activity
+\&  }
+.Ve
+.PP
+.Vb 4
+\&  struct ev_timer mytimer;
+\&  ev_timer_init (&mytimer, timeout_cb, 0., 10.); /* note, only repeat used */
+\&  ev_timer_again (&mytimer); /* start timer */
+\&  ev_loop (loop, 0);
+.Ve
+.PP
+.Vb 3
+\&  // and in some piece of code that gets executed on any "activity":
+\&  // reset the timeout to start ticking again at 10 seconds
+\&  ev_timer_again (&mytimer);
+.Ve
 .ie n .Sh """ev_periodic"" \- to cron or not to cron"
 .el .Sh "\f(CWev_periodic\fP \- to cron or not to cron"
 .IX Subsection "ev_periodic - to cron or not to cron"
@@ -847,6 +1012,51 @@ Simply stops and restarts the periodic watcher again. This is only useful
 when you changed some parameters or the reschedule callback would return
 a different time than the last time it was called (e.g. in a crond like
 program when the crontabs have changed).
+.PP
+Example: call a callback every hour, or, more precisely, whenever the
+system clock is divisible by 3600. The callback invocation times have
+potentially a lot of jittering, but good long-term stability.
+.PP
+.Vb 5
+\&  static void
+\&  clock_cb (struct ev_loop *loop, struct ev_io *w, int revents)
+\&  {
+\&    ... its now a full hour (UTC, or TAI or whatever your clock follows)
+\&  }
+.Ve
+.PP
+.Vb 3
+\&  struct ev_periodic hourly_tick;
+\&  ev_periodic_init (&hourly_tick, clock_cb, 0., 3600., 0);
+\&  ev_periodic_start (loop, &hourly_tick);
+.Ve
+.PP
+Example: the same as above, but use a reschedule callback to do it:
+.PP
+.Vb 1
+\&  #include <math.h>
+.Ve
+.PP
+.Vb 5
+\&  static ev_tstamp
+\&  my_scheduler_cb (struct ev_periodic *w, ev_tstamp now)
+\&  {
+\&    return fmod (now, 3600.) + 3600.;
+\&  }
+.Ve
+.PP
+.Vb 1
+\&  ev_periodic_init (&hourly_tick, clock_cb, 0., 0., my_scheduler_cb);
+.Ve
+.PP
+Example: call a callback every hour, starting now:
+.PP
+.Vb 4
+\&  struct ev_periodic hourly_tick;
+\&  ev_periodic_init (&hourly_tick, clock_cb,
+\&                    fmod (ev_now (loop), 3600.), 3600., 0);
+\&  ev_periodic_start (loop, &hourly_tick);
+.Ve
 .ie n .Sh """ev_signal"" \- signal me when a signal gets signalled"
 .el .Sh "\f(CWev_signal\fP \- signal me when a signal gets signalled"
 .IX Subsection "ev_signal - signal me when a signal gets signalled"
@@ -886,6 +1096,22 @@ at the \f(CW\*(C`rstatus\*(C'\fR member of the \f(CW\*(C`ev_child\*(C'\fR watche
 the status word (use the macros from \f(CW\*(C`sys/wait.h\*(C'\fR and see your systems
 \&\f(CW\*(C`waitpid\*(C'\fR documentation). The \f(CW\*(C`rpid\*(C'\fR member contains the pid of the
 process causing the status change.
+.PP
+Example: try to exit cleanly on \s-1SIGINT\s0 and \s-1SIGTERM\s0.
+.PP
+.Vb 5
+\&  static void
+\&  sigint_cb (struct ev_loop *loop, struct ev_signal *w, int revents)
+\&  {
+\&    ev_unloop (loop, EVUNLOOP_ALL);
+\&  }
+.Ve
+.PP
+.Vb 3
+\&  struct ev_signal signal_watcher;
+\&  ev_signal_init (&signal_watcher, sigint_cb, SIGINT);
+\&  ev_signal_start (loop, &sigint_cb);
+.Ve
 .ie n .Sh """ev_idle"" \- when you've got nothing better to do"
 .el .Sh "\f(CWev_idle\fP \- when you've got nothing better to do"
 .IX Subsection "ev_idle - when you've got nothing better to do"
@@ -909,6 +1135,25 @@ event loop has handled all outstanding events.
 Initialises and configures the idle watcher \- it has no parameters of any
 kind. There is a \f(CW\*(C`ev_idle_set\*(C'\fR macro, but using it is utterly pointless,
 believe me.
+.PP
+Example: dynamically allocate an \f(CW\*(C`ev_idle\*(C'\fR, start it, and in the
+callback, free it. Alos, use no error checking, as usual.
+.PP
+.Vb 7
+\&  static void
+\&  idle_cb (struct ev_loop *loop, struct ev_idle *w, int revents)
+\&  {
+\&    free (w);
+\&    // now do something you wanted to do when the program has
+\&    // no longer asnything immediate to do.
+\&  }
+.Ve
+.PP
+.Vb 3
+\&  struct ev_idle *idle_watcher = malloc (sizeof (struct ev_idle));
+\&  ev_idle_init (idle_watcher, idle_cb);
+\&  ev_idle_start (loop, idle_cb);
+.Ve
 .ie n .Sh """ev_prepare""\fP and \f(CW""ev_check"" \- customise your event loop"
 .el .Sh "\f(CWev_prepare\fP and \f(CWev_check\fP \- customise your event loop"
 .IX Subsection "ev_prepare and ev_check - customise your event loop"
@@ -946,6 +1191,8 @@ low-priority coroutines to idle/background tasks).
 Initialises and configures the prepare or check watcher \- they have no
 parameters of any kind. There are \f(CW\*(C`ev_prepare_set\*(C'\fR and \f(CW\*(C`ev_check_set\*(C'\fR
 macros, but using them is utterly, utterly and completely pointless.
+.PP
+Example: *TODO*.
 .SH "OTHER FUNCTIONS"
 .IX Header "OTHER FUNCTIONS"
 There are some other functions of possible interest. Described. Here. Now.

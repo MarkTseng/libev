@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Nov 23 16:26:06 2007" />
+	<meta name="created" content="Fri Nov 23 17:17:04 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -98,7 +98,12 @@ will not have this argument.</p>
 (fractional) number of seconds since the (POSIX) epoch (somewhere near
 the beginning of 1970, details are complicated, don't ask). This type is
 called <code>ev_tstamp</code>, which is what you should use too. It usually aliases
-to the double type in C.</p>
+to the <code>double</code> type in C, and when you need to do any calculations on
+it, you should treat it as such.</p>
+
+
+
+
 
 </div>
 <h1 id="GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
@@ -124,6 +129,13 @@ version of the library your program was compiled against.</p>
 as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.</p>
+		<p>Example: make sure we haven't accidentally been linked against the wrong
+version:</p>
+<pre>  assert ((&quot;libev version mismatch&quot;,
+           ev_version_major () == EV_VERSION_MAJOR
+           &amp;&amp; ev_version_minor () &gt;= EV_VERSION_MINOR));
+
+</pre>
 	</dd>
 	<dt>unsigned int ev_supported_backends ()</dt>
 	<dd>
@@ -131,6 +143,12 @@ not a problem.</p>
 value) compiled into this binary of libev (independent of their
 availability on the system you are running on). See <code>ev_default_loop</code> for
 a description of the set values.</p>
+		<p>Example: make sure we have the epoll method, because yeah this is cool and
+a must have and can we have a torrent of it please!!!11</p>
+<pre>  assert ((&quot;sorry, no epoll, no sex&quot;,
+           ev_supported_backends () &amp; EVBACKEND_EPOLL));
+
+</pre>
 	</dd>
 	<dt>unsigned int ev_recommended_backends ()</dt>
 	<dd>
@@ -151,6 +169,26 @@ destructive action. The default is your system realloc function.</p>
 		<p>You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.</p>
+		<p>Example: replace the libev allocator with one that waits a bit and then
+retries: better than mine).</p>
+<pre>   static void *
+   persistent_realloc (void *ptr, long size)
+   {
+     for (;;)
+       {
+         void *newptr = realloc (ptr, size);
+
+         if (newptr)
+           return newptr;
+
+         sleep (60);
+       }
+   }
+
+   ...
+   ev_set_allocator (persistent_realloc);
+
+</pre>
 	</dd>
 	<dt>ev_set_syserr_cb (void (*cb)(const char *msg));</dt>
 	<dd>
@@ -161,6 +199,18 @@ callback is set, then libev will expect it to remedy the sitution, no
 matter what, when it returns. That is, libev will generally retry the
 requested operation, or, if the condition doesn't go away, do bad stuff
 (such as abort).</p>
+		<p>Example: do the same thing as libev does internally:</p>
+<pre>   static void
+   fatal_error (const char *msg)
+   {
+     perror (msg);
+     abort ();
+   }
+
+   ...
+   ev_set_syserr_cb (fatal_error);
+
+</pre>
 	</dd>
 </dl>
 
@@ -295,6 +345,12 @@ event loop and only if you know the OS supports your types of fds):</p>
 always distinct from the default loop. Unlike the default loop, it cannot
 handle signal and child watchers, and attempts to do so will be greeted by
 undefined behaviour (or a failed assertion if assertions are enabled).</p>
+		<p>Example: try to create a event loop that uses epoll and nothing else.</p>
+<pre>  struct ev_loop *epoller = ev_loop_new (EVBACKEND_EPOLL | EVFLAG_NOENV);
+  if (!epoller)
+    fatal (&quot;no epoll found here, maybe it hides under your chair&quot;);
+
+</pre>
 	</dd>
 	<dt>ev_default_destroy ()</dt>
 	<dd>
@@ -340,10 +396,10 @@ use.</p>
 	<dt>ev_tstamp ev_now (loop)</dt>
 	<dd>
 		<p>Returns the current &quot;event loop time&quot;, which is the time the event loop
-got events and started processing them. This timestamp does not change
-as long as callbacks are being processed, and this is also the base time
-used for relative timers. You can treat it as the timestamp of the event
-occuring (or more correctly, the mainloop finding out about it).</p>
+received events and started processing them. This timestamp does not
+change as long as callbacks are being processed, and this is also the base
+time used for relative timers. You can treat it as the timestamp of the
+event occuring (or more correctly, libev finding out about it).</p>
 	</dd>
 	<dt>ev_loop (loop, int flags)</dt>
 	<dd>
@@ -352,6 +408,11 @@ after you initialised all your watchers and you want to start handling
 events.</p>
 		<p>If the flags argument is specified as <code>0</code>, it will not return until
 either no event watchers are active anymore or <code>ev_unloop</code> was called.</p>
+		<p>Please note that an explicit <code>ev_unloop</code> is usually better than
+relying on all watchers to be stopped when deciding when a program has
+finished (especially in interactive programs), but having a program that
+automatically loops as long as it has to and no longer by virtue of
+relying on its watchers stopping correctly is a thing of beauty.</p>
 		<p>A flags value of <code>EVLOOP_NONBLOCK</code> will look for new events, will handle
 those events and any outstanding ones, but will not block your process in
 case there are no events and will return after one iteration of the loop.</p>
@@ -383,6 +444,14 @@ usually a better approach for this kind of thing.</p>
      were used, return, otherwise continue with step *.
 
 </pre>
+		<p>Example: queue some jobs and then loop until no events are outsanding
+anymore.</p>
+<pre>   ... queue jobs here, make sure they register event watchers as long
+   ... as they still have work to do (even an idle watcher will do..)
+   ev_loop (my_loop, 0);
+   ... jobs done. yeah!
+
+</pre>
 	</dd>
 	<dt>ev_unloop (loop, how)</dt>
 	<dd>
@@ -404,6 +473,19 @@ visible to the libev user and should not keep <code>ev_loop</code> from exiting 
 no event watchers registered by it are active. It is also an excellent
 way to do this for generic recurring timers or from within third-party
 libraries. Just remember to <i>unref after start</i> and <i>ref before stop</i>.</p>
+		<p>Example: create a signal watcher, but keep it from keeping <code>ev_loop</code>
+running when nothing else is active.</p>
+<pre>  struct dv_signal exitsig;
+  ev_signal_init (&amp;exitsig, sig_cb, SIGINT);
+  ev_signal_start (myloop, &amp;exitsig);
+  evf_unref (myloop);
+
+</pre>
+		<p>Example: for some weird reason, unregister the above signal handler again.</p>
+<pre>  ev_ref (myloop);
+  ev_signal_stop (myloop, &amp;exitsig);
+
+</pre>
 	</dd>
 </dl>
 
@@ -549,6 +631,10 @@ have been omitted....</p>
 <p>This section describes each watcher in detail, but will not repeat
 information given in the last section.</p>
 
+
+
+
+
 </div>
 <h2 id="code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable</h2>
 <div id="code_ev_io_code_is_this_file_descrip-2">
@@ -588,6 +674,27 @@ typical ways of handling events, so its a good idea to use non-blocking
 I/O unconditionally.</p>
 	</dd>
 </dl>
+<p>Example: call <code>stdin_readable_cb</code> when STDIN_FILENO has become, well
+readable, but only once. Since it is likely line-buffered, you could
+attempt to read a whole line in the callback:</p>
+<pre>  static void
+  stdin_readable_cb (struct ev_loop *loop, struct ev_io *w, int revents)
+  {
+     ev_io_stop (loop, w);
+    .. read from stdin here (or from w-&gt;fd) and haqndle any I/O errors
+  }
+
+  ...
+  struct ev_loop *loop = ev_default_init (0);
+  struct ev_io stdin_readable;
+  ev_io_init (&amp;stdin_readable, stdin_readable_cb, STDIN_FILENO, EV_READ);
+  ev_io_start (loop, &amp;stdin_readable);
+  ev_loop (loop, 0);
+
+
+
+
+</pre>
 
 </div>
 <h2 id="code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally recurring timeouts</h2>
@@ -641,6 +748,39 @@ state where you do not expect data to travel on the socket, you can stop
 the timer, and again will automatically restart it if need be.</p>
 	</dd>
 </dl>
+<p>Example: create a timer that fires after 60 seconds.</p>
+<pre>  static void
+  one_minute_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
+  {
+    .. one minute over, w is actually stopped right here
+  }
+
+  struct ev_timer mytimer;
+  ev_timer_init (&amp;mytimer, one_minute_cb, 60., 0.);
+  ev_timer_start (loop, &amp;mytimer);
+
+</pre>
+<p>Example: create a timeout timer that times out after 10 seconds of
+inactivity.</p>
+<pre>  static void
+  timeout_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
+  {
+    .. ten seconds without any activity
+  }
+
+  struct ev_timer mytimer;
+  ev_timer_init (&amp;mytimer, timeout_cb, 0., 10.); /* note, only repeat used */
+  ev_timer_again (&amp;mytimer); /* start timer */
+  ev_loop (loop, 0);
+
+  // and in some piece of code that gets executed on any &quot;activity&quot;:
+  // reset the timeout to start ticking again at 10 seconds
+  ev_timer_again (&amp;mytimer);
+
+
+
+
+</pre>
 
 </div>
 <h2 id="code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron</h2>
@@ -734,6 +874,42 @@ a different time than the last time it was called (e.g. in a crond like
 program when the crontabs have changed).</p>
 	</dd>
 </dl>
+<p>Example: call a callback every hour, or, more precisely, whenever the
+system clock is divisible by 3600. The callback invocation times have
+potentially a lot of jittering, but good long-term stability.</p>
+<pre>  static void
+  clock_cb (struct ev_loop *loop, struct ev_io *w, int revents)
+  {
+    ... its now a full hour (UTC, or TAI or whatever your clock follows)
+  }
+
+  struct ev_periodic hourly_tick;
+  ev_periodic_init (&amp;hourly_tick, clock_cb, 0., 3600., 0);
+  ev_periodic_start (loop, &amp;hourly_tick);
+
+</pre>
+<p>Example: the same as above, but use a reschedule callback to do it:</p>
+<pre>  #include &lt;math.h&gt;
+
+  static ev_tstamp
+  my_scheduler_cb (struct ev_periodic *w, ev_tstamp now)
+  {
+    return fmod (now, 3600.) + 3600.;
+  }
+
+  ev_periodic_init (&amp;hourly_tick, clock_cb, 0., 0., my_scheduler_cb);
+
+</pre>
+<p>Example: call a callback every hour, starting now:</p>
+<pre>  struct ev_periodic hourly_tick;
+  ev_periodic_init (&amp;hourly_tick, clock_cb,
+                    fmod (ev_now (loop), 3600.), 3600., 0);
+  ev_periodic_start (loop, &amp;hourly_tick);
+
+
+
+
+</pre>
 
 </div>
 <h2 id="code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled</h2>
@@ -774,6 +950,21 @@ the status word (use the macros from <code>sys/wait.h</code> and see your system
 process causing the status change.</p>
 	</dd>
 </dl>
+<p>Example: try to exit cleanly on SIGINT and SIGTERM.</p>
+<pre>  static void
+  sigint_cb (struct ev_loop *loop, struct ev_signal *w, int revents)
+  {
+    ev_unloop (loop, EVUNLOOP_ALL);
+  }
+
+  struct ev_signal signal_watcher;
+  ev_signal_init (&amp;signal_watcher, sigint_cb, SIGINT);
+  ev_signal_start (loop, &amp;sigint_cb);
+
+
+
+
+</pre>
 
 </div>
 <h2 id="code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do</h2>
@@ -799,6 +990,24 @@ kind. There is a <code>ev_idle_set</code> macro, but using it is utterly pointle
 believe me.</p>
 	</dd>
 </dl>
+<p>Example: dynamically allocate an <code>ev_idle</code>, start it, and in the
+callback, free it. Alos, use no error checking, as usual.</p>
+<pre>  static void
+  idle_cb (struct ev_loop *loop, struct ev_idle *w, int revents)
+  {
+    free (w);
+    // now do something you wanted to do when the program has
+    // no longer asnything immediate to do.
+  }
+
+  struct ev_idle *idle_watcher = malloc (sizeof (struct ev_idle));
+  ev_idle_init (idle_watcher, idle_cb);
+  ev_idle_start (loop, idle_cb);
+
+
+
+
+</pre>
 
 </div>
 <h2 id="code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop</h2>
@@ -834,6 +1043,11 @@ parameters of any kind. There are <code>ev_prepare_set</code> and <code>ev_check
 macros, but using them is utterly, utterly and completely pointless.</p>
 	</dd>
 </dl>
+<p>Example: *TODO*.</p>
+
+
+
+
 
 </div>
 <h1 id="OTHER_FUNCTIONS">OTHER FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
@@ -886,6 +1100,10 @@ the given events it.</p>
 		<p>Feed an event as if the given signal occured (loop must be the default loop!).</p>
 	</dd>
 </dl>
+
+
+
+
 
 </div>
 <h1 id="LIBEVENT_EMULATION">LIBEVENT EMULATION</h1><p><a href="#TOP" class="toplink">Top</a></p>
