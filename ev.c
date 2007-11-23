@@ -797,7 +797,7 @@ ev_supported_backends (void)
 unsigned int
 ev_recommended_backends (void)
 {
-  unsigned int flags = ev_recommended_backends ();
+  unsigned int flags = ev_supported_backends ();
 
 #ifndef __NetBSD__
   /* kqueue is borked on everything but netbsd apparently */
