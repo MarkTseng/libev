@@ -57,17 +57,20 @@ kqueue_change (EV_P_ int fd, int filter, int flags, int fflags)
 static void
 kqueue_modify (EV_P_ int fd, int oev, int nev)
 {
-  /* to detect close/reopen reliably, we have to remove and re-add */
+  if (oev != nev)
+    {
+      if (oev & EV_READ)
+        kqueue_change (EV_A_ fd, EVFILT_READ , EV_DELETE, 0);
+
+      if (oev & EV_WRITE)
+        kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_DELETE, 0);
+    }
+
+  /* to detect close/reopen reliably, we have to re-add */
   /* event requests even when oev == nev */
 
-  if (oev & EV_READ)
-    kqueue_change (EV_A_ fd, EVFILT_READ, EV_DELETE, 0);
-
-  if (oev & EV_WRITE)
-    kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_DELETE, 0);
-
   if (nev & EV_READ)
-    kqueue_change (EV_A_ fd, EVFILT_READ, EV_ADD, NOTE_EOF);
+    kqueue_change (EV_A_ fd, EVFILT_READ , EV_ADD, NOTE_EOF);
 
   if (nev & EV_WRITE)
     kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_ADD, NOTE_EOF);
