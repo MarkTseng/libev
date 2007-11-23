@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Nov 23 09:26:40 2007" />
+	<meta name="created" content="Fri Nov 23 16:26:06 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -139,7 +139,7 @@ recommended for this platform. This set is often smaller than the one
 returned by <code>ev_supported_backends</code>, as for example kqueue is broken on
 most BSDs and will not be autodetected unless you explicitly request it
 (assuming you know what you are doing). This is the set of backends that
-<code>EVFLAG_AUTO</code> will probe for.</p>
+libev will probe for if you specify no backends explicitly.</p>
 	</dd>
 	<dt>ev_set_allocator (void *(*cb)(void *ptr, long size))</dt>
 	<dd>
@@ -186,8 +186,8 @@ flags. If that is troubling you, check <code>ev_backend ()</code> afterwards).</
 		<p>If you don't know what event loop to use, use the one returned from this
 function.</p>
 		<p>The flags argument can be used to specify special behaviour or specific
-backends to use, and is usually specified as <code>0</code> (or EVFLAG_AUTO).</p>
-		<p>It supports the following flags:</p>
+backends to use, and is usually specified as <code>0</code> (or <code>EVFLAG_AUTO</code>).</p>
+		<p>The following flags are supported:</p>
 		<p>
 			<dl>
 				<dt><code>EVFLAG_AUTO</code></dt>
@@ -239,8 +239,9 @@ need to use non-blocking I/O or other means to avoid blocking when no data
 					<p>Kqueue deserves special mention, as at the time of this writing, it
 was broken on all BSDs except NetBSD (usually it doesn't work with
 anything but sockets and pipes, except on Darwin, where of course its
-completely useless). For this reason its not being &quot;autodetected&quot; unless
-you explicitly specify the flags (i.e. you don't use EVFLAG_AUTO).</p>
+completely useless). For this reason its not being &quot;autodetected&quot;
+unless you explicitly specify it explicitly in the flags (i.e. using
+<code>EVBACKEND_KQUEUE</code>).</p>
 					<p>It scales in the same way as the epoll backend, but the interface to the
 kernel is more efficient (which says nothing about its actual speed, of
 course). While starting and stopping an I/O watcher does not cause an
@@ -271,6 +272,22 @@ with <code>EVFLAG_AUTO</code>). Since this is a mask, you can do stuff such as
 backends will be tried (in the reverse order as given here). If none are
 specified, most compiled-in backend will be tried, usually in reverse
 order of their flag values :)</p>
+		<p>The most typical usage is like this:</p>
+<pre>  if (!ev_default_loop (0))
+    fatal (&quot;could not initialise libev, bad $LIBEV_FLAGS in environment?&quot;);
+
+</pre>
+		<p>Restrict libev to the select and poll backends, and do not allow
+environment settings to be taken into account:</p>
+<pre>  ev_default_loop (EVBACKEND_POLL | EVBACKEND_SELECT | EVFLAG_NOENV);
+
+</pre>
+		<p>Use whatever libev has to offer, but make sure that kqueue is used if
+available (warning, breaks stuff, best use only with your own private
+event loop and only if you know the OS supports your types of fds):</p>
+<pre>  ev_default_loop (ev_recommended_backends () | EVBACKEND_KQUEUE);
+
+</pre>
 	</dd>
 	<dt>struct ev_loop *ev_loop_new (unsigned int flags)</dt>
 	<dd>
@@ -333,34 +350,37 @@ occuring (or more correctly, the mainloop finding out about it).</p>
 		<p>Finally, this is it, the event handler. This function usually is called
 after you initialised all your watchers and you want to start handling
 events.</p>
-		<p>If the flags argument is specified as 0, it will not return until either
-no event watchers are active anymore or <code>ev_unloop</code> was called.</p>
+		<p>If the flags argument is specified as <code>0</code>, it will not return until
+either no event watchers are active anymore or <code>ev_unloop</code> was called.</p>
 		<p>A flags value of <code>EVLOOP_NONBLOCK</code> will look for new events, will handle
 those events and any outstanding ones, but will not block your process in
 case there are no events and will return after one iteration of the loop.</p>
 		<p>A flags value of <code>EVLOOP_ONESHOT</code> will look for new events (waiting if
 neccessary) and will handle those and any outstanding ones. It will block
 your process until at least one new event arrives, and will return after
-one iteration of the loop.</p>
-		<p>This flags value could be used to implement alternative looping
-constructs, but the <code>prepare</code> and <code>check</code> watchers provide a better and
-more generic mechanism.</p>
-		<p>Here are the gory details of what ev_loop does:</p>
-<pre>   1. If there are no active watchers (reference count is zero), return.
-   2. Queue and immediately call all prepare watchers.
-   3. If we have been forked, recreate the kernel state.
-   4. Update the kernel state with all outstanding changes.
-   5. Update the &quot;event loop time&quot;.
-   6. Calculate for how long to block.
-   7. Block the process, waiting for events.
-   8. Update the &quot;event loop time&quot; and do time jump handling.
-   9. Queue all outstanding timers.
-  10. Queue all outstanding periodics.
-  11. If no events are pending now, queue all idle watchers.
-  12. Queue all check watchers.
-  13. Call all queued watchers in reverse order (i.e. check watchers first).
-  14. If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
-      was used, return, otherwise continue with step #1.
+one iteration of the loop. This is useful if you are waiting for some
+external event in conjunction with something not expressible using other
+libev watchers. However, a pair of <code>ev_prepare</code>/<code>ev_check</code> watchers is
+usually a better approach for this kind of thing.</p>
+		<p>Here are the gory details of what <code>ev_loop</code> does:</p>
+<pre>   * If there are no active watchers (reference count is zero), return.
+   - Queue prepare watchers and then call all outstanding watchers.
+   - If we have been forked, recreate the kernel state.
+   - Update the kernel state with all outstanding changes.
+   - Update the &quot;event loop time&quot;.
+   - Calculate for how long to block.
+   - Block the process, waiting for any events.
+   - Queue all outstanding I/O (fd) events.
+   - Update the &quot;event loop time&quot; and do time jump handling.
+   - Queue all outstanding timers.
+   - Queue all outstanding periodics.
+   - If no events are pending now, queue all idle watchers.
+   - Queue all check watchers.
+   - Call all queued watchers in reverse order (i.e. check watchers first).
+     Signals and child watchers are implemented as I/O watchers, and will
+     be handled here by queueing them when their watcher gets executed.
+   - If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
+     were used, return, otherwise continue with step *.
 
 </pre>
 	</dd>

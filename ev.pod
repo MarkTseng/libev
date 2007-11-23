@@ -91,7 +91,7 @@ recommended for this platform. This set is often smaller than the one
 returned by C<ev_supported_backends>, as for example kqueue is broken on
 most BSDs and will not be autodetected unless you explicitly request it
 (assuming you know what you are doing). This is the set of backends that
-C<EVFLAG_AUTO> will probe for.
+libev will probe for if you specify no backends explicitly.
 
 =item ev_set_allocator (void *(*cb)(void *ptr, long size))
 
@@ -143,9 +143,9 @@ If you don't know what event loop to use, use the one returned from this
 function.
 
 The flags argument can be used to specify special behaviour or specific
-backends to use, and is usually specified as C<0> (or EVFLAG_AUTO).
+backends to use, and is usually specified as C<0> (or C<EVFLAG_AUTO>).
 
-It supports the following flags:
+The following flags are supported:
 
 =over 4
 
@@ -200,8 +200,9 @@ need to use non-blocking I/O or other means to avoid blocking when no data
 Kqueue deserves special mention, as at the time of this writing, it
 was broken on all BSDs except NetBSD (usually it doesn't work with
 anything but sockets and pipes, except on Darwin, where of course its
-completely useless). For this reason its not being "autodetected" unless
-you explicitly specify the flags (i.e. you don't use EVFLAG_AUTO).
+completely useless). For this reason its not being "autodetected"
+unless you explicitly specify it explicitly in the flags (i.e. using
+C<EVBACKEND_KQUEUE>).
 
 It scales in the same way as the epoll backend, but the interface to the
 kernel is more efficient (which says nothing about its actual speed, of
@@ -234,6 +235,22 @@ If one or more of these are ored into the flags value, then only these
 backends will be tried (in the reverse order as given here). If none are
 specified, most compiled-in backend will be tried, usually in reverse
 order of their flag values :)
+
+The most typical usage is like this:
+
+  if (!ev_default_loop (0))
+    fatal ("could not initialise libev, bad $LIBEV_FLAGS in environment?");
+
+Restrict libev to the select and poll backends, and do not allow
+environment settings to be taken into account:
+
+  ev_default_loop (EVBACKEND_POLL | EVBACKEND_SELECT | EVFLAG_NOENV);
+
+Use whatever libev has to offer, but make sure that kqueue is used if
+available (warning, breaks stuff, best use only with your own private
+event loop and only if you know the OS supports your types of fds):
+
+  ev_default_loop (ev_recommended_backends () | EVBACKEND_KQUEUE);
 
 =item struct ev_loop *ev_loop_new (unsigned int flags)
 
@@ -299,8 +316,8 @@ Finally, this is it, the event handler. This function usually is called
 after you initialised all your watchers and you want to start handling
 events.
 
-If the flags argument is specified as 0, it will not return until either
-no event watchers are active anymore or C<ev_unloop> was called.
+If the flags argument is specified as C<0>, it will not return until
+either no event watchers are active anymore or C<ev_unloop> was called.
 
 A flags value of C<EVLOOP_NONBLOCK> will look for new events, will handle
 those events and any outstanding ones, but will not block your process in
@@ -309,29 +326,31 @@ case there are no events and will return after one iteration of the loop.
 A flags value of C<EVLOOP_ONESHOT> will look for new events (waiting if
 neccessary) and will handle those and any outstanding ones. It will block
 your process until at least one new event arrives, and will return after
-one iteration of the loop.
+one iteration of the loop. This is useful if you are waiting for some
+external event in conjunction with something not expressible using other
+libev watchers. However, a pair of C<ev_prepare>/C<ev_check> watchers is
+usually a better approach for this kind of thing.
 
-This flags value could be used to implement alternative looping
-constructs, but the C<prepare> and C<check> watchers provide a better and
-more generic mechanism.
+Here are the gory details of what C<ev_loop> does:
 
-Here are the gory details of what ev_loop does:
-
-   1. If there are no active watchers (reference count is zero), return.
-   2. Queue and immediately call all prepare watchers.
-   3. If we have been forked, recreate the kernel state.
-   4. Update the kernel state with all outstanding changes.
-   5. Update the "event loop time".
-   6. Calculate for how long to block.
-   7. Block the process, waiting for events.
-   8. Update the "event loop time" and do time jump handling.
-   9. Queue all outstanding timers.
-  10. Queue all outstanding periodics.
-  11. If no events are pending now, queue all idle watchers.
-  12. Queue all check watchers.
-  13. Call all queued watchers in reverse order (i.e. check watchers first).
-  14. If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
-      was used, return, otherwise continue with step #1.
+   * If there are no active watchers (reference count is zero), return.
+   - Queue prepare watchers and then call all outstanding watchers.
+   - If we have been forked, recreate the kernel state.
+   - Update the kernel state with all outstanding changes.
+   - Update the "event loop time".
+   - Calculate for how long to block.
+   - Block the process, waiting for any events.
+   - Queue all outstanding I/O (fd) events.
+   - Update the "event loop time" and do time jump handling.
+   - Queue all outstanding timers.
+   - Queue all outstanding periodics.
+   - If no events are pending now, queue all idle watchers.
+   - Queue all check watchers.
+   - Call all queued watchers in reverse order (i.e. check watchers first).
+     Signals and child watchers are implemented as I/O watchers, and will
+     be handled here by queueing them when their watcher gets executed.
+   - If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
+     were used, return, otherwise continue with step *.
 
 =item ev_unloop (loop, how)
 
