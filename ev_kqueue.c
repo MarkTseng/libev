@@ -42,12 +42,7 @@ kqueue_change (EV_P_ int fd, int filter, int flags, int fflags)
   ++kqueue_changecnt;
   array_needsize (struct kevent, kqueue_changes, kqueue_changemax, kqueue_changecnt, EMPTY2);
 
-  ke = &kqueue_changes [kqueue_changecnt - 1];
-  memset (ke, 0, sizeof (struct kevent));
-  ke->ident  = fd;
-  ke->filter = filter;
-  ke->flags  = flags;
-  ke->fflags = fflags;
+  EV_SET (&kqueue_changes [kqueue_changecnt - 1], fd, filter, flags, fflags, 0, 0);
 }
 
 #ifndef NOTE_EOF
