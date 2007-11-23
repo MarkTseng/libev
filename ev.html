@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Nov 23 06:14:47 2007" />
+	<meta name="created" content="Fri Nov 23 09:26:40 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -230,6 +230,9 @@ result in some caching, there is still a syscall per such incident
 (because the fd could point to a different file description now), so its
 best to avoid that. Also, dup()ed file descriptors might not work very
 well if you register events for both fds.</p>
+					<p>Please note that epoll sometimes generates spurious notifications, so you
+need to use non-blocking I/O or other means to avoid blocking when no data
+(or space) is available.</p>
 				</dd>
 				<dt><code>EVBACKEND_KQUEUE</code>  (value 8, most BSD clones)</dt>
 				<dd>
@@ -252,6 +255,9 @@ incident, so its best to avoid that.</p>
 				<dd>
 					<p>This uses the Solaris 10 port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).</p>
+					<p>Please note that solaris ports can result in a lot of spurious
+notifications, so you need to use non-blocking I/O or other means to avoid
+blocking when no data (or space) is available.</p>
 				</dd>
 				<dt><code>EVBACKEND_ALL</code></dt>
 				<dd>
@@ -550,6 +556,16 @@ the same underlying &quot;file open&quot;).</p>
 		<p>Configures an <code>ev_io</code> watcher. The fd is the file descriptor to rceeive
 events for and events is either <code>EV_READ</code>, <code>EV_WRITE</code> or <code>EV_READ |
 EV_WRITE</code> to receive the given events.</p>
+		<p>Please note that most of the more scalable backend mechanisms (for example
+epoll and solaris ports) can result in spurious readyness notifications
+for file descriptors, so you practically need to use non-blocking I/O (and
+treat callback invocation as hint only), or retest separately with a safe
+interface before doing I/O (XLib can do this), or force the use of either
+<code>EVBACKEND_SELECT</code> or <code>EVBACKEND_POLL</code>, which don't suffer from this
+problem. Also note that it is quite easy to have your callback invoked
+when the readyness condition is no longer valid even when employing
+typical ways of handling events, so its a good idea to use non-blocking
+I/O unconditionally.</p>
 	</dd>
 </dl>
 

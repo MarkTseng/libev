@@ -191,6 +191,10 @@ result in some caching, there is still a syscall per such incident
 best to avoid that. Also, dup()ed file descriptors might not work very
 well if you register events for both fds.
 
+Please note that epoll sometimes generates spurious notifications, so you
+need to use non-blocking I/O or other means to avoid blocking when no data
+(or space) is available.
+
 =item C<EVBACKEND_KQUEUE>  (value 8, most BSD clones)
 
 Kqueue deserves special mention, as at the time of this writing, it
@@ -213,6 +217,10 @@ This is not implemented yet (and might never be).
 
 This uses the Solaris 10 port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).
+
+Please note that solaris ports can result in a lot of spurious
+notifications, so you need to use non-blocking I/O or other means to avoid
+blocking when no data (or space) is available.
 
 =item C<EVBACKEND_ALL>
 
@@ -529,6 +537,17 @@ C<EVBACKEND_POLL>).
 Configures an C<ev_io> watcher. The fd is the file descriptor to rceeive
 events for and events is either C<EV_READ>, C<EV_WRITE> or C<EV_READ |
 EV_WRITE> to receive the given events.
+
+Please note that most of the more scalable backend mechanisms (for example
+epoll and solaris ports) can result in spurious readyness notifications
+for file descriptors, so you practically need to use non-blocking I/O (and
+treat callback invocation as hint only), or retest separately with a safe
+interface before doing I/O (XLib can do this), or force the use of either
+C<EVBACKEND_SELECT> or C<EVBACKEND_POLL>, which don't suffer from this
+problem. Also note that it is quite easy to have your callback invoked
+when the readyness condition is no longer valid even when employing
+typical ways of handling events, so its a good idea to use non-blocking
+I/O unconditionally.
 
 =back
 

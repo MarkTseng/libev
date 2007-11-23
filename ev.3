@@ -304,6 +304,10 @@ result in some caching, there is still a syscall per such incident
 (because the fd could point to a different file description now), so its
 best to avoid that. Also, \fIdup()\fRed file descriptors might not work very
 well if you register events for both fds.
+.Sp
+Please note that epoll sometimes generates spurious notifications, so you
+need to use non-blocking I/O or other means to avoid blocking when no data
+(or space) is available.
 .ie n .IP """EVBACKEND_KQUEUE""  (value 8, most \s-1BSD\s0 clones)" 4
 .el .IP "\f(CWEVBACKEND_KQUEUE\fR  (value 8, most \s-1BSD\s0 clones)" 4
 .IX Item "EVBACKEND_KQUEUE  (value 8, most BSD clones)"
@@ -327,6 +331,10 @@ This is not implemented yet (and might never be).
 .IX Item "EVBACKEND_PORT    (value 32, Solaris 10)"
 This uses the Solaris 10 port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).
+.Sp
+Please note that solaris ports can result in a lot of spurious
+notifications, so you need to use non-blocking I/O or other means to avoid
+blocking when no data (or space) is available.
 .ie n .IP """EVBACKEND_ALL""" 4
 .el .IP "\f(CWEVBACKEND_ALL\fR" 4
 .IX Item "EVBACKEND_ALL"
@@ -643,6 +651,17 @@ If you must do this, then force the use of a known-to-be-good backend
 Configures an \f(CW\*(C`ev_io\*(C'\fR watcher. The fd is the file descriptor to rceeive
 events for and events is either \f(CW\*(C`EV_READ\*(C'\fR, \f(CW\*(C`EV_WRITE\*(C'\fR or \f(CW\*(C`EV_READ |
 EV_WRITE\*(C'\fR to receive the given events.
+.Sp
+Please note that most of the more scalable backend mechanisms (for example
+epoll and solaris ports) can result in spurious readyness notifications
+for file descriptors, so you practically need to use non-blocking I/O (and
+treat callback invocation as hint only), or retest separately with a safe
+interface before doing I/O (XLib can do this), or force the use of either
+\&\f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR, which don't suffer from this
+problem. Also note that it is quite easy to have your callback invoked
+when the readyness condition is no longer valid even when employing
+typical ways of handling events, so its a good idea to use non-blocking
+I/O unconditionally.
 .ie n .Sh """ev_timer"" \- relative and optionally recurring timeouts"
 .el .Sh "\f(CWev_timer\fP \- relative and optionally recurring timeouts"
 .IX Subsection "ev_timer - relative and optionally recurring timeouts"
