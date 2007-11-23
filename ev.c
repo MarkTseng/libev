@@ -729,10 +729,11 @@ childcb (EV_P_ struct ev_signal *sw, int revents)
   if (0 < (pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)))
     {
       /* make sure we are called again until all childs have been reaped */
+      /* we need to do it this way so that the callback gets called before we continue */
       ev_feed_event (EV_A_ (W)sw, EV_SIGNAL);
 
       child_reap (EV_A_ sw, pid, pid, status);
-      child_reap (EV_A_ sw,   0, pid, status); /* this might trigger a watcher twice, but event catches that */
+      child_reap (EV_A_ sw,   0, pid, status); /* this might trigger a watcher twice, but feed_event catches that */
     }
 }
 
