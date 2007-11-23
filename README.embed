@@ -169,9 +169,14 @@ PREPROCESSOR SYMBOLS
         be used to virtually rename the ev.h header file in case of
         conflicts.
 
+    EV_CONFIG_H
+
+        If EV_STANDALONE isn't 1, this variable can be used to override
+        ev.c's idea of where to find the "config.h" file.
+
     EV_EVENT_H
 
-        Similarly to EV_H, this macro cna be used to override event.c's idea
+        Similarly to EV_H, this macro can be used to override event.c's idea
         of how the event.h header can be found.
 
     EV_PROTOTYPES

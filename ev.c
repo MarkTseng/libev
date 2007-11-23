@@ -34,7 +34,11 @@ extern "C" {
 #endif
 
 #ifndef EV_STANDALONE
-# include "config.h"
+# ifdef EV_CONFIG_H
+#  include EV_CONFIG_H
+# else
+#  include "config.h"
+# endif
 
 # if HAVE_CLOCK_GETTIME
 #  ifndef EV_USE_MONOTONIC
