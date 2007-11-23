@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Nov 23 05:35:59 2007" />
+	<meta name="created" content="Fri Nov 23 06:14:47 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -125,6 +125,22 @@ as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.</p>
 	</dd>
+	<dt>unsigned int ev_supported_backends ()</dt>
+	<dd>
+		<p>Return the set of all backends (i.e. their corresponding <code>EV_BACKEND_*</code>
+value) compiled into this binary of libev (independent of their
+availability on the system you are running on). See <code>ev_default_loop</code> for
+a description of the set values.</p>
+	</dd>
+	<dt>unsigned int ev_recommended_backends ()</dt>
+	<dd>
+		<p>Return the set of all backends compiled into this binary of libev and also
+recommended for this platform. This set is often smaller than the one
+returned by <code>ev_supported_backends</code>, as for example kqueue is broken on
+most BSDs and will not be autodetected unless you explicitly request it
+(assuming you know what you are doing). This is the set of backends that
+<code>EVFLAG_AUTO</code> will probe for.</p>
+	</dd>
 	<dt>ev_set_allocator (void *(*cb)(void *ptr, long size))</dt>
 	<dd>
 		<p>Sets the allocation function to use (the prototype is similar to the
@@ -166,11 +182,11 @@ done correctly, because it's hideous and inefficient).</p>
 		<p>This will initialise the default event loop if it hasn't been initialised
 yet and return it. If the default loop could not be initialised, returns
 false. If it already was initialised it simply returns it (and ignores the
-flags).</p>
+flags. If that is troubling you, check <code>ev_backend ()</code> afterwards).</p>
 		<p>If you don't know what event loop to use, use the one returned from this
 function.</p>
 		<p>The flags argument can be used to specify special behaviour or specific
-backends to use, and is usually specified as 0 (or EVFLAG_AUTO).</p>
+backends to use, and is usually specified as <code>0</code> (or EVFLAG_AUTO).</p>
 		<p>It supports the following flags:</p>
 		<p>
 			<dl>
@@ -188,7 +204,7 @@ override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.</p>
 				</dd>
-				<dt><code>EVMETHOD_SELECT</code>  (value 1, portable select backend)</dt>
+				<dt><code>EVBACKEND_SELECT</code>  (value 1, portable select backend)</dt>
 				<dd>
 					<p>This is your standard select(2) backend. Not <i>completely</i> standard, as
 libev tries to roll its own fd_set with no limits on the number of fds,
@@ -196,14 +212,14 @@ but if that fails, expect a fairly low limit on the number of fds when
 using this backend. It doesn't scale too well (O(highest_fd)), but its usually
 the fastest backend for a low number of fds.</p>
 				</dd>
-				<dt><code>EVMETHOD_POLL</code>    (value 2, poll backend, available everywhere except on windows)</dt>
+				<dt><code>EVBACKEND_POLL</code>    (value 2, poll backend, available everywhere except on windows)</dt>
 				<dd>
 					<p>And this is your standard poll(2) backend. It's more complicated than
 select, but handles sparse fds better and has no artificial limit on the
 number of fds you can use (except it will slow down considerably with a
 lot of inactive fds). It scales similarly to select, i.e. O(total_fds).</p>
 				</dd>
-				<dt><code>EVMETHOD_EPOLL</code>   (value 4, Linux)</dt>
+				<dt><code>EVBACKEND_EPOLL</code>   (value 4, Linux)</dt>
 				<dd>
 					<p>For few fds, this backend is a bit little slower than poll and select,
 but it scales phenomenally better. While poll and select usually scale like
@@ -215,7 +231,7 @@ result in some caching, there is still a syscall per such incident
 best to avoid that. Also, dup()ed file descriptors might not work very
 well if you register events for both fds.</p>
 				</dd>
-				<dt><code>EVMETHOD_KQUEUE</code>  (value 8, most BSD clones)</dt>
+				<dt><code>EVBACKEND_KQUEUE</code>  (value 8, most BSD clones)</dt>
 				<dd>
 					<p>Kqueue deserves special mention, as at the time of this writing, it
 was broken on all BSDs except NetBSD (usually it doesn't work with
@@ -228,20 +244,20 @@ course). While starting and stopping an I/O watcher does not cause an
 extra syscall as with epoll, it still adds up to four event changes per
 incident, so its best to avoid that.</p>
 				</dd>
-				<dt><code>EVMETHOD_DEVPOLL</code> (value 16, Solaris 8)</dt>
+				<dt><code>EVBACKEND_DEVPOLL</code> (value 16, Solaris 8)</dt>
 				<dd>
 					<p>This is not implemented yet (and might never be).</p>
 				</dd>
-				<dt><code>EVMETHOD_PORT</code>    (value 32, Solaris 10)</dt>
+				<dt><code>EVBACKEND_PORT</code>    (value 32, Solaris 10)</dt>
 				<dd>
 					<p>This uses the Solaris 10 port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).</p>
 				</dd>
-				<dt><code>EVMETHOD_ALL</code></dt>
+				<dt><code>EVBACKEND_ALL</code></dt>
 				<dd>
 					<p>Try all backends (even potentially broken ones that wouldn't be tried
 with <code>EVFLAG_AUTO</code>). Since this is a mask, you can do stuff such as
-<code>EVMETHOD_ALL &amp; ~EVMETHOD_KQUEUE</code>.</p>
+<code>EVBACKEND_ALL &amp; ~EVBACKEND_KQUEUE</code>.</p>
 				</dd>
 			</dl>
 		</p>
@@ -283,6 +299,9 @@ quite nicely into a call to <code>pthread_atfork</code>:</p>
 <pre>    pthread_atfork (0, 0, ev_default_fork);
 
 </pre>
+		<p>At the moment, <code>EVBACKEND_SELECT</code> and <code>EVBACKEND_POLL</code> are safe to use
+without calling this function, so if you force one of those backends you
+do not need to care.</p>
 	</dd>
 	<dt>ev_loop_fork (loop)</dt>
 	<dd>
@@ -290,9 +309,9 @@ quite nicely into a call to <code>pthread_atfork</code>:</p>
 <code>ev_loop_new</code>. Yes, you have to call this on every allocated event loop
 after fork, and how you do this is entirely your own problem.</p>
 	</dd>
-	<dt>unsigned int ev_method (loop)</dt>
+	<dt>unsigned int ev_backend (loop)</dt>
 	<dd>
-		<p>Returns one of the <code>EVMETHOD_*</code> flags indicating the event backend in
+		<p>Returns one of the <code>EVBACKEND_*</code> flags indicating the event backend in
 use.</p>
 	</dd>
 	<dt>ev_tstamp ev_now (loop)</dt>
@@ -400,7 +419,7 @@ with a watcher-specific start function (<code>ev_&lt;type&gt;_start (loop, watch
 corresponding stop function (<code>ev_&lt;type&gt;_stop (loop, watcher *)</code>.</p>
 <p>As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
-reinitialise it or call its set method.</p>
+reinitialise it or call its set macro.</p>
 <p>You can check whether an event is active by calling the <code>ev_is_active
 (watcher *)</code> macro. To see whether an event is outstanding (but the
 callback for it has not been called yet) you can use the <code>ev_is_pending
@@ -522,8 +541,8 @@ descriptors correctly if you register interest in two or more fds pointing
 to the same underlying file/socket etc. description (that is, they share
 the same underlying &quot;file open&quot;).</p>
 <p>If you must do this, then force the use of a known-to-be-good backend
-(at the time of this writing, this includes only EVMETHOD_SELECT and
-EVMETHOD_POLL).</p>
+(at the time of this writing, this includes only <code>EVBACKEND_SELECT</code> and
+<code>EVBACKEND_POLL</code>).</p>
 <dl>
 	<dt>ev_io_init (ev_io *, callback, int fd, int events)</dt>
 	<dt>ev_io_set (ev_io *, int fd, int events)</dt>

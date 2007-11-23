@@ -201,6 +201,20 @@ Usually, it's a good idea to terminate if the major versions mismatch,
 as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.
+.IP "unsigned int ev_supported_backends ()" 4
+.IX Item "unsigned int ev_supported_backends ()"
+Return the set of all backends (i.e. their corresponding \f(CW\*(C`EV_BACKEND_*\*(C'\fR
+value) compiled into this binary of libev (independent of their
+availability on the system you are running on). See \f(CW\*(C`ev_default_loop\*(C'\fR for
+a description of the set values.
+.IP "unsigned int ev_recommended_backends ()" 4
+.IX Item "unsigned int ev_recommended_backends ()"
+Return the set of all backends compiled into this binary of libev and also
+recommended for this platform. This set is often smaller than the one
+returned by \f(CW\*(C`ev_supported_backends\*(C'\fR, as for example kqueue is broken on
+most BSDs and will not be autodetected unless you explicitly request it
+(assuming you know what you are doing). This is the set of backends that
+\&\f(CW\*(C`EVFLAG_AUTO\*(C'\fR will probe for.
 .IP "ev_set_allocator (void *(*cb)(void *ptr, long size))" 4
 .IX Item "ev_set_allocator (void *(*cb)(void *ptr, long size))"
 Sets the allocation function to use (the prototype is similar to the
@@ -238,13 +252,13 @@ done correctly, because it's hideous and inefficient).
 This will initialise the default event loop if it hasn't been initialised
 yet and return it. If the default loop could not be initialised, returns
 false. If it already was initialised it simply returns it (and ignores the
-flags).
+flags. If that is troubling you, check \f(CW\*(C`ev_backend ()\*(C'\fR afterwards).
 .Sp
 If you don't know what event loop to use, use the one returned from this
 function.
 .Sp
 The flags argument can be used to specify special behaviour or specific
-backends to use, and is usually specified as 0 (or \s-1EVFLAG_AUTO\s0).
+backends to use, and is usually specified as \f(CW0\fR (or \s-1EVFLAG_AUTO\s0).
 .Sp
 It supports the following flags:
 .RS 4
@@ -262,24 +276,24 @@ or setgid) then libev will \fInot\fR look at the environment variable
 override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.
-.ie n .IP """EVMETHOD_SELECT""  (value 1, portable select backend)" 4
-.el .IP "\f(CWEVMETHOD_SELECT\fR  (value 1, portable select backend)" 4
-.IX Item "EVMETHOD_SELECT  (value 1, portable select backend)"
+.ie n .IP """EVBACKEND_SELECT""  (value 1, portable select backend)" 4
+.el .IP "\f(CWEVBACKEND_SELECT\fR  (value 1, portable select backend)" 4
+.IX Item "EVBACKEND_SELECT  (value 1, portable select backend)"
 This is your standard \fIselect\fR\|(2) backend. Not \fIcompletely\fR standard, as
 libev tries to roll its own fd_set with no limits on the number of fds,
 but if that fails, expect a fairly low limit on the number of fds when
 using this backend. It doesn't scale too well (O(highest_fd)), but its usually
 the fastest backend for a low number of fds.
-.ie n .IP """EVMETHOD_POLL""    (value 2, poll backend, available everywhere except on windows)" 4
-.el .IP "\f(CWEVMETHOD_POLL\fR    (value 2, poll backend, available everywhere except on windows)" 4
-.IX Item "EVMETHOD_POLL    (value 2, poll backend, available everywhere except on windows)"
+.ie n .IP """EVBACKEND_POLL""    (value 2, poll backend, available everywhere except on windows)" 4
+.el .IP "\f(CWEVBACKEND_POLL\fR    (value 2, poll backend, available everywhere except on windows)" 4
+.IX Item "EVBACKEND_POLL    (value 2, poll backend, available everywhere except on windows)"
 And this is your standard \fIpoll\fR\|(2) backend. It's more complicated than
 select, but handles sparse fds better and has no artificial limit on the
 number of fds you can use (except it will slow down considerably with a
 lot of inactive fds). It scales similarly to select, i.e. O(total_fds).
-.ie n .IP """EVMETHOD_EPOLL""   (value 4, Linux)" 4
-.el .IP "\f(CWEVMETHOD_EPOLL\fR   (value 4, Linux)" 4
-.IX Item "EVMETHOD_EPOLL   (value 4, Linux)"
+.ie n .IP """EVBACKEND_EPOLL""   (value 4, Linux)" 4
+.el .IP "\f(CWEVBACKEND_EPOLL\fR   (value 4, Linux)" 4
+.IX Item "EVBACKEND_EPOLL   (value 4, Linux)"
 For few fds, this backend is a bit little slower than poll and select,
 but it scales phenomenally better. While poll and select usually scale like
 O(total_fds) where n is the total number of fds (or the highest fd), epoll scales
@@ -290,9 +304,9 @@ result in some caching, there is still a syscall per such incident
 (because the fd could point to a different file description now), so its
 best to avoid that. Also, \fIdup()\fRed file descriptors might not work very
 well if you register events for both fds.
-.ie n .IP """EVMETHOD_KQUEUE""  (value 8, most \s-1BSD\s0 clones)" 4
-.el .IP "\f(CWEVMETHOD_KQUEUE\fR  (value 8, most \s-1BSD\s0 clones)" 4
-.IX Item "EVMETHOD_KQUEUE  (value 8, most BSD clones)"
+.ie n .IP """EVBACKEND_KQUEUE""  (value 8, most \s-1BSD\s0 clones)" 4
+.el .IP "\f(CWEVBACKEND_KQUEUE\fR  (value 8, most \s-1BSD\s0 clones)" 4
+.IX Item "EVBACKEND_KQUEUE  (value 8, most BSD clones)"
 Kqueue deserves special mention, as at the time of this writing, it
 was broken on all BSDs except NetBSD (usually it doesn't work with
 anything but sockets and pipes, except on Darwin, where of course its
@@ -304,21 +318,21 @@ kernel is more efficient (which says nothing about its actual speed, of
 course). While starting and stopping an I/O watcher does not cause an
 extra syscall as with epoll, it still adds up to four event changes per
 incident, so its best to avoid that.
-.ie n .IP """EVMETHOD_DEVPOLL"" (value 16, Solaris 8)" 4
-.el .IP "\f(CWEVMETHOD_DEVPOLL\fR (value 16, Solaris 8)" 4
-.IX Item "EVMETHOD_DEVPOLL (value 16, Solaris 8)"
+.ie n .IP """EVBACKEND_DEVPOLL"" (value 16, Solaris 8)" 4
+.el .IP "\f(CWEVBACKEND_DEVPOLL\fR (value 16, Solaris 8)" 4
+.IX Item "EVBACKEND_DEVPOLL (value 16, Solaris 8)"
 This is not implemented yet (and might never be).
-.ie n .IP """EVMETHOD_PORT""    (value 32, Solaris 10)" 4
-.el .IP "\f(CWEVMETHOD_PORT\fR    (value 32, Solaris 10)" 4
-.IX Item "EVMETHOD_PORT    (value 32, Solaris 10)"
+.ie n .IP """EVBACKEND_PORT""    (value 32, Solaris 10)" 4
+.el .IP "\f(CWEVBACKEND_PORT\fR    (value 32, Solaris 10)" 4
+.IX Item "EVBACKEND_PORT    (value 32, Solaris 10)"
 This uses the Solaris 10 port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).
-.ie n .IP """EVMETHOD_ALL""" 4
-.el .IP "\f(CWEVMETHOD_ALL\fR" 4
-.IX Item "EVMETHOD_ALL"
+.ie n .IP """EVBACKEND_ALL""" 4
+.el .IP "\f(CWEVBACKEND_ALL\fR" 4
+.IX Item "EVBACKEND_ALL"
 Try all backends (even potentially broken ones that wouldn't be tried
 with \f(CW\*(C`EVFLAG_AUTO\*(C'\fR). Since this is a mask, you can do stuff such as
-\&\f(CW\*(C`EVMETHOD_ALL & ~EVMETHOD_KQUEUE\*(C'\fR.
+\&\f(CW\*(C`EVBACKEND_ALL & ~EVBACKEND_KQUEUE\*(C'\fR.
 .RE
 .RS 4
 .Sp
@@ -360,14 +374,18 @@ quite nicely into a call to \f(CW\*(C`pthread_atfork\*(C'\fR:
 .Vb 1
 \&    pthread_atfork (0, 0, ev_default_fork);
 .Ve
+.Sp
+At the moment, \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR and \f(CW\*(C`EVBACKEND_POLL\*(C'\fR are safe to use
+without calling this function, so if you force one of those backends you
+do not need to care.
 .IP "ev_loop_fork (loop)" 4
 .IX Item "ev_loop_fork (loop)"
 Like \f(CW\*(C`ev_default_fork\*(C'\fR, but acts on an event loop created by
 \&\f(CW\*(C`ev_loop_new\*(C'\fR. Yes, you have to call this on every allocated event loop
 after fork, and how you do this is entirely your own problem.
-.IP "unsigned int ev_method (loop)" 4
-.IX Item "unsigned int ev_method (loop)"
-Returns one of the \f(CW\*(C`EVMETHOD_*\*(C'\fR flags indicating the event backend in
+.IP "unsigned int ev_backend (loop)" 4
+.IX Item "unsigned int ev_backend (loop)"
+Returns one of the \f(CW\*(C`EVBACKEND_*\*(C'\fR flags indicating the event backend in
 use.
 .IP "ev_tstamp ev_now (loop)" 4
 .IX Item "ev_tstamp ev_now (loop)"
@@ -484,7 +502,7 @@ corresponding stop function (\f(CW\*(C`ev_<type>_stop (loop, watcher *)\*(C'\fR.
 .PP
 As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
-reinitialise it or call its set method.
+reinitialise it or call its set macro.
 .PP
 You can check whether an event is active by calling the \f(CW\*(C`ev_is_active
 (watcher *)\*(C'\fR macro. To see whether an event is outstanding (but the
@@ -614,8 +632,8 @@ to the same underlying file/socket etc. description (that is, they share
 the same underlying \*(L"file open\*(R").
 .PP
 If you must do this, then force the use of a known-to-be-good backend
-(at the time of this writing, this includes only \s-1EVMETHOD_SELECT\s0 and
-\&\s-1EVMETHOD_POLL\s0).
+(at the time of this writing, this includes only \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR and
+\&\f(CW\*(C`EVBACKEND_POLL\*(C'\fR).
 .IP "ev_io_init (ev_io *, callback, int fd, int events)" 4
 .IX Item "ev_io_init (ev_io *, callback, int fd, int events)"
 .PD 0
