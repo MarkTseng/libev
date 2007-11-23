@@ -118,7 +118,7 @@ port_init (EV_P_ int flags)
   port_eventmax = 64; /* intiial number of events receivable per poll */
   port_events = (port_event_t *)ev_malloc (sizeof (port_event_t) * port_eventmax);
 
-  return EVMETHOD_PORT;
+  return EVBACKEND_PORT;
 }
 
 static void

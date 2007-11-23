@@ -156,12 +156,6 @@ extern "C" {
 
 /**/
 
-/* darwin simply cannot be helped */
-#ifdef __APPLE__
-# undef EV_USE_POLL
-# undef EV_USE_KQUEUE
-#endif
-
 #ifndef CLOCK_MONOTONIC
 # undef EV_USE_MONOTONIC
 # define EV_USE_MONOTONIC 0
@@ -787,9 +781,40 @@ enable_secure (void)
 }
 
 unsigned int
-ev_method (EV_P)
+ev_supported_backends (void)
 {
-  return method;
+}
+
+unsigned int
+ev_recommended_backends (void)
+{
+  unsigned int flags;
+
+  if (EV_USE_PORT  ) flags |= EVBACKEND_PORT;
+  if (EV_USE_KQUEUE) flags |= EVBACKEND_KQUEUE;
+  if (EV_USE_EPOLL ) flags |= EVBACKEND_EPOLL;
+  if (EV_USE_POLL  ) flags |= EVBACKEND_POLL;
+  if (EV_USE_SELECT) flags |= EVBACKEND_SELECT;
+  
+  return flags;
+}
+
+unsigned int
+ev_backend (EV_P)
+{
+  unsigned int flags = ev_recommended_backends ();
+
+#ifndef __NetBSD__
+  /* kqueue is borked on everything but netbsd apparently */
+  /* it usually doesn't work correctly on anything but sockets and pipes */
+  flags &= ~EVBACKEND_KQUEUE;
+#endif
+#ifdef __APPLE__
+  // flags &= ~EVBACKEND_KQUEUE; for documentation
+  flags &= ~EVBACKEND_POLL;
+#endif
+
+  return flags;
 }
 
 static void
@@ -815,31 +840,24 @@ loop_init (EV_P_ unsigned int flags)
           && getenv ("LIBEV_FLAGS"))
         flags = atoi (getenv ("LIBEV_FLAGS"));
 
-      if (!(flags & EVMETHOD_ALL))
-        {
-          flags |= EVMETHOD_ALL;
-#if EV_USE_KQUEUE && !defined (__NetBSD__)
-          /* kqueue is borked on everything but netbsd apparently */
-          /* it usually doesn't work correctly on anything but sockets and pipes */
-          flags &= ~EVMETHOD_KQUEUE;
-#endif
-        }
+      if (!(flags & 0x0000ffffUL))
+        flags |= ev_recommended_backends ();
 
       method = 0;
 #if EV_USE_PORT
-      if (!method && (flags & EVMETHOD_PORT  )) method = port_init   (EV_A_ flags);
+      if (!method && (flags & EVBACKEND_PORT  )) method = port_init   (EV_A_ flags);
 #endif
 #if EV_USE_KQUEUE
-      if (!method && (flags & EVMETHOD_KQUEUE)) method = kqueue_init (EV_A_ flags);
+      if (!method && (flags & EVBACKEND_KQUEUE)) method = kqueue_init (EV_A_ flags);
 #endif
 #if EV_USE_EPOLL
-      if (!method && (flags & EVMETHOD_EPOLL )) method = epoll_init  (EV_A_ flags);
+      if (!method && (flags & EVBACKEND_EPOLL )) method = epoll_init  (EV_A_ flags);
 #endif
 #if EV_USE_POLL
-      if (!method && (flags & EVMETHOD_POLL  )) method = poll_init   (EV_A_ flags);
+      if (!method && (flags & EVBACKEND_POLL  )) method = poll_init   (EV_A_ flags);
 #endif
 #if EV_USE_SELECT
-      if (!method && (flags & EVMETHOD_SELECT)) method = select_init (EV_A_ flags);
+      if (!method && (flags & EVBACKEND_SELECT)) method = select_init (EV_A_ flags);
 #endif
 
       ev_init (&sigev, sigcb);
@@ -853,19 +871,19 @@ loop_destroy (EV_P)
   int i;
 
 #if EV_USE_PORT
-  if (method == EVMETHOD_PORT  ) port_destroy   (EV_A);
+  if (method == EVBACKEND_PORT  ) port_destroy   (EV_A);
 #endif
 #if EV_USE_KQUEUE
-  if (method == EVMETHOD_KQUEUE) kqueue_destroy (EV_A);
+  if (method == EVBACKEND_KQUEUE) kqueue_destroy (EV_A);
 #endif
 #if EV_USE_EPOLL
-  if (method == EVMETHOD_EPOLL ) epoll_destroy  (EV_A);
+  if (method == EVBACKEND_EPOLL ) epoll_destroy  (EV_A);
 #endif
 #if EV_USE_POLL
-  if (method == EVMETHOD_POLL  ) poll_destroy   (EV_A);
+  if (method == EVBACKEND_POLL  ) poll_destroy   (EV_A);
 #endif
 #if EV_USE_SELECT
-  if (method == EVMETHOD_SELECT) select_destroy (EV_A);
+  if (method == EVBACKEND_SELECT) select_destroy (EV_A);
 #endif
 
   for (i = NUMPRI; i--; )
@@ -888,13 +906,13 @@ static void
 loop_fork (EV_P)
 {
 #if EV_USE_PORT
-  if (method == EVMETHOD_PORT  ) port_fork   (EV_A);
+  if (method == EVBACKEND_PORT  ) port_fork   (EV_A);
 #endif
 #if EV_USE_KQUEUE
-  if (method == EVMETHOD_KQUEUE) kqueue_fork (EV_A);
+  if (method == EVBACKEND_KQUEUE) kqueue_fork (EV_A);
 #endif
 #if EV_USE_EPOLL
-  if (method == EVMETHOD_EPOLL ) epoll_fork  (EV_A);
+  if (method == EVBACKEND_EPOLL ) epoll_fork  (EV_A);
 #endif
 
   if (ev_is_active (&sigev))

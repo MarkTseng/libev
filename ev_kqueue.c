@@ -193,7 +193,7 @@ kqueue_init (EV_P_ int flags)
   kqueue_changemax = 0;
   kqueue_changecnt = 0;
 
-  return EVMETHOD_KQUEUE;
+  return EVBACKEND_KQUEUE;
 }
 
 static void

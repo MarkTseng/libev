@@ -115,7 +115,7 @@ poll_init (EV_P_ int flags)
   pollidxs = 0; pollidxmax = 0;
   polls    = 0; pollmax    = 0; pollcnt = 0;
 
-  return EVMETHOD_POLL;
+  return EVBACKEND_POLL;
 }
 
 static void

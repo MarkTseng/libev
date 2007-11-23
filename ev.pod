@@ -77,6 +77,22 @@ as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.
 
+=item unsigned int ev_supported_backends ()
+
+Return the set of all backends (i.e. their corresponding C<EV_BACKEND_*>
+value) compiled into this binary of libev (independent of their
+availability on the system you are running on). See C<ev_default_loop> for
+a description of the set values.
+
+=item unsigned int ev_recommended_backends ()
+
+Return the set of all backends compiled into this binary of libev and also
+recommended for this platform. This set is often smaller than the one
+returned by C<ev_supported_backends>, as for example kqueue is broken on
+most BSDs and will not be autodetected unless you explicitly request it
+(assuming you know what you are doing). This is the set of backends that
+C<EVFLAG_AUTO> will probe for.
+
 =item ev_set_allocator (void *(*cb)(void *ptr, long size))
 
 Sets the allocation function to use (the prototype is similar to the
@@ -121,13 +137,13 @@ done correctly, because it's hideous and inefficient).
 This will initialise the default event loop if it hasn't been initialised
 yet and return it. If the default loop could not be initialised, returns
 false. If it already was initialised it simply returns it (and ignores the
-flags).
+flags. If that is troubling you, check C<ev_backend ()> afterwards).
 
 If you don't know what event loop to use, use the one returned from this
 function.
 
 The flags argument can be used to specify special behaviour or specific
-backends to use, and is usually specified as 0 (or EVFLAG_AUTO).
+backends to use, and is usually specified as C<0> (or EVFLAG_AUTO).
 
 It supports the following flags:
 
@@ -147,7 +163,7 @@ override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.
 
-=item C<EVMETHOD_SELECT>  (value 1, portable select backend)
+=item C<EVBACKEND_SELECT>  (value 1, portable select backend)
 
 This is your standard select(2) backend. Not I<completely> standard, as
 libev tries to roll its own fd_set with no limits on the number of fds,
@@ -155,14 +171,14 @@ but if that fails, expect a fairly low limit on the number of fds when
 using this backend. It doesn't scale too well (O(highest_fd)), but its usually
 the fastest backend for a low number of fds.
 
-=item C<EVMETHOD_POLL>    (value 2, poll backend, available everywhere except on windows)
+=item C<EVBACKEND_POLL>    (value 2, poll backend, available everywhere except on windows)
 
 And this is your standard poll(2) backend. It's more complicated than
 select, but handles sparse fds better and has no artificial limit on the
 number of fds you can use (except it will slow down considerably with a
 lot of inactive fds). It scales similarly to select, i.e. O(total_fds).
 
-=item C<EVMETHOD_EPOLL>   (value 4, Linux)
+=item C<EVBACKEND_EPOLL>   (value 4, Linux)
 
 For few fds, this backend is a bit little slower than poll and select,
 but it scales phenomenally better. While poll and select usually scale like
@@ -175,7 +191,7 @@ result in some caching, there is still a syscall per such incident
 best to avoid that. Also, dup()ed file descriptors might not work very
 well if you register events for both fds.
 
-=item C<EVMETHOD_KQUEUE>  (value 8, most BSD clones)
+=item C<EVBACKEND_KQUEUE>  (value 8, most BSD clones)
 
 Kqueue deserves special mention, as at the time of this writing, it
 was broken on all BSDs except NetBSD (usually it doesn't work with
@@ -189,20 +205,20 @@ course). While starting and stopping an I/O watcher does not cause an
 extra syscall as with epoll, it still adds up to four event changes per
 incident, so its best to avoid that.
 
-=item C<EVMETHOD_DEVPOLL> (value 16, Solaris 8)
+=item C<EVBACKEND_DEVPOLL> (value 16, Solaris 8)
 
 This is not implemented yet (and might never be).
 
-=item C<EVMETHOD_PORT>    (value 32, Solaris 10)
+=item C<EVBACKEND_PORT>    (value 32, Solaris 10)
 
 This uses the Solaris 10 port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).
 
-=item C<EVMETHOD_ALL>
+=item C<EVBACKEND_ALL>
 
 Try all backends (even potentially broken ones that wouldn't be tried
 with C<EVFLAG_AUTO>). Since this is a mask, you can do stuff such as
-C<EVMETHOD_ALL & ~EVMETHOD_KQUEUE>.
+C<EVBACKEND_ALL & ~EVBACKEND_KQUEUE>.
 
 =back
 
@@ -246,15 +262,19 @@ quite nicely into a call to C<pthread_atfork>:
 
     pthread_atfork (0, 0, ev_default_fork);
 
+At the moment, C<EVBACKEND_SELECT> and C<EVBACKEND_POLL> are safe to use
+without calling this function, so if you force one of those backends you
+do not need to care.
+
 =item ev_loop_fork (loop)
 
 Like C<ev_default_fork>, but acts on an event loop created by
 C<ev_loop_new>. Yes, you have to call this on every allocated event loop
 after fork, and how you do this is entirely your own problem.
 
-=item unsigned int ev_method (loop)
+=item unsigned int ev_backend (loop)
 
-Returns one of the C<EVMETHOD_*> flags indicating the event backend in
+Returns one of the C<EVBACKEND_*> flags indicating the event backend in
 use.
 
 =item ev_tstamp ev_now (loop)
@@ -370,7 +390,7 @@ corresponding stop function (C<< ev_<type>_stop (loop, watcher *) >>.
 
 As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
-reinitialise it or call its set method.
+reinitialise it or call its set macro.
 
 You can check whether an event is active by calling the C<ev_is_active
 (watcher *)> macro. To see whether an event is outstanding (but the
@@ -497,8 +517,8 @@ to the same underlying file/socket etc. description (that is, they share
 the same underlying "file open").
 
 If you must do this, then force the use of a known-to-be-good backend
-(at the time of this writing, this includes only EVMETHOD_SELECT and
-EVMETHOD_POLL).
+(at the time of this writing, this includes only C<EVBACKEND_SELECT> and
+C<EVBACKEND_POLL>).
 
 =over 4
 

@@ -221,7 +221,7 @@ select_init (EV_P_ int flags)
   vec_wo  = 0; 
 #endif
 
-  return EVMETHOD_SELECT;
+  return EVBACKEND_SELECT;
 }
 
 static void

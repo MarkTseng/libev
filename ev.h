@@ -71,18 +71,18 @@ struct ev_loop;
 #endif
 
 /* eventmask, revents, events... */
-#define EV_UNDEF          -1 /* guaranteed to be invalid */
-#define EV_NONE         0x00
-#define EV_READ         0x01 /* io only */
-#define EV_WRITE        0x02 /* io only */
-#define EV_TIMEOUT  0x000100 /* timer only */
-#define EV_PERIODIC 0x000200 /* periodic timer only */
-#define EV_SIGNAL   0x000400 /* signal only */
-#define EV_IDLE     0x000800 /* idle only */
-#define EV_CHECK    0x001000 /* check only */
-#define EV_PREPARE  0x002000 /* prepare only */
-#define EV_CHILD    0x004000 /* child/pid only */
-#define EV_ERROR    0x800000 /* sent when an error occurs */
+#define EV_UNDEF          -1L /* guaranteed to be invalid */
+#define EV_NONE         0x00L 
+#define EV_READ         0x01L /* io only */
+#define EV_WRITE        0x02L /* io only */
+#define EV_TIMEOUT  0x000100L /* timer only */
+#define EV_PERIODIC 0x000200L /* periodic timer only */
+#define EV_SIGNAL   0x000400L /* signal only */
+#define EV_IDLE     0x000800L /* idle only */
+#define EV_CHECK    0x001000L /* check only */
+#define EV_PREPARE  0x002000L /* prepare only */
+#define EV_CHILD    0x004000L /* child/pid only */
+#define EV_ERROR    0x800000L /* sent when an error occurs */
 
 /* can be used to add custom fields to all watchers, while losing binary compatibility */
 #ifndef EV_COMMON
@@ -233,23 +233,23 @@ union ev_any_watcher
 
 /* bits for ev_default_loop and ev_loop_new */
 /* the default */
-#define EVFLAG_AUTO      0x00000000 /* not quite a mask */
-
-/* method bits to be ored together */
-#define EVMETHOD_SELECT  0x00000001 /* about anywhere */
-#define EVMETHOD_POLL    0x00000002 /* !win */
-#define EVMETHOD_EPOLL   0x00000004 /* linux */
-#define EVMETHOD_KQUEUE  0x00000008 /* bsd */
-#define EVMETHOD_DEVPOLL 0x00000010 /* solaris 8 */ /* NYI */
-#define EVMETHOD_PORT    0x00000020 /* solaris 10 */
-#define EVMETHOD_ALL     0x0000ffff /* all methods, also future ones, or so */
-
+#define EVFLAG_AUTO       0x00000000UL /* not quite a mask */
 /* flag bits */
-#define EVFLAG_NOENV     0x01000000 /* do NOT consult environment */
+#define EVFLAG_NOENV      0x01000000UL /* do NOT consult environment */
+/* method bits to be ored together */
+#define EVBACKEND_SELECT  0x00000001UL /* about anywhere */
+#define EVBACKEND_POLL    0x00000002UL /* !win */
+#define EVBACKEND_EPOLL   0x00000004UL /* linux */
+#define EVBACKEND_KQUEUE  0x00000008UL /* bsd */
+#define EVBACKEND_DEVPOLL 0x00000010UL /* solaris 8 */ /* NYI */
+#define EVBACKEND_PORT    0x00000020UL /* solaris 10 */
 
 #if EV_PROTOTYPES
 int ev_version_major (void);
 int ev_version_minor (void);
+
+unsigned int ev_supported_backends (void);
+unsigned int ev_recommended_backends (void);
 
 ev_tstamp ev_time (void);
 
@@ -309,7 +309,7 @@ void ev_default_destroy (void); /* destroy the default loop */
 /* you can actually call it at any time, anywhere :) */
 void ev_default_fork (void);
 
-unsigned int ev_method (EV_P);
+unsigned int ev_backend (EV_P);
 #endif
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */

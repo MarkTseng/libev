@@ -96,7 +96,7 @@ epoll_init (EV_P_ int flags)
   epoll_eventmax = 64; /* intiial number of events receivable per poll */
   epoll_events = (struct epoll_event *)ev_malloc (sizeof (struct epoll_event) * epoll_eventmax);
 
-  return EVMETHOD_EPOLL;
+  return EVBACKEND_EPOLL;
 }
 
 static void
