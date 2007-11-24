@@ -242,7 +242,9 @@ union ev_any_watcher
   struct ev_check check;
   struct ev_signal signal;
   struct ev_child child;
+#if EV_MULTIPLICITY
   struct ev_embed embed;
+#endif
 };
 
 /* bits for ev_default_loop and ev_loop_new */
