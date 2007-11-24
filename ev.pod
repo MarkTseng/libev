@@ -325,8 +325,12 @@ Example: try to create a event loop that uses epoll and nothing else.
 =item ev_default_destroy ()
 
 Destroys the default loop again (frees all memory and kernel state
-etc.). This stops all registered event watchers (by not touching them in
-any way whatsoever, although you cannot rely on this :).
+etc.). None of the active event watchers will be stopped in the normal
+sense, so e.g. C<ev_is_active> might still return true. It is your
+responsibility to either stop all watchers cleanly yoursef I<before>
+calling this function, or cope with the fact afterwards (which is usually
+the easiest thing, youc na just ignore the watchers and/or C<free ()> them
+for example).
 
 =item ev_loop_destroy (loop)
 

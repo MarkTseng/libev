@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Nov 24 08:13:46 2007" />
+	<meta name="created" content="Sat Nov 24 08:20:38 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -366,8 +366,12 @@ undefined behaviour (or a failed assertion if assertions are enabled).</p>
 	<dt>ev_default_destroy ()</dt>
 	<dd>
 		<p>Destroys the default loop again (frees all memory and kernel state
-etc.). This stops all registered event watchers (by not touching them in
-any way whatsoever, although you cannot rely on this :).</p>
+etc.). None of the active event watchers will be stopped in the normal
+sense, so e.g. <code>ev_is_active</code> might still return true. It is your
+responsibility to either stop all watchers cleanly yoursef <i>before</i>
+calling this function, or cope with the fact afterwards (which is usually
+the easiest thing, youc na just ignore the watchers and/or <code>free ()</code> them
+for example).</p>
 	</dd>
 	<dt>ev_loop_destroy (loop)</dt>
 	<dd>

@@ -460,8 +460,12 @@ Example: try to create a event loop that uses epoll and nothing else.
 .IP "ev_default_destroy ()" 4
 .IX Item "ev_default_destroy ()"
 Destroys the default loop again (frees all memory and kernel state
-etc.). This stops all registered event watchers (by not touching them in
-any way whatsoever, although you cannot rely on this :).
+etc.). None of the active event watchers will be stopped in the normal
+sense, so e.g. \f(CW\*(C`ev_is_active\*(C'\fR might still return true. It is your
+responsibility to either stop all watchers cleanly yoursef \fIbefore\fR
+calling this function, or cope with the fact afterwards (which is usually
+the easiest thing, youc na just ignore the watchers and/or \f(CW\*(C`free ()\*(C'\fR them
+for example).
 .IP "ev_loop_destroy (loop)" 4
 .IX Item "ev_loop_destroy (loop)"
 Like \f(CW\*(C`ev_default_destroy\*(C'\fR, but destroys an event loop created by an
