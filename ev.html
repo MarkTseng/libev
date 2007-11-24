@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Nov 24 11:10:25 2007" />
+	<meta name="created" content="Sat Nov 24 11:15:15 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1672,24 +1672,17 @@ will be compiled. It is pretty complex because it provides its own header
 file.</p>
 		<p>The usage in rxvt-unicode is simpler. It has a <cite>ev_cpp.h</cite> header file
 that everybody includes and which overrides some autoconf choices:</p>
-<pre>   #define EV_USE_POLL 0
-   #define EV_MULTIPLICITY 0
-   #define EV_PERIODICS 0
-   #define EV_CONFIG_H &lt;config.h&gt;
+<pre>  #define EV_USE_POLL 0
+  #define EV_MULTIPLICITY 0
+  #define EV_PERIODICS 0
+  #define EV_CONFIG_H &lt;config.h&gt;
 
-   #include &quot;ev++.h&quot;
+  #include &quot;ev++.h&quot;
 
 </pre>
 		<p>And a <cite>ev_cpp.C</cite> implementation file that contains libev proper and is compiled:</p>
-<pre>   #include &quot;rxvttoolkit.h&quot;
-
-   /* darwin has problems with its header files in C++, requiring this namespace juggling */
-   using namespace ev;
-
-   #include &quot;ev.c&quot;
-
-
-
+<pre>  #include &quot;ev_cpp.h&quot;
+  #include &quot;ev.c&quot;
 
 </pre>
 

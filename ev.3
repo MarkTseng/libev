@@ -1538,6 +1538,291 @@ the constructor.
 \&    io.start (fd, ev::READ);
 \&  }
 .Ve
+.SH "EMBEDDING"
+.IX Header "EMBEDDING"
+Libev can (and often is) directly embedded into host
+applications. Examples of applications that embed it include the Deliantra
+Game Server, the \s-1EV\s0 perl module, the \s-1GNU\s0 Virtual Private Ethernet (gvpe)
+and rxvt\-unicode.
+.PP
+The goal is to enable you to just copy the neecssary files into your
+source directory without having to change even a single line in them, so
+you can easily upgrade by simply copying (or having a checked-out copy of
+libev somewhere in your source tree).
+.Sh "\s-1FILESETS\s0"
+.IX Subsection "FILESETS"
+Depending on what features you need you need to include one or more sets of files
+in your app.
+.PP
+\fI\s-1CORE\s0 \s-1EVENT\s0 \s-1LOOP\s0\fR
+.IX Subsection "CORE EVENT LOOP"
+.PP
+To include only the libev core (all the \f(CW\*(C`ev_*\*(C'\fR functions), with manual
+configuration (no autoconf):
+.PP
+.Vb 2
+\&  #define EV_STANDALONE 1
+\&  #include "ev.c"
+.Ve
+.PP
+This will automatically include \fIev.h\fR, too, and should be done in a
+single C source file only to provide the function implementations. To use
+it, do the same for \fIev.h\fR in all files wishing to use this \s-1API\s0 (best
+done by writing a wrapper around \fIev.h\fR that you can include instead and
+where you can put other configuration options):
+.PP
+.Vb 2
+\&  #define EV_STANDALONE 1
+\&  #include "ev.h"
+.Ve
+.PP
+Both header files and implementation files can be compiled with a \*(C+
+compiler (at least, thats a stated goal, and breakage will be treated
+as a bug).
+.PP
+You need the following files in your source tree, or in a directory
+in your include path (e.g. in libev/ when using \-Ilibev):
+.PP
+.Vb 4
+\&  ev.h
+\&  ev.c
+\&  ev_vars.h
+\&  ev_wrap.h
+.Ve
+.PP
+.Vb 1
+\&  ev_win32.c      required on win32 platforms only
+.Ve
+.PP
+.Vb 5
+\&  ev_select.c     only when select backend is enabled (which is is by default)
+\&  ev_poll.c       only when poll backend is enabled (disabled by default)
+\&  ev_epoll.c      only when the epoll backend is enabled (disabled by default)
+\&  ev_kqueue.c     only when the kqueue backend is enabled (disabled by default)
+\&  ev_port.c       only when the solaris port backend is enabled (disabled by default)
+.Ve
+.PP
+\&\fIev.c\fR includes the backend files directly when enabled, so you only need
+to compile a single file.
+.PP
+\fI\s-1LIBEVENT\s0 \s-1COMPATIBILITY\s0 \s-1API\s0\fR
+.IX Subsection "LIBEVENT COMPATIBILITY API"
+.PP
+To include the libevent compatibility \s-1API\s0, also include:
+.PP
+.Vb 1
+\&  #include "event.c"
+.Ve
+.PP
+in the file including \fIev.c\fR, and:
+.PP
+.Vb 1
+\&  #include "event.h"
+.Ve
+.PP
+in the files that want to use the libevent \s-1API\s0. This also includes \fIev.h\fR.
+.PP
+You need the following additional files for this:
+.PP
+.Vb 2
+\&  event.h
+\&  event.c
+.Ve
+.PP
+\fI\s-1AUTOCONF\s0 \s-1SUPPORT\s0\fR
+.IX Subsection "AUTOCONF SUPPORT"
+.PP
+Instead of using \f(CW\*(C`EV_STANDALONE=1\*(C'\fR and providing your config in
+whatever way you want, you can also \f(CW\*(C`m4_include([libev.m4])\*(C'\fR in your
+\&\fIconfigure.ac\fR and leave \f(CW\*(C`EV_STANDALONE\*(C'\fR off. \fIev.c\fR will then include
+\&\fIconfig.h\fR and configure itself accordingly.
+.PP
+For this of course you need the m4 file:
+.PP
+.Vb 1
+\&  libev.m4
+.Ve
+.Sh "\s-1PREPROCESSOR\s0 \s-1SYMBOLS/MACROS\s0"
+.IX Subsection "PREPROCESSOR SYMBOLS/MACROS"
+Libev can be configured via a variety of preprocessor symbols you have to define
+before including any of its files. The default is not to build for multiplicity
+and only include the select backend.
+.IP "\s-1EV_STANDALONE\s0" 4
+.IX Item "EV_STANDALONE"
+Must always be \f(CW1\fR if you do not use autoconf configuration, which
+keeps libev from including \fIconfig.h\fR, and it also defines dummy
+implementations for some libevent functions (such as logging, which is not
+supported). It will also not define any of the structs usually found in
+\&\fIevent.h\fR that are not directly supported by the libev core alone.
+.IP "\s-1EV_USE_MONOTONIC\s0" 4
+.IX Item "EV_USE_MONOTONIC"
+If defined to be \f(CW1\fR, libev will try to detect the availability of the
+monotonic clock option at both compiletime and runtime. Otherwise no use
+of the monotonic clock option will be attempted. If you enable this, you
+usually have to link against librt or something similar. Enabling it when
+the functionality isn't available is safe, though, althoguh you have
+to make sure you link against any libraries where the \f(CW\*(C`clock_gettime\*(C'\fR
+function is hiding in (often \fI\-lrt\fR).
+.IP "\s-1EV_USE_REALTIME\s0" 4
+.IX Item "EV_USE_REALTIME"
+If defined to be \f(CW1\fR, libev will try to detect the availability of the
+realtime clock option at compiletime (and assume its availability at
+runtime if successful). Otherwise no use of the realtime clock option will
+be attempted. This effectively replaces \f(CW\*(C`gettimeofday\*(C'\fR by \f(CW\*(C`clock_get
+(CLOCK_REALTIME, ...)\*(C'\fR and will not normally affect correctness. See tzhe note about libraries
+in the description of \f(CW\*(C`EV_USE_MONOTONIC\*(C'\fR, though.
+.IP "\s-1EV_USE_SELECT\s0" 4
+.IX Item "EV_USE_SELECT"
+If undefined or defined to be \f(CW1\fR, libev will compile in support for the
+\&\f(CW\*(C`select\*(C'\fR(2) backend. No attempt at autodetection will be done: if no
+other method takes over, select will be it. Otherwise the select backend
+will not be compiled in.
+.IP "\s-1EV_SELECT_USE_FD_SET\s0" 4
+.IX Item "EV_SELECT_USE_FD_SET"
+If defined to \f(CW1\fR, then the select backend will use the system \f(CW\*(C`fd_set\*(C'\fR
+structure. This is useful if libev doesn't compile due to a missing
+\&\f(CW\*(C`NFDBITS\*(C'\fR or \f(CW\*(C`fd_mask\*(C'\fR definition or it misguesses the bitset layout on
+exotic systems. This usually limits the range of file descriptors to some
+low limit such as 1024 or might have other limitations (winsocket only
+allows 64 sockets). The \f(CW\*(C`FD_SETSIZE\*(C'\fR macro, set before compilation, might
+influence the size of the \f(CW\*(C`fd_set\*(C'\fR used.
+.IP "\s-1EV_SELECT_IS_WINSOCKET\s0" 4
+.IX Item "EV_SELECT_IS_WINSOCKET"
+When defined to \f(CW1\fR, the select backend will assume that
+select/socket/connect etc. don't understand file descriptors but
+wants osf handles on win32 (this is the case when the select to
+be used is the winsock select). This means that it will call
+\&\f(CW\*(C`_get_osfhandle\*(C'\fR on the fd to convert it to an \s-1OS\s0 handle. Otherwise,
+it is assumed that all these functions actually work on fds, even
+on win32. Should not be defined on non\-win32 platforms.
+.IP "\s-1EV_USE_POLL\s0" 4
+.IX Item "EV_USE_POLL"
+If defined to be \f(CW1\fR, libev will compile in support for the \f(CW\*(C`poll\*(C'\fR(2)
+backend. Otherwise it will be enabled on non\-win32 platforms. It
+takes precedence over select.
+.IP "\s-1EV_USE_EPOLL\s0" 4
+.IX Item "EV_USE_EPOLL"
+If defined to be \f(CW1\fR, libev will compile in support for the Linux
+\&\f(CW\*(C`epoll\*(C'\fR(7) backend. Its availability will be detected at runtime,
+otherwise another method will be used as fallback. This is the
+preferred backend for GNU/Linux systems.
+.IP "\s-1EV_USE_KQUEUE\s0" 4
+.IX Item "EV_USE_KQUEUE"
+If defined to be \f(CW1\fR, libev will compile in support for the \s-1BSD\s0 style
+\&\f(CW\*(C`kqueue\*(C'\fR(2) backend. Its actual availability will be detected at runtime,
+otherwise another method will be used as fallback. This is the preferred
+backend for \s-1BSD\s0 and BSD-like systems, although on most BSDs kqueue only
+supports some types of fds correctly (the only platform we found that
+supports ptys for example was NetBSD), so kqueue might be compiled in, but
+not be used unless explicitly requested. The best way to use it is to find
+out wether kqueue supports your type of fd properly and use an embedded
+kqueue loop.
+.IP "\s-1EV_USE_PORT\s0" 4
+.IX Item "EV_USE_PORT"
+If defined to be \f(CW1\fR, libev will compile in support for the Solaris
+10 port style backend. Its availability will be detected at runtime,
+otherwise another method will be used as fallback. This is the preferred
+backend for Solaris 10 systems.
+.IP "\s-1EV_USE_DEVPOLL\s0" 4
+.IX Item "EV_USE_DEVPOLL"
+reserved for future expansion, works like the \s-1USE\s0 symbols above.
+.IP "\s-1EV_H\s0" 4
+.IX Item "EV_H"
+The name of the \fIev.h\fR header file used to include it. The default if
+undefined is \f(CW\*(C`<ev.h>\*(C'\fR in \fIevent.h\fR and \f(CW"ev.h"\fR in \fIev.c\fR. This
+can be used to virtually rename the \fIev.h\fR header file in case of conflicts.
+.IP "\s-1EV_CONFIG_H\s0" 4
+.IX Item "EV_CONFIG_H"
+If \f(CW\*(C`EV_STANDALONE\*(C'\fR isn't \f(CW1\fR, this variable can be used to override
+\&\fIev.c\fR's idea of where to find the \fIconfig.h\fR file, similarly to
+\&\f(CW\*(C`EV_H\*(C'\fR, above.
+.IP "\s-1EV_EVENT_H\s0" 4
+.IX Item "EV_EVENT_H"
+Similarly to \f(CW\*(C`EV_H\*(C'\fR, this macro can be used to override \fIevent.c\fR's idea
+of how the \fIevent.h\fR header can be found.
+.IP "\s-1EV_PROTOTYPES\s0" 4
+.IX Item "EV_PROTOTYPES"
+If defined to be \f(CW0\fR, then \fIev.h\fR will not define any function
+prototypes, but still define all the structs and other symbols. This is
+occasionally useful if you want to provide your own wrapper functions
+around libev functions.
+.IP "\s-1EV_MULTIPLICITY\s0" 4
+.IX Item "EV_MULTIPLICITY"
+If undefined or defined to \f(CW1\fR, then all event-loop-specific functions
+will have the \f(CW\*(C`struct ev_loop *\*(C'\fR as first argument, and you can create
+additional independent event loops. Otherwise there will be no support
+for multiple event loops and there is no first event loop pointer
+argument. Instead, all functions act on the single default loop.
+.IP "\s-1EV_PERIODICS\s0" 4
+.IX Item "EV_PERIODICS"
+If undefined or defined to be \f(CW1\fR, then periodic timers are supported,
+otherwise not. This saves a few kb of code.
+.IP "\s-1EV_COMMON\s0" 4
+.IX Item "EV_COMMON"
+By default, all watchers have a \f(CW\*(C`void *data\*(C'\fR member. By redefining
+this macro to a something else you can include more and other types of
+members. You have to define it each time you include one of the files,
+though, and it must be identical each time.
+.Sp
+For example, the perl \s-1EV\s0 module uses something like this:
+.Sp
+.Vb 3
+\&  #define EV_COMMON                       \e
+\&    SV *self; /* contains this struct */  \e
+\&    SV *cb_sv, *fh /* note no trailing ";" */
+.Ve
+.IP "\s-1EV_CB_DECLARE\s0(type)" 4
+.IX Item "EV_CB_DECLARE(type)"
+.PD 0
+.IP "\s-1EV_CB_INVOKE\s0(watcher,revents)" 4
+.IX Item "EV_CB_INVOKE(watcher,revents)"
+.IP "ev_set_cb(ev,cb)" 4
+.IX Item "ev_set_cb(ev,cb)"
+.PD
+Can be used to change the callback member declaration in each watcher,
+and the way callbacks are invoked and set. Must expand to a struct member
+definition and a statement, respectively. See the \fIev.v\fR header file for
+their default definitions. One possible use for overriding these is to
+avoid the ev_loop pointer as first argument in all cases, or to use method
+calls instead of plain function calls in \*(C+.
+.Sh "\s-1EXAMPLES\s0"
+.IX Subsection "EXAMPLES"
+For a real-world example of a program the includes libev
+verbatim, you can have a look at the \s-1EV\s0 perl module
+(<http://software.schmorp.de/pkg/EV.html>). It has the libev files in
+the \fIlibev/\fR subdirectory and includes them in the \fI\s-1EV/EVAPI\s0.h\fR (public
+interface) and \fI\s-1EV\s0.xs\fR (implementation) files. Only the \fI\s-1EV\s0.xs\fR file
+will be compiled. It is pretty complex because it provides its own header
+file.
+.Sp
+The usage in rxvt-unicode is simpler. It has a \fIev_cpp.h\fR header file
+that everybody includes and which overrides some autoconf choices:
+.Sp
+.Vb 4
+\&   #define EV_USE_POLL 0
+\&   #define EV_MULTIPLICITY 0
+\&   #define EV_PERIODICS 0
+\&   #define EV_CONFIG_H <config.h>
+.Ve
+.Sp
+.Vb 1
+\&   #include "ev++.h"
+.Ve
+.Sp
+And a \fIev_cpp.C\fR implementation file that contains libev proper and is compiled:
+.Sp
+.Vb 1
+\&   #include "rxvttoolkit.h"
+.Ve
+.Sp
+.Vb 2
+\&   /* darwin has problems with its header files in C++, requiring this namespace juggling */
+\&   using namespace ev;
+.Ve
+.Sp
+.Vb 1
+\&   #include "ev.c"
+.Ve
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 Marc Lehmann <libev@schmorp.de>.
