@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Nov 23 17:17:04 2007" />
+	<meta name="created" content="Sat Nov 24 05:58:35 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -34,6 +34,7 @@
 <li><a href="#code_ev_child_code_wait_for_pid_stat"><code>ev_child</code> - wait for pid status changes</a></li>
 <li><a href="#code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do</a></li>
 <li><a href="#code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop</a></li>
+<li><a href="#code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough</a></li>
 </ul>
 </li>
 <li><a href="#OTHER_FUNCTIONS">OTHER FUNCTIONS</a></li>
@@ -158,6 +159,15 @@ returned by <code>ev_supported_backends</code>, as for example kqueue is broken 
 most BSDs and will not be autodetected unless you explicitly request it
 (assuming you know what you are doing). This is the set of backends that
 libev will probe for if you specify no backends explicitly.</p>
+	</dd>
+	<dt>unsigned int ev_embeddable_backends ()</dt>
+	<dd>
+		<p>Returns the set of backends that are embeddable in other event loops. This
+is the theoretical, all-platform, value. To find which backends
+might be supported on the current system, you would need to look at
+<code>ev_embeddable_backends () &amp; ev_supported_backends ()</code>, likewise for
+recommended ones.</p>
+		<p>See the description of <code>ev_embed</code> watchers for more info.</p>
 	</dd>
 	<dt>ev_set_allocator (void *(*cb)(void *ptr, long size))</dt>
 	<dd>
@@ -933,6 +943,10 @@ of the <code>SIGxxx</code> constants).</p>
 	</dd>
 </dl>
 
+
+
+
+
 </div>
 <h2 id="code_ev_child_code_wait_for_pid_stat"><code>ev_child</code> - wait for pid status changes</h2>
 <div id="code_ev_child_code_wait_for_pid_stat-2">
@@ -1015,9 +1029,10 @@ callback, free it. Alos, use no error checking, as usual.</p>
 <p>Prepare and check watchers are usually (but not always) used in tandem:
 prepare watchers get invoked before the process blocks and check watchers
 afterwards.</p>
-<p>Their main purpose is to integrate other event mechanisms into libev. This
-could be used, for example, to track variable changes, implement your own
-watchers, integrate net-snmp or a coroutine library and lots more.</p>
+<p>Their main purpose is to integrate other event mechanisms into libev and
+their use is somewhat advanced. This could be used, for example, to track
+variable changes, implement your own watchers, integrate net-snmp or a
+coroutine library and lots more.</p>
 <p>This is done by examining in each prepare call which file descriptors need
 to be watched by the other library, registering <code>ev_io</code> watchers for
 them and starting an <code>ev_timer</code> watcher for any timeouts (many libraries
@@ -1044,6 +1059,72 @@ macros, but using them is utterly, utterly and completely pointless.</p>
 	</dd>
 </dl>
 <p>Example: *TODO*.</p>
+
+
+
+
+
+</div>
+<h2 id="code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough</h2>
+<div id="code_ev_embed_code_when_one_backend_-2">
+<p>This is a rather advanced watcher type that lets you embed one event loop
+into another.</p>
+<p>There are primarily two reasons you would want that: work around bugs and
+prioritise I/O.</p>
+<p>As an example for a bug workaround, the kqueue backend might only support
+sockets on some platform, so it is unusable as generic backend, but you
+still want to make use of it because you have many sockets and it scales
+so nicely. In this case, you would create a kqueue-based loop and embed it
+into your default loop (which might use e.g. poll). Overall operation will
+be a bit slower because first libev has to poll and then call kevent, but
+at least you can use both at what they are best.</p>
+<p>As for prioritising I/O: rarely you have the case where some fds have
+to be watched and handled very quickly (with low latency), and even
+priorities and idle watchers might have too much overhead. In this case
+you would put all the high priority stuff in one loop and all the rest in
+a second one, and embed the second one in the first.</p>
+<p>As long as the watcher is started it will automatically handle events. The
+callback will be invoked whenever some events have been handled. You can
+set the callback to <code>0</code> to avoid having to specify one if you are not
+interested in that.</p>
+<p>Also, there have not currently been made special provisions for forking:
+when you fork, you not only have to call <code>ev_loop_fork</code> on both loops,
+but you will also have to stop and restart any <code>ev_embed</code> watchers
+yourself.</p>
+<p>Unfortunately, not all backends are embeddable, only the ones returned by
+<code>ev_embeddable_backends</code> are, which, unfortunately, does not include any
+portable one.</p>
+<p>So when you want to use this feature you will always have to be prepared
+that you cannot get an embeddable loop. The recommended way to get around
+this is to have a separate variables for your embeddable loop, try to
+create it, and if that fails, use the normal loop for everything:</p>
+<pre>  struct ev_loop *loop_hi = ev_default_init (0);
+  struct ev_loop *loop_lo = 0;
+  struct ev_embed embed;
+
+  // see if there is a chance of getting one that works
+  // (remember that a flags value of 0 means autodetection)
+  loop_lo = ev_embeddable_backends () &amp; ev_recommended_backends ()
+    ? ev_loop_new (ev_embeddable_backends () &amp; ev_recommended_backends ())
+    : 0;
+
+  // if we got one, then embed it, otherwise default to loop_hi
+  if (loop_lo)
+    {
+      ev_embed_init (&amp;embed, 0, loop_lo);
+      ev_embed_start (loop_hi, &amp;embed);
+    }
+  else
+    loop_lo = loop_hi;
+
+</pre>
+<dl>
+	<dt>ev_embed_init (ev_embed *, callback, struct ev_loop *loop)</dt>
+	<dt>ev_embed_set (ev_embed *, callback, struct ev_loop *loop)</dt>
+	<dd>
+		<p>Configures the watcher to embed the given loop, which must be embeddable.</p>
+	</dd>
+</dl>
 
 
 

@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-11-23" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-11-24" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -233,6 +233,15 @@ returned by \f(CW\*(C`ev_supported_backends\*(C'\fR, as for example kqueue is br
 most BSDs and will not be autodetected unless you explicitly request it
 (assuming you know what you are doing). This is the set of backends that
 libev will probe for if you specify no backends explicitly.
+.IP "unsigned int ev_embeddable_backends ()" 4
+.IX Item "unsigned int ev_embeddable_backends ()"
+Returns the set of backends that are embeddable in other event loops. This
+is the theoretical, all\-platform, value. To find which backends
+might be supported on the current system, you would need to look at
+\&\f(CW\*(C`ev_embeddable_backends () & ev_supported_backends ()\*(C'\fR, likewise for
+recommended ones.
+.Sp
+See the description of \f(CW\*(C`ev_embed\*(C'\fR watchers for more info.
 .IP "ev_set_allocator (void *(*cb)(void *ptr, long size))" 4
 .IX Item "ev_set_allocator (void *(*cb)(void *ptr, long size))"
 Sets the allocation function to use (the prototype is similar to the
@@ -1161,9 +1170,10 @@ Prepare and check watchers are usually (but not always) used in tandem:
 prepare watchers get invoked before the process blocks and check watchers
 afterwards.
 .PP
-Their main purpose is to integrate other event mechanisms into libev. This
-could be used, for example, to track variable changes, implement your own
-watchers, integrate net-snmp or a coroutine library and lots more.
+Their main purpose is to integrate other event mechanisms into libev and
+their use is somewhat advanced. This could be used, for example, to track
+variable changes, implement your own watchers, integrate net-snmp or a
+coroutine library and lots more.
 .PP
 This is done by examining in each prepare call which file descriptors need
 to be watched by the other library, registering \f(CW\*(C`ev_io\*(C'\fR watchers for
@@ -1193,6 +1203,79 @@ parameters of any kind. There are \f(CW\*(C`ev_prepare_set\*(C'\fR and \f(CW\*(C
 macros, but using them is utterly, utterly and completely pointless.
 .PP
 Example: *TODO*.
+.ie n .Sh """ev_embed"" \- when one backend isn't enough"
+.el .Sh "\f(CWev_embed\fP \- when one backend isn't enough"
+.IX Subsection "ev_embed - when one backend isn't enough"
+This is a rather advanced watcher type that lets you embed one event loop
+into another.
+.PP
+There are primarily two reasons you would want that: work around bugs and
+prioritise I/O.
+.PP
+As an example for a bug workaround, the kqueue backend might only support
+sockets on some platform, so it is unusable as generic backend, but you
+still want to make use of it because you have many sockets and it scales
+so nicely. In this case, you would create a kqueue-based loop and embed it
+into your default loop (which might use e.g. poll). Overall operation will
+be a bit slower because first libev has to poll and then call kevent, but
+at least you can use both at what they are best.
+.PP
+As for prioritising I/O: rarely you have the case where some fds have
+to be watched and handled very quickly (with low latency), and even
+priorities and idle watchers might have too much overhead. In this case
+you would put all the high priority stuff in one loop and all the rest in
+a second one, and embed the second one in the first.
+.PP
+As long as the watcher is started it will automatically handle events. The
+callback will be invoked whenever some events have been handled. You can
+set the callback to \f(CW0\fR to avoid having to specify one if you are not
+interested in that.
+.PP
+Also, there have not currently been made special provisions for forking:
+when you fork, you not only have to call \f(CW\*(C`ev_loop_fork\*(C'\fR on both loops,
+but you will also have to stop and restart any \f(CW\*(C`ev_embed\*(C'\fR watchers
+yourself.
+.PP
+Unfortunately, not all backends are embeddable, only the ones returned by
+\&\f(CW\*(C`ev_embeddable_backends\*(C'\fR are, which, unfortunately, does not include any
+portable one.
+.PP
+So when you want to use this feature you will always have to be prepared
+that you cannot get an embeddable loop. The recommended way to get around
+this is to have a separate variables for your embeddable loop, try to
+create it, and if that fails, use the normal loop for everything:
+.PP
+.Vb 3
+\&  struct ev_loop *loop_hi = ev_default_init (0);
+\&  struct ev_loop *loop_lo = 0;
+\&  struct ev_embed embed;
+.Ve
+.PP
+.Vb 5
+\&  // see if there is a chance of getting one that works
+\&  // (remember that a flags value of 0 means autodetection)
+\&  loop_lo = ev_embeddable_backends () & ev_recommended_backends ()
+\&    ? ev_loop_new (ev_embeddable_backends () & ev_recommended_backends ())
+\&    : 0;
+.Ve
+.PP
+.Vb 8
+\&  // if we got one, then embed it, otherwise default to loop_hi
+\&  if (loop_lo)
+\&    {
+\&      ev_embed_init (&embed, 0, loop_lo);
+\&      ev_embed_start (loop_hi, &embed);
+\&    }
+\&  else
+\&    loop_lo = loop_hi;
+.Ve
+.IP "ev_embed_init (ev_embed *, callback, struct ev_loop *loop)" 4
+.IX Item "ev_embed_init (ev_embed *, callback, struct ev_loop *loop)"
+.PD 0
+.IP "ev_embed_set (ev_embed *, callback, struct ev_loop *loop)" 4
+.IX Item "ev_embed_set (ev_embed *, callback, struct ev_loop *loop)"
+.PD
+Configures the watcher to embed the given loop, which must be embeddable.
 .SH "OTHER FUNCTIONS"
 .IX Header "OTHER FUNCTIONS"
 There are some other functions of possible interest. Described. Here. Now.

@@ -1250,8 +1250,9 @@ static int loop_done;
 void
 ev_loop (EV_P_ int flags)
 {
-  double block;
-  loop_done = flags & (EVLOOP_ONESHOT | EVLOOP_NONBLOCK) ? 1 : 0;
+  loop_done = flags & (EVLOOP_ONESHOT | EVLOOP_NONBLOCK)
+            ? EVUNLOOP_ONE
+            : EVUNLOOP_CANCEL;
 
   while (activecnt)
     {
@@ -1270,43 +1271,45 @@ ev_loop (EV_P_ int flags)
       fd_reify (EV_A);
 
       /* calculate blocking time */
+      {
+        double block;
 
-      /* we only need this for !monotonic clock or timers, but as we basically
-         always have timers, we just calculate it always */
+        if (flags & EVLOOP_NONBLOCK || idlecnt)
+          block = 0.; /* do not block at all */
+        else
+          {
+            /* update time to cancel out callback processing overhead */
 #if EV_USE_MONOTONIC
-      if (expect_true (have_monotonic))
-        time_update_monotonic (EV_A);
-      else
+            if (expect_true (have_monotonic))
+              time_update_monotonic (EV_A);
+            else
 #endif
-        {
-          ev_rt_now = ev_time ();
-          mn_now    = ev_rt_now;
-        }
+              {
+                ev_rt_now = ev_time ();
+                mn_now    = ev_rt_now;
+              }
 
-      if (flags & EVLOOP_NONBLOCK || idlecnt)
-        block = 0.;
-      else
-        {
-          block = MAX_BLOCKTIME;
+            block = MAX_BLOCKTIME;
 
-          if (timercnt)
-            {
-              ev_tstamp to = ((WT)timers [0])->at - mn_now + backend_fudge;
-              if (block > to) block = to;
-            }
+            if (timercnt)
+              {
+                ev_tstamp to = ((WT)timers [0])->at - mn_now + backend_fudge;
+                if (block > to) block = to;
+              }
 
 #if EV_PERIODICS
-          if (periodiccnt)
-            {
-              ev_tstamp to = ((WT)periodics [0])->at - ev_rt_now + backend_fudge;
-              if (block > to) block = to;
-            }
+            if (periodiccnt)
+              {
+                ev_tstamp to = ((WT)periodics [0])->at - ev_rt_now + backend_fudge;
+                if (block > to) block = to;
+              }
 #endif
 
-          if (expect_false (block < 0.)) block = 0.;
-        }
+            if (expect_false (block < 0.)) block = 0.;
+          }
 
-      backend_poll (EV_A_ block);
+        backend_poll (EV_A_ block);
+      }
 
       /* update ev_rt_now, do magic */
       time_update (EV_A);
@@ -1331,8 +1334,8 @@ ev_loop (EV_P_ int flags)
         break;
     }
 
-  if (loop_done != 2)
-    loop_done = 0;
+  if (loop_done == EVUNLOOP_ONE)
+    loop_done = EVUNLOOP_CANCEL;
 }
 
 void
