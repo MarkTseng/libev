@@ -1601,7 +1601,7 @@ in your include path (e.g. in libev/ when using \-Ilibev):
 .Ve
 .PP
 .Vb 5
-\&  ev_select.c     only when select backend is enabled (which is is by default)
+\&  ev_select.c     only when select backend is enabled (which is by default)
 \&  ev_poll.c       only when poll backend is enabled (disabled by default)
 \&  ev_epoll.c      only when the epoll backend is enabled (disabled by default)
 \&  ev_kqueue.c     only when the kqueue backend is enabled (disabled by default)
@@ -1609,7 +1609,7 @@ in your include path (e.g. in libev/ when using \-Ilibev):
 .Ve
 .PP
 \&\fIev.c\fR includes the backend files directly when enabled, so you only need
-to compile a single file.
+to compile this single file.
 .PP
 \fI\s-1LIBEVENT\s0 \s-1COMPATIBILITY\s0 \s-1API\s0\fR
 .IX Subsection "LIBEVENT COMPATIBILITY API"
@@ -1640,8 +1640,8 @@ You need the following additional files for this:
 .PP
 Instead of using \f(CW\*(C`EV_STANDALONE=1\*(C'\fR and providing your config in
 whatever way you want, you can also \f(CW\*(C`m4_include([libev.m4])\*(C'\fR in your
-\&\fIconfigure.ac\fR and leave \f(CW\*(C`EV_STANDALONE\*(C'\fR off. \fIev.c\fR will then include
-\&\fIconfig.h\fR and configure itself accordingly.
+\&\fIconfigure.ac\fR and leave \f(CW\*(C`EV_STANDALONE\*(C'\fR undefined. \fIev.c\fR will then
+include \fIconfig.h\fR and configure itself accordingly.
 .PP
 For this of course you need the m4 file:
 .PP
