@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Nov 24 11:19:13 2007" />
+	<meta name="created" content="Sat Nov 24 17:31:33 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -23,19 +23,19 @@
 <li><a href="#GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</a></li>
 <li><a href="#FUNCTIONS_CONTROLLING_THE_EVENT_LOOP">FUNCTIONS CONTROLLING THE EVENT LOOP</a></li>
 <li><a href="#ANATOMY_OF_A_WATCHER">ANATOMY OF A WATCHER</a>
-<ul><li><a href="#SUMMARY_OF_GENERIC_WATCHER_FUNCTIONS">SUMMARY OF GENERIC WATCHER FUNCTIONS</a></li>
+<ul><li><a href="#GENERIC_WATCHER_FUNCTIONS">GENERIC WATCHER FUNCTIONS</a></li>
 <li><a href="#ASSOCIATING_CUSTOM_DATA_WITH_A_WATCH">ASSOCIATING CUSTOM DATA WITH A WATCHER</a></li>
 </ul>
 </li>
 <li><a href="#WATCHER_TYPES">WATCHER TYPES</a>
-<ul><li><a href="#code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable</a></li>
-<li><a href="#code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally recurring timeouts</a></li>
-<li><a href="#code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron</a></li>
-<li><a href="#code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled</a></li>
-<li><a href="#code_ev_child_code_wait_for_pid_stat"><code>ev_child</code> - wait for pid status changes</a></li>
-<li><a href="#code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do</a></li>
-<li><a href="#code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop</a></li>
-<li><a href="#code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough</a></li>
+<ul><li><a href="#code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable?</a></li>
+<li><a href="#code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally repeating timeouts</a></li>
+<li><a href="#code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron?</a></li>
+<li><a href="#code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled!</a></li>
+<li><a href="#code_ev_child_code_watch_out_for_pro"><code>ev_child</code> - watch out for process status changes</a></li>
+<li><a href="#code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do...</a></li>
+<li><a href="#code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop!</a></li>
+<li><a href="#code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough...</a></li>
 </ul>
 </li>
 <li><a href="#OTHER_FUNCTIONS">OTHER FUNCTIONS</a></li>
@@ -515,6 +515,10 @@ running when nothing else is active.</p>
 	</dd>
 </dl>
 
+
+
+
+
 </div>
 <h1 id="ANATOMY_OF_A_WATCHER">ANATOMY OF A WATCHER</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="ANATOMY_OF_A_WATCHER_CONTENT">
@@ -614,8 +618,8 @@ programs, though, so beware.</p>
 </dl>
 
 </div>
-<h2 id="SUMMARY_OF_GENERIC_WATCHER_FUNCTIONS">SUMMARY OF GENERIC WATCHER FUNCTIONS</h2>
-<div id="SUMMARY_OF_GENERIC_WATCHER_FUNCTIONS-2">
+<h2 id="GENERIC_WATCHER_FUNCTIONS">GENERIC WATCHER FUNCTIONS</h2>
+<div id="GENERIC_WATCHER_FUNCTIONS_CONTENT">
 <p>In the following description, <code>TYPE</code> stands for the watcher type,
 e.g. <code>timer</code> for <code>ev_timer</code> watchers and <code>io</code> for <code>ev_io</code> watchers.</p>
 <dl>
@@ -629,7 +633,7 @@ type-specific parts. For each type there is also a <code>ev_TYPE_init</code> mac
 which rolls both calls into one.</p>
 		<p>You can reinitialise a watcher at any time as long as it has been stopped
 (or never started) and there are no pending events outstanding.</p>
-		<p>The callbakc is always of type <code>void (*)(ev_loop *loop, ev_TYPE *watcher,
+		<p>The callback is always of type <code>void (*)(ev_loop *loop, ev_TYPE *watcher,
 int revents)</code>.</p>
 	</dd>
 	<dt><code>ev_TYPE_set</code> (ev_TYPE *, [args])</dt>
@@ -736,13 +740,15 @@ information given in the last section.</p>
 
 
 </div>
-<h2 id="code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable</h2>
+<h2 id="code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable?</h2>
 <div id="code_ev_io_code_is_this_file_descrip-2">
 <p>I/O watchers check whether a file descriptor is readable or writable
-in each iteration of the event loop (This behaviour is called
-level-triggering because you keep receiving events as long as the
-condition persists. Remember you can stop the watcher if you don't want to
-act on the event and neither want to receive future events).</p>
+in each iteration of the event loop, or, more precisely, when reading
+would not block the process and writing would at least be able to write
+some data. This behaviour is called level-triggering because you keep
+receiving events as long as the condition persists. Remember you can stop
+the watcher if you don't want to act on the event and neither want to
+receive future events.</p>
 <p>In general you can register as many read and/or write event watchers per
 fd as you want (as long as you don't confuse yourself). Setting all file
 descriptors to non-blocking mode is also usually a good idea (but not
@@ -750,28 +756,31 @@ required if you know what you are doing).</p>
 <p>You have to be careful with dup'ed file descriptors, though. Some backends
 (the linux epoll backend is a notable example) cannot handle dup'ed file
 descriptors correctly if you register interest in two or more fds pointing
-to the same underlying file/socket etc. description (that is, they share
+to the same underlying file/socket/etc. description (that is, they share
 the same underlying &quot;file open&quot;).</p>
 <p>If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only <code>EVBACKEND_SELECT</code> and
 <code>EVBACKEND_POLL</code>).</p>
+<p>Another thing you have to watch out for is that it is quite easy to
+receive &quot;spurious&quot; readyness notifications, that is your callback might
+be called with <code>EV_READ</code> but a subsequent <code>read</code>(2) will actually block
+because there is no data. Not only are some backends known to create a
+lot of those (for example solaris ports), it is very easy to get into
+this situation even with a relatively standard program structure. Thus
+it is best to always use non-blocking I/O: An extra <code>read</code>(2) returning
+<code>EAGAIN</code> is far preferable to a program hanging until some data arrives.</p>
+<p>If you cannot run the fd in non-blocking mode (for example you should not
+play around with an Xlib connection), then you have to seperately re-test
+wether a file descriptor is really ready with a known-to-be good interface
+such as poll (fortunately in our Xlib example, Xlib already does this on
+its own, so its quite safe to use).</p>
 <dl>
 	<dt>ev_io_init (ev_io *, callback, int fd, int events)</dt>
 	<dt>ev_io_set (ev_io *, int fd, int events)</dt>
 	<dd>
-		<p>Configures an <code>ev_io</code> watcher. The fd is the file descriptor to rceeive
-events for and events is either <code>EV_READ</code>, <code>EV_WRITE</code> or <code>EV_READ |
-EV_WRITE</code> to receive the given events.</p>
-		<p>Please note that most of the more scalable backend mechanisms (for example
-epoll and solaris ports) can result in spurious readyness notifications
-for file descriptors, so you practically need to use non-blocking I/O (and
-treat callback invocation as hint only), or retest separately with a safe
-interface before doing I/O (XLib can do this), or force the use of either
-<code>EVBACKEND_SELECT</code> or <code>EVBACKEND_POLL</code>, which don't suffer from this
-problem. Also note that it is quite easy to have your callback invoked
-when the readyness condition is no longer valid even when employing
-typical ways of handling events, so its a good idea to use non-blocking
-I/O unconditionally.</p>
+		<p>Configures an <code>ev_io</code> watcher. The <code>fd</code> is the file descriptor to
+rceeive events for and events is either <code>EV_READ</code>, <code>EV_WRITE</code> or
+<code>EV_READ | EV_WRITE</code> to receive the given events.</p>
 	</dd>
 </dl>
 <p>Example: call <code>stdin_readable_cb</code> when STDIN_FILENO has become, well
@@ -797,7 +806,7 @@ attempt to read a whole line in the callback:</p>
 </pre>
 
 </div>
-<h2 id="code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally recurring timeouts</h2>
+<h2 id="code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally repeating timeouts</h2>
 <div id="code_ev_timer_code_relative_and_opti-2">
 <p>Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.</p>
@@ -883,7 +892,7 @@ inactivity.</p>
 </pre>
 
 </div>
-<h2 id="code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron</h2>
+<h2 id="code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron?</h2>
 <div id="code_ev_periodic_code_to_cron_or_not-2">
 <p>Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).</p>
@@ -1012,7 +1021,7 @@ potentially a lot of jittering, but good long-term stability.</p>
 </pre>
 
 </div>
-<h2 id="code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled</h2>
+<h2 id="code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled!</h2>
 <div id="code_ev_signal_code_signal_me_when_a-2">
 <p>Signal watchers will trigger an event when the process receives a specific
 signal one or more times. Even though signals are very asynchronous, libev
@@ -1038,8 +1047,8 @@ of the <code>SIGxxx</code> constants).</p>
 
 
 </div>
-<h2 id="code_ev_child_code_wait_for_pid_stat"><code>ev_child</code> - wait for pid status changes</h2>
-<div id="code_ev_child_code_wait_for_pid_stat-2">
+<h2 id="code_ev_child_code_watch_out_for_pro"><code>ev_child</code> - watch out for process status changes</h2>
+<div id="code_ev_child_code_watch_out_for_pro-2">
 <p>Child watchers trigger when your process receives a SIGCHLD in response to
 some child status changes (most typically when a child of yours dies).</p>
 <dl>
@@ -1071,7 +1080,7 @@ process causing the status change.</p>
 </pre>
 
 </div>
-<h2 id="code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do</h2>
+<h2 id="code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do...</h2>
 <div id="code_ev_idle_code_when_you_ve_got_no-2">
 <p>Idle watchers trigger events when there are no other events are pending
 (prepare, check and other idle watchers do not count). That is, as long
@@ -1114,7 +1123,7 @@ callback, free it. Alos, use no error checking, as usual.</p>
 </pre>
 
 </div>
-<h2 id="code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop</h2>
+<h2 id="code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop!</h2>
 <div id="code_ev_prepare_code_and_code_ev_che-2">
 <p>Prepare and check watchers are usually (but not always) used in tandem:
 prepare watchers get invoked before the process blocks and check watchers
@@ -1155,7 +1164,7 @@ macros, but using them is utterly, utterly and completely pointless.</p>
 
 
 </div>
-<h2 id="code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough</h2>
+<h2 id="code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough...</h2>
 <div id="code_ev_embed_code_when_one_backend_-2">
 <p>This is a rather advanced watcher type that lets you embed one event loop
 into another (currently only <code>ev_io</code> events are supported in the embedded

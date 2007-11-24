@@ -719,8 +719,8 @@ for example it might indicate that a fd is readable or writable, and if
 your callbacks is well-written it can just attempt the operation and cope
 with the error from \fIread()\fR or \fIwrite()\fR. This will not work in multithreaded
 programs, though, so beware.
-.Sh "\s-1SUMMARY\s0 \s-1OF\s0 \s-1GENERIC\s0 \s-1WATCHER\s0 \s-1FUNCTIONS\s0"
-.IX Subsection "SUMMARY OF GENERIC WATCHER FUNCTIONS"
+.Sh "\s-1GENERIC\s0 \s-1WATCHER\s0 \s-1FUNCTIONS\s0"
+.IX Subsection "GENERIC WATCHER FUNCTIONS"
 In the following description, \f(CW\*(C`TYPE\*(C'\fR stands for the watcher type,
 e.g. \f(CW\*(C`timer\*(C'\fR for \f(CW\*(C`ev_timer\*(C'\fR watchers and \f(CW\*(C`io\*(C'\fR for \f(CW\*(C`ev_io\*(C'\fR watchers.
 .ie n .IP """ev_init"" (ev_TYPE *watcher, callback)" 4
@@ -736,7 +736,7 @@ which rolls both calls into one.
 You can reinitialise a watcher at any time as long as it has been stopped
 (or never started) and there are no pending events outstanding.
 .Sp
-The callbakc is always of type \f(CW\*(C`void (*)(ev_loop *loop, ev_TYPE *watcher,
+The callback is always of type \f(CW\*(C`void (*)(ev_loop *loop, ev_TYPE *watcher,
 int revents)\*(C'\fR.
 .ie n .IP """ev_TYPE_set"" (ev_TYPE *, [args])" 4
 .el .IP "\f(CWev_TYPE_set\fR (ev_TYPE *, [args])" 4
@@ -824,14 +824,16 @@ have been omitted....
 .IX Header "WATCHER TYPES"
 This section describes each watcher in detail, but will not repeat
 information given in the last section.
-.ie n .Sh """ev_io"" \- is this file descriptor readable or writable"
-.el .Sh "\f(CWev_io\fP \- is this file descriptor readable or writable"
-.IX Subsection "ev_io - is this file descriptor readable or writable"
+.ie n .Sh """ev_io"" \- is this file descriptor readable or writable?"
+.el .Sh "\f(CWev_io\fP \- is this file descriptor readable or writable?"
+.IX Subsection "ev_io - is this file descriptor readable or writable?"
 I/O watchers check whether a file descriptor is readable or writable
-in each iteration of the event loop (This behaviour is called
-level-triggering because you keep receiving events as long as the
-condition persists. Remember you can stop the watcher if you don't want to
-act on the event and neither want to receive future events).
+in each iteration of the event loop, or, more precisely, when reading
+would not block the process and writing would at least be able to write
+some data. This behaviour is called level-triggering because you keep
+receiving events as long as the condition persists. Remember you can stop
+the watcher if you don't want to act on the event and neither want to
+receive future events.
 .PP
 In general you can register as many read and/or write event watchers per
 fd as you want (as long as you don't confuse yourself). Setting all file
@@ -841,32 +843,36 @@ required if you know what you are doing).
 You have to be careful with dup'ed file descriptors, though. Some backends
 (the linux epoll backend is a notable example) cannot handle dup'ed file
 descriptors correctly if you register interest in two or more fds pointing
-to the same underlying file/socket etc. description (that is, they share
+to the same underlying file/socket/etc. description (that is, they share
 the same underlying \*(L"file open\*(R").
 .PP
 If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR and
 \&\f(CW\*(C`EVBACKEND_POLL\*(C'\fR).
+.PP
+Another thing you have to watch out for is that it is quite easy to
+receive \*(L"spurious\*(R" readyness notifications, that is your callback might
+be called with \f(CW\*(C`EV_READ\*(C'\fR but a subsequent \f(CW\*(C`read\*(C'\fR(2) will actually block
+because there is no data. Not only are some backends known to create a
+lot of those (for example solaris ports), it is very easy to get into
+this situation even with a relatively standard program structure. Thus
+it is best to always use non-blocking I/O: An extra \f(CW\*(C`read\*(C'\fR(2) returning
+\&\f(CW\*(C`EAGAIN\*(C'\fR is far preferable to a program hanging until some data arrives.
+.PP
+If you cannot run the fd in non-blocking mode (for example you should not
+play around with an Xlib connection), then you have to seperately re-test
+wether a file descriptor is really ready with a known-to-be good interface
+such as poll (fortunately in our Xlib example, Xlib already does this on
+its own, so its quite safe to use).
 .IP "ev_io_init (ev_io *, callback, int fd, int events)" 4
 .IX Item "ev_io_init (ev_io *, callback, int fd, int events)"
 .PD 0
 .IP "ev_io_set (ev_io *, int fd, int events)" 4
 .IX Item "ev_io_set (ev_io *, int fd, int events)"
 .PD
-Configures an \f(CW\*(C`ev_io\*(C'\fR watcher. The fd is the file descriptor to rceeive
-events for and events is either \f(CW\*(C`EV_READ\*(C'\fR, \f(CW\*(C`EV_WRITE\*(C'\fR or \f(CW\*(C`EV_READ |
-EV_WRITE\*(C'\fR to receive the given events.
-.Sp
-Please note that most of the more scalable backend mechanisms (for example
-epoll and solaris ports) can result in spurious readyness notifications
-for file descriptors, so you practically need to use non-blocking I/O (and
-treat callback invocation as hint only), or retest separately with a safe
-interface before doing I/O (XLib can do this), or force the use of either
-\&\f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR, which don't suffer from this
-problem. Also note that it is quite easy to have your callback invoked
-when the readyness condition is no longer valid even when employing
-typical ways of handling events, so its a good idea to use non-blocking
-I/O unconditionally.
+Configures an \f(CW\*(C`ev_io\*(C'\fR watcher. The \f(CW\*(C`fd\*(C'\fR is the file descriptor to
+rceeive events for and events is either \f(CW\*(C`EV_READ\*(C'\fR, \f(CW\*(C`EV_WRITE\*(C'\fR or
+\&\f(CW\*(C`EV_READ | EV_WRITE\*(C'\fR to receive the given events.
 .PP
 Example: call \f(CW\*(C`stdin_readable_cb\*(C'\fR when \s-1STDIN_FILENO\s0 has become, well
 readable, but only once. Since it is likely line\-buffered, you could
@@ -889,9 +895,9 @@ attempt to read a whole line in the callback:
 \&  ev_io_start (loop, &stdin_readable);
 \&  ev_loop (loop, 0);
 .Ve
-.ie n .Sh """ev_timer"" \- relative and optionally recurring timeouts"
-.el .Sh "\f(CWev_timer\fP \- relative and optionally recurring timeouts"
-.IX Subsection "ev_timer - relative and optionally recurring timeouts"
+.ie n .Sh """ev_timer"" \- relative and optionally repeating timeouts"
+.el .Sh "\f(CWev_timer\fP \- relative and optionally repeating timeouts"
+.IX Subsection "ev_timer - relative and optionally repeating timeouts"
 Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.
 .PP
@@ -988,9 +994,9 @@ inactivity.
 \&  // reset the timeout to start ticking again at 10 seconds
 \&  ev_timer_again (&mytimer);
 .Ve
-.ie n .Sh """ev_periodic"" \- to cron or not to cron"
-.el .Sh "\f(CWev_periodic\fP \- to cron or not to cron"
-.IX Subsection "ev_periodic - to cron or not to cron"
+.ie n .Sh """ev_periodic"" \- to cron or not to cron?"
+.el .Sh "\f(CWev_periodic\fP \- to cron or not to cron?"
+.IX Subsection "ev_periodic - to cron or not to cron?"
 Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).
 .PP
@@ -1134,9 +1140,9 @@ Example: call a callback every hour, starting now:
 \&                    fmod (ev_now (loop), 3600.), 3600., 0);
 \&  ev_periodic_start (loop, &hourly_tick);
 .Ve
-.ie n .Sh """ev_signal"" \- signal me when a signal gets signalled"
-.el .Sh "\f(CWev_signal\fP \- signal me when a signal gets signalled"
-.IX Subsection "ev_signal - signal me when a signal gets signalled"
+.ie n .Sh """ev_signal"" \- signal me when a signal gets signalled!"
+.el .Sh "\f(CWev_signal\fP \- signal me when a signal gets signalled!"
+.IX Subsection "ev_signal - signal me when a signal gets signalled!"
 Signal watchers will trigger an event when the process receives a specific
 signal one or more times. Even though signals are very asynchronous, libev
 will try it's best to deliver signals synchronously, i.e. as part of the
@@ -1156,9 +1162,9 @@ watcher for a signal is stopped libev will reset the signal handler to
 .PD
 Configures the watcher to trigger on the given signal number (usually one
 of the \f(CW\*(C`SIGxxx\*(C'\fR constants).
-.ie n .Sh """ev_child"" \- wait for pid status changes"
-.el .Sh "\f(CWev_child\fP \- wait for pid status changes"
-.IX Subsection "ev_child - wait for pid status changes"
+.ie n .Sh """ev_child"" \- watch out for process status changes"
+.el .Sh "\f(CWev_child\fP \- watch out for process status changes"
+.IX Subsection "ev_child - watch out for process status changes"
 Child watchers trigger when your process receives a \s-1SIGCHLD\s0 in response to
 some child status changes (most typically when a child of yours dies).
 .IP "ev_child_init (ev_child *, callback, int pid)" 4
@@ -1189,9 +1195,9 @@ Example: try to exit cleanly on \s-1SIGINT\s0 and \s-1SIGTERM\s0.
 \&  ev_signal_init (&signal_watcher, sigint_cb, SIGINT);
 \&  ev_signal_start (loop, &sigint_cb);
 .Ve
-.ie n .Sh """ev_idle"" \- when you've got nothing better to do"
-.el .Sh "\f(CWev_idle\fP \- when you've got nothing better to do"
-.IX Subsection "ev_idle - when you've got nothing better to do"
+.ie n .Sh """ev_idle"" \- when you've got nothing better to do..."
+.el .Sh "\f(CWev_idle\fP \- when you've got nothing better to do..."
+.IX Subsection "ev_idle - when you've got nothing better to do..."
 Idle watchers trigger events when there are no other events are pending
 (prepare, check and other idle watchers do not count). That is, as long
 as your process is busy handling sockets or timeouts (or even signals,
@@ -1231,9 +1237,9 @@ callback, free it. Alos, use no error checking, as usual.
 \&  ev_idle_init (idle_watcher, idle_cb);
 \&  ev_idle_start (loop, idle_cb);
 .Ve
-.ie n .Sh """ev_prepare""\fP and \f(CW""ev_check"" \- customise your event loop"
-.el .Sh "\f(CWev_prepare\fP and \f(CWev_check\fP \- customise your event loop"
-.IX Subsection "ev_prepare and ev_check - customise your event loop"
+.ie n .Sh """ev_prepare""\fP and \f(CW""ev_check"" \- customise your event loop!"
+.el .Sh "\f(CWev_prepare\fP and \f(CWev_check\fP \- customise your event loop!"
+.IX Subsection "ev_prepare and ev_check - customise your event loop!"
 Prepare and check watchers are usually (but not always) used in tandem:
 prepare watchers get invoked before the process blocks and check watchers
 afterwards.
@@ -1271,9 +1277,9 @@ parameters of any kind. There are \f(CW\*(C`ev_prepare_set\*(C'\fR and \f(CW\*(C
 macros, but using them is utterly, utterly and completely pointless.
 .PP
 Example: *TODO*.
-.ie n .Sh """ev_embed"" \- when one backend isn't enough"
-.el .Sh "\f(CWev_embed\fP \- when one backend isn't enough"
-.IX Subsection "ev_embed - when one backend isn't enough"
+.ie n .Sh """ev_embed"" \- when one backend isn't enough..."
+.el .Sh "\f(CWev_embed\fP \- when one backend isn't enough..."
+.IX Subsection "ev_embed - when one backend isn't enough..."
 This is a rather advanced watcher type that lets you embed one event loop
 into another (currently only \f(CW\*(C`ev_io\*(C'\fR events are supported in the embedded
 loop, other types of watchers might be handled in a delayed or incorrect

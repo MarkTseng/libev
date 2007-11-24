@@ -470,6 +470,7 @@ Example: for some weird reason, unregister the above signal handler again.
 
 =back
 
+
 =head1 ANATOMY OF A WATCHER
 
 A watcher is a structure that you create and register to record your
@@ -578,7 +579,7 @@ programs, though, so beware.
 
 =back
 
-=head2 SUMMARY OF GENERIC WATCHER FUNCTIONS
+=head2 GENERIC WATCHER FUNCTIONS
 
 In the following description, C<TYPE> stands for the watcher type,
 e.g. C<timer> for C<ev_timer> watchers and C<io> for C<ev_io> watchers.
@@ -597,7 +598,7 @@ which rolls both calls into one.
 You can reinitialise a watcher at any time as long as it has been stopped
 (or never started) and there are no pending events outstanding.
 
-The callbakc is always of type C<void (*)(ev_loop *loop, ev_TYPE *watcher,
+The callback is always of type C<void (*)(ev_loop *loop, ev_TYPE *watcher,
 int revents)>.
 
 =item C<ev_TYPE_set> (ev_TYPE *, [args])
@@ -693,13 +694,15 @@ This section describes each watcher in detail, but will not repeat
 information given in the last section.
 
 
-=head2 C<ev_io> - is this file descriptor readable or writable
+=head2 C<ev_io> - is this file descriptor readable or writable?
 
 I/O watchers check whether a file descriptor is readable or writable
-in each iteration of the event loop (This behaviour is called
-level-triggering because you keep receiving events as long as the
-condition persists. Remember you can stop the watcher if you don't want to
-act on the event and neither want to receive future events).
+in each iteration of the event loop, or, more precisely, when reading
+would not block the process and writing would at least be able to write
+some data. This behaviour is called level-triggering because you keep
+receiving events as long as the condition persists. Remember you can stop
+the watcher if you don't want to act on the event and neither want to
+receive future events.
 
 In general you can register as many read and/or write event watchers per
 fd as you want (as long as you don't confuse yourself). Setting all file
@@ -709,12 +712,27 @@ required if you know what you are doing).
 You have to be careful with dup'ed file descriptors, though. Some backends
 (the linux epoll backend is a notable example) cannot handle dup'ed file
 descriptors correctly if you register interest in two or more fds pointing
-to the same underlying file/socket etc. description (that is, they share
+to the same underlying file/socket/etc. description (that is, they share
 the same underlying "file open").
 
 If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only C<EVBACKEND_SELECT> and
 C<EVBACKEND_POLL>).
+
+Another thing you have to watch out for is that it is quite easy to
+receive "spurious" readyness notifications, that is your callback might
+be called with C<EV_READ> but a subsequent C<read>(2) will actually block
+because there is no data. Not only are some backends known to create a
+lot of those (for example solaris ports), it is very easy to get into
+this situation even with a relatively standard program structure. Thus
+it is best to always use non-blocking I/O: An extra C<read>(2) returning
+C<EAGAIN> is far preferable to a program hanging until some data arrives.
+
+If you cannot run the fd in non-blocking mode (for example you should not
+play around with an Xlib connection), then you have to seperately re-test
+wether a file descriptor is really ready with a known-to-be good interface
+such as poll (fortunately in our Xlib example, Xlib already does this on
+its own, so its quite safe to use).
 
 =over 4
 
@@ -722,20 +740,9 @@ C<EVBACKEND_POLL>).
 
 =item ev_io_set (ev_io *, int fd, int events)
 
-Configures an C<ev_io> watcher. The fd is the file descriptor to rceeive
-events for and events is either C<EV_READ>, C<EV_WRITE> or C<EV_READ |
-EV_WRITE> to receive the given events.
-
-Please note that most of the more scalable backend mechanisms (for example
-epoll and solaris ports) can result in spurious readyness notifications
-for file descriptors, so you practically need to use non-blocking I/O (and
-treat callback invocation as hint only), or retest separately with a safe
-interface before doing I/O (XLib can do this), or force the use of either
-C<EVBACKEND_SELECT> or C<EVBACKEND_POLL>, which don't suffer from this
-problem. Also note that it is quite easy to have your callback invoked
-when the readyness condition is no longer valid even when employing
-typical ways of handling events, so its a good idea to use non-blocking
-I/O unconditionally.
+Configures an C<ev_io> watcher. The C<fd> is the file descriptor to
+rceeive events for and events is either C<EV_READ>, C<EV_WRITE> or
+C<EV_READ | EV_WRITE> to receive the given events.
 
 =back
 
@@ -758,7 +765,7 @@ attempt to read a whole line in the callback:
   ev_loop (loop, 0);
 
 
-=head2 C<ev_timer> - relative and optionally recurring timeouts
+=head2 C<ev_timer> - relative and optionally repeating timeouts
 
 Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.
@@ -850,7 +857,7 @@ inactivity.
   ev_timer_again (&mytimer);
 
 
-=head2 C<ev_periodic> - to cron or not to cron
+=head2 C<ev_periodic> - to cron or not to cron?
 
 Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).
@@ -988,7 +995,7 @@ Example: call a callback every hour, starting now:
   ev_periodic_start (loop, &hourly_tick);
   
 
-=head2 C<ev_signal> - signal me when a signal gets signalled
+=head2 C<ev_signal> - signal me when a signal gets signalled!
 
 Signal watchers will trigger an event when the process receives a specific
 signal one or more times. Even though signals are very asynchronous, libev
@@ -1014,7 +1021,7 @@ of the C<SIGxxx> constants).
 =back
 
 
-=head2 C<ev_child> - wait for pid status changes
+=head2 C<ev_child> - watch out for process status changes
 
 Child watchers trigger when your process receives a SIGCHLD in response to
 some child status changes (most typically when a child of yours dies).
@@ -1047,7 +1054,7 @@ Example: try to exit cleanly on SIGINT and SIGTERM.
   ev_signal_start (loop, &sigint_cb);
 
 
-=head2 C<ev_idle> - when you've got nothing better to do
+=head2 C<ev_idle> - when you've got nothing better to do...
 
 Idle watchers trigger events when there are no other events are pending
 (prepare, check and other idle watchers do not count). That is, as long
@@ -1091,7 +1098,7 @@ callback, free it. Alos, use no error checking, as usual.
   ev_idle_start (loop, idle_cb);
 
 
-=head2 C<ev_prepare> and C<ev_check> - customise your event loop
+=head2 C<ev_prepare> and C<ev_check> - customise your event loop!
 
 Prepare and check watchers are usually (but not always) used in tandem:
 prepare watchers get invoked before the process blocks and check watchers
@@ -1135,7 +1142,7 @@ macros, but using them is utterly, utterly and completely pointless.
 Example: *TODO*.
 
 
-=head2 C<ev_embed> - when one backend isn't enough
+=head2 C<ev_embed> - when one backend isn't enough...
 
 This is a rather advanced watcher type that lets you embed one event loop
 into another (currently only C<ev_io> events are supported in the embedded
