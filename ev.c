@@ -1674,7 +1674,7 @@ ev_child_stop (EV_P_ ev_child *w)
 
 #if EV_MULTIPLICITY
 void
-ev_embed_loop (EV_P_ ev_embed *w)
+ev_embed_sweep (EV_P_ ev_embed *w)
 {
   ev_loop (w->loop, EVLOOP_NONBLOCK);
 }
@@ -1687,7 +1687,7 @@ embed_cb (EV_P_ ev_io *io, int revents)
   if (ev_cb (w))
     ev_feed_event (EV_A_ (W)w, EV_EMBED);
   else
-    ev_embed_loop (loop, w);
+    ev_embed_sweep (loop, w);
 }
 
 void

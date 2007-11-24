@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Nov 24 08:20:38 2007" />
+	<meta name="created" content="Sat Nov 24 10:48:32 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -879,8 +879,8 @@ inactivity.</p>
 <p>Unlike <code>ev_timer</code>'s, they are not based on real time (or relative time)
 but on wallclock time (absolute time). You can tell a periodic watcher
 to trigger &quot;at&quot; some specific point in time. For example, if you tell a
-periodic watcher to trigger in 10 seconds (by specifiying e.g. c&lt;ev_now ()
-+ 10.&gt;) and then reset your system clock to the last year, then it will
+periodic watcher to trigger in 10 seconds (by specifiying e.g. <code>ev_now ()
++ 10.</code>) and then reset your system clock to the last year, then it will
 take a year to trigger the event (unlike an <code>ev_timer</code>, which would trigger
 roughly 10 seconds later and of course not if you reset your system time
 again).</p>
@@ -1308,7 +1308,100 @@ to use the libev header file and library.</dt>
 </div>
 <h1 id="C_SUPPORT">C++ SUPPORT</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="C_SUPPORT_CONTENT">
-<p>TBD.</p>
+<p>Libev comes with some simplistic wrapper classes for C++ that mainly allow
+you to use some convinience methods to start/stop watchers and also change
+the callback model to a model using method callbacks on objects.</p>
+<p>To use it,</p>
+<pre>  #include &lt;ev++.h&gt;
+
+</pre>
+<p>(it is not installed by default). This automatically includes <cite>ev.h</cite>
+and puts all of its definitions (many of them macros) into the global
+namespace. All C++ specific things are put into the <code>ev</code> namespace.</p>
+<p>It should support all the same embedding options as <cite>ev.h</cite>, most notably
+<code>EV_MULTIPLICITY</code>.</p>
+<p>Here is a list of things available in the <code>ev</code> namespace:</p>
+<dl>
+	<dt><code>ev::READ</code>, <code>ev::WRITE</code> etc.</dt>
+	<dd>
+		<p>These are just enum values with the same values as the <code>EV_READ</code> etc.
+macros from <cite>ev.h</cite>.</p>
+	</dd>
+	<dt><code>ev::tstamp</code>, <code>ev::now</code></dt>
+	<dd>
+		<p>Aliases to the same types/functions as with the <code>ev_</code> prefix.</p>
+	</dd>
+	<dt><code>ev::io</code>, <code>ev::timer</code>, <code>ev::periodic</code>, <code>ev::idle</code>, <code>ev::sig</code> etc.</dt>
+	<dd>
+		<p>For each <code>ev_TYPE</code> watcher in <cite>ev.h</cite> there is a corresponding class of
+the same name in the <code>ev</code> namespace, with the exception of <code>ev_signal</code>
+which is called <code>ev::sig</code> to avoid clashes with the <code>signal</code> macro
+defines by many implementations.</p>
+		<p>All of those classes have these methods:</p>
+		<p>
+			<dl>
+				<dt>ev::TYPE::TYPE (object *, object::method *)</dt>
+				<dt>ev::TYPE::TYPE (object *, object::method *, struct ev_loop *)</dt>
+				<dt>ev::TYPE::~TYPE</dt>
+				<dd>
+					<p>The constructor takes a pointer to an object and a method pointer to
+the event handler callback to call in this class. The constructor calls
+<code>ev_init</code> for you, which means you have to call the <code>set</code> method
+before starting it. If you do not specify a loop then the constructor
+automatically associates the default loop with this watcher.</p>
+					<p>The destructor automatically stops the watcher if it is active.</p>
+				</dd>
+				<dt>w-&gt;set (struct ev_loop *)</dt>
+				<dd>
+					<p>Associates a different <code>struct ev_loop</code> with this watcher. You can only
+do this when the watcher is inactive (and not pending either).</p>
+				</dd>
+				<dt>w-&gt;set ([args])</dt>
+				<dd>
+					<p>Basically the same as <code>ev_TYPE_set</code>, with the same args. Must be
+called at least once.  Unlike the C counterpart, an active watcher gets
+automatically stopped and restarted.</p>
+				</dd>
+				<dt>w-&gt;start ()</dt>
+				<dd>
+					<p>Starts the watcher. Note that there is no <code>loop</code> argument as the
+constructor already takes the loop.</p>
+				</dd>
+				<dt>w-&gt;stop ()</dt>
+				<dd>
+					<p>Stops the watcher if it is active. Again, no <code>loop</code> argument.</p>
+				</dd>
+				<dt>w-&gt;again ()       <code>ev::timer</code>, <code>ev::periodic</code> only</dt>
+				<dd>
+					<p>For <code>ev::timer</code> and <code>ev::periodic</code>, this invokes the corresponding
+<code>ev_TYPE_again</code> function.</p>
+				</dd>
+				<dt>w-&gt;sweep ()       <code>ev::embed</code> only</dt>
+				<dd>
+					<p>Invokes <code>ev_embed_sweep</code>.</p>
+				</dd>
+			</dl>
+		</p>
+	</dd>
+</dl>
+<p>Example: Define a class with an IO and idle watcher, start one of them in
+the constructor.</p>
+<pre>  class myclass
+  {
+    ev_io   io;   void io_cb   (ev::io   &amp;w, int revents);
+    ev_idle idle  void idle_cb (ev::idle &amp;w, int revents);
+
+    myclass ();
+  }
+
+  myclass::myclass (int fd)
+  : io   (this, &amp;myclass::io_cb),
+    idle (this, &amp;myclass::idle_cb)
+  {
+    io.start (fd, ev::READ);
+  }
+
+</pre>
 
 </div>
 <h1 id="AUTHOR">AUTHOR</h1><p><a href="#TOP" class="toplink">Top</a></p>

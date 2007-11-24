@@ -997,8 +997,8 @@ Periodic watchers are also timers of a kind, but they are very versatile
 Unlike \f(CW\*(C`ev_timer\*(C'\fR's, they are not based on real time (or relative time)
 but on wallclock time (absolute time). You can tell a periodic watcher
 to trigger \*(L"at\*(R" some specific point in time. For example, if you tell a
-periodic watcher to trigger in 10 seconds (by specifiying e.g. c<ev_now ()
-+ 10.>) and then reset your system clock to the last year, then it will
+periodic watcher to trigger in 10 seconds (by specifiying e.g. \f(CW\*(C`ev_now ()
++ 10.\*(C'\fR) and then reset your system clock to the last year, then it will
 take a year to trigger the event (unlike an \f(CW\*(C`ev_timer\*(C'\fR, which would trigger
 roughly 10 seconds later and of course not if you reset your system time
 again).
@@ -1434,7 +1434,110 @@ emulate the internals of libevent, so here are some usage hints:
 .PD
 .SH "\*(C+ SUPPORT"
 .IX Header " SUPPORT"
-\&\s-1TBD\s0.
+Libev comes with some simplistic wrapper classes for \*(C+ that mainly allow
+you to use some convinience methods to start/stop watchers and also change
+the callback model to a model using method callbacks on objects.
+.PP
+To use it,
+.PP
+.Vb 1
+\&  #include <ev++.h>
+.Ve
+.PP
+(it is not installed by default). This automatically includes \fIev.h\fR
+and puts all of its definitions (many of them macros) into the global
+namespace. All \*(C+ specific things are put into the \f(CW\*(C`ev\*(C'\fR namespace.
+.PP
+It should support all the same embedding options as \fIev.h\fR, most notably
+\&\f(CW\*(C`EV_MULTIPLICITY\*(C'\fR.
+.PP
+Here is a list of things available in the \f(CW\*(C`ev\*(C'\fR namespace:
+.ie n .IP """ev::READ""\fR, \f(CW""ev::WRITE"" etc." 4
+.el .IP "\f(CWev::READ\fR, \f(CWev::WRITE\fR etc." 4
+.IX Item "ev::READ, ev::WRITE etc."
+These are just enum values with the same values as the \f(CW\*(C`EV_READ\*(C'\fR etc.
+macros from \fIev.h\fR.
+.ie n .IP """ev::tstamp""\fR, \f(CW""ev::now""" 4
+.el .IP "\f(CWev::tstamp\fR, \f(CWev::now\fR" 4
+.IX Item "ev::tstamp, ev::now"
+Aliases to the same types/functions as with the \f(CW\*(C`ev_\*(C'\fR prefix.
+.ie n .IP """ev::io""\fR, \f(CW""ev::timer""\fR, \f(CW""ev::periodic""\fR, \f(CW""ev::idle""\fR, \f(CW""ev::sig"" etc." 4
+.el .IP "\f(CWev::io\fR, \f(CWev::timer\fR, \f(CWev::periodic\fR, \f(CWev::idle\fR, \f(CWev::sig\fR etc." 4
+.IX Item "ev::io, ev::timer, ev::periodic, ev::idle, ev::sig etc."
+For each \f(CW\*(C`ev_TYPE\*(C'\fR watcher in \fIev.h\fR there is a corresponding class of
+the same name in the \f(CW\*(C`ev\*(C'\fR namespace, with the exception of \f(CW\*(C`ev_signal\*(C'\fR
+which is called \f(CW\*(C`ev::sig\*(C'\fR to avoid clashes with the \f(CW\*(C`signal\*(C'\fR macro
+defines by many implementations.
+.Sp
+All of those classes have these methods:
+.RS 4
+.IP "ev::TYPE::TYPE (object *, object::method *)" 4
+.IX Item "ev::TYPE::TYPE (object *, object::method *)"
+.PD 0
+.IP "ev::TYPE::TYPE (object *, object::method *, struct ev_loop *)" 4
+.IX Item "ev::TYPE::TYPE (object *, object::method *, struct ev_loop *)"
+.IP "ev::TYPE::~TYPE" 4
+.IX Item "ev::TYPE::~TYPE"
+.PD
+The constructor takes a pointer to an object and a method pointer to
+the event handler callback to call in this class. The constructor calls
+\&\f(CW\*(C`ev_init\*(C'\fR for you, which means you have to call the \f(CW\*(C`set\*(C'\fR method
+before starting it. If you do not specify a loop then the constructor
+automatically associates the default loop with this watcher.
+.Sp
+The destructor automatically stops the watcher if it is active.
+.IP "w\->set (struct ev_loop *)" 4
+.IX Item "w->set (struct ev_loop *)"
+Associates a different \f(CW\*(C`struct ev_loop\*(C'\fR with this watcher. You can only
+do this when the watcher is inactive (and not pending either).
+.IP "w\->set ([args])" 4
+.IX Item "w->set ([args])"
+Basically the same as \f(CW\*(C`ev_TYPE_set\*(C'\fR, with the same args. Must be
+called at least once.  Unlike the C counterpart, an active watcher gets
+automatically stopped and restarted.
+.IP "w\->start ()" 4
+.IX Item "w->start ()"
+Starts the watcher. Note that there is no \f(CW\*(C`loop\*(C'\fR argument as the
+constructor already takes the loop.
+.IP "w\->stop ()" 4
+.IX Item "w->stop ()"
+Stops the watcher if it is active. Again, no \f(CW\*(C`loop\*(C'\fR argument.
+.ie n .IP "w\->again ()       ""ev::timer""\fR, \f(CW""ev::periodic"" only" 4
+.el .IP "w\->again ()       \f(CWev::timer\fR, \f(CWev::periodic\fR only" 4
+.IX Item "w->again ()       ev::timer, ev::periodic only"
+For \f(CW\*(C`ev::timer\*(C'\fR and \f(CW\*(C`ev::periodic\*(C'\fR, this invokes the corresponding
+\&\f(CW\*(C`ev_TYPE_again\*(C'\fR function.
+.ie n .IP "w\->sweep ()       ""ev::embed"" only" 4
+.el .IP "w\->sweep ()       \f(CWev::embed\fR only" 4
+.IX Item "w->sweep ()       ev::embed only"
+Invokes \f(CW\*(C`ev_embed_sweep\*(C'\fR.
+.RE
+.RS 4
+.RE
+.PP
+Example: Define a class with an \s-1IO\s0 and idle watcher, start one of them in
+the constructor.
+.PP
+.Vb 4
+\&  class myclass
+\&  {
+\&    ev_io   io;   void io_cb   (ev::io   &w, int revents);
+\&    ev_idle idle  void idle_cb (ev::idle &w, int revents);
+.Ve
+.PP
+.Vb 2
+\&    myclass ();
+\&  }
+.Ve
+.PP
+.Vb 6
+\&  myclass::myclass (int fd)
+\&  : io   (this, &myclass::io_cb),
+\&    idle (this, &myclass::idle_cb)
+\&  {
+\&    io.start (fd, ev::READ);
+\&  }
+.Ve
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 Marc Lehmann <libev@schmorp.de>.

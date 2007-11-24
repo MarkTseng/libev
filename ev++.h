@@ -1,7 +1,7 @@
 #ifndef EVPP_H__
 #define EVPP_H__
 
-/* work in progress, don't use unless you know what you are doing */
+#include "ev.h"
 
 namespace ev {
 
@@ -43,8 +43,6 @@ namespace ev {
       return prxy->call (obj, meth, *w, e);
     }
   };
-
-  #include "ev.h"
 
   enum {
     UNDEF    = EV_UNDEF,
@@ -219,12 +217,15 @@ namespace ev {
   #endif
 
   EV_BEGIN_WATCHER (idle, idle)
+    void set () { }
   EV_END_WATCHER (idle, idle)
 
   EV_BEGIN_WATCHER (prepare, prepare)
+    void set () { }
   EV_END_WATCHER (prepare, prepare)
 
   EV_BEGIN_WATCHER (check, check)
+    void set () { }
   EV_END_WATCHER (check, check)
 
   EV_BEGIN_WATCHER (sig, signal)
@@ -259,8 +260,34 @@ namespace ev {
     }
   EV_END_WATCHER (child, child)
 
+  #if EV_MULTIPLICITY
+
+  EV_BEGIN_WATCHER (embed, embed)
+    void set (struct ev_loop *loop)
+    {
+      int active = is_active ();
+      if (active) stop ();
+      ev_embed_set (static_cast<ev_embed *>(this), loop);
+      if (active) start ();
+    }
+
+    void start (struct ev_loop *embedded_loop)
+    {
+      set (embedded_loop);
+      start ();
+    }
+
+    void sweep ()
+    {
+      ev_embed_sweep (EV_A_ static_cast<ev_embed *>(this));
+    }
+  EV_END_WATCHER (embed, embed)
+
+  #endif
+
   #undef EV_CONSTRUCT
   #undef EV_BEGIN_WATCHER
+  #undef EV_END_WATCHER
 }
 
 #endif

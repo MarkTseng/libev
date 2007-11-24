@@ -437,7 +437,7 @@ void ev_child_stop     (EV_P_ ev_child *w);
 /* only supported when loop to be embedded is in fact embeddable */
 void ev_embed_start    (EV_P_ ev_embed *w);
 void ev_embed_stop     (EV_P_ ev_embed *w);
-void ev_embed_loop     (EV_P_ ev_embed *w);
+void ev_embed_sweep    (EV_P_ ev_embed *w);
 # endif
 
 #endif

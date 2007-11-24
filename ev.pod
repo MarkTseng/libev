@@ -858,7 +858,7 @@ Periodic watchers are also timers of a kind, but they are very versatile
 Unlike C<ev_timer>'s, they are not based on real time (or relative time)
 but on wallclock time (absolute time). You can tell a periodic watcher
 to trigger "at" some specific point in time. For example, if you tell a
-periodic watcher to trigger in 10 seconds (by specifiying e.g. c<ev_now ()
+periodic watcher to trigger in 10 seconds (by specifiying e.g. C<ev_now ()
 + 10.>) and then reset your system clock to the last year, then it will
 take a year to trigger the event (unlike an C<ev_timer>, which would trigger
 roughly 10 seconds later and of course not if you reset your system time
@@ -1312,7 +1312,109 @@ to use the libev header file and library.
 
 =head1 C++ SUPPORT
 
-TBD.
+Libev comes with some simplistic wrapper classes for C++ that mainly allow
+you to use some convinience methods to start/stop watchers and also change
+the callback model to a model using method callbacks on objects.
+
+To use it,
+   
+  #include <ev++.h>
+
+(it is not installed by default). This automatically includes F<ev.h>
+and puts all of its definitions (many of them macros) into the global
+namespace. All C++ specific things are put into the C<ev> namespace.
+
+It should support all the same embedding options as F<ev.h>, most notably
+C<EV_MULTIPLICITY>.
+
+Here is a list of things available in the C<ev> namespace:
+
+=over 4
+
+=item C<ev::READ>, C<ev::WRITE> etc.
+
+These are just enum values with the same values as the C<EV_READ> etc.
+macros from F<ev.h>.
+
+=item C<ev::tstamp>, C<ev::now>
+
+Aliases to the same types/functions as with the C<ev_> prefix.
+
+=item C<ev::io>, C<ev::timer>, C<ev::periodic>, C<ev::idle>, C<ev::sig> etc.
+
+For each C<ev_TYPE> watcher in F<ev.h> there is a corresponding class of
+the same name in the C<ev> namespace, with the exception of C<ev_signal>
+which is called C<ev::sig> to avoid clashes with the C<signal> macro
+defines by many implementations.
+
+All of those classes have these methods:
+
+=over 4
+
+=item ev::TYPE::TYPE (object *, object::method *)
+
+=item ev::TYPE::TYPE (object *, object::method *, struct ev_loop *)
+
+=item ev::TYPE::~TYPE
+
+The constructor takes a pointer to an object and a method pointer to
+the event handler callback to call in this class. The constructor calls
+C<ev_init> for you, which means you have to call the C<set> method
+before starting it. If you do not specify a loop then the constructor
+automatically associates the default loop with this watcher.
+
+The destructor automatically stops the watcher if it is active.
+
+=item w->set (struct ev_loop *)
+
+Associates a different C<struct ev_loop> with this watcher. You can only
+do this when the watcher is inactive (and not pending either).
+
+=item w->set ([args])
+
+Basically the same as C<ev_TYPE_set>, with the same args. Must be
+called at least once.  Unlike the C counterpart, an active watcher gets
+automatically stopped and restarted.
+
+=item w->start ()
+
+Starts the watcher. Note that there is no C<loop> argument as the
+constructor already takes the loop.
+
+=item w->stop ()
+
+Stops the watcher if it is active. Again, no C<loop> argument.
+
+=item w->again ()       C<ev::timer>, C<ev::periodic> only
+
+For C<ev::timer> and C<ev::periodic>, this invokes the corresponding
+C<ev_TYPE_again> function.
+
+=item w->sweep ()       C<ev::embed> only
+
+Invokes C<ev_embed_sweep>.
+
+=back
+
+=back
+
+Example: Define a class with an IO and idle watcher, start one of them in
+the constructor.
+
+  class myclass
+  {
+    ev_io   io;   void io_cb   (ev::io   &w, int revents);
+    ev_idle idle  void idle_cb (ev::idle &w, int revents);
+
+    myclass ();
+  }
+
+  myclass::myclass (int fd)
+  : io   (this, &myclass::io_cb),
+    idle (this, &myclass::idle_cb)
+  {
+    io.start (fd, ev::READ);
+  }
 
 =head1 AUTHOR
 
