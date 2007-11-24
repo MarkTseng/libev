@@ -1317,7 +1317,7 @@ ev_loop (EV_P_ int flags)
       periodics_reify (EV_A); /* absolute timers called first */
 #endif
 
-      /* queue idle watchers unless io or timers are pending */
+      /* queue idle watchers unless other events are pending */
       if (idlecnt && !any_pending (EV_A))
         queue_events (EV_A_ (W *)idles, idlecnt, EV_IDLE);
 
