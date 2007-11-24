@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Nov 24 10:48:32 2007" />
+	<meta name="created" content="Sat Nov 24 11:10:25 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -41,6 +41,17 @@
 <li><a href="#OTHER_FUNCTIONS">OTHER FUNCTIONS</a></li>
 <li><a href="#LIBEVENT_EMULATION">LIBEVENT EMULATION</a></li>
 <li><a href="#C_SUPPORT">C++ SUPPORT</a></li>
+<li><a href="#EMBEDDING">EMBEDDING</a>
+<ul><li><a href="#FILESETS">FILESETS</a>
+<ul><li><a href="#CORE_EVENT_LOOP">CORE EVENT LOOP</a></li>
+<li><a href="#LIBEVENT_COMPATIBILITY_API">LIBEVENT COMPATIBILITY API</a></li>
+<li><a href="#AUTOCONF_SUPPORT">AUTOCONF SUPPORT</a></li>
+</ul>
+</li>
+<li><a href="#PREPROCESSOR_SYMBOLS_MACROS">PREPROCESSOR SYMBOLS/MACROS</a></li>
+<li><a href="#EXAMPLES">EXAMPLES</a></li>
+</ul>
+</li>
 <li><a href="#AUTHOR">AUTHOR</a>
 </li>
 </ul><hr />
@@ -1404,9 +1415,288 @@ the constructor.</p>
 </pre>
 
 </div>
+<h1 id="EMBEDDING">EMBEDDING</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="EMBEDDING_CONTENT">
+<p>Libev can (and often is) directly embedded into host
+applications. Examples of applications that embed it include the Deliantra
+Game Server, the EV perl module, the GNU Virtual Private Ethernet (gvpe)
+and rxvt-unicode.</p>
+<p>The goal is to enable you to just copy the neecssary files into your
+source directory without having to change even a single line in them, so
+you can easily upgrade by simply copying (or having a checked-out copy of
+libev somewhere in your source tree).</p>
+
+</div>
+<h2 id="FILESETS">FILESETS</h2>
+<div id="FILESETS_CONTENT">
+<p>Depending on what features you need you need to include one or more sets of files
+in your app.</p>
+
+</div>
+<h3 id="CORE_EVENT_LOOP">CORE EVENT LOOP</h3>
+<div id="CORE_EVENT_LOOP_CONTENT">
+<p>To include only the libev core (all the <code>ev_*</code> functions), with manual
+configuration (no autoconf):</p>
+<pre>  #define EV_STANDALONE 1
+  #include &quot;ev.c&quot;
+
+</pre>
+<p>This will automatically include <cite>ev.h</cite>, too, and should be done in a
+single C source file only to provide the function implementations. To use
+it, do the same for <cite>ev.h</cite> in all files wishing to use this API (best
+done by writing a wrapper around <cite>ev.h</cite> that you can include instead and
+where you can put other configuration options):</p>
+<pre>  #define EV_STANDALONE 1
+  #include &quot;ev.h&quot;
+
+</pre>
+<p>Both header files and implementation files can be compiled with a C++
+compiler (at least, thats a stated goal, and breakage will be treated
+as a bug).</p>
+<p>You need the following files in your source tree, or in a directory
+in your include path (e.g. in libev/ when using -Ilibev):</p>
+<pre>  ev.h
+  ev.c
+  ev_vars.h
+  ev_wrap.h
+
+  ev_win32.c      required on win32 platforms only
+
+  ev_select.c     only when select backend is enabled (which is is by default)
+  ev_poll.c       only when poll backend is enabled (disabled by default)
+  ev_epoll.c      only when the epoll backend is enabled (disabled by default)
+  ev_kqueue.c     only when the kqueue backend is enabled (disabled by default)
+  ev_port.c       only when the solaris port backend is enabled (disabled by default)
+
+</pre>
+<p><cite>ev.c</cite> includes the backend files directly when enabled, so you only need
+to compile a single file.</p>
+
+</div>
+<h3 id="LIBEVENT_COMPATIBILITY_API">LIBEVENT COMPATIBILITY API</h3>
+<div id="LIBEVENT_COMPATIBILITY_API_CONTENT">
+<p>To include the libevent compatibility API, also include:</p>
+<pre>  #include &quot;event.c&quot;
+
+</pre>
+<p>in the file including <cite>ev.c</cite>, and:</p>
+<pre>  #include &quot;event.h&quot;
+
+</pre>
+<p>in the files that want to use the libevent API. This also includes <cite>ev.h</cite>.</p>
+<p>You need the following additional files for this:</p>
+<pre>  event.h
+  event.c
+
+</pre>
+
+</div>
+<h3 id="AUTOCONF_SUPPORT">AUTOCONF SUPPORT</h3>
+<div id="AUTOCONF_SUPPORT_CONTENT">
+<p>Instead of using <code>EV_STANDALONE=1</code> and providing your config in
+whatever way you want, you can also <code>m4_include([libev.m4])</code> in your
+<cite>configure.ac</cite> and leave <code>EV_STANDALONE</code> off. <cite>ev.c</cite> will then include
+<cite>config.h</cite> and configure itself accordingly.</p>
+<p>For this of course you need the m4 file:</p>
+<pre>  libev.m4
+
+</pre>
+
+</div>
+<h2 id="PREPROCESSOR_SYMBOLS_MACROS">PREPROCESSOR SYMBOLS/MACROS</h2>
+<div id="PREPROCESSOR_SYMBOLS_MACROS_CONTENT">
+<p>Libev can be configured via a variety of preprocessor symbols you have to define
+before including any of its files. The default is not to build for multiplicity
+and only include the select backend.</p>
+<dl>
+	<dt>EV_STANDALONE</dt>
+	<dd>
+		<p>Must always be <code>1</code> if you do not use autoconf configuration, which
+keeps libev from including <cite>config.h</cite>, and it also defines dummy
+implementations for some libevent functions (such as logging, which is not
+supported). It will also not define any of the structs usually found in
+<cite>event.h</cite> that are not directly supported by the libev core alone.</p>
+	</dd>
+	<dt>EV_USE_MONOTONIC</dt>
+	<dd>
+		<p>If defined to be <code>1</code>, libev will try to detect the availability of the
+monotonic clock option at both compiletime and runtime. Otherwise no use
+of the monotonic clock option will be attempted. If you enable this, you
+usually have to link against librt or something similar. Enabling it when
+the functionality isn't available is safe, though, althoguh you have
+to make sure you link against any libraries where the <code>clock_gettime</code>
+function is hiding in (often <cite>-lrt</cite>).</p>
+	</dd>
+	<dt>EV_USE_REALTIME</dt>
+	<dd>
+		<p>If defined to be <code>1</code>, libev will try to detect the availability of the
+realtime clock option at compiletime (and assume its availability at
+runtime if successful). Otherwise no use of the realtime clock option will
+be attempted. This effectively replaces <code>gettimeofday</code> by <code>clock_get
+(CLOCK_REALTIME, ...)</code> and will not normally affect correctness. See tzhe note about libraries
+in the description of <code>EV_USE_MONOTONIC</code>, though.</p>
+	</dd>
+	<dt>EV_USE_SELECT</dt>
+	<dd>
+		<p>If undefined or defined to be <code>1</code>, libev will compile in support for the
+<code>select</code>(2) backend. No attempt at autodetection will be done: if no
+other method takes over, select will be it. Otherwise the select backend
+will not be compiled in.</p>
+	</dd>
+	<dt>EV_SELECT_USE_FD_SET</dt>
+	<dd>
+		<p>If defined to <code>1</code>, then the select backend will use the system <code>fd_set</code>
+structure. This is useful if libev doesn't compile due to a missing
+<code>NFDBITS</code> or <code>fd_mask</code> definition or it misguesses the bitset layout on
+exotic systems. This usually limits the range of file descriptors to some
+low limit such as 1024 or might have other limitations (winsocket only
+allows 64 sockets). The <code>FD_SETSIZE</code> macro, set before compilation, might
+influence the size of the <code>fd_set</code> used.</p>
+	</dd>
+	<dt>EV_SELECT_IS_WINSOCKET</dt>
+	<dd>
+		<p>When defined to <code>1</code>, the select backend will assume that
+select/socket/connect etc. don't understand file descriptors but
+wants osf handles on win32 (this is the case when the select to
+be used is the winsock select). This means that it will call
+<code>_get_osfhandle</code> on the fd to convert it to an OS handle. Otherwise,
+it is assumed that all these functions actually work on fds, even
+on win32. Should not be defined on non-win32 platforms.</p>
+	</dd>
+	<dt>EV_USE_POLL</dt>
+	<dd>
+		<p>If defined to be <code>1</code>, libev will compile in support for the <code>poll</code>(2)
+backend. Otherwise it will be enabled on non-win32 platforms. It
+takes precedence over select.</p>
+	</dd>
+	<dt>EV_USE_EPOLL</dt>
+	<dd>
+		<p>If defined to be <code>1</code>, libev will compile in support for the Linux
+<code>epoll</code>(7) backend. Its availability will be detected at runtime,
+otherwise another method will be used as fallback. This is the
+preferred backend for GNU/Linux systems.</p>
+	</dd>
+	<dt>EV_USE_KQUEUE</dt>
+	<dd>
+		<p>If defined to be <code>1</code>, libev will compile in support for the BSD style
+<code>kqueue</code>(2) backend. Its actual availability will be detected at runtime,
+otherwise another method will be used as fallback. This is the preferred
+backend for BSD and BSD-like systems, although on most BSDs kqueue only
+supports some types of fds correctly (the only platform we found that
+supports ptys for example was NetBSD), so kqueue might be compiled in, but
+not be used unless explicitly requested. The best way to use it is to find
+out wether kqueue supports your type of fd properly and use an embedded
+kqueue loop.</p>
+	</dd>
+	<dt>EV_USE_PORT</dt>
+	<dd>
+		<p>If defined to be <code>1</code>, libev will compile in support for the Solaris
+10 port style backend. Its availability will be detected at runtime,
+otherwise another method will be used as fallback. This is the preferred
+backend for Solaris 10 systems.</p>
+	</dd>
+	<dt>EV_USE_DEVPOLL</dt>
+	<dd>
+		<p>reserved for future expansion, works like the USE symbols above.</p>
+	</dd>
+	<dt>EV_H</dt>
+	<dd>
+		<p>The name of the <cite>ev.h</cite> header file used to include it. The default if
+undefined is <code>&lt;ev.h&gt;</code> in <cite>event.h</cite> and <code>&quot;ev.h&quot;</code> in <cite>ev.c</cite>. This
+can be used to virtually rename the <cite>ev.h</cite> header file in case of conflicts.</p>
+	</dd>
+	<dt>EV_CONFIG_H</dt>
+	<dd>
+		<p>If <code>EV_STANDALONE</code> isn't <code>1</code>, this variable can be used to override
+<cite>ev.c</cite>'s idea of where to find the <cite>config.h</cite> file, similarly to
+<code>EV_H</code>, above.</p>
+	</dd>
+	<dt>EV_EVENT_H</dt>
+	<dd>
+		<p>Similarly to <code>EV_H</code>, this macro can be used to override <cite>event.c</cite>'s idea
+of how the <cite>event.h</cite> header can be found.</p>
+	</dd>
+	<dt>EV_PROTOTYPES</dt>
+	<dd>
+		<p>If defined to be <code>0</code>, then <cite>ev.h</cite> will not define any function
+prototypes, but still define all the structs and other symbols. This is
+occasionally useful if you want to provide your own wrapper functions
+around libev functions.</p>
+	</dd>
+	<dt>EV_MULTIPLICITY</dt>
+	<dd>
+		<p>If undefined or defined to <code>1</code>, then all event-loop-specific functions
+will have the <code>struct ev_loop *</code> as first argument, and you can create
+additional independent event loops. Otherwise there will be no support
+for multiple event loops and there is no first event loop pointer
+argument. Instead, all functions act on the single default loop.</p>
+	</dd>
+	<dt>EV_PERIODICS</dt>
+	<dd>
+		<p>If undefined or defined to be <code>1</code>, then periodic timers are supported,
+otherwise not. This saves a few kb of code.</p>
+	</dd>
+	<dt>EV_COMMON</dt>
+	<dd>
+		<p>By default, all watchers have a <code>void *data</code> member. By redefining
+this macro to a something else you can include more and other types of
+members. You have to define it each time you include one of the files,
+though, and it must be identical each time.</p>
+		<p>For example, the perl EV module uses something like this:</p>
+<pre>  #define EV_COMMON                       \
+    SV *self; /* contains this struct */  \
+    SV *cb_sv, *fh /* note no trailing &quot;;&quot; */
+
+</pre>
+	</dd>
+	<dt>EV_CB_DECLARE(type)</dt>
+	<dt>EV_CB_INVOKE(watcher,revents)</dt>
+	<dt>ev_set_cb(ev,cb)</dt>
+	<dd>
+		<p>Can be used to change the callback member declaration in each watcher,
+and the way callbacks are invoked and set. Must expand to a struct member
+definition and a statement, respectively. See the <cite>ev.v</cite> header file for
+their default definitions. One possible use for overriding these is to
+avoid the ev_loop pointer as first argument in all cases, or to use method
+calls instead of plain function calls in C++.</p>
+
+</div>
+<h2 id="EXAMPLES">EXAMPLES</h2>
+<div id="EXAMPLES_CONTENT">
+		<p>For a real-world example of a program the includes libev
+verbatim, you can have a look at the EV perl module
+(<a href="http://software.schmorp.de/pkg/EV.html">http://software.schmorp.de/pkg/EV.html</a>). It has the libev files in
+the <cite>libev/</cite> subdirectory and includes them in the <cite>EV/EVAPI.h</cite> (public
+interface) and <cite>EV.xs</cite> (implementation) files. Only the <cite>EV.xs</cite> file
+will be compiled. It is pretty complex because it provides its own header
+file.</p>
+		<p>The usage in rxvt-unicode is simpler. It has a <cite>ev_cpp.h</cite> header file
+that everybody includes and which overrides some autoconf choices:</p>
+<pre>   #define EV_USE_POLL 0
+   #define EV_MULTIPLICITY 0
+   #define EV_PERIODICS 0
+   #define EV_CONFIG_H &lt;config.h&gt;
+
+   #include &quot;ev++.h&quot;
+
+</pre>
+		<p>And a <cite>ev_cpp.C</cite> implementation file that contains libev proper and is compiled:</p>
+<pre>   #include &quot;rxvttoolkit.h&quot;
+
+   /* darwin has problems with its header files in C++, requiring this namespace juggling */
+   using namespace ev;
+
+   #include &quot;ev.c&quot;
+
+
+
+
+</pre>
+
+</div>
 <h1 id="AUTHOR">AUTHOR</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="AUTHOR_CONTENT">
-<p>Marc Lehmann &lt;libev@schmorp.de&gt;.</p>
+		<p>Marc Lehmann &lt;libev@schmorp.de&gt;.</p>
 
 </div>
 </div></body>

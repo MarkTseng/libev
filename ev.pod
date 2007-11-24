@@ -1675,22 +1675,17 @@ file.
 The usage in rxvt-unicode is simpler. It has a F<ev_cpp.h> header file
 that everybody includes and which overrides some autoconf choices:
 
-   #define EV_USE_POLL 0
-   #define EV_MULTIPLICITY 0
-   #define EV_PERIODICS 0
-   #define EV_CONFIG_H <config.h>
+  #define EV_USE_POLL 0
+  #define EV_MULTIPLICITY 0
+  #define EV_PERIODICS 0
+  #define EV_CONFIG_H <config.h>
 
-   #include "ev++.h"
+  #include "ev++.h"
 
 And a F<ev_cpp.C> implementation file that contains libev proper and is compiled:
 
-   #include "rxvttoolkit.h"
-
-   /* darwin has problems with its header files in C++, requiring this namespace juggling */
-   using namespace ev;
-
-   #include "ev.c"
-
+  #include "ev_cpp.h"
+  #include "ev.c"
 
 =head1 AUTHOR
 
