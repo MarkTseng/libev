@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Nov 24 05:58:35 2007" />
+	<meta name="created" content="Sat Nov 24 08:13:46 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -23,7 +23,8 @@
 <li><a href="#GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</a></li>
 <li><a href="#FUNCTIONS_CONTROLLING_THE_EVENT_LOOP">FUNCTIONS CONTROLLING THE EVENT LOOP</a></li>
 <li><a href="#ANATOMY_OF_A_WATCHER">ANATOMY OF A WATCHER</a>
-<ul><li><a href="#ASSOCIATING_CUSTOM_DATA_WITH_A_WATCH">ASSOCIATING CUSTOM DATA WITH A WATCHER</a></li>
+<ul><li><a href="#SUMMARY_OF_GENERIC_WATCHER_FUNCTIONS">SUMMARY OF GENERIC WATCHER FUNCTIONS</a></li>
+<li><a href="#ASSOCIATING_CUSTOM_DATA_WITH_A_WATCH">ASSOCIATING CUSTOM DATA WITH A WATCHER</a></li>
 </ul>
 </li>
 <li><a href="#WATCHER_TYPES">WATCHER TYPES</a>
@@ -537,11 +538,7 @@ with a watcher-specific start function (<code>ev_&lt;type&gt;_start (loop, watch
 corresponding stop function (<code>ev_&lt;type&gt;_stop (loop, watcher *)</code>.</p>
 <p>As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
-reinitialise it or call its set macro.</p>
-<p>You can check whether an event is active by calling the <code>ev_is_active
-(watcher *)</code> macro. To see whether an event is outstanding (but the
-callback for it has not been called yet) you can use the <code>ev_is_pending
-(watcher *)</code> macro.</p>
+reinitialise it or call its <code>set</code> macro.</p>
 <p>Each and every callback receives the event loop pointer as first, the
 registered watcher structure as second, and a bitset of received events as
 third argument.</p>
@@ -600,6 +597,84 @@ with the error from read() or write(). This will not work in multithreaded
 programs, though, so beware.</p>
 	</dd>
 </dl>
+
+</div>
+<h2 id="SUMMARY_OF_GENERIC_WATCHER_FUNCTIONS">SUMMARY OF GENERIC WATCHER FUNCTIONS</h2>
+<div id="SUMMARY_OF_GENERIC_WATCHER_FUNCTIONS-2">
+<p>In the following description, <code>TYPE</code> stands for the watcher type,
+e.g. <code>timer</code> for <code>ev_timer</code> watchers and <code>io</code> for <code>ev_io</code> watchers.</p>
+<dl>
+	<dt><code>ev_init</code> (ev_TYPE *watcher, callback)</dt>
+	<dd>
+		<p>This macro initialises the generic portion of a watcher. The contents
+of the watcher object can be arbitrary (so <code>malloc</code> will do). Only
+the generic parts of the watcher are initialised, you <i>need</i> to call
+the type-specific <code>ev_TYPE_set</code> macro afterwards to initialise the
+type-specific parts. For each type there is also a <code>ev_TYPE_init</code> macro
+which rolls both calls into one.</p>
+		<p>You can reinitialise a watcher at any time as long as it has been stopped
+(or never started) and there are no pending events outstanding.</p>
+		<p>The callbakc is always of type <code>void (*)(ev_loop *loop, ev_TYPE *watcher,
+int revents)</code>.</p>
+	</dd>
+	<dt><code>ev_TYPE_set</code> (ev_TYPE *, [args])</dt>
+	<dd>
+		<p>This macro initialises the type-specific parts of a watcher. You need to
+call <code>ev_init</code> at least once before you call this macro, but you can
+call <code>ev_TYPE_set</code> any number of times. You must not, however, call this
+macro on a watcher that is active (it can be pending, however, which is a
+difference to the <code>ev_init</code> macro).</p>
+		<p>Although some watcher types do not have type-specific arguments
+(e.g. <code>ev_prepare</code>) you still need to call its <code>set</code> macro.</p>
+	</dd>
+	<dt><code>ev_TYPE_init</code> (ev_TYPE *watcher, callback, [args])</dt>
+	<dd>
+		<p>This convinience macro rolls both <code>ev_init</code> and <code>ev_TYPE_set</code> macro
+calls into a single call. This is the most convinient method to initialise
+a watcher. The same limitations apply, of course.</p>
+	</dd>
+	<dt><code>ev_TYPE_start</code> (loop *, ev_TYPE *watcher)</dt>
+	<dd>
+		<p>Starts (activates) the given watcher. Only active watchers will receive
+events. If the watcher is already active nothing will happen.</p>
+	</dd>
+	<dt><code>ev_TYPE_stop</code> (loop *, ev_TYPE *watcher)</dt>
+	<dd>
+		<p>Stops the given watcher again (if active) and clears the pending
+status. It is possible that stopped watchers are pending (for example,
+non-repeating timers are being stopped when they become pending), but
+<code>ev_TYPE_stop</code> ensures that the watcher is neither active nor pending. If
+you want to free or reuse the memory used by the watcher it is therefore a
+good idea to always call its <code>ev_TYPE_stop</code> function.</p>
+	</dd>
+	<dt>bool ev_is_active (ev_TYPE *watcher)</dt>
+	<dd>
+		<p>Returns a true value iff the watcher is active (i.e. it has been started
+and not yet been stopped). As long as a watcher is active you must not modify
+it.</p>
+	</dd>
+	<dt>bool ev_is_pending (ev_TYPE *watcher)</dt>
+	<dd>
+		<p>Returns a true value iff the watcher is pending, (i.e. it has outstanding
+events but its callback has not yet been invoked). As long as a watcher
+is pending (but not active) you must not call an init function on it (but
+<code>ev_TYPE_set</code> is safe) and you must make sure the watcher is available to
+libev (e.g. you cnanot <code>free ()</code> it).</p>
+	</dd>
+	<dt>callback = ev_cb (ev_TYPE *watcher)</dt>
+	<dd>
+		<p>Returns the callback currently set on the watcher.</p>
+	</dd>
+	<dt>ev_cb_set (ev_TYPE *watcher, callback)</dt>
+	<dd>
+		<p>Change the callback. You can change the callback at virtually any time
+(modulo threads).</p>
+	</dd>
+</dl>
+
+
+
+
 
 </div>
 <h2 id="ASSOCIATING_CUSTOM_DATA_WITH_A_WATCH">ASSOCIATING CUSTOM DATA WITH A WATCHER</h2>
@@ -1068,7 +1143,9 @@ macros, but using them is utterly, utterly and completely pointless.</p>
 <h2 id="code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough</h2>
 <div id="code_ev_embed_code_when_one_backend_-2">
 <p>This is a rather advanced watcher type that lets you embed one event loop
-into another.</p>
+into another (currently only <code>ev_io</code> events are supported in the embedded
+loop, other types of watchers might be handled in a delayed or incorrect
+fashion and must not be used).</p>
 <p>There are primarily two reasons you would want that: work around bugs and
 prioritise I/O.</p>
 <p>As an example for a bug workaround, the kqueue backend might only support
@@ -1083,6 +1160,13 @@ to be watched and handled very quickly (with low latency), and even
 priorities and idle watchers might have too much overhead. In this case
 you would put all the high priority stuff in one loop and all the rest in
 a second one, and embed the second one in the first.</p>
+<p>As long as the watcher is active, the callback will be invoked every time
+there might be events pending in the embedded loop. The callback must then
+call <code>ev_embed_sweep (mainloop, watcher)</code> to make a single sweep and invoke
+their callbacks (you could also start an idle watcher to give the embedded
+loop strictly lower priority for example). You can also set the callback
+to <code>0</code>, in which case the embed watcher will automatically execute the
+embedded loop sweep.</p>
 <p>As long as the watcher is started it will automatically handle events. The
 callback will be invoked whenever some events have been handled. You can
 set the callback to <code>0</code> to avoid having to specify one if you are not
@@ -1119,10 +1203,20 @@ create it, and if that fails, use the normal loop for everything:</p>
 
 </pre>
 <dl>
-	<dt>ev_embed_init (ev_embed *, callback, struct ev_loop *loop)</dt>
-	<dt>ev_embed_set (ev_embed *, callback, struct ev_loop *loop)</dt>
+	<dt>ev_embed_init (ev_embed *, callback, struct ev_loop *embedded_loop)</dt>
+	<dt>ev_embed_set (ev_embed *, callback, struct ev_loop *embedded_loop)</dt>
 	<dd>
-		<p>Configures the watcher to embed the given loop, which must be embeddable.</p>
+		<p>Configures the watcher to embed the given loop, which must be
+embeddable. If the callback is <code>0</code>, then <code>ev_embed_sweep</code> will be
+invoked automatically, otherwise it is the responsibility of the callback
+to invoke it (it will continue to be called until the sweep has been done,
+if you do not want thta, you need to temporarily stop the embed watcher).</p>
+	</dd>
+	<dt>ev_embed_sweep (loop, ev_embed *)</dt>
+	<dd>
+		<p>Make a single, non-blocking sweep over the embedded loop. This works
+similarly to <code>ev_loop (embedded_loop, EVLOOP_NONBLOCK)</code>, but in the most
+apropriate way for embedded loops.</p>
 	</dd>
 </dl>
 
@@ -1165,20 +1259,21 @@ value passed to <code>ev_once</code>:</p>
 
 </pre>
 	</dd>
-	<dt>ev_feed_event (loop, watcher, int events)</dt>
+	<dt>ev_feed_event (ev_loop *, watcher *, int revents)</dt>
 	<dd>
 		<p>Feeds the given event set into the event loop, as if the specified event
 had happened for the specified watcher (which must be a pointer to an
 initialised but not necessarily started event watcher).</p>
 	</dd>
-	<dt>ev_feed_fd_event (loop, int fd, int revents)</dt>
+	<dt>ev_feed_fd_event (ev_loop *, int fd, int revents)</dt>
 	<dd>
 		<p>Feed an event on the given fd, as if a file descriptor backend detected
 the given events it.</p>
 	</dd>
-	<dt>ev_feed_signal_event (loop, int signum)</dt>
+	<dt>ev_feed_signal_event (ev_loop *loop, int signum)</dt>
 	<dd>
-		<p>Feed an event as if the given signal occured (loop must be the default loop!).</p>
+		<p>Feed an event as if the given signal occured (<code>loop</code> must be the default
+loop!).</p>
 	</dd>
 </dl>
 

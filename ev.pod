@@ -507,12 +507,7 @@ corresponding stop function (C<< ev_<type>_stop (loop, watcher *) >>.
 
 As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
-reinitialise it or call its set macro.
-
-You can check whether an event is active by calling the C<ev_is_active
-(watcher *)> macro. To see whether an event is outstanding (but the
-callback for it has not been called yet) you can use the C<ev_is_pending
-(watcher *)> macro.
+reinitialise it or call its C<set> macro.
 
 Each and every callback receives the event loop pointer as first, the
 registered watcher structure as second, and a bitset of received events as
@@ -578,6 +573,85 @@ with the error from read() or write(). This will not work in multithreaded
 programs, though, so beware.
 
 =back
+
+=head2 SUMMARY OF GENERIC WATCHER FUNCTIONS
+
+In the following description, C<TYPE> stands for the watcher type,
+e.g. C<timer> for C<ev_timer> watchers and C<io> for C<ev_io> watchers.
+
+=over 4
+
+=item C<ev_init> (ev_TYPE *watcher, callback)
+
+This macro initialises the generic portion of a watcher. The contents
+of the watcher object can be arbitrary (so C<malloc> will do). Only
+the generic parts of the watcher are initialised, you I<need> to call
+the type-specific C<ev_TYPE_set> macro afterwards to initialise the
+type-specific parts. For each type there is also a C<ev_TYPE_init> macro
+which rolls both calls into one.
+
+You can reinitialise a watcher at any time as long as it has been stopped
+(or never started) and there are no pending events outstanding.
+
+The callbakc is always of type C<void (*)(ev_loop *loop, ev_TYPE *watcher,
+int revents)>.
+
+=item C<ev_TYPE_set> (ev_TYPE *, [args])
+
+This macro initialises the type-specific parts of a watcher. You need to
+call C<ev_init> at least once before you call this macro, but you can
+call C<ev_TYPE_set> any number of times. You must not, however, call this
+macro on a watcher that is active (it can be pending, however, which is a
+difference to the C<ev_init> macro).
+
+Although some watcher types do not have type-specific arguments
+(e.g. C<ev_prepare>) you still need to call its C<set> macro.
+
+=item C<ev_TYPE_init> (ev_TYPE *watcher, callback, [args])
+
+This convinience macro rolls both C<ev_init> and C<ev_TYPE_set> macro
+calls into a single call. This is the most convinient method to initialise
+a watcher. The same limitations apply, of course.
+
+=item C<ev_TYPE_start> (loop *, ev_TYPE *watcher)
+
+Starts (activates) the given watcher. Only active watchers will receive
+events. If the watcher is already active nothing will happen.
+
+=item C<ev_TYPE_stop> (loop *, ev_TYPE *watcher)
+
+Stops the given watcher again (if active) and clears the pending
+status. It is possible that stopped watchers are pending (for example,
+non-repeating timers are being stopped when they become pending), but
+C<ev_TYPE_stop> ensures that the watcher is neither active nor pending. If
+you want to free or reuse the memory used by the watcher it is therefore a
+good idea to always call its C<ev_TYPE_stop> function.
+
+=item bool ev_is_active (ev_TYPE *watcher)
+
+Returns a true value iff the watcher is active (i.e. it has been started
+and not yet been stopped). As long as a watcher is active you must not modify
+it.
+
+=item bool ev_is_pending (ev_TYPE *watcher)
+
+Returns a true value iff the watcher is pending, (i.e. it has outstanding
+events but its callback has not yet been invoked). As long as a watcher
+is pending (but not active) you must not call an init function on it (but
+C<ev_TYPE_set> is safe) and you must make sure the watcher is available to
+libev (e.g. you cnanot C<free ()> it).
+
+=item callback = ev_cb (ev_TYPE *watcher)
+
+Returns the callback currently set on the watcher.
+
+=item ev_cb_set (ev_TYPE *watcher, callback)
+
+Change the callback. You can change the callback at virtually any time
+(modulo threads).
+
+=back
+
 
 =head2 ASSOCIATING CUSTOM DATA WITH A WATCHER
 
@@ -1060,7 +1134,9 @@ Example: *TODO*.
 =head2 C<ev_embed> - when one backend isn't enough
 
 This is a rather advanced watcher type that lets you embed one event loop
-into another.
+into another (currently only C<ev_io> events are supported in the embedded
+loop, other types of watchers might be handled in a delayed or incorrect
+fashion and must not be used).
 
 There are primarily two reasons you would want that: work around bugs and
 prioritise I/O.
@@ -1078,6 +1154,14 @@ to be watched and handled very quickly (with low latency), and even
 priorities and idle watchers might have too much overhead. In this case
 you would put all the high priority stuff in one loop and all the rest in
 a second one, and embed the second one in the first.
+
+As long as the watcher is active, the callback will be invoked every time
+there might be events pending in the embedded loop. The callback must then
+call C<ev_embed_sweep (mainloop, watcher)> to make a single sweep and invoke
+their callbacks (you could also start an idle watcher to give the embedded
+loop strictly lower priority for example). You can also set the callback
+to C<0>, in which case the embed watcher will automatically execute the
+embedded loop sweep.
 
 As long as the watcher is started it will automatically handle events. The
 callback will be invoked whenever some events have been handled. You can
@@ -1119,11 +1203,21 @@ create it, and if that fails, use the normal loop for everything:
 
 =over 4
 
-=item ev_embed_init (ev_embed *, callback, struct ev_loop *loop)
+=item ev_embed_init (ev_embed *, callback, struct ev_loop *embedded_loop)
 
-=item ev_embed_set (ev_embed *, callback, struct ev_loop *loop)
+=item ev_embed_set (ev_embed *, callback, struct ev_loop *embedded_loop)
 
-Configures the watcher to embed the given loop, which must be embeddable.
+Configures the watcher to embed the given loop, which must be
+embeddable. If the callback is C<0>, then C<ev_embed_sweep> will be
+invoked automatically, otherwise it is the responsibility of the callback
+to invoke it (it will continue to be called until the sweep has been done,
+if you do not want thta, you need to temporarily stop the embed watcher).
+
+=item ev_embed_sweep (loop, ev_embed *)
+
+Make a single, non-blocking sweep over the embedded loop. This works
+similarly to C<ev_loop (embedded_loop, EVLOOP_NONBLOCK)>, but in the most
+apropriate way for embedded loops.
 
 =back
 
@@ -1166,20 +1260,21 @@ value passed to C<ev_once>:
 
   ev_once (STDIN_FILENO, EV_READ, 10., stdin_ready, 0);
 
-=item ev_feed_event (loop, watcher, int events)
+=item ev_feed_event (ev_loop *, watcher *, int revents)
 
 Feeds the given event set into the event loop, as if the specified event
 had happened for the specified watcher (which must be a pointer to an
 initialised but not necessarily started event watcher).
 
-=item ev_feed_fd_event (loop, int fd, int revents)
+=item ev_feed_fd_event (ev_loop *, int fd, int revents)
 
 Feed an event on the given fd, as if a file descriptor backend detected
 the given events it.
 
-=item ev_feed_signal_event (loop, int signum)
+=item ev_feed_signal_event (ev_loop *loop, int signum)
 
-Feed an event as if the given signal occured (loop must be the default loop!).
+Feed an event as if the given signal occured (C<loop> must be the default
+loop!).
 
 =back
 

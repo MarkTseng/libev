@@ -647,12 +647,7 @@ corresponding stop function (\f(CW\*(C`ev_<type>_stop (loop, watcher *)\*(C'\fR.
 .PP
 As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
-reinitialise it or call its set macro.
-.PP
-You can check whether an event is active by calling the \f(CW\*(C`ev_is_active
-(watcher *)\*(C'\fR macro. To see whether an event is outstanding (but the
-callback for it has not been called yet) you can use the \f(CW\*(C`ev_is_pending
-(watcher *)\*(C'\fR macro.
+reinitialise it or call its \f(CW\*(C`set\*(C'\fR macro.
 .PP
 Each and every callback receives the event loop pointer as first, the
 registered watcher structure as second, and a bitset of received events as
@@ -720,6 +715,75 @@ for example it might indicate that a fd is readable or writable, and if
 your callbacks is well-written it can just attempt the operation and cope
 with the error from \fIread()\fR or \fIwrite()\fR. This will not work in multithreaded
 programs, though, so beware.
+.Sh "\s-1SUMMARY\s0 \s-1OF\s0 \s-1GENERIC\s0 \s-1WATCHER\s0 \s-1FUNCTIONS\s0"
+.IX Subsection "SUMMARY OF GENERIC WATCHER FUNCTIONS"
+In the following description, \f(CW\*(C`TYPE\*(C'\fR stands for the watcher type,
+e.g. \f(CW\*(C`timer\*(C'\fR for \f(CW\*(C`ev_timer\*(C'\fR watchers and \f(CW\*(C`io\*(C'\fR for \f(CW\*(C`ev_io\*(C'\fR watchers.
+.ie n .IP """ev_init"" (ev_TYPE *watcher, callback)" 4
+.el .IP "\f(CWev_init\fR (ev_TYPE *watcher, callback)" 4
+.IX Item "ev_init (ev_TYPE *watcher, callback)"
+This macro initialises the generic portion of a watcher. The contents
+of the watcher object can be arbitrary (so \f(CW\*(C`malloc\*(C'\fR will do). Only
+the generic parts of the watcher are initialised, you \fIneed\fR to call
+the type-specific \f(CW\*(C`ev_TYPE_set\*(C'\fR macro afterwards to initialise the
+type-specific parts. For each type there is also a \f(CW\*(C`ev_TYPE_init\*(C'\fR macro
+which rolls both calls into one.
+.Sp
+You can reinitialise a watcher at any time as long as it has been stopped
+(or never started) and there are no pending events outstanding.
+.Sp
+The callbakc is always of type \f(CW\*(C`void (*)(ev_loop *loop, ev_TYPE *watcher,
+int revents)\*(C'\fR.
+.ie n .IP """ev_TYPE_set"" (ev_TYPE *, [args])" 4
+.el .IP "\f(CWev_TYPE_set\fR (ev_TYPE *, [args])" 4
+.IX Item "ev_TYPE_set (ev_TYPE *, [args])"
+This macro initialises the type-specific parts of a watcher. You need to
+call \f(CW\*(C`ev_init\*(C'\fR at least once before you call this macro, but you can
+call \f(CW\*(C`ev_TYPE_set\*(C'\fR any number of times. You must not, however, call this
+macro on a watcher that is active (it can be pending, however, which is a
+difference to the \f(CW\*(C`ev_init\*(C'\fR macro).
+.Sp
+Although some watcher types do not have type-specific arguments
+(e.g. \f(CW\*(C`ev_prepare\*(C'\fR) you still need to call its \f(CW\*(C`set\*(C'\fR macro.
+.ie n .IP """ev_TYPE_init"" (ev_TYPE *watcher, callback, [args])" 4
+.el .IP "\f(CWev_TYPE_init\fR (ev_TYPE *watcher, callback, [args])" 4
+.IX Item "ev_TYPE_init (ev_TYPE *watcher, callback, [args])"
+This convinience macro rolls both \f(CW\*(C`ev_init\*(C'\fR and \f(CW\*(C`ev_TYPE_set\*(C'\fR macro
+calls into a single call. This is the most convinient method to initialise
+a watcher. The same limitations apply, of course.
+.ie n .IP """ev_TYPE_start"" (loop *, ev_TYPE *watcher)" 4
+.el .IP "\f(CWev_TYPE_start\fR (loop *, ev_TYPE *watcher)" 4
+.IX Item "ev_TYPE_start (loop *, ev_TYPE *watcher)"
+Starts (activates) the given watcher. Only active watchers will receive
+events. If the watcher is already active nothing will happen.
+.ie n .IP """ev_TYPE_stop"" (loop *, ev_TYPE *watcher)" 4
+.el .IP "\f(CWev_TYPE_stop\fR (loop *, ev_TYPE *watcher)" 4
+.IX Item "ev_TYPE_stop (loop *, ev_TYPE *watcher)"
+Stops the given watcher again (if active) and clears the pending
+status. It is possible that stopped watchers are pending (for example,
+non-repeating timers are being stopped when they become pending), but
+\&\f(CW\*(C`ev_TYPE_stop\*(C'\fR ensures that the watcher is neither active nor pending. If
+you want to free or reuse the memory used by the watcher it is therefore a
+good idea to always call its \f(CW\*(C`ev_TYPE_stop\*(C'\fR function.
+.IP "bool ev_is_active (ev_TYPE *watcher)" 4
+.IX Item "bool ev_is_active (ev_TYPE *watcher)"
+Returns a true value iff the watcher is active (i.e. it has been started
+and not yet been stopped). As long as a watcher is active you must not modify
+it.
+.IP "bool ev_is_pending (ev_TYPE *watcher)" 4
+.IX Item "bool ev_is_pending (ev_TYPE *watcher)"
+Returns a true value iff the watcher is pending, (i.e. it has outstanding
+events but its callback has not yet been invoked). As long as a watcher
+is pending (but not active) you must not call an init function on it (but
+\&\f(CW\*(C`ev_TYPE_set\*(C'\fR is safe) and you must make sure the watcher is available to
+libev (e.g. you cnanot \f(CW\*(C`free ()\*(C'\fR it).
+.IP "callback = ev_cb (ev_TYPE *watcher)" 4
+.IX Item "callback = ev_cb (ev_TYPE *watcher)"
+Returns the callback currently set on the watcher.
+.IP "ev_cb_set (ev_TYPE *watcher, callback)" 4
+.IX Item "ev_cb_set (ev_TYPE *watcher, callback)"
+Change the callback. You can change the callback at virtually any time
+(modulo threads).
 .Sh "\s-1ASSOCIATING\s0 \s-1CUSTOM\s0 \s-1DATA\s0 \s-1WITH\s0 A \s-1WATCHER\s0"
 .IX Subsection "ASSOCIATING CUSTOM DATA WITH A WATCHER"
 Each watcher has, by default, a member \f(CW\*(C`void *data\*(C'\fR that you can change
@@ -1207,7 +1271,9 @@ Example: *TODO*.
 .el .Sh "\f(CWev_embed\fP \- when one backend isn't enough"
 .IX Subsection "ev_embed - when one backend isn't enough"
 This is a rather advanced watcher type that lets you embed one event loop
-into another.
+into another (currently only \f(CW\*(C`ev_io\*(C'\fR events are supported in the embedded
+loop, other types of watchers might be handled in a delayed or incorrect
+fashion and must not be used).
 .PP
 There are primarily two reasons you would want that: work around bugs and
 prioritise I/O.
@@ -1225,6 +1291,14 @@ to be watched and handled very quickly (with low latency), and even
 priorities and idle watchers might have too much overhead. In this case
 you would put all the high priority stuff in one loop and all the rest in
 a second one, and embed the second one in the first.
+.PP
+As long as the watcher is active, the callback will be invoked every time
+there might be events pending in the embedded loop. The callback must then
+call \f(CW\*(C`ev_embed_sweep (mainloop, watcher)\*(C'\fR to make a single sweep and invoke
+their callbacks (you could also start an idle watcher to give the embedded
+loop strictly lower priority for example). You can also set the callback
+to \f(CW0\fR, in which case the embed watcher will automatically execute the
+embedded loop sweep.
 .PP
 As long as the watcher is started it will automatically handle events. The
 callback will be invoked whenever some events have been handled. You can
@@ -1269,13 +1343,22 @@ create it, and if that fails, use the normal loop for everything:
 \&  else
 \&    loop_lo = loop_hi;
 .Ve
-.IP "ev_embed_init (ev_embed *, callback, struct ev_loop *loop)" 4
-.IX Item "ev_embed_init (ev_embed *, callback, struct ev_loop *loop)"
+.IP "ev_embed_init (ev_embed *, callback, struct ev_loop *embedded_loop)" 4
+.IX Item "ev_embed_init (ev_embed *, callback, struct ev_loop *embedded_loop)"
 .PD 0
-.IP "ev_embed_set (ev_embed *, callback, struct ev_loop *loop)" 4
-.IX Item "ev_embed_set (ev_embed *, callback, struct ev_loop *loop)"
+.IP "ev_embed_set (ev_embed *, callback, struct ev_loop *embedded_loop)" 4
+.IX Item "ev_embed_set (ev_embed *, callback, struct ev_loop *embedded_loop)"
 .PD
-Configures the watcher to embed the given loop, which must be embeddable.
+Configures the watcher to embed the given loop, which must be
+embeddable. If the callback is \f(CW0\fR, then \f(CW\*(C`ev_embed_sweep\*(C'\fR will be
+invoked automatically, otherwise it is the responsibility of the callback
+to invoke it (it will continue to be called until the sweep has been done,
+if you do not want thta, you need to temporarily stop the embed watcher).
+.IP "ev_embed_sweep (loop, ev_embed *)" 4
+.IX Item "ev_embed_sweep (loop, ev_embed *)"
+Make a single, non-blocking sweep over the embedded loop. This works
+similarly to \f(CW\*(C`ev_loop (embedded_loop, EVLOOP_NONBLOCK)\*(C'\fR, but in the most
+apropriate way for embedded loops.
 .SH "OTHER FUNCTIONS"
 .IX Header "OTHER FUNCTIONS"
 There are some other functions of possible interest. Described. Here. Now.
@@ -1314,18 +1397,19 @@ value passed to \f(CW\*(C`ev_once\*(C'\fR:
 .Vb 1
 \&  ev_once (STDIN_FILENO, EV_READ, 10., stdin_ready, 0);
 .Ve
-.IP "ev_feed_event (loop, watcher, int events)" 4
-.IX Item "ev_feed_event (loop, watcher, int events)"
+.IP "ev_feed_event (ev_loop *, watcher *, int revents)" 4
+.IX Item "ev_feed_event (ev_loop *, watcher *, int revents)"
 Feeds the given event set into the event loop, as if the specified event
 had happened for the specified watcher (which must be a pointer to an
 initialised but not necessarily started event watcher).
-.IP "ev_feed_fd_event (loop, int fd, int revents)" 4
-.IX Item "ev_feed_fd_event (loop, int fd, int revents)"
+.IP "ev_feed_fd_event (ev_loop *, int fd, int revents)" 4
+.IX Item "ev_feed_fd_event (ev_loop *, int fd, int revents)"
 Feed an event on the given fd, as if a file descriptor backend detected
 the given events it.
-.IP "ev_feed_signal_event (loop, int signum)" 4
-.IX Item "ev_feed_signal_event (loop, int signum)"
-Feed an event as if the given signal occured (loop must be the default loop!).
+.IP "ev_feed_signal_event (ev_loop *loop, int signum)" 4
+.IX Item "ev_feed_signal_event (ev_loop *loop, int signum)"
+Feed an event as if the given signal occured (\f(CW\*(C`loop\*(C'\fR must be the default
+loop!).
 .SH "LIBEVENT EMULATION"
 .IX Header "LIBEVENT EMULATION"
 Libev offers a compatibility emulation layer for libevent. It cannot
