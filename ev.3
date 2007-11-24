@@ -1799,29 +1799,21 @@ The usage in rxvt-unicode is simpler. It has a \fIev_cpp.h\fR header file
 that everybody includes and which overrides some autoconf choices:
 .Sp
 .Vb 4
-\&   #define EV_USE_POLL 0
-\&   #define EV_MULTIPLICITY 0
-\&   #define EV_PERIODICS 0
-\&   #define EV_CONFIG_H <config.h>
+\&  #define EV_USE_POLL 0
+\&  #define EV_MULTIPLICITY 0
+\&  #define EV_PERIODICS 0
+\&  #define EV_CONFIG_H <config.h>
 .Ve
 .Sp
 .Vb 1
-\&   #include "ev++.h"
+\&  #include "ev++.h"
 .Ve
 .Sp
 And a \fIev_cpp.C\fR implementation file that contains libev proper and is compiled:
 .Sp
-.Vb 1
-\&   #include "rxvttoolkit.h"
-.Ve
-.Sp
 .Vb 2
-\&   /* darwin has problems with its header files in C++, requiring this namespace juggling */
-\&   using namespace ev;
-.Ve
-.Sp
-.Vb 1
-\&   #include "ev.c"
+\&  #include "ev_cpp.h"
+\&  #include "ev.c"
 .Ve
 .SH "AUTHOR"
 .IX Header "AUTHOR"

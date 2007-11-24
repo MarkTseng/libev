@@ -1585,7 +1585,7 @@ backend for BSD and BSD-like systems, although on most BSDs kqueue only
 supports some types of fds correctly (the only platform we found that
 supports ptys for example was NetBSD), so kqueue might be compiled in, but
 not be used unless explicitly requested. The best way to use it is to find
-out wether kqueue supports your type of fd properly and use an embedded
+out whether kqueue supports your type of fd properly and use an embedded
 kqueue loop.
 
 =item EV_USE_PORT
