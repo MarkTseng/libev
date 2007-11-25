@@ -1076,6 +1076,8 @@ call_pending (EV_P)
 
         if (expect_true (p->w))
           {
+            assert (("non-pending watcher on pending list", p->w->pending));
+
             p->w->pending = 0;
             EV_CB_INVOKE (p->w, p->events);
           }
@@ -1191,7 +1193,15 @@ time_update (EV_P)
         {
           ev_tstamp odiff = rtmn_diff;
 
-          for (i = 4; --i; ) /* loop a few times, before making important decisions */
+          /* loop a few times, before making important decisions.
+           * on the choice of "4": one iteration isn't enough,
+           * in case we get preempted during the calls to
+           * ev_time and get_clock. a second call is almost guarenteed
+           * to succeed in that case, though. and looping a few more times
+           * doesn't hurt either as we only do this on time-jumps or
+           * in the unlikely event of getting preempted here.
+           */
+          for (i = 4; --i; )
             {
               rtmn_diff = ev_rt_now - mn_now;
 
@@ -1553,7 +1563,12 @@ ev_idle_stop (EV_P_ ev_idle *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  idles [((W)w)->active - 1] = idles [--idlecnt];
+  {
+    int active = ((W)w)->active;
+    idles [active - 1] = idles [--idlecnt];
+    ((W)idles [active - 1])->active = active;
+  }
+
   ev_stop (EV_A_ (W)w);
 }
 
@@ -1575,7 +1590,12 @@ ev_prepare_stop (EV_P_ ev_prepare *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  prepares [((W)w)->active - 1] = prepares [--preparecnt];
+  {
+    int active = ((W)w)->active;
+    prepares [active - 1] = prepares [--preparecnt];
+    ((W)prepares [active - 1])->active = active;
+  }
+
   ev_stop (EV_A_ (W)w);
 }
 
@@ -1597,7 +1617,12 @@ ev_check_stop (EV_P_ ev_check *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  checks [((W)w)->active - 1] = checks [--checkcnt];
+  {
+    int active = ((W)w)->active;
+    checks [active - 1] = checks [--checkcnt];
+    ((W)checks [active - 1])->active = active;
+  }
+
   ev_stop (EV_A_ (W)w);
 }
 
