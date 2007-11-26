@@ -1104,10 +1104,21 @@ Prepare and check watchers are usually (but not always) used in tandem:
 prepare watchers get invoked before the process blocks and check watchers
 afterwards.
 
+You I<must not> call C<ev_loop> or similar functions that enter
+the current event loop from either C<ev_prepare> or C<ev_check>
+watchers. Other loops than the current one are fine, however. The
+rationale behind this is that you do not need to check for recursion in
+those watchers, i.e. the sequence will always be C<ev_prepare>, blocking,
+C<ev_check> so if you have one watcher of each kind they will always be
+called in pairs bracketing the blocking call.
+
 Their main purpose is to integrate other event mechanisms into libev and
 their use is somewhat advanced. This could be used, for example, to track
 variable changes, implement your own watchers, integrate net-snmp or a
-coroutine library and lots more.
+coroutine library and lots more. They are also occasionally useful if
+you cache some data and want to flush it before blocking (for example,
+in X programs you might want to do an C<XFlush ()> in an C<ev_prepare>
+watcher).
 
 This is done by examining in each prepare call which file descriptors need
 to be watched by the other library, registering C<ev_io> watchers for
@@ -1139,7 +1150,59 @@ macros, but using them is utterly, utterly and completely pointless.
 
 =back
 
-Example: *TODO*.
+Example: To include a library such as adns, you would add IO watchers
+and a timeout watcher in a prepare handler, as required by libadns, and
+in a check watcher, destroy them and call into libadns. What follows is
+pseudo-code only of course:
+
+  static ev_io iow [nfd];
+  static ev_timer tw;
+
+  static void
+  io_cb (ev_loop *loop, ev_io *w, int revents)
+  {
+    // set the relevant poll flags
+    struct pollfd *fd = (struct pollfd *)w->data;
+    if (revents & EV_READ ) fd->revents |= fd->events & POLLIN;
+    if (revents & EV_WRITE) fd->revents |= fd->events & POLLOUT;
+  }
+
+  // create io watchers for each fd and a timer before blocking
+  static void
+  adns_prepare_cb (ev_loop *loop, ev_prepare *w, int revents)
+  {
+    int timeout = 3600000;truct pollfd fds [nfd];
+    // actual code will need to loop here and realloc etc.
+    adns_beforepoll (ads, fds, &nfd, &timeout, timeval_from (ev_time ()));
+
+    /* the callback is illegal, but won't be called as we stop during check */
+    ev_timer_init (&tw, 0, timeout * 1e-3);
+    ev_timer_start (loop, &tw);
+
+    // create on ev_io per pollfd
+    for (int i = 0; i < nfd; ++i)
+      {
+        ev_io_init (iow + i, io_cb, fds [i].fd,
+          ((fds [i].events & POLLIN ? EV_READ : 0)
+           | (fds [i].events & POLLOUT ? EV_WRITE : 0)));
+
+        fds [i].revents = 0;
+        iow [i].data = fds + i;
+        ev_io_start (loop, iow + i);
+      }
+  }
+
+  // stop all watchers after blocking
+  static void
+  adns_check_cb (ev_loop *loop, ev_check *w, int revents)
+  {
+    ev_timer_stop (loop, &tw);
+
+    for (int i = 0; i < nfd; ++i)
+      ev_io_stop (loop, iow + i);
+
+    adns_afterpoll (adns, fds, nfd, timeval_from (ev_now (loop));
+  }
 
 
 =head2 C<ev_embed> - when one backend isn't enough...

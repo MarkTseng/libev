@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Nov 24 17:57:37 2007" />
+	<meta name="created" content="Mon Nov 26 10:52:13 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1128,10 +1128,20 @@ callback, free it. Alos, use no error checking, as usual.</p>
 <p>Prepare and check watchers are usually (but not always) used in tandem:
 prepare watchers get invoked before the process blocks and check watchers
 afterwards.</p>
+<p>You <i>must not</i> call <code>ev_loop</code> or similar functions that enter
+the current event loop from either <code>ev_prepare</code> or <code>ev_check</code>
+watchers. Other loops than the current one are fine, however. The
+rationale behind this is that you do not need to check for recursion in
+those watchers, i.e. the sequence will always be <code>ev_prepare</code>, blocking,
+<code>ev_check</code> so if you have one watcher of each kind they will always be
+called in pairs bracketing the blocking call.</p>
 <p>Their main purpose is to integrate other event mechanisms into libev and
 their use is somewhat advanced. This could be used, for example, to track
 variable changes, implement your own watchers, integrate net-snmp or a
-coroutine library and lots more.</p>
+coroutine library and lots more. They are also occasionally useful if
+you cache some data and want to flush it before blocking (for example,
+in X programs you might want to do an <code>XFlush ()</code> in an <code>ev_prepare</code>
+watcher).</p>
 <p>This is done by examining in each prepare call which file descriptors need
 to be watched by the other library, registering <code>ev_io</code> watchers for
 them and starting an <code>ev_timer</code> watcher for any timeouts (many libraries
@@ -1157,11 +1167,63 @@ parameters of any kind. There are <code>ev_prepare_set</code> and <code>ev_check
 macros, but using them is utterly, utterly and completely pointless.</p>
 	</dd>
 </dl>
-<p>Example: *TODO*.</p>
+<p>Example: To include a library such as adns, you would add IO watchers
+and a timeout watcher in a prepare handler, as required by libadns, and
+in a check watcher, destroy them and call into libadns. What follows is
+pseudo-code only of course:</p>
+<pre>  static ev_io iow [nfd];
+  static ev_timer tw;
+
+  static void
+  io_cb (ev_loop *loop, ev_io *w, int revents)
+  {
+    // set the relevant poll flags
+    struct pollfd *fd = (struct pollfd *)w-&gt;data;
+    if (revents &amp; EV_READ ) fd-&gt;revents |= fd-&gt;events &amp; POLLIN;
+    if (revents &amp; EV_WRITE) fd-&gt;revents |= fd-&gt;events &amp; POLLOUT;
+  }
+
+  // create io watchers for each fd and a timer before blocking
+  static void
+  adns_prepare_cb (ev_loop *loop, ev_prepare *w, int revents)
+  {
+    int timeout = 3600000;truct pollfd fds [nfd];
+    // actual code will need to loop here and realloc etc.
+    adns_beforepoll (ads, fds, &amp;nfd, &amp;timeout, timeval_from (ev_time ()));
+
+    /* the callback is illegal, but won't be called as we stop during check */
+    ev_timer_init (&amp;tw, 0, timeout * 1e-3);
+    ev_timer_start (loop, &amp;tw);
+
+    // create on ev_io per pollfd
+    for (int i = 0; i &lt; nfd; ++i)
+      {
+        ev_io_init (iow + i, io_cb, fds [i].fd,
+          ((fds [i].events &amp; POLLIN ? EV_READ : 0)
+           | (fds [i].events &amp; POLLOUT ? EV_WRITE : 0)));
+
+        fds [i].revents = 0;
+        iow [i].data = fds + i;
+        ev_io_start (loop, iow + i);
+      }
+  }
+
+  // stop all watchers after blocking
+  static void
+  adns_check_cb (ev_loop *loop, ev_check *w, int revents)
+  {
+    ev_timer_stop (loop, &amp;tw);
+
+    for (int i = 0; i &lt; nfd; ++i)
+      ev_io_stop (loop, iow + i);
+
+    adns_afterpoll (adns, fds, nfd, timeval_from (ev_now (loop));
+  }
 
 
 
 
+</pre>
 
 </div>
 <h2 id="code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough...</h2>
