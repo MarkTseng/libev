@@ -1702,10 +1702,27 @@ additional independent event loops. Otherwise there will be no support
 for multiple event loops and there is no first event loop pointer
 argument. Instead, all functions act on the single default loop.
 
-=item EV_PERIODICS
+=item EV_PERIODIC_ENABLE
 
-If undefined or defined to be C<1>, then periodic timers are supported,
-otherwise not. This saves a few kb of code.
+If undefined or defined to be C<1>, then periodic timers are supported. If
+defined to be C<0>, then they are not. Disabling them saves a few kB of
+code.
+
+=item EV_EMBED_ENABLE
+
+If undefined or defined to be C<1>, then embed watchers are supported. If
+defined to be C<0>, then they are not.
+
+=item EV_STAT_ENABLE
+
+If undefined or defined to be C<1>, then stat watchers are supported. If
+defined to be C<0>, then they are not.
+
+=item EV_MINIMAL
+
+If you need to shave off some kilobytes of code at the expense of some
+speed, define this symbol to C<1>. Currently only used for gcc to override
+some inlining decisions, saves roughly 30% codesize of amd64.
 
 =item EV_COMMON
 

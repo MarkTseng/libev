@@ -62,7 +62,7 @@ VARx(struct ev_timer **, timers)
 VARx(int, timermax)
 VARx(int, timercnt)
 
-#if EV_PERIODICS || EV_GENWRAP
+#if EV_PERIODIC_ENABLE || EV_GENWRAP
 VARx(struct ev_periodic **, periodics)
 VARx(int, periodicmax)
 VARx(int, periodiccnt)
