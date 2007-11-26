@@ -1297,11 +1297,12 @@ pseudo-code only of course:
 \&  static ev_timer tw;
 .Ve
 .PP
-.Vb 8
+.Vb 9
 \&  static void
 \&  io_cb (ev_loop *loop, ev_io *w, int revents)
 \&  {
 \&    // set the relevant poll flags
+\&    // could also call adns_processreadable etc. here
 \&    struct pollfd *fd = (struct pollfd *)w->data;
 \&    if (revents & EV_READ ) fd->revents |= fd->events & POLLIN;
 \&    if (revents & EV_WRITE) fd->revents |= fd->events & POLLOUT;
@@ -1902,6 +1903,32 @@ And a \fIev_cpp.C\fR implementation file that contains libev proper and is compi
 \&  #include "ev_cpp.h"
 \&  #include "ev.c"
 .Ve
+.SH "COMPLEXITIES"
+.IX Header "COMPLEXITIES"
+In this section the complexities of (many of) the algorithms used inside
+libev will be explained. For complexity discussions about backends see the
+documentation for \f(CW\*(C`ev_default_init\*(C'\fR.
+.RS 4
+.IP "Starting and stopping timer/periodic watchers: O(log skipped_other_timers)" 4
+.IX Item "Starting and stopping timer/periodic watchers: O(log skipped_other_timers)"
+.PD 0
+.IP "Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)" 4
+.IX Item "Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)"
+.IP "Starting io/check/prepare/idle/signal/child watchers: O(1)" 4
+.IX Item "Starting io/check/prepare/idle/signal/child watchers: O(1)"
+.IP "Stopping check/prepare/idle watchers: O(1)" 4
+.IX Item "Stopping check/prepare/idle watchers: O(1)"
+.IP "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % 16))" 4
+.IX Item "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % 16))"
+.IP "Finding the next timer per loop iteration: O(1)" 4
+.IX Item "Finding the next timer per loop iteration: O(1)"
+.IP "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)" 4
+.IX Item "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)"
+.IP "Activating one watcher: O(1)" 4
+.IX Item "Activating one watcher: O(1)"
+.RE
+.RS 4
+.PD
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 Marc Lehmann <libev@schmorp.de>.

@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Mon Nov 26 10:52:13 2007" />
+	<meta name="created" content="Mon Nov 26 11:20:35 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -52,6 +52,7 @@
 <li><a href="#EXAMPLES">EXAMPLES</a></li>
 </ul>
 </li>
+<li><a href="#COMPLEXITIES">COMPLEXITIES</a></li>
 <li><a href="#AUTHOR">AUTHOR</a>
 </li>
 </ul><hr />
@@ -1178,6 +1179,7 @@ pseudo-code only of course:</p>
   io_cb (ev_loop *loop, ev_io *w, int revents)
   {
     // set the relevant poll flags
+    // could also call adns_processreadable etc. here
     struct pollfd *fd = (struct pollfd *)w-&gt;data;
     if (revents &amp; EV_READ ) fd-&gt;revents |= fd-&gt;events &amp; POLLIN;
     if (revents &amp; EV_WRITE) fd-&gt;revents |= fd-&gt;events &amp; POLLOUT;
@@ -1755,7 +1757,33 @@ that everybody includes and which overrides some autoconf choices:</p>
 <pre>  #include &quot;ev_cpp.h&quot;
   #include &quot;ev.c&quot;
 
+
+
+
 </pre>
+
+</div>
+<h1 id="COMPLEXITIES">COMPLEXITIES</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="COMPLEXITIES_CONTENT">
+		<p>In this section the complexities of (many of) the algorithms used inside
+libev will be explained. For complexity discussions about backends see the
+documentation for <code>ev_default_init</code>.</p>
+		<p>
+			<dl>
+				<dt>Starting and stopping timer/periodic watchers: O(log skipped_other_timers)</dt>
+				<dt>Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)</dt>
+				<dt>Starting io/check/prepare/idle/signal/child watchers: O(1)</dt>
+				<dt>Stopping check/prepare/idle watchers: O(1)</dt>
+				<dt>Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % 16))</dt>
+				<dt>Finding the next timer per loop iteration: O(1)</dt>
+				<dt>Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)</dt>
+				<dt>Activating one watcher: O(1)</dt>
+			</dl>
+		</p>
+
+
+
+
 
 </div>
 <h1 id="AUTHOR">AUTHOR</h1><p><a href="#TOP" class="toplink">Top</a></p>

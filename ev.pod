@@ -1162,6 +1162,7 @@ pseudo-code only of course:
   io_cb (ev_loop *loop, ev_io *w, int revents)
   {
     // set the relevant poll flags
+    // could also call adns_processreadable etc. here
     struct pollfd *fd = (struct pollfd *)w->data;
     if (revents & EV_READ ) fd->revents |= fd->events & POLLIN;
     if (revents & EV_WRITE) fd->revents |= fd->events & POLLOUT;
@@ -1756,6 +1757,34 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
 
   #include "ev_cpp.h"
   #include "ev.c"
+
+
+=head1 COMPLEXITIES
+
+In this section the complexities of (many of) the algorithms used inside
+libev will be explained. For complexity discussions about backends see the
+documentation for C<ev_default_init>.
+
+=over 4
+
+=item Starting and stopping timer/periodic watchers: O(log skipped_other_timers)
+
+=item Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)
+
+=item Starting io/check/prepare/idle/signal/child watchers: O(1)
+
+=item Stopping check/prepare/idle watchers: O(1)
+
+=item Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % 16))
+
+=item Finding the next timer per loop iteration: O(1)
+
+=item Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)
+
+=item Activating one watcher: O(1)
+
+=back
+
 
 =head1 AUTHOR
 
