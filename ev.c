@@ -227,12 +227,13 @@ static int have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
 
 static void (*syserr_cb)(const char *msg);
 
-void ev_set_syserr_cb (void (*cb)(const char *msg))
+void
+ev_set_syserr_cb (void (*cb)(const char *msg))
 {
   syserr_cb = cb;
 }
 
-static void
+static void noinline
 syserr (const char *msg)
 {
   if (!msg)
@@ -249,7 +250,8 @@ syserr (const char *msg)
 
 static void *(*alloc)(void *ptr, long size);
 
-void ev_set_allocator (void *(*cb)(void *ptr, long size))
+void
+ev_set_allocator (void *(*cb)(void *ptr, long size))
 {
   alloc = cb;
 }
@@ -317,7 +319,7 @@ typedef struct
 
 /*****************************************************************************/
 
-ev_tstamp noinline
+ev_tstamp
 ev_time (void)
 {
 #if EV_USE_REALTIME
@@ -384,19 +386,6 @@ ev_now (EV_P)
 
 /*****************************************************************************/
 
-void inline_size
-anfds_init (ANFD *base, int count)
-{
-  while (count--)
-    {
-      base->head   = 0;
-      base->events = EV_NONE;
-      base->reify  = 0;
-
-      ++base;
-    }
-}
-
 void noinline
 ev_feed_event (EV_P_ void *w, int revents)
 {
@@ -414,13 +403,28 @@ ev_feed_event (EV_P_ void *w, int revents)
   pendings [ABSPRI (w_)][w_->pending - 1].events = revents;
 }
 
-static void
+void inline_size
 queue_events (EV_P_ W *events, int eventcnt, int type)
 {
   int i;
 
   for (i = 0; i < eventcnt; ++i)
     ev_feed_event (EV_A_ events [i], type);
+}
+
+/*****************************************************************************/
+
+void inline_size
+anfds_init (ANFD *base, int count)
+{
+  while (count--)
+    {
+      base->head   = 0;
+      base->events = EV_NONE;
+      base->reify  = 0;
+
+      ++base;
+    }
 }
 
 void inline_speed
@@ -443,8 +447,6 @@ ev_feed_fd_event (EV_P_ int fd, int revents)
 {
   fd_event (EV_A_ fd, revents);
 }
-
-/*****************************************************************************/
 
 void inline_size
 fd_reify (EV_P)
