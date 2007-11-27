@@ -854,7 +854,7 @@ ev_backend (EV_P)
   return backend;
 }
 
-static void
+static void noinline
 loop_init (EV_P_ unsigned int flags)
 {
   if (!backend)
@@ -902,7 +902,7 @@ loop_init (EV_P_ unsigned int flags)
     }
 }
 
-static void
+static void noinline
 loop_destroy (EV_P)
 {
   int i;
@@ -939,7 +939,7 @@ loop_destroy (EV_P)
   backend = 0;
 }
 
-static void
+void inline_size
 loop_fork (EV_P)
 {
 #if EV_USE_PORT
@@ -1099,7 +1099,7 @@ call_pending (EV_P)
 
         if (expect_true (p->w))
           {
-            assert (("non-pending watcher on pending list", p->w->pending));
+            /*assert (("non-pending watcher on pending list", p->w->pending));*/
 
             p->w->pending = 0;
             EV_CB_INVOKE (p->w, p->events);
@@ -1114,7 +1114,7 @@ timers_reify (EV_P)
     {
       ev_timer *w = timers [0];
 
-      assert (("inactive timer on timer heap detected", ev_is_active (w)));
+      /*assert (("inactive timer on timer heap detected", ev_is_active (w)));*/
 
       /* first reschedule or stop timer */
       if (w->repeat)
@@ -1142,7 +1142,7 @@ periodics_reify (EV_P)
     {
       ev_periodic *w = periodics [0];
 
-      assert (("inactive timer on periodic heap detected", ev_is_active (w)));
+      /*assert (("inactive timer on periodic heap detected", ev_is_active (w)));*/
 
       /* first reschedule or stop timer */
       if (w->reschedule_cb)
@@ -1484,7 +1484,7 @@ ev_timer_start (EV_P_ ev_timer *w)
   timers [timercnt - 1] = w;
   upheap ((WT *)timers, timercnt - 1);
 
-  assert (("internal timer heap corruption", timers [((W)w)->active - 1] == w));
+  /*assert (("internal timer heap corruption", timers [((W)w)->active - 1] == w));*/
 }
 
 void
@@ -1496,11 +1496,15 @@ ev_timer_stop (EV_P_ ev_timer *w)
 
   assert (("internal timer heap corruption", timers [((W)w)->active - 1] == w));
 
-  if (expect_true (((W)w)->active < timercnt--))
-    {
-      timers [((W)w)->active - 1] = timers [timercnt];
-      adjustheap ((WT *)timers, timercnt, ((W)w)->active - 1);
-    }
+  {
+    int active = ((W)w)->active;
+
+    if (expect_true (--active < --timercnt))
+      {
+        timers [active] = timers [timercnt];
+        adjustheap ((WT *)timers, timercnt, active);
+      }
+  }
 
   ((WT)w)->at -= mn_now;
 
@@ -1548,7 +1552,7 @@ ev_periodic_start (EV_P_ ev_periodic *w)
   periodics [periodiccnt - 1] = w;
   upheap ((WT *)periodics, periodiccnt - 1);
 
-  assert (("internal periodic heap corruption", periodics [((W)w)->active - 1] == w));
+  /*assert (("internal periodic heap corruption", periodics [((W)w)->active - 1] == w));*/
 }
 
 void
@@ -1560,11 +1564,15 @@ ev_periodic_stop (EV_P_ ev_periodic *w)
 
   assert (("internal periodic heap corruption", periodics [((W)w)->active - 1] == w));
 
-  if (expect_true (((W)w)->active < periodiccnt--))
-    {
-      periodics [((W)w)->active - 1] = periodics [periodiccnt];
-      adjustheap ((WT *)periodics, periodiccnt, ((W)w)->active - 1);
-    }
+  {
+    int active = ((W)w)->active;
+
+    if (expect_true (--active < --periodiccnt))
+      {
+        periodics [active] = periodics [periodiccnt];
+        adjustheap ((WT *)periodics, periodiccnt, active);
+      }
+  }
 
   ev_stop (EV_A_ (W)w);
 }
