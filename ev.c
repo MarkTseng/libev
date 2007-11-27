@@ -1634,7 +1634,8 @@ ev_child_stop (EV_P_ ev_child *w)
 #if EV_STAT_ENABLE
 
 # ifdef _WIN32
-#  define lstat(a,b) stat(a,b)
+#  undef lstat
+#  define lstat(a,b) _stati64 (a,b)
 # endif
 
 #define DEF_STAT_INTERVAL 5.0074891

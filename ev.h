@@ -213,7 +213,11 @@ typedef struct ev_child
 
 #if EV_STAT_ENABLE
 /* st_nlink = 0 means missing file or other error */
+#ifdef _WIN32
+typedef struct _stati64 ev_statdata;
+#else
 typedef struct stat ev_statdata;
+#endif
 
 /* invoked each time the stat data changes for a given path */
 /* revent EV_STAT */
