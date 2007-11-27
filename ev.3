@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-11-26" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-11-27" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -686,6 +686,10 @@ The signal specified in the \f(CW\*(C`ev_signal\*(C'\fR watcher has been receive
 .el .IP "\f(CWEV_CHILD\fR" 4
 .IX Item "EV_CHILD"
 The pid specified in the \f(CW\*(C`ev_child\*(C'\fR watcher has received a status change.
+.ie n .IP """EV_STAT""" 4
+.el .IP "\f(CWEV_STAT\fR" 4
+.IX Item "EV_STAT"
+The path specified in the \f(CW\*(C`ev_stat\*(C'\fR watcher changed its attributes somehow.
 .ie n .IP """EV_IDLE""" 4
 .el .IP "\f(CWEV_IDLE\fR" 4
 .IX Item "EV_IDLE"
@@ -823,7 +827,17 @@ have been omitted....
 .SH "WATCHER TYPES"
 .IX Header "WATCHER TYPES"
 This section describes each watcher in detail, but will not repeat
-information given in the last section.
+information given in the last section. Any initialisation/set macros,
+functions and members specific to the watcher type are explained.
+.PP
+Members are additionally marked with either \fI[read\-only]\fR, meaning that,
+while the watcher is active, you can look at the member and expect some
+sensible content, but you must not modify it (you can modify it while the
+watcher is stopped to your hearts content), or \fI[read\-write]\fR, which
+means you can expect it to have some sensible content while the watcher
+is active, but you can also modify it. Modifying it may not do something
+sensible or take immediate effect (or do anything at all), but libev will
+not crash or malfunction in any way.
 .ie n .Sh """ev_io"" \- is this file descriptor readable or writable?"
 .el .Sh "\f(CWev_io\fP \- is this file descriptor readable or writable?"
 .IX Subsection "ev_io - is this file descriptor readable or writable?"
@@ -873,6 +887,12 @@ its own, so its quite safe to use).
 Configures an \f(CW\*(C`ev_io\*(C'\fR watcher. The \f(CW\*(C`fd\*(C'\fR is the file descriptor to
 rceeive events for and events is either \f(CW\*(C`EV_READ\*(C'\fR, \f(CW\*(C`EV_WRITE\*(C'\fR or
 \&\f(CW\*(C`EV_READ | EV_WRITE\*(C'\fR to receive the given events.
+.IP "int fd [read\-only]" 4
+.IX Item "int fd [read-only]"
+The file descriptor being watched.
+.IP "int events [read\-only]" 4
+.IX Item "int events [read-only]"
+The events being watched.
 .PP
 Example: call \f(CW\*(C`stdin_readable_cb\*(C'\fR when \s-1STDIN_FILENO\s0 has become, well
 readable, but only once. Since it is likely line\-buffered, you could
@@ -947,13 +967,36 @@ If the timer is repeating, either start it if necessary (with the repeat
 value), or reset the running timer to the repeat value.
 .Sp
 This sounds a bit complicated, but here is a useful and typical
-example: Imagine you have a tcp connection and you want a so-called idle
-timeout, that is, you want to be called when there have been, say, 60
-seconds of inactivity on the socket. The easiest way to do this is to
-configure an \f(CW\*(C`ev_timer\*(C'\fR with after=repeat=60 and calling ev_timer_again each
-time you successfully read or write some data. If you go into an idle
-state where you do not expect data to travel on the socket, you can stop
-the timer, and again will automatically restart it if need be.
+example: Imagine you have a tcp connection and you want a so-called
+idle timeout, that is, you want to be called when there have been,
+say, 60 seconds of inactivity on the socket. The easiest way to do
+this is to configure an \f(CW\*(C`ev_timer\*(C'\fR with \f(CW\*(C`after\*(C'\fR=\f(CW\*(C`repeat\*(C'\fR=\f(CW60\fR and calling
+\&\f(CW\*(C`ev_timer_again\*(C'\fR each time you successfully read or write some data. If
+you go into an idle state where you do not expect data to travel on the
+socket, you can stop the timer, and again will automatically restart it if
+need be.
+.Sp
+You can also ignore the \f(CW\*(C`after\*(C'\fR value and \f(CW\*(C`ev_timer_start\*(C'\fR altogether
+and only ever use the \f(CW\*(C`repeat\*(C'\fR value:
+.Sp
+.Vb 8
+\&   ev_timer_init (timer, callback, 0., 5.);
+\&   ev_timer_again (loop, timer);
+\&   ...
+\&   timer->again = 17.;
+\&   ev_timer_again (loop, timer);
+\&   ...
+\&   timer->again = 10.;
+\&   ev_timer_again (loop, timer);
+.Ve
+.Sp
+This is more efficient then stopping/starting the timer eahc time you want
+to modify its timeout value.
+.IP "ev_tstamp repeat [read\-write]" 4
+.IX Item "ev_tstamp repeat [read-write]"
+The current \f(CW\*(C`repeat\*(C'\fR value. Will be used each time the watcher times out
+or \f(CW\*(C`ev_timer_again\*(C'\fR is called and determines the next timeout (if any),
+which is also when any modifications are taken into account.
 .PP
 Example: create a timer that fires after 60 seconds.
 .PP
@@ -1095,6 +1138,16 @@ Simply stops and restarts the periodic watcher again. This is only useful
 when you changed some parameters or the reschedule callback would return
 a different time than the last time it was called (e.g. in a crond like
 program when the crontabs have changed).
+.IP "ev_tstamp interval [read\-write]" 4
+.IX Item "ev_tstamp interval [read-write]"
+The current interval value. Can be modified any time, but changes only
+take effect when the periodic timer fires or \f(CW\*(C`ev_periodic_again\*(C'\fR is being
+called.
+.IP "ev_tstamp (*reschedule_cb)(struct ev_periodic *w, ev_tstamp now) [read\-write]" 4
+.IX Item "ev_tstamp (*reschedule_cb)(struct ev_periodic *w, ev_tstamp now) [read-write]"
+The current reschedule callback, or \f(CW0\fR, if this functionality is
+switched off. Can be changed any time, but changes only take effect when
+the periodic timer fires or \f(CW\*(C`ev_periodic_again\*(C'\fR is being called.
 .PP
 Example: call a callback every hour, or, more precisely, whenever the
 system clock is divisible by 3600. The callback invocation times have
@@ -1162,6 +1215,9 @@ watcher for a signal is stopped libev will reset the signal handler to
 .PD
 Configures the watcher to trigger on the given signal number (usually one
 of the \f(CW\*(C`SIGxxx\*(C'\fR constants).
+.IP "int signum [read\-only]" 4
+.IX Item "int signum [read-only]"
+The signal the watcher watches out for.
 .ie n .Sh """ev_child"" \- watch out for process status changes"
 .el .Sh "\f(CWev_child\fP \- watch out for process status changes"
 .IX Subsection "ev_child - watch out for process status changes"
@@ -1179,6 +1235,16 @@ at the \f(CW\*(C`rstatus\*(C'\fR member of the \f(CW\*(C`ev_child\*(C'\fR watche
 the status word (use the macros from \f(CW\*(C`sys/wait.h\*(C'\fR and see your systems
 \&\f(CW\*(C`waitpid\*(C'\fR documentation). The \f(CW\*(C`rpid\*(C'\fR member contains the pid of the
 process causing the status change.
+.IP "int pid [read\-only]" 4
+.IX Item "int pid [read-only]"
+The process id this watcher watches out for, or \f(CW0\fR, meaning any process id.
+.IP "int rpid [read\-write]" 4
+.IX Item "int rpid [read-write]"
+The process id that detected a status change.
+.IP "int rstatus [read\-write]" 4
+.IX Item "int rstatus [read-write]"
+The process exit/trace status caused by \f(CW\*(C`rpid\*(C'\fR (see your systems
+\&\f(CW\*(C`waitpid\*(C'\fR and \f(CW\*(C`sys/wait.h\*(C'\fR documentation for details).
 .PP
 Example: try to exit cleanly on \s-1SIGINT\s0 and \s-1SIGTERM\s0.
 .PP
@@ -1194,6 +1260,101 @@ Example: try to exit cleanly on \s-1SIGINT\s0 and \s-1SIGTERM\s0.
 \&  struct ev_signal signal_watcher;
 \&  ev_signal_init (&signal_watcher, sigint_cb, SIGINT);
 \&  ev_signal_start (loop, &sigint_cb);
+.Ve
+.ie n .Sh """ev_stat"" \- did the file attributes just change?"
+.el .Sh "\f(CWev_stat\fP \- did the file attributes just change?"
+.IX Subsection "ev_stat - did the file attributes just change?"
+This watches a filesystem path for attribute changes. That is, it calls
+\&\f(CW\*(C`stat\*(C'\fR regularly (or when the \s-1OS\s0 says it changed) and sees if it changed
+compared to the last time, invoking the callback if it did.
+.PP
+The path does not need to exist: changing from \*(L"path exists\*(R" to \*(L"path does
+not exist\*(R" is a status change like any other. The condition \*(L"path does
+not exist\*(R" is signified by the \f(CW\*(C`st_nlink\*(C'\fR field being zero (which is
+otherwise always forced to be at least one) and all the other fields of
+the stat buffer having unspecified contents.
+.PP
+Since there is no standard to do this, the portable implementation simply
+calls \f(CW\*(C`stat (2)\*(C'\fR regulalry on the path to see if it changed somehow. You
+can specify a recommended polling interval for this case. If you specify
+a polling interval of \f(CW0\fR (highly recommended!) then a \fIsuitable,
+unspecified default\fR value will be used (which you can expect to be around
+five seconds, although this might change dynamically). Libev will also
+impose a minimum interval which is currently around \f(CW0.1\fR, but thats
+usually overkill.
+.PP
+This watcher type is not meant for massive numbers of stat watchers,
+as even with OS-supported change notifications, this can be
+resource\-intensive.
+.PP
+At the time of this writing, no specific \s-1OS\s0 backends are implemented, but
+if demand increases, at least a kqueue and inotify backend will be added.
+.IP "ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)" 4
+.IX Item "ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)"
+.PD 0
+.IP "ev_stat_set (ev_stat *, const char *path, ev_tstamp interval)" 4
+.IX Item "ev_stat_set (ev_stat *, const char *path, ev_tstamp interval)"
+.PD
+Configures the watcher to wait for status changes of the given
+\&\f(CW\*(C`path\*(C'\fR. The \f(CW\*(C`interval\*(C'\fR is a hint on how quickly a change is expected to
+be detected and should normally be specified as \f(CW0\fR to let libev choose
+a suitable value. The memory pointed to by \f(CW\*(C`path\*(C'\fR must point to the same
+path for as long as the watcher is active.
+.Sp
+The callback will be receive \f(CW\*(C`EV_STAT\*(C'\fR when a change was detected,
+relative to the attributes at the time the watcher was started (or the
+last change was detected).
+.IP "ev_stat_stat (ev_stat *)" 4
+.IX Item "ev_stat_stat (ev_stat *)"
+Updates the stat buffer immediately with new values. If you change the
+watched path in your callback, you could call this fucntion to avoid
+detecting this change (while introducing a race condition). Can also be
+useful simply to find out the new values.
+.IP "ev_statdata attr [read\-only]" 4
+.IX Item "ev_statdata attr [read-only]"
+The most-recently detected attributes of the file. Although the type is of
+\&\f(CW\*(C`ev_statdata\*(C'\fR, this is usually the (or one of the) \f(CW\*(C`struct stat\*(C'\fR types
+suitable for your system. If the \f(CW\*(C`st_nlink\*(C'\fR member is \f(CW0\fR, then there
+was some error while \f(CW\*(C`stat\*(C'\fRing the file.
+.IP "ev_statdata prev [read\-only]" 4
+.IX Item "ev_statdata prev [read-only]"
+The previous attributes of the file. The callback gets invoked whenever
+\&\f(CW\*(C`prev\*(C'\fR != \f(CW\*(C`attr\*(C'\fR.
+.IP "ev_tstamp interval [read\-only]" 4
+.IX Item "ev_tstamp interval [read-only]"
+The specified interval.
+.IP "const char *path [read\-only]" 4
+.IX Item "const char *path [read-only]"
+The filesystem path that is being watched.
+.PP
+Example: Watch \f(CW\*(C`/etc/passwd\*(C'\fR for attribute changes.
+.PP
+.Vb 15
+\&  static void
+\&  passwd_cb (struct ev_loop *loop, ev_stat *w, int revents)
+\&  {
+\&    /* /etc/passwd changed in some way */
+\&    if (w->attr.st_nlink)
+\&      {
+\&        printf ("passwd current size  %ld\en", (long)w->attr.st_size);
+\&        printf ("passwd current atime %ld\en", (long)w->attr.st_mtime);
+\&        printf ("passwd current mtime %ld\en", (long)w->attr.st_mtime);
+\&      }
+\&    else
+\&      /* you shalt not abuse printf for puts */
+\&      puts ("wow, /etc/passwd is not there, expect problems. "
+\&            "if this is windows, they already arrived\en");
+\&  }
+.Ve
+.PP
+.Vb 2
+\&  ...
+\&  ev_stat passwd;
+.Ve
+.PP
+.Vb 2
+\&  ev_stat_init (&passwd, passwd_cb, "/etc/passwd");
+\&  ev_stat_start (loop, &passwd);
 .Ve
 .ie n .Sh """ev_idle"" \- when you've got nothing better to do..."
 .el .Sh "\f(CWev_idle\fP \- when you've got nothing better to do..."
@@ -1451,6 +1612,9 @@ if you do not want thta, you need to temporarily stop the embed watcher).
 Make a single, non-blocking sweep over the embedded loop. This works
 similarly to \f(CW\*(C`ev_loop (embedded_loop, EVLOOP_NONBLOCK)\*(C'\fR, but in the most
 apropriate way for embedded loops.
+.IP "struct ev_loop *loop [read\-only]" 4
+.IX Item "struct ev_loop *loop [read-only]"
+The embedded event loop.
 .SH "OTHER FUNCTIONS"
 .IX Header "OTHER FUNCTIONS"
 There are some other functions of possible interest. Described. Here. Now.
@@ -1841,10 +2005,24 @@ will have the \f(CW\*(C`struct ev_loop *\*(C'\fR as first argument, and you can 
 additional independent event loops. Otherwise there will be no support
 for multiple event loops and there is no first event loop pointer
 argument. Instead, all functions act on the single default loop.
-.IP "\s-1EV_PERIODICS\s0" 4
-.IX Item "EV_PERIODICS"
-If undefined or defined to be \f(CW1\fR, then periodic timers are supported,
-otherwise not. This saves a few kb of code.
+.IP "\s-1EV_PERIODIC_ENABLE\s0" 4
+.IX Item "EV_PERIODIC_ENABLE"
+If undefined or defined to be \f(CW1\fR, then periodic timers are supported. If
+defined to be \f(CW0\fR, then they are not. Disabling them saves a few kB of
+code.
+.IP "\s-1EV_EMBED_ENABLE\s0" 4
+.IX Item "EV_EMBED_ENABLE"
+If undefined or defined to be \f(CW1\fR, then embed watchers are supported. If
+defined to be \f(CW0\fR, then they are not.
+.IP "\s-1EV_STAT_ENABLE\s0" 4
+.IX Item "EV_STAT_ENABLE"
+If undefined or defined to be \f(CW1\fR, then stat watchers are supported. If
+defined to be \f(CW0\fR, then they are not.
+.IP "\s-1EV_MINIMAL\s0" 4
+.IX Item "EV_MINIMAL"
+If you need to shave off some kilobytes of code at the expense of some
+speed, define this symbol to \f(CW1\fR. Currently only used for gcc to override
+some inlining decisions, saves roughly 30% codesize of amd64.
 .IP "\s-1EV_COMMON\s0" 4
 .IX Item "EV_COMMON"
 By default, all watchers have a \f(CW\*(C`void *data\*(C'\fR member. By redefining

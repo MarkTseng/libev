@@ -1560,6 +1560,144 @@ ev_periodic_again (EV_P_ ev_periodic *w)
 }
 #endif
 
+#ifndef SA_RESTART
+# define SA_RESTART 0
+#endif
+
+void
+ev_signal_start (EV_P_ ev_signal *w)
+{
+#if EV_MULTIPLICITY
+  assert (("signal watchers are only supported in the default loop", loop == ev_default_loop_ptr));
+#endif
+  if (expect_false (ev_is_active (w)))
+    return;
+
+  assert (("ev_signal_start called with illegal signal number", w->signum > 0));
+
+  ev_start (EV_A_ (W)w, 1);
+  array_needsize (ANSIG, signals, signalmax, w->signum, signals_init);
+  wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
+
+  if (!((WL)w)->next)
+    {
+#if _WIN32
+      signal (w->signum, sighandler);
+#else
+      struct sigaction sa;
+      sa.sa_handler = sighandler;
+      sigfillset (&sa.sa_mask);
+      sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
+      sigaction (w->signum, &sa, 0);
+#endif
+    }
+}
+
+void
+ev_signal_stop (EV_P_ ev_signal *w)
+{
+  ev_clear_pending (EV_A_ (W)w);
+  if (expect_false (!ev_is_active (w)))
+    return;
+
+  wlist_del ((WL *)&signals [w->signum - 1].head, (WL)w);
+  ev_stop (EV_A_ (W)w);
+
+  if (!signals [w->signum - 1].head)
+    signal (w->signum, SIG_DFL);
+}
+
+void
+ev_child_start (EV_P_ ev_child *w)
+{
+#if EV_MULTIPLICITY
+  assert (("child watchers are only supported in the default loop", loop == ev_default_loop_ptr));
+#endif
+  if (expect_false (ev_is_active (w)))
+    return;
+
+  ev_start (EV_A_ (W)w, 1);
+  wlist_add ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
+}
+
+void
+ev_child_stop (EV_P_ ev_child *w)
+{
+  ev_clear_pending (EV_A_ (W)w);
+  if (expect_false (!ev_is_active (w)))
+    return;
+
+  wlist_del ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
+  ev_stop (EV_A_ (W)w);
+}
+
+#if EV_STAT_ENABLE
+
+# ifdef _WIN32
+#  define lstat(a,b) stat(a,b)
+# endif
+
+#define DEF_STAT_INTERVAL 5.0074891
+#define MIN_STAT_INTERVAL 0.1074891
+
+void
+ev_stat_stat (EV_P_ ev_stat *w)
+{
+  if (lstat (w->path, &w->attr) < 0)
+    w->attr.st_nlink = 0;
+  else if (!w->attr.st_nlink)
+    w->attr.st_nlink = 1;
+}
+
+static void
+stat_timer_cb (EV_P_ ev_timer *w_, int revents)
+{
+  ev_stat *w = (ev_stat *)(((char *)w_) - offsetof (ev_stat, timer));
+
+  /* we copy this here each the time so that */
+  /* prev has the old value when the callback gets invoked */
+  w->prev = w->attr;
+  ev_stat_stat (EV_A_ w);
+
+  if (memcmp (&w->prev, &w->attr, sizeof (ev_statdata)))
+    ev_feed_event (EV_A_ w, EV_STAT);
+}
+
+void
+ev_stat_start (EV_P_ ev_stat *w)
+{
+  if (expect_false (ev_is_active (w)))
+    return;
+
+  /* since we use memcmp, we need to clear any padding data etc. */
+  memset (&w->prev, 0, sizeof (ev_statdata));
+  memset (&w->attr, 0, sizeof (ev_statdata));
+
+  ev_stat_stat (EV_A_ w);
+
+  if (w->interval < MIN_STAT_INTERVAL)
+    w->interval = w->interval ? MIN_STAT_INTERVAL : DEF_STAT_INTERVAL;
+
+  ev_timer_init (&w->timer, stat_timer_cb, w->interval, w->interval);
+  ev_set_priority (&w->timer, ev_priority (w));
+  ev_timer_start (EV_A_ &w->timer);
+
+  ev_start (EV_A_ (W)w, 1);
+}
+
+void
+ev_stat_stop (EV_P_ ev_stat *w)
+{
+  ev_clear_pending (EV_A_ (W)w);
+  if (expect_false (!ev_is_active (w)))
+    return;
+
+  ev_timer_stop (EV_A_ &w->timer);
+
+  ev_stop (EV_A_ (W)w);
+}
+#endif
+
 void
 ev_idle_start (EV_P_ ev_idle *w)
 {
@@ -1641,77 +1779,6 @@ ev_check_stop (EV_P_ ev_check *w)
   ev_stop (EV_A_ (W)w);
 }
 
-#ifndef SA_RESTART
-# define SA_RESTART 0
-#endif
-
-void
-ev_signal_start (EV_P_ ev_signal *w)
-{
-#if EV_MULTIPLICITY
-  assert (("signal watchers are only supported in the default loop", loop == ev_default_loop_ptr));
-#endif
-  if (expect_false (ev_is_active (w)))
-    return;
-
-  assert (("ev_signal_start called with illegal signal number", w->signum > 0));
-
-  ev_start (EV_A_ (W)w, 1);
-  array_needsize (ANSIG, signals, signalmax, w->signum, signals_init);
-  wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
-
-  if (!((WL)w)->next)
-    {
-#if _WIN32
-      signal (w->signum, sighandler);
-#else
-      struct sigaction sa;
-      sa.sa_handler = sighandler;
-      sigfillset (&sa.sa_mask);
-      sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
-      sigaction (w->signum, &sa, 0);
-#endif
-    }
-}
-
-void
-ev_signal_stop (EV_P_ ev_signal *w)
-{
-  ev_clear_pending (EV_A_ (W)w);
-  if (expect_false (!ev_is_active (w)))
-    return;
-
-  wlist_del ((WL *)&signals [w->signum - 1].head, (WL)w);
-  ev_stop (EV_A_ (W)w);
-
-  if (!signals [w->signum - 1].head)
-    signal (w->signum, SIG_DFL);
-}
-
-void
-ev_child_start (EV_P_ ev_child *w)
-{
-#if EV_MULTIPLICITY
-  assert (("child watchers are only supported in the default loop", loop == ev_default_loop_ptr));
-#endif
-  if (expect_false (ev_is_active (w)))
-    return;
-
-  ev_start (EV_A_ (W)w, 1);
-  wlist_add ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
-}
-
-void
-ev_child_stop (EV_P_ ev_child *w)
-{
-  ev_clear_pending (EV_A_ (W)w);
-  if (expect_false (!ev_is_active (w)))
-    return;
-
-  wlist_del ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
-  ev_stop (EV_A_ (W)w);
-}
-
 #if EV_EMBED_ENABLE
 void noinline
 ev_embed_sweep (EV_P_ ev_embed *w)
@@ -1756,73 +1823,6 @@ ev_embed_stop (EV_P_ ev_embed *w)
     return;
 
   ev_io_stop (EV_A_ &w->io);
-
-  ev_stop (EV_A_ (W)w);
-}
-#endif
-
-#if EV_STAT_ENABLE
-
-# ifdef _WIN32
-#  define lstat(a,b) stat(a,b)
-# endif
-
-#define DEF_STAT_INTERVAL 5.0074891
-#define MIN_STAT_INTERVAL 0.1074891
-
-void
-ev_stat_stat (EV_P_ ev_stat *w)
-{
-  if (lstat (w->path, &w->attr) < 0)
-    w->attr.st_nlink = 0;
-  else if (!w->attr.st_nlink)
-    w->attr.st_nlink = 1;
-}
-
-static void
-stat_timer_cb (EV_P_ ev_timer *w_, int revents)
-{
-  ev_stat *w = (ev_stat *)(((char *)w_) - offsetof (ev_stat, timer));
-
-  /* we copy this here each the time so that */
-  /* prev has the old value when the callback gets invoked */
-  w->prev = w->attr;
-  ev_stat_stat (EV_A_ w);
-
-  if (memcmp (&w->prev, &w->attr, sizeof (ev_statdata)))
-    ev_feed_event (EV_A_ w, EV_STAT);
-}
-
-void
-ev_stat_start (EV_P_ ev_stat *w)
-{
-  if (expect_false (ev_is_active (w)))
-    return;
-
-  /* since we use memcmp, we need to clear any padding data etc. */
-  memset (&w->prev, 0, sizeof (ev_statdata));
-  memset (&w->attr, 0, sizeof (ev_statdata));
-
-  ev_stat_stat (EV_A_ w);
-
-  if (w->interval < MIN_STAT_INTERVAL)
-    w->interval = w->interval ? MIN_STAT_INTERVAL : DEF_STAT_INTERVAL;
-
-  ev_timer_init (&w->timer, stat_timer_cb, w->interval, w->interval);
-  ev_set_priority (&w->timer, ev_priority (w));
-  ev_timer_start (EV_A_ &w->timer);
-
-  ev_start (EV_A_ (W)w, 1);
-}
-
-void
-ev_stat_stop (EV_P_ ev_stat *w)
-{
-  ev_clear_pending (EV_A_ (W)w);
-  if (expect_false (!ev_is_active (w)))
-    return;
-
-  ev_timer_stop (EV_A_ &w->timer);
 
   ev_stop (EV_A_ (W)w);
 }
