@@ -1279,12 +1279,14 @@ ev_loop (EV_P_ int flags)
   while (activecnt)
     {
       /* we might have forked, so reify kernel state if necessary */
-      if (expect_false (postfork))
-        if (forkcnt)
-          {
-            queue_events (EV_A_ (W *)forks, forkcnt, EV_FORK);
-            call_pending (EV_A);
-          }
+      #if EV_FORK_ENABLE
+        if (expect_false (postfork))
+          if (forkcnt)
+            {
+              queue_events (EV_A_ (W *)forks, forkcnt, EV_FORK);
+              call_pending (EV_A);
+            }
+      #endif
 
       /* queue check watchers (and execute them) */
       if (expect_false (preparecnt))
