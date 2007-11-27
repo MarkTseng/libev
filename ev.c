@@ -200,7 +200,7 @@ extern "C" {
 #else
 # define expect(expr,value)         (expr)
 # define inline_speed               static
-# define inline_minimal             static
+# define inline_size                static
 # define noinline
 #endif
 
