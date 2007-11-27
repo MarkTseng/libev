@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Tue Nov 27 21:26:46 2007" />
+	<meta name="created" content="Tue Nov 27 21:38:05 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -62,19 +62,19 @@
 </ul><hr />
 <!-- INDEX END -->
 
-<h1 id="NAME">NAME</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="NAME">NAME</h1>
 <div id="NAME_CONTENT">
 <p>libev - a high performance full-featured event loop written in C</p>
 
 </div>
-<h1 id="SYNOPSIS">SYNOPSIS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
 <div id="SYNOPSIS_CONTENT">
 <pre>  #include &lt;ev.h&gt;
 
 </pre>
 
 </div>
-<h1 id="EXAMPLE_PROGRAM">EXAMPLE PROGRAM</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="EXAMPLE_PROGRAM">EXAMPLE PROGRAM</h1>
 <div id="EXAMPLE_PROGRAM_CONTENT">
 <pre>  #include &lt;ev.h&gt;
 
@@ -119,7 +119,7 @@
 </pre>
 
 </div>
-<h1 id="DESCRIPTION">DESCRIPTION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
 <div id="DESCRIPTION_CONTENT">
 <p>Libev is an event loop: you register interest in certain events (such as a
 file descriptor being readable or a timeout occuring), and it will manage
@@ -133,7 +133,7 @@ details of the event, and then hand it over to libev by <i>starting</i> the
 watcher.</p>
 
 </div>
-<h1 id="FEATURES">FEATURES</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="FEATURES">FEATURES</h1>
 <div id="FEATURES_CONTENT">
 <p>Libev supports <code>select</code>, <code>poll</code>, the linux-specific <code>epoll</code>, the
 bsd-specific <code>kqueue</code> and the solaris-specific event port mechanisms
@@ -149,7 +149,7 @@ file watchers (<code>ev_stat</code>) and even limited support for fork events
 for example).</p>
 
 </div>
-<h1 id="CONVENTIONS">CONVENTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="CONVENTIONS">CONVENTIONS</h1>
 <div id="CONVENTIONS_CONTENT">
 <p>Libev is very configurable. In this manual the default configuration will
 be described, which supports multiple event loops. For more info about
@@ -159,7 +159,7 @@ loops, then all functions taking an initial argument of name <code>loop</code>
 (which is always of type <code>struct ev_loop *</code>) will not have this argument.</p>
 
 </div>
-<h1 id="TIME_REPRESENTATION">TIME REPRESENTATION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="TIME_REPRESENTATION">TIME REPRESENTATION</h1>
 <div id="TIME_REPRESENTATION_CONTENT">
 <p>Libev represents time as a single floating point number, representing the
 (fractional) number of seconds since the (POSIX) epoch (somewhere near
@@ -169,7 +169,7 @@ to the <code>double</code> type in C, and when you need to do any calculations o
 it, you should treat it as such.</p>
 
 </div>
-<h1 id="GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</h1>
 <div id="GLOBAL_FUNCTIONS_CONTENT">
 <p>These functions can be called anytime, even before initialising the
 library in any way.</p>
@@ -287,7 +287,7 @@ requested operation, or, if the condition doesn't go away, do bad stuff
 </dl>
 
 </div>
-<h1 id="FUNCTIONS_CONTROLLING_THE_EVENT_LOOP">FUNCTIONS CONTROLLING THE EVENT LOOP</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="FUNCTIONS_CONTROLLING_THE_EVENT_LOOP">FUNCTIONS CONTROLLING THE EVENT LOOP</h1>
 <div id="FUNCTIONS_CONTROLLING_THE_EVENT_LOOP-2">
 <p>An event loop is described by a <code>struct ev_loop *</code>. The library knows two
 types of such loops, the <i>default</i> loop, which supports signals and child
@@ -570,7 +570,7 @@ running when nothing else is active.</p>
 
 
 </div>
-<h1 id="ANATOMY_OF_A_WATCHER">ANATOMY OF A WATCHER</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="ANATOMY_OF_A_WATCHER">ANATOMY OF A WATCHER</h1>
 <div id="ANATOMY_OF_A_WATCHER_CONTENT">
 <p>A watcher is a structure that you create and register to record your
 interest in some event. For instance, if you want to wait for STDIN to
@@ -743,7 +743,7 @@ is pending (but not active) you must not call an init function on it (but
 <code>ev_TYPE_set</code> is safe) and you must make sure the watcher is available to
 libev (e.g. you cnanot <code>free ()</code> it).</p>
 	</dd>
-	<dt>callback = ev_cb (ev_TYPE *watcher)</dt>
+	<dt>callback ev_cb (ev_TYPE *watcher)</dt>
 	<dd>
 		<p>Returns the callback currently set on the watcher.</p>
 	</dd>
@@ -785,15 +785,43 @@ can cast it back to your own type:</p>
   }
 
 </pre>
-<p>More interesting and less C-conformant ways of catsing your callback type
-have been omitted....</p>
+<p>More interesting and less C-conformant ways of casting your callback type
+instead have been omitted.</p>
+<p>Another common scenario is having some data structure with multiple
+watchers:</p>
+<pre>  struct my_biggy
+  {
+    int some_data;
+    ev_timer t1;
+    ev_timer t2;
+  }
+
+</pre>
+<p>In this case getting the pointer to <code>my_biggy</code> is a bit more complicated,
+you need to use <code>offsetof</code>:</p>
+<pre>  #include &lt;stddef.h&gt;
+
+  static void
+  t1_cb (EV_P_ struct ev_timer *w, int revents)
+  {
+    struct my_biggy big = (struct my_biggy *
+      (((char *)w) - offsetof (struct my_biggy, t1));
+  }
+
+  static void
+  t2_cb (EV_P_ struct ev_timer *w, int revents)
+  {
+    struct my_biggy big = (struct my_biggy *
+      (((char *)w) - offsetof (struct my_biggy, t2));
+  }
 
 
 
 
+</pre>
 
 </div>
-<h1 id="WATCHER_TYPES">WATCHER TYPES</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="WATCHER_TYPES">WATCHER TYPES</h1>
 <div id="WATCHER_TYPES_CONTENT">
 <p>This section describes each watcher in detail, but will not repeat
 information given in the last section. Any initialisation/set macros,
@@ -1562,7 +1590,7 @@ believe me.</p>
 
 
 </div>
-<h1 id="OTHER_FUNCTIONS">OTHER FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="OTHER_FUNCTIONS">OTHER FUNCTIONS</h1>
 <div id="OTHER_FUNCTIONS_CONTENT">
 <p>There are some other functions of possible interest. Described. Here. Now.</p>
 <dl>
@@ -1619,7 +1647,7 @@ loop!).</p>
 
 
 </div>
-<h1 id="LIBEVENT_EMULATION">LIBEVENT EMULATION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="LIBEVENT_EMULATION">LIBEVENT EMULATION</h1>
 <div id="LIBEVENT_EMULATION_CONTENT">
 <p>Libev offers a compatibility emulation layer for libevent. It cannot
 emulate the internals of libevent, so here are some usage hints:</p>
@@ -1639,7 +1667,7 @@ to use the libev header file and library.</dt>
 </dl>
 
 </div>
-<h1 id="C_SUPPORT">C++ SUPPORT</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="C_SUPPORT">C++ SUPPORT</h1>
 <div id="C_SUPPORT_CONTENT">
 <p>Libev comes with some simplistic wrapper classes for C++ that mainly allow
 you to use some convinience methods to start/stop watchers and also change
@@ -1744,7 +1772,7 @@ the constructor.</p>
 </pre>
 
 </div>
-<h1 id="MACRO_MAGIC">MACRO MAGIC</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="MACRO_MAGIC">MACRO MAGIC</h1>
 <div id="MACRO_MAGIC_CONTENT">
 <p>Libev can be compiled with a variety of options, the most fundemantal is
 <code>EV_MULTIPLICITY</code>. This option determines wether (most) functions and
@@ -1805,7 +1833,7 @@ wether multiple loops are supported or not.</p>
 </pre>
 
 </div>
-<h1 id="EMBEDDING">EMBEDDING</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="EMBEDDING">EMBEDDING</h1>
 <div id="EMBEDDING_CONTENT">
 <p>Libev can (and often is) directly embedded into host
 applications. Examples of applications that embed it include the Deliantra
@@ -2109,7 +2137,7 @@ that everybody includes and which overrides some autoconf choices:</p>
 </pre>
 
 </div>
-<h1 id="COMPLEXITIES">COMPLEXITIES</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="COMPLEXITIES">COMPLEXITIES</h1>
 <div id="COMPLEXITIES_CONTENT">
 		<p>In this section the complexities of (many of) the algorithms used inside
 libev will be explained. For complexity discussions about backends see the
@@ -2132,7 +2160,7 @@ documentation for <code>ev_default_init</code>.</p>
 
 
 </div>
-<h1 id="AUTHOR">AUTHOR</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="AUTHOR">AUTHOR</h1>
 <div id="AUTHOR_CONTENT">
 		<p>Marc Lehmann &lt;libev@schmorp.de&gt;.</p>
 

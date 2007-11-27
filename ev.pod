@@ -705,7 +705,7 @@ is pending (but not active) you must not call an init function on it (but
 C<ev_TYPE_set> is safe) and you must make sure the watcher is available to
 libev (e.g. you cnanot C<free ()> it).
 
-=item callback = ev_cb (ev_TYPE *watcher)
+=item callback ev_cb (ev_TYPE *watcher)
 
 Returns the callback currently set on the watcher.
 
@@ -743,8 +743,37 @@ can cast it back to your own type:
     ...
   }
 
-More interesting and less C-conformant ways of catsing your callback type
-have been omitted....
+More interesting and less C-conformant ways of casting your callback type
+instead have been omitted.
+
+Another common scenario is having some data structure with multiple
+watchers:
+
+  struct my_biggy
+  {
+    int some_data;
+    ev_timer t1;
+    ev_timer t2;
+  }
+
+In this case getting the pointer to C<my_biggy> is a bit more complicated,
+you need to use C<offsetof>:
+
+  #include <stddef.h>
+
+  static void
+  t1_cb (EV_P_ struct ev_timer *w, int revents)
+  {
+    struct my_biggy big = (struct my_biggy *
+      (((char *)w) - offsetof (struct my_biggy, t1));
+  }
+
+  static void
+  t2_cb (EV_P_ struct ev_timer *w, int revents)
+  {
+    struct my_biggy big = (struct my_biggy *
+      (((char *)w) - offsetof (struct my_biggy, t2));
+  }
 
 
 =head1 WATCHER TYPES

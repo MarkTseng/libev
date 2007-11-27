@@ -858,8 +858,8 @@ events but its callback has not yet been invoked). As long as a watcher
 is pending (but not active) you must not call an init function on it (but
 \&\f(CW\*(C`ev_TYPE_set\*(C'\fR is safe) and you must make sure the watcher is available to
 libev (e.g. you cnanot \f(CW\*(C`free ()\*(C'\fR it).
-.IP "callback = ev_cb (ev_TYPE *watcher)" 4
-.IX Item "callback = ev_cb (ev_TYPE *watcher)"
+.IP "callback ev_cb (ev_TYPE *watcher)" 4
+.IX Item "callback ev_cb (ev_TYPE *watcher)"
 Returns the callback currently set on the watcher.
 .IP "ev_cb_set (ev_TYPE *watcher, callback)" 4
 .IX Item "ev_cb_set (ev_TYPE *watcher, callback)"
@@ -895,8 +895,45 @@ can cast it back to your own type:
 \&  }
 .Ve
 .PP
-More interesting and less C\-conformant ways of catsing your callback type
-have been omitted....
+More interesting and less C\-conformant ways of casting your callback type
+instead have been omitted.
+.PP
+Another common scenario is having some data structure with multiple
+watchers:
+.PP
+.Vb 6
+\&  struct my_biggy
+\&  {
+\&    int some_data;
+\&    ev_timer t1;
+\&    ev_timer t2;
+\&  }
+.Ve
+.PP
+In this case getting the pointer to \f(CW\*(C`my_biggy\*(C'\fR is a bit more complicated,
+you need to use \f(CW\*(C`offsetof\*(C'\fR:
+.PP
+.Vb 1
+\&  #include <stddef.h>
+.Ve
+.PP
+.Vb 6
+\&  static void
+\&  t1_cb (EV_P_ struct ev_timer *w, int revents)
+\&  {
+\&    struct my_biggy big = (struct my_biggy *
+\&      (((char *)w) - offsetof (struct my_biggy, t1));
+\&  }
+.Ve
+.PP
+.Vb 6
+\&  static void
+\&  t2_cb (EV_P_ struct ev_timer *w, int revents)
+\&  {
+\&    struct my_biggy big = (struct my_biggy *
+\&      (((char *)w) - offsetof (struct my_biggy, t2));
+\&  }
+.Ve
 .SH "WATCHER TYPES"
 .IX Header "WATCHER TYPES"
 This section describes each watcher in detail, but will not repeat
