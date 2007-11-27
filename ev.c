@@ -717,10 +717,6 @@ static ev_child *childs [PID_HASHSIZE];
 
 static ev_signal childev;
 
-#ifndef WCONTINUED
-# define WCONTINUED 0
-#endif
-
 void inline_speed
 child_reap (EV_P_ ev_signal *sw, int chain, int pid, int status)
 {
@@ -736,20 +732,28 @@ child_reap (EV_P_ ev_signal *sw, int chain, int pid, int status)
       }
 }
 
+#ifndef WCONTINUED
+# define WCONTINUED 0
+#endif
+
 static void
 childcb (EV_P_ ev_signal *sw, int revents)
 {
   int pid, status;
 
-  if (0 < (pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)))
-    {
-      /* make sure we are called again until all childs have been reaped */
-      /* we need to do it this way so that the callback gets called before we continue */
-      ev_feed_event (EV_A_ (W)sw, EV_SIGNAL);
+  /* some systems define WCONTINUED but then fail to support it (linux 2.4) */
+  if (0 >= (pid = waitpid (-1, &status, WNOHANG | WUNTRACED | WCONTINUED)))
+    if (!WCONTINUED
+        || errno != EINVAL
+        || 0 >= (pid = waitpid (-1, &status, WNOHANG | WUNTRACED)))
+      return;
 
-      child_reap (EV_A_ sw, pid, pid, status);
-      child_reap (EV_A_ sw,   0, pid, status); /* this might trigger a watcher twice, but feed_event catches that */
-    }
+  /* make sure we are called again until all childs have been reaped */
+  /* we need to do it this way so that the callback gets called before we continue */
+  ev_feed_event (EV_A_ (W)sw, EV_SIGNAL);
+
+  child_reap (EV_A_ sw, pid, pid, status);
+  child_reap (EV_A_ sw,   0, pid, status); /* this might trigger a watcher twice, but feed_event catches that */
 }
 
 #endif
