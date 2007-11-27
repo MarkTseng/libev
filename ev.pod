@@ -1640,6 +1640,10 @@ C<ev_TYPE_again> function.
 
 Invokes C<ev_embed_sweep>.
 
+=item w->update ()      C<ev::stat> only
+
+Invokes C<ev_stat_stat>.
+
 =back
 
 =back

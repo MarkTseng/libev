@@ -193,7 +193,7 @@ namespace ev {
     }
   EV_END_WATCHER (timer, timer)
 
-  #if EV_PERIODICS
+  #if EV_PERIODIC_ENABLE
   EV_BEGIN_WATCHER (periodic, periodic)
     void set (ev_tstamp at, ev_tstamp interval = 0.)
     {
@@ -215,18 +215,6 @@ namespace ev {
     }
   EV_END_WATCHER (periodic, periodic)
   #endif
-
-  EV_BEGIN_WATCHER (idle, idle)
-    void set () { }
-  EV_END_WATCHER (idle, idle)
-
-  EV_BEGIN_WATCHER (prepare, prepare)
-    void set () { }
-  EV_END_WATCHER (prepare, prepare)
-
-  EV_BEGIN_WATCHER (check, check)
-    void set () { }
-  EV_END_WATCHER (check, check)
 
   EV_BEGIN_WATCHER (sig, signal)
     void set (int signum)
@@ -260,8 +248,42 @@ namespace ev {
     }
   EV_END_WATCHER (child, child)
 
-  #if EV_MULTIPLICITY
+  #if EV_STAT_ENABLE
+  EV_BEGIN_WATCHER (stat, stat)
+    void set (const char *path, ev_tstamp interval = 0.)
+    {
+      int active = is_active ();
+      if (active) stop ();
+      ev_stat_set (static_cast<ev_stat *>(this), path, interval);
+      if (active) start ();
+    }
 
+    void start (const char *path, ev_tstamp interval = 0.)
+    {
+      set (path, interval);
+      start ();
+    }
+
+    void update ()
+    {
+      ev_stat_stat (EV_A_ static_cast<ev_stat *>(this));
+    }
+  EV_END_WATCHER (stat, stat)
+  #endif
+
+  EV_BEGIN_WATCHER (idle, idle)
+    void set () { }
+  EV_END_WATCHER (idle, idle)
+
+  EV_BEGIN_WATCHER (prepare, prepare)
+    void set () { }
+  EV_END_WATCHER (prepare, prepare)
+
+  EV_BEGIN_WATCHER (check, check)
+    void set () { }
+  EV_END_WATCHER (check, check)
+
+  #if EV_EMBED_ENABLE
   EV_BEGIN_WATCHER (embed, embed)
     void set (struct ev_loop *loop)
     {
@@ -282,7 +304,6 @@ namespace ev {
       ev_embed_sweep (EV_A_ static_cast<ev_embed *>(this));
     }
   EV_END_WATCHER (embed, embed)
-
   #endif
 
   #undef EV_CONSTRUCT
