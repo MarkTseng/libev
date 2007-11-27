@@ -309,6 +309,12 @@ namespace ev {
   EV_END_WATCHER (embed, embed)
   #endif
 
+  #if EV_FORK_ENABLE
+  EV_BEGIN_WATCHER (fork, fork)
+    void set () { }
+  EV_END_WATCHER (fork, fork)
+  #endif
+
   #undef EV_CONSTRUCT
   #undef EV_BEGIN_WATCHER
   #undef EV_END_WATCHER
