@@ -4,10 +4,12 @@ libev - a high performance full-featured event loop written in C
 
 =head1 SYNOPSIS
 
-  /* this is the only header you need */
   #include <ev.h>
 
-  /* what follows is a fully working example program */
+=head1 EXAMPLE PROGRAM
+
+  #include <ev.h>
+
   ev_io stdin_watcher;
   ev_timer timeout_watcher;
 
@@ -63,23 +65,28 @@ watcher.
 
 =head1 FEATURES
 
-Libev supports select, poll, the linux-specific epoll and the bsd-specific
-kqueue mechanisms for file descriptor events, relative timers, absolute
-timers with customised rescheduling, signal events, process status change
-events (related to SIGCHLD), and event watchers dealing with the event
-loop mechanism itself (idle, prepare and check watchers). It also is quite
-fast (see this L<benchmark|http://libev.schmorp.de/bench.html> comparing
-it to libevent for example).
+Libev supports C<select>, C<poll>, the linux-specific C<epoll>, the
+bsd-specific C<kqueue> and the solaris-specific event port mechanisms
+for file descriptor events (C<ev_io>), relative timers (C<ev_timer>),
+absolute timers with customised rescheduling (C<ev_periodic>), synchronous
+signals (C<ev_signal>), process status change events (C<ev_child>), and
+event watchers dealing with the event loop mechanism itself (C<ev_idle>,
+C<ev_embed>, C<ev_prepare> and C<ev_check> watchers) as well as
+file watchers (C<ev_stat>) and even limited support for fork events
+(C<ev_fork>).
+
+It also is quite fast (see this
+L<benchmark|http://libev.schmorp.de/bench.html> comparing it to libevent
+for example).
 
 =head1 CONVENTIONS
 
-Libev is very configurable. In this manual the default configuration
-will be described, which supports multiple event loops. For more info
-about various configuration options please have a look at the file
-F<README.embed> in the libev distribution. If libev was configured without
-support for multiple event loops, then all functions taking an initial
-argument of name C<loop> (which is always of type C<struct ev_loop *>)
-will not have this argument.
+Libev is very configurable. In this manual the default configuration will
+be described, which supports multiple event loops. For more info about
+various configuration options please have a look at B<EMBED> section in
+this manual. If libev was configured without support for multiple event
+loops, then all functions taking an initial argument of name C<loop>
+(which is always of type C<struct ev_loop *>) will not have this argument.
 
 =head1 TIME REPRESENTATION
 
@@ -118,8 +125,8 @@ as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.
 
-Example: make sure we haven't accidentally been linked against the wrong
-version:
+Example: Make sure we haven't accidentally been linked against the wrong
+version.
 
   assert (("libev version mismatch",
            ev_version_major () == EV_VERSION_MAJOR
@@ -169,8 +176,8 @@ You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.
 
-Example: replace the libev allocator with one that waits a bit and then
-retries: better than mine).
+Example: Replace the libev allocator with one that waits a bit and then
+retries).
 
    static void *
    persistent_realloc (void *ptr, size_t size)
@@ -199,7 +206,7 @@ matter what, when it returns. That is, libev will generally retry the
 requested operation, or, if the condition doesn't go away, do bad stuff
 (such as abort).
 
-Example: do the same thing as libev does internally:
+Example: This is basically the same thing that libev does internally, too.
 
    static void
    fatal_error (const char *msg)
@@ -355,7 +362,7 @@ always distinct from the default loop. Unlike the default loop, it cannot
 handle signal and child watchers, and attempts to do so will be greeted by
 undefined behaviour (or a failed assertion if assertions are enabled).
 
-Example: try to create a event loop that uses epoll and nothing else.
+Example: Try to create a event loop that uses epoll and nothing else.
 
   struct ev_loop *epoller = ev_loop_new (EVBACKEND_EPOLL | EVFLAG_NOENV);
   if (!epoller)
@@ -464,7 +471,7 @@ Here are the gory details of what C<ev_loop> does:
    - If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
      were used, return, otherwise continue with step *.
 
-Example: queue some jobs and then loop until no events are outsanding
+Example: Queue some jobs and then loop until no events are outsanding
 anymore.
 
    ... queue jobs here, make sure they register event watchers as long
@@ -494,18 +501,18 @@ no event watchers registered by it are active. It is also an excellent
 way to do this for generic recurring timers or from within third-party
 libraries. Just remember to I<unref after start> and I<ref before stop>.
 
-Example: create a signal watcher, but keep it from keeping C<ev_loop>
+Example: Create a signal watcher, but keep it from keeping C<ev_loop>
 running when nothing else is active.
 
-  struct dv_signal exitsig;
+  struct ev_signal exitsig;
   ev_signal_init (&exitsig, sig_cb, SIGINT);
-  ev_signal_start (myloop, &exitsig);
-  evf_unref (myloop);
+  ev_signal_start (loop, &exitsig);
+  evf_unref (loop);
 
-Example: for some weird reason, unregister the above signal handler again.
+Example: For some weird reason, unregister the above signal handler again.
 
-  ev_ref (myloop);
-  ev_signal_stop (myloop, &exitsig);
+  ev_ref (loop);
+  ev_signal_stop (loop, &exitsig);
 
 =back
 
@@ -816,9 +823,9 @@ The events being watched.
 
 =back
 
-Example: call C<stdin_readable_cb> when STDIN_FILENO has become, well
+Example: Call C<stdin_readable_cb> when STDIN_FILENO has become, well
 readable, but only once. Since it is likely line-buffered, you could
-attempt to read a whole line in the callback:
+attempt to read a whole line in the callback.
 
   static void
   stdin_readable_cb (struct ev_loop *loop, struct ev_io *w, int revents)
@@ -918,7 +925,7 @@ which is also when any modifications are taken into account.
 
 =back
 
-Example: create a timer that fires after 60 seconds.
+Example: Create a timer that fires after 60 seconds.
 
   static void
   one_minute_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
@@ -930,7 +937,7 @@ Example: create a timer that fires after 60 seconds.
   ev_timer_init (&mytimer, one_minute_cb, 60., 0.);
   ev_timer_start (loop, &mytimer);
 
-Example: create a timeout timer that times out after 10 seconds of
+Example: Create a timeout timer that times out after 10 seconds of
 inactivity.
 
   static void
@@ -1065,7 +1072,7 @@ the periodic timer fires or C<ev_periodic_again> is being called.
 
 =back
 
-Example: call a callback every hour, or, more precisely, whenever the
+Example: Call a callback every hour, or, more precisely, whenever the
 system clock is divisible by 3600. The callback invocation times have
 potentially a lot of jittering, but good long-term stability.
 
@@ -1079,7 +1086,7 @@ potentially a lot of jittering, but good long-term stability.
   ev_periodic_init (&hourly_tick, clock_cb, 0., 3600., 0);
   ev_periodic_start (loop, &hourly_tick);
 
-Example: the same as above, but use a reschedule callback to do it:
+Example: The same as above, but use a reschedule callback to do it:
 
   #include <math.h>
 
@@ -1091,7 +1098,7 @@ Example: the same as above, but use a reschedule callback to do it:
 
   ev_periodic_init (&hourly_tick, clock_cb, 0., 0., my_scheduler_cb);
 
-Example: call a callback every hour, starting now:
+Example: Call a callback every hour, starting now:
 
   struct ev_periodic hourly_tick;
   ev_periodic_init (&hourly_tick, clock_cb,
@@ -1162,7 +1169,7 @@ C<waitpid> and C<sys/wait.h> documentation for details).
 
 =back
 
-Example: try to exit cleanly on SIGINT and SIGTERM.
+Example: Try to exit cleanly on SIGINT and SIGTERM.
 
   static void
   sigint_cb (struct ev_loop *loop, struct ev_signal *w, int revents)
@@ -1301,8 +1308,8 @@ believe me.
 
 =back
 
-Example: dynamically allocate an C<ev_idle>, start it, and in the
-callback, free it. Alos, use no error checking, as usual.
+Example: Dynamically allocate an C<ev_idle> watcher, start it, and in the
+callback, free it. Also, use no error checking, as usual.
 
   static void
   idle_cb (struct ev_loop *loop, struct ev_idle *w, int revents)

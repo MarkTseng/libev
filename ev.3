@@ -134,13 +134,16 @@
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
-.Vb 2
-\&  /* this is the only header you need */
+.Vb 1
+\&  #include <ev.h>
+.Ve
+.SH "EXAMPLE PROGRAM"
+.IX Header "EXAMPLE PROGRAM"
+.Vb 1
 \&  #include <ev.h>
 .Ve
 .PP
-.Vb 3
-\&  /* what follows is a fully working example program */
+.Vb 2
 \&  ev_io stdin_watcher;
 \&  ev_timer timeout_watcher;
 .Ve
@@ -209,22 +212,27 @@ details of the event, and then hand it over to libev by \fIstarting\fR the
 watcher.
 .SH "FEATURES"
 .IX Header "FEATURES"
-Libev supports select, poll, the linux-specific epoll and the bsd-specific
-kqueue mechanisms for file descriptor events, relative timers, absolute
-timers with customised rescheduling, signal events, process status change
-events (related to \s-1SIGCHLD\s0), and event watchers dealing with the event
-loop mechanism itself (idle, prepare and check watchers). It also is quite
-fast (see this benchmark comparing
-it to libevent for example).
+Libev supports \f(CW\*(C`select\*(C'\fR, \f(CW\*(C`poll\*(C'\fR, the linux-specific \f(CW\*(C`epoll\*(C'\fR, the
+bsd-specific \f(CW\*(C`kqueue\*(C'\fR and the solaris-specific event port mechanisms
+for file descriptor events (\f(CW\*(C`ev_io\*(C'\fR), relative timers (\f(CW\*(C`ev_timer\*(C'\fR),
+absolute timers with customised rescheduling (\f(CW\*(C`ev_periodic\*(C'\fR), synchronous
+signals (\f(CW\*(C`ev_signal\*(C'\fR), process status change events (\f(CW\*(C`ev_child\*(C'\fR), and
+event watchers dealing with the event loop mechanism itself (\f(CW\*(C`ev_idle\*(C'\fR,
+\&\f(CW\*(C`ev_embed\*(C'\fR, \f(CW\*(C`ev_prepare\*(C'\fR and \f(CW\*(C`ev_check\*(C'\fR watchers) as well as
+file watchers (\f(CW\*(C`ev_stat\*(C'\fR) and even limited support for fork events
+(\f(CW\*(C`ev_fork\*(C'\fR).
+.PP
+It also is quite fast (see this
+benchmark comparing it to libevent
+for example).
 .SH "CONVENTIONS"
 .IX Header "CONVENTIONS"
-Libev is very configurable. In this manual the default configuration
-will be described, which supports multiple event loops. For more info
-about various configuration options please have a look at the file
-\&\fI\s-1README\s0.embed\fR in the libev distribution. If libev was configured without
-support for multiple event loops, then all functions taking an initial
-argument of name \f(CW\*(C`loop\*(C'\fR (which is always of type \f(CW\*(C`struct ev_loop *\*(C'\fR)
-will not have this argument.
+Libev is very configurable. In this manual the default configuration will
+be described, which supports multiple event loops. For more info about
+various configuration options please have a look at \fB\s-1EMBED\s0\fR section in
+this manual. If libev was configured without support for multiple event
+loops, then all functions taking an initial argument of name \f(CW\*(C`loop\*(C'\fR
+(which is always of type \f(CW\*(C`struct ev_loop *\*(C'\fR) will not have this argument.
 .SH "TIME REPRESENTATION"
 .IX Header "TIME REPRESENTATION"
 Libev represents time as a single floating point number, representing the
@@ -259,8 +267,8 @@ as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.
 .Sp
-Example: make sure we haven't accidentally been linked against the wrong
-version:
+Example: Make sure we haven't accidentally been linked against the wrong
+version.
 .Sp
 .Vb 3
 \&  assert (("libev version mismatch",
@@ -310,8 +318,8 @@ You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.
 .Sp
-Example: replace the libev allocator with one that waits a bit and then
-retries: better than mine).
+Example: Replace the libev allocator with one that waits a bit and then
+retries).
 .Sp
 .Vb 6
 \&   static void *
@@ -347,7 +355,7 @@ matter what, when it returns. That is, libev will generally retry the
 requested operation, or, if the condition doesn't go away, do bad stuff
 (such as abort).
 .Sp
-Example: do the same thing as libev does internally:
+Example: This is basically the same thing that libev does internally, too.
 .Sp
 .Vb 6
 \&   static void
@@ -506,7 +514,7 @@ always distinct from the default loop. Unlike the default loop, it cannot
 handle signal and child watchers, and attempts to do so will be greeted by
 undefined behaviour (or a failed assertion if assertions are enabled).
 .Sp
-Example: try to create a event loop that uses epoll and nothing else.
+Example: Try to create a event loop that uses epoll and nothing else.
 .Sp
 .Vb 3
 \&  struct ev_loop *epoller = ev_loop_new (EVBACKEND_EPOLL | EVFLAG_NOENV);
@@ -614,7 +622,7 @@ Here are the gory details of what \f(CW\*(C`ev_loop\*(C'\fR does:
 \&     were used, return, otherwise continue with step *.
 .Ve
 .Sp
-Example: queue some jobs and then loop until no events are outsanding
+Example: Queue some jobs and then loop until no events are outsanding
 anymore.
 .Sp
 .Vb 4
@@ -646,21 +654,21 @@ no event watchers registered by it are active. It is also an excellent
 way to do this for generic recurring timers or from within third-party
 libraries. Just remember to \fIunref after start\fR and \fIref before stop\fR.
 .Sp
-Example: create a signal watcher, but keep it from keeping \f(CW\*(C`ev_loop\*(C'\fR
+Example: Create a signal watcher, but keep it from keeping \f(CW\*(C`ev_loop\*(C'\fR
 running when nothing else is active.
 .Sp
 .Vb 4
-\&  struct dv_signal exitsig;
+\&  struct ev_signal exitsig;
 \&  ev_signal_init (&exitsig, sig_cb, SIGINT);
-\&  ev_signal_start (myloop, &exitsig);
-\&  evf_unref (myloop);
+\&  ev_signal_start (loop, &exitsig);
+\&  evf_unref (loop);
 .Ve
 .Sp
-Example: for some weird reason, unregister the above signal handler again.
+Example: For some weird reason, unregister the above signal handler again.
 .Sp
 .Vb 2
-\&  ev_ref (myloop);
-\&  ev_signal_stop (myloop, &exitsig);
+\&  ev_ref (loop);
+\&  ev_signal_stop (loop, &exitsig);
 .Ve
 .SH "ANATOMY OF A WATCHER"
 .IX Header "ANATOMY OF A WATCHER"
@@ -959,9 +967,9 @@ The file descriptor being watched.
 .IX Item "int events [read-only]"
 The events being watched.
 .PP
-Example: call \f(CW\*(C`stdin_readable_cb\*(C'\fR when \s-1STDIN_FILENO\s0 has become, well
+Example: Call \f(CW\*(C`stdin_readable_cb\*(C'\fR when \s-1STDIN_FILENO\s0 has become, well
 readable, but only once. Since it is likely line\-buffered, you could
-attempt to read a whole line in the callback:
+attempt to read a whole line in the callback.
 .PP
 .Vb 6
 \&  static void
@@ -1063,7 +1071,7 @@ The current \f(CW\*(C`repeat\*(C'\fR value. Will be used each time the watcher t
 or \f(CW\*(C`ev_timer_again\*(C'\fR is called and determines the next timeout (if any),
 which is also when any modifications are taken into account.
 .PP
-Example: create a timer that fires after 60 seconds.
+Example: Create a timer that fires after 60 seconds.
 .PP
 .Vb 5
 \&  static void
@@ -1079,7 +1087,7 @@ Example: create a timer that fires after 60 seconds.
 \&  ev_timer_start (loop, &mytimer);
 .Ve
 .PP
-Example: create a timeout timer that times out after 10 seconds of
+Example: Create a timeout timer that times out after 10 seconds of
 inactivity.
 .PP
 .Vb 5
@@ -1214,7 +1222,7 @@ The current reschedule callback, or \f(CW0\fR, if this functionality is
 switched off. Can be changed any time, but changes only take effect when
 the periodic timer fires or \f(CW\*(C`ev_periodic_again\*(C'\fR is being called.
 .PP
-Example: call a callback every hour, or, more precisely, whenever the
+Example: Call a callback every hour, or, more precisely, whenever the
 system clock is divisible by 3600. The callback invocation times have
 potentially a lot of jittering, but good long-term stability.
 .PP
@@ -1232,7 +1240,7 @@ potentially a lot of jittering, but good long-term stability.
 \&  ev_periodic_start (loop, &hourly_tick);
 .Ve
 .PP
-Example: the same as above, but use a reschedule callback to do it:
+Example: The same as above, but use a reschedule callback to do it:
 .PP
 .Vb 1
 \&  #include <math.h>
@@ -1250,7 +1258,7 @@ Example: the same as above, but use a reschedule callback to do it:
 \&  ev_periodic_init (&hourly_tick, clock_cb, 0., 0., my_scheduler_cb);
 .Ve
 .PP
-Example: call a callback every hour, starting now:
+Example: Call a callback every hour, starting now:
 .PP
 .Vb 4
 \&  struct ev_periodic hourly_tick;
@@ -1311,7 +1319,7 @@ The process id that detected a status change.
 The process exit/trace status caused by \f(CW\*(C`rpid\*(C'\fR (see your systems
 \&\f(CW\*(C`waitpid\*(C'\fR and \f(CW\*(C`sys/wait.h\*(C'\fR documentation for details).
 .PP
-Example: try to exit cleanly on \s-1SIGINT\s0 and \s-1SIGTERM\s0.
+Example: Try to exit cleanly on \s-1SIGINT\s0 and \s-1SIGTERM\s0.
 .PP
 .Vb 5
 \&  static void
@@ -1445,8 +1453,8 @@ Initialises and configures the idle watcher \- it has no parameters of any
 kind. There is a \f(CW\*(C`ev_idle_set\*(C'\fR macro, but using it is utterly pointless,
 believe me.
 .PP
-Example: dynamically allocate an \f(CW\*(C`ev_idle\*(C'\fR, start it, and in the
-callback, free it. Alos, use no error checking, as usual.
+Example: Dynamically allocate an \f(CW\*(C`ev_idle\*(C'\fR watcher, start it, and in the
+callback, free it. Also, use no error checking, as usual.
 .PP
 .Vb 7
 \&  static void

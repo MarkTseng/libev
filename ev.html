@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Tue Nov 27 21:14:27 2007" />
+	<meta name="created" content="Tue Nov 27 21:29:04 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -16,6 +16,7 @@
 
 <ul><li><a href="#NAME">NAME</a></li>
 <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#EXAMPLE_PROGRAM">EXAMPLE PROGRAM</a></li>
 <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
 <li><a href="#FEATURES">FEATURES</a></li>
 <li><a href="#CONVENTIONS">CONVENTIONS</a></li>
@@ -61,17 +62,22 @@
 </ul><hr />
 <!-- INDEX END -->
 
-<h1 id="NAME">NAME</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="NAME">NAME</h1>
 <div id="NAME_CONTENT">
 <p>libev - a high performance full-featured event loop written in C</p>
 
 </div>
-<h1 id="SYNOPSIS">SYNOPSIS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
 <div id="SYNOPSIS_CONTENT">
-<pre>  /* this is the only header you need */
-  #include &lt;ev.h&gt;
+<pre>  #include &lt;ev.h&gt;
 
-  /* what follows is a fully working example program */
+</pre>
+
+</div>
+<h1 id="EXAMPLE_PROGRAM">EXAMPLE PROGRAM</h1>
+<div id="EXAMPLE_PROGRAM_CONTENT">
+<pre>  #include &lt;ev.h&gt;
+
   ev_io stdin_watcher;
   ev_timer timeout_watcher;
 
@@ -113,7 +119,7 @@
 </pre>
 
 </div>
-<h1 id="DESCRIPTION">DESCRIPTION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
 <div id="DESCRIPTION_CONTENT">
 <p>Libev is an event loop: you register interest in certain events (such as a
 file descriptor being readable or a timeout occuring), and it will manage
@@ -127,29 +133,33 @@ details of the event, and then hand it over to libev by <i>starting</i> the
 watcher.</p>
 
 </div>
-<h1 id="FEATURES">FEATURES</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="FEATURES">FEATURES</h1>
 <div id="FEATURES_CONTENT">
-<p>Libev supports select, poll, the linux-specific epoll and the bsd-specific
-kqueue mechanisms for file descriptor events, relative timers, absolute
-timers with customised rescheduling, signal events, process status change
-events (related to SIGCHLD), and event watchers dealing with the event
-loop mechanism itself (idle, prepare and check watchers). It also is quite
-fast (see this <a href="http://libev.schmorp.de/bench.html">benchmark</a> comparing
-it to libevent for example).</p>
+<p>Libev supports <code>select</code>, <code>poll</code>, the linux-specific <code>epoll</code>, the
+bsd-specific <code>kqueue</code> and the solaris-specific event port mechanisms
+for file descriptor events (<code>ev_io</code>), relative timers (<code>ev_timer</code>),
+absolute timers with customised rescheduling (<code>ev_periodic</code>), synchronous
+signals (<code>ev_signal</code>), process status change events (<code>ev_child</code>), and
+event watchers dealing with the event loop mechanism itself (<code>ev_idle</code>,
+<code>ev_embed</code>, <code>ev_prepare</code> and <code>ev_check</code> watchers) as well as
+file watchers (<code>ev_stat</code>) and even limited support for fork events
+(<code>ev_fork</code>).</p>
+<p>It also is quite fast (see this
+<a href="http://libev.schmorp.de/bench.html">benchmark</a> comparing it to libevent
+for example).</p>
 
 </div>
-<h1 id="CONVENTIONS">CONVENTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="CONVENTIONS">CONVENTIONS</h1>
 <div id="CONVENTIONS_CONTENT">
-<p>Libev is very configurable. In this manual the default configuration
-will be described, which supports multiple event loops. For more info
-about various configuration options please have a look at the file
-<cite>README.embed</cite> in the libev distribution. If libev was configured without
-support for multiple event loops, then all functions taking an initial
-argument of name <code>loop</code> (which is always of type <code>struct ev_loop *</code>)
-will not have this argument.</p>
+<p>Libev is very configurable. In this manual the default configuration will
+be described, which supports multiple event loops. For more info about
+various configuration options please have a look at <strong>EMBED</strong> section in
+this manual. If libev was configured without support for multiple event
+loops, then all functions taking an initial argument of name <code>loop</code>
+(which is always of type <code>struct ev_loop *</code>) will not have this argument.</p>
 
 </div>
-<h1 id="TIME_REPRESENTATION">TIME REPRESENTATION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="TIME_REPRESENTATION">TIME REPRESENTATION</h1>
 <div id="TIME_REPRESENTATION_CONTENT">
 <p>Libev represents time as a single floating point number, representing the
 (fractional) number of seconds since the (POSIX) epoch (somewhere near
@@ -159,7 +169,7 @@ to the <code>double</code> type in C, and when you need to do any calculations o
 it, you should treat it as such.</p>
 
 </div>
-<h1 id="GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</h1>
 <div id="GLOBAL_FUNCTIONS_CONTENT">
 <p>These functions can be called anytime, even before initialising the
 library in any way.</p>
@@ -182,8 +192,8 @@ version of the library your program was compiled against.</p>
 as this indicates an incompatible change.  Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.</p>
-		<p>Example: make sure we haven't accidentally been linked against the wrong
-version:</p>
+		<p>Example: Make sure we haven't accidentally been linked against the wrong
+version.</p>
 <pre>  assert ((&quot;libev version mismatch&quot;,
            ev_version_major () == EV_VERSION_MAJOR
            &amp;&amp; ev_version_minor () &gt;= EV_VERSION_MINOR));
@@ -231,8 +241,8 @@ action. The default is your system realloc function.</p>
 		<p>You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.</p>
-		<p>Example: replace the libev allocator with one that waits a bit and then
-retries: better than mine).</p>
+		<p>Example: Replace the libev allocator with one that waits a bit and then
+retries).</p>
 <pre>   static void *
    persistent_realloc (void *ptr, size_t size)
    {
@@ -261,7 +271,7 @@ callback is set, then libev will expect it to remedy the sitution, no
 matter what, when it returns. That is, libev will generally retry the
 requested operation, or, if the condition doesn't go away, do bad stuff
 (such as abort).</p>
-		<p>Example: do the same thing as libev does internally:</p>
+		<p>Example: This is basically the same thing that libev does internally, too.</p>
 <pre>   static void
    fatal_error (const char *msg)
    {
@@ -277,7 +287,7 @@ requested operation, or, if the condition doesn't go away, do bad stuff
 </dl>
 
 </div>
-<h1 id="FUNCTIONS_CONTROLLING_THE_EVENT_LOOP">FUNCTIONS CONTROLLING THE EVENT LOOP</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="FUNCTIONS_CONTROLLING_THE_EVENT_LOOP">FUNCTIONS CONTROLLING THE EVENT LOOP</h1>
 <div id="FUNCTIONS_CONTROLLING_THE_EVENT_LOOP-2">
 <p>An event loop is described by a <code>struct ev_loop *</code>. The library knows two
 types of such loops, the <i>default</i> loop, which supports signals and child
@@ -407,7 +417,7 @@ event loop and only if you know the OS supports your types of fds):</p>
 always distinct from the default loop. Unlike the default loop, it cannot
 handle signal and child watchers, and attempts to do so will be greeted by
 undefined behaviour (or a failed assertion if assertions are enabled).</p>
-		<p>Example: try to create a event loop that uses epoll and nothing else.</p>
+		<p>Example: Try to create a event loop that uses epoll and nothing else.</p>
 <pre>  struct ev_loop *epoller = ev_loop_new (EVBACKEND_EPOLL | EVFLAG_NOENV);
   if (!epoller)
     fatal (&quot;no epoll found here, maybe it hides under your chair&quot;);
@@ -510,7 +520,7 @@ usually a better approach for this kind of thing.</p>
      were used, return, otherwise continue with step *.
 
 </pre>
-		<p>Example: queue some jobs and then loop until no events are outsanding
+		<p>Example: Queue some jobs and then loop until no events are outsanding
 anymore.</p>
 <pre>   ... queue jobs here, make sure they register event watchers as long
    ... as they still have work to do (even an idle watcher will do..)
@@ -539,17 +549,17 @@ visible to the libev user and should not keep <code>ev_loop</code> from exiting 
 no event watchers registered by it are active. It is also an excellent
 way to do this for generic recurring timers or from within third-party
 libraries. Just remember to <i>unref after start</i> and <i>ref before stop</i>.</p>
-		<p>Example: create a signal watcher, but keep it from keeping <code>ev_loop</code>
+		<p>Example: Create a signal watcher, but keep it from keeping <code>ev_loop</code>
 running when nothing else is active.</p>
-<pre>  struct dv_signal exitsig;
+<pre>  struct ev_signal exitsig;
   ev_signal_init (&amp;exitsig, sig_cb, SIGINT);
-  ev_signal_start (myloop, &amp;exitsig);
-  evf_unref (myloop);
+  ev_signal_start (loop, &amp;exitsig);
+  evf_unref (loop);
 
 </pre>
-		<p>Example: for some weird reason, unregister the above signal handler again.</p>
-<pre>  ev_ref (myloop);
-  ev_signal_stop (myloop, &amp;exitsig);
+		<p>Example: For some weird reason, unregister the above signal handler again.</p>
+<pre>  ev_ref (loop);
+  ev_signal_stop (loop, &amp;exitsig);
 
 </pre>
 	</dd>
@@ -560,7 +570,7 @@ running when nothing else is active.</p>
 
 
 </div>
-<h1 id="ANATOMY_OF_A_WATCHER">ANATOMY OF A WATCHER</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="ANATOMY_OF_A_WATCHER">ANATOMY OF A WATCHER</h1>
 <div id="ANATOMY_OF_A_WATCHER_CONTENT">
 <p>A watcher is a structure that you create and register to record your
 interest in some event. For instance, if you want to wait for STDIN to
@@ -783,7 +793,7 @@ have been omitted....</p>
 
 
 </div>
-<h1 id="WATCHER_TYPES">WATCHER TYPES</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="WATCHER_TYPES">WATCHER TYPES</h1>
 <div id="WATCHER_TYPES_CONTENT">
 <p>This section describes each watcher in detail, but will not repeat
 information given in the last section. Any initialisation/set macros,
@@ -853,9 +863,9 @@ rceeive events for and events is either <code>EV_READ</code>, <code>EV_WRITE</co
 		<p>The events being watched.</p>
 	</dd>
 </dl>
-<p>Example: call <code>stdin_readable_cb</code> when STDIN_FILENO has become, well
+<p>Example: Call <code>stdin_readable_cb</code> when STDIN_FILENO has become, well
 readable, but only once. Since it is likely line-buffered, you could
-attempt to read a whole line in the callback:</p>
+attempt to read a whole line in the callback.</p>
 <pre>  static void
   stdin_readable_cb (struct ev_loop *loop, struct ev_io *w, int revents)
   {
@@ -948,7 +958,7 @@ or <code>ev_timer_again</code> is called and determines the next timeout (if any
 which is also when any modifications are taken into account.</p>
 	</dd>
 </dl>
-<p>Example: create a timer that fires after 60 seconds.</p>
+<p>Example: Create a timer that fires after 60 seconds.</p>
 <pre>  static void
   one_minute_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
   {
@@ -960,7 +970,7 @@ which is also when any modifications are taken into account.</p>
   ev_timer_start (loop, &amp;mytimer);
 
 </pre>
-<p>Example: create a timeout timer that times out after 10 seconds of
+<p>Example: Create a timeout timer that times out after 10 seconds of
 inactivity.</p>
 <pre>  static void
   timeout_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
@@ -1086,7 +1096,7 @@ switched off. Can be changed any time, but changes only take effect when
 the periodic timer fires or <code>ev_periodic_again</code> is being called.</p>
 	</dd>
 </dl>
-<p>Example: call a callback every hour, or, more precisely, whenever the
+<p>Example: Call a callback every hour, or, more precisely, whenever the
 system clock is divisible by 3600. The callback invocation times have
 potentially a lot of jittering, but good long-term stability.</p>
 <pre>  static void
@@ -1100,7 +1110,7 @@ potentially a lot of jittering, but good long-term stability.</p>
   ev_periodic_start (loop, &amp;hourly_tick);
 
 </pre>
-<p>Example: the same as above, but use a reschedule callback to do it:</p>
+<p>Example: The same as above, but use a reschedule callback to do it:</p>
 <pre>  #include &lt;math.h&gt;
 
   static ev_tstamp
@@ -1112,7 +1122,7 @@ potentially a lot of jittering, but good long-term stability.</p>
   ev_periodic_init (&amp;hourly_tick, clock_cb, 0., 0., my_scheduler_cb);
 
 </pre>
-<p>Example: call a callback every hour, starting now:</p>
+<p>Example: Call a callback every hour, starting now:</p>
 <pre>  struct ev_periodic hourly_tick;
   ev_periodic_init (&amp;hourly_tick, clock_cb,
                     fmod (ev_now (loop), 3600.), 3600., 0);
@@ -1183,7 +1193,7 @@ process causing the status change.</p>
 <code>waitpid</code> and <code>sys/wait.h</code> documentation for details).</p>
 	</dd>
 </dl>
-<p>Example: try to exit cleanly on SIGINT and SIGTERM.</p>
+<p>Example: Try to exit cleanly on SIGINT and SIGTERM.</p>
 <pre>  static void
   sigint_cb (struct ev_loop *loop, struct ev_signal *w, int revents)
   {
@@ -1316,8 +1326,8 @@ kind. There is a <code>ev_idle_set</code> macro, but using it is utterly pointle
 believe me.</p>
 	</dd>
 </dl>
-<p>Example: dynamically allocate an <code>ev_idle</code>, start it, and in the
-callback, free it. Alos, use no error checking, as usual.</p>
+<p>Example: Dynamically allocate an <code>ev_idle</code> watcher, start it, and in the
+callback, free it. Also, use no error checking, as usual.</p>
 <pre>  static void
   idle_cb (struct ev_loop *loop, struct ev_idle *w, int revents)
   {
@@ -1552,7 +1562,7 @@ believe me.</p>
 
 
 </div>
-<h1 id="OTHER_FUNCTIONS">OTHER FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="OTHER_FUNCTIONS">OTHER FUNCTIONS</h1>
 <div id="OTHER_FUNCTIONS_CONTENT">
 <p>There are some other functions of possible interest. Described. Here. Now.</p>
 <dl>
@@ -1609,7 +1619,7 @@ loop!).</p>
 
 
 </div>
-<h1 id="LIBEVENT_EMULATION">LIBEVENT EMULATION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="LIBEVENT_EMULATION">LIBEVENT EMULATION</h1>
 <div id="LIBEVENT_EMULATION_CONTENT">
 <p>Libev offers a compatibility emulation layer for libevent. It cannot
 emulate the internals of libevent, so here are some usage hints:</p>
@@ -1629,7 +1639,7 @@ to use the libev header file and library.</dt>
 </dl>
 
 </div>
-<h1 id="C_SUPPORT">C++ SUPPORT</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="C_SUPPORT">C++ SUPPORT</h1>
 <div id="C_SUPPORT_CONTENT">
 <p>Libev comes with some simplistic wrapper classes for C++ that mainly allow
 you to use some convinience methods to start/stop watchers and also change
@@ -1734,7 +1744,7 @@ the constructor.</p>
 </pre>
 
 </div>
-<h1 id="MACRO_MAGIC">MACRO MAGIC</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="MACRO_MAGIC">MACRO MAGIC</h1>
 <div id="MACRO_MAGIC_CONTENT">
 <p>Libev can be compiled with a variety of options, the most fundemantal is
 <code>EV_MULTIPLICITY</code>. This option determines wether (most) functions and
@@ -1795,7 +1805,7 @@ wether multiple loops are supported or not.</p>
 </pre>
 
 </div>
-<h1 id="EMBEDDING">EMBEDDING</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="EMBEDDING">EMBEDDING</h1>
 <div id="EMBEDDING_CONTENT">
 <p>Libev can (and often is) directly embedded into host
 applications. Examples of applications that embed it include the Deliantra
@@ -2099,7 +2109,7 @@ that everybody includes and which overrides some autoconf choices:</p>
 </pre>
 
 </div>
-<h1 id="COMPLEXITIES">COMPLEXITIES</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="COMPLEXITIES">COMPLEXITIES</h1>
 <div id="COMPLEXITIES_CONTENT">
 		<p>In this section the complexities of (many of) the algorithms used inside
 libev will be explained. For complexity discussions about backends see the
@@ -2122,7 +2132,7 @@ documentation for <code>ev_default_init</code>.</p>
 
 
 </div>
-<h1 id="AUTHOR">AUTHOR</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<h1 id="AUTHOR">AUTHOR</h1>
 <div id="AUTHOR_CONTENT">
 		<p>Marc Lehmann &lt;libev@schmorp.de&gt;.</p>
 
