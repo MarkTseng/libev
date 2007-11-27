@@ -1767,6 +1767,9 @@ ev_embed_stop (EV_P_ ev_embed *w)
 #  define lstat(a,b) stat(a,b)
 # endif
 
+#define DEF_STAT_INTERVAL 5.0074891
+#define MIN_STAT_INTERVAL 0.1074891
+
 void
 ev_stat_stat (EV_P_ ev_stat *w)
 {
@@ -1801,6 +1804,9 @@ ev_stat_start (EV_P_ ev_stat *w)
   memset (&w->attr, 0, sizeof (ev_statdata));
 
   ev_stat_stat (EV_A_ w);
+
+  if (w->interval < MIN_STAT_INTERVAL)
+    w->interval = w->interval ? MIN_STAT_INTERVAL : DEF_STAT_INTERVAL;
 
   ev_timer_init (&w->timer, stat_timer_cb, w->interval, w->interval);
   ev_set_priority (&w->timer, ev_priority (w));
