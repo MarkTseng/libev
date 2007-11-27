@@ -8,39 +8,26 @@ namespace ev {
   template<class watcher>
   class callback
   {
-    struct object { };
+    struct klass; // it is vital that this is never defined
 
-    void *obj;
-    void (object::*meth)(watcher &, int);
-
-    /* a proxy is a kind of recipe on how to call a specific class method */
-    struct proxy_base {
-      virtual void call (void *obj, void (object::*meth)(watcher &, int), watcher &w, int) const = 0;
-    };
-    template<class O1, class O2>
-    struct proxy : proxy_base {
-      virtual void call (void *obj, void (object::*meth)(watcher &, int), watcher &w, int e) const
-      {
-        ((reinterpret_cast<O1 *>(obj)) ->* (reinterpret_cast<void (O2::*)(watcher &, int)>(meth)))
-          (w, e);
-      }
-    };
-
-    proxy_base *prxy;
+    klass *o;
+    void (klass::*m)(watcher &, int);
 
   public:
     template<class O1, class O2>
     explicit callback (O1 *object, void (O2::*method)(watcher &, int))
     {
-      static proxy<O1,O2> p;
-      obj  = reinterpret_cast<void *>(object);
-      meth = reinterpret_cast<void (object::*)(watcher &, int)>(method);
-      prxy = &p;
+      o = reinterpret_cast<klass *>(object);
+      m = reinterpret_cast<void (klass::*)(watcher &, int)>(method);
     }
 
-    void call (watcher *w, int e) const
+    // this works because a standards-compliant C++ compiler
+    // basically can't help it: it doesn't have the knowledge
+    // required to miscompile (klass is not defined anywhere
+    // and nothing is known about the constructor arguments) :)
+    void call (watcher *w, int revents)
     {
-      return prxy->call (obj, meth, *w, e);
+      (o->*m) (*w, revents);
     }
   };
 
