@@ -66,6 +66,8 @@ typedef double ev_tstamp;
 
 /*****************************************************************************/
 
+#include <stddef.h> /* for size_t */
+
 #if EV_STAT_ENABLE
 # include <sys/stat.h>
 #endif
@@ -334,7 +336,7 @@ ev_tstamp ev_time (void);
  * or take some potentially destructive action.
  * The default is your system realloc function.
  */
-void ev_set_allocator (void *(*cb)(void *ptr, long size));
+void ev_set_allocator (void *(*cb)(void *ptr, size_t size));
 
 /* set the callback function to call on a
  * retryable syscall error

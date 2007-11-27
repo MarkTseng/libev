@@ -255,22 +255,22 @@ syserr (const char *msg)
     }
 }
 
-static void *(*alloc)(void *ptr, long size);
+static void *(*alloc)(void *ptr, size_t size) = realloc;
 
 void
-ev_set_allocator (void *(*cb)(void *ptr, long size))
+ev_set_allocator (void *(*cb)(void *ptr, size_t size))
 {
   alloc = cb;
 }
 
-static void *
-ev_realloc (void *ptr, long size)
+inline_speed void *
+ev_realloc (void *ptr, size_t size)
 {
-  ptr = alloc ? alloc (ptr, size) : realloc (ptr, size);
+  ptr = alloc (ptr, size);
 
   if (!ptr && size)
     {
-      fprintf (stderr, "libev: cannot allocate %ld bytes, aborting.", size);
+      fprintf (stderr, "libev: cannot allocate %ld bytes, aborting.", (long)size);
       abort ();
     }
 
