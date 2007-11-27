@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Tue Nov 27 11:59:06 2007" />
+	<meta name="created" content="Tue Nov 27 20:23:27 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1997,6 +1997,13 @@ defined to be <code>0</code>, then they are not.</p>
 		<p>If you need to shave off some kilobytes of code at the expense of some
 speed, define this symbol to <code>1</code>. Currently only used for gcc to override
 some inlining decisions, saves roughly 30% codesize of amd64.</p>
+	</dd>
+	<dt>EV_PID_HASHSIZE</dt>
+	<dd>
+		<p><code>ev_child</code> watchers use a small hash table to distribute workload by
+pid. The default size is <code>16</code> (or <code>1</code> with <code>EV_MINIMAL</code>), usually more
+than enough. If you need to manage thousands of children you might want to
+increase this value.</p>
 	</dd>
 	<dt>EV_COMMON</dt>
 	<dd>

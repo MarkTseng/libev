@@ -158,6 +158,14 @@ extern "C" {
 # define EV_USE_PORT 0
 #endif
 
+#ifndef EV_PID_HASHSIZE
+# if EV_MINIMAL
+#  define EV_PID_HASHSIZE 1
+# else
+#  define EV_PID_HASHSIZE 16
+# endif
+#endif
+
 /**/
 
 #ifndef CLOCK_MONOTONIC
@@ -178,7 +186,6 @@ extern "C" {
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 59.743 /* never wait longer than this time (to detect time jumps) */
-#define PID_HASHSIZE  16 /* size of pid hash table, must be power of two */
 /*#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds */
 
 #ifdef EV_H
@@ -711,7 +718,7 @@ siginit (EV_P)
 
 /*****************************************************************************/
 
-static ev_child *childs [PID_HASHSIZE];
+static ev_child *childs [EV_PID_HASHSIZE];
 
 #ifndef _WIN32
 
@@ -722,7 +729,7 @@ child_reap (EV_P_ ev_signal *sw, int chain, int pid, int status)
 {
   ev_child *w;
 
-  for (w = (ev_child *)childs [chain & (PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
+  for (w = (ev_child *)childs [chain & (EV_PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
     if (w->pid == pid || !w->pid)
       {
         ev_priority (w) = ev_priority (sw); /* need to do it *now* */
@@ -753,7 +760,8 @@ childcb (EV_P_ ev_signal *sw, int revents)
   ev_feed_event (EV_A_ (W)sw, EV_SIGNAL);
 
   child_reap (EV_A_ sw, pid, pid, status);
-  child_reap (EV_A_ sw,   0, pid, status); /* this might trigger a watcher twice, but feed_event catches that */
+  if (EV_PID_HASHSIZE > 1)
+    child_reap (EV_A_ sw, 0, pid, status); /* this might trigger a watcher twice, but feed_event catches that */
 }
 
 #endif
@@ -1627,7 +1635,7 @@ ev_child_start (EV_P_ ev_child *w)
     return;
 
   ev_start (EV_A_ (W)w, 1);
-  wlist_add ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
+  wlist_add ((WL *)&childs [w->pid & (EV_PID_HASHSIZE - 1)], (WL)w);
 }
 
 void
@@ -1637,7 +1645,7 @@ ev_child_stop (EV_P_ ev_child *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  wlist_del ((WL *)&childs [w->pid & (PID_HASHSIZE - 1)], (WL)w);
+  wlist_del ((WL *)&childs [w->pid & (EV_PID_HASHSIZE - 1)], (WL)w);
   ev_stop (EV_A_ (W)w);
 }
 

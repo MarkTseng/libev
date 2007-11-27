@@ -2120,6 +2120,12 @@ defined to be \f(CW0\fR, then they are not.
 If you need to shave off some kilobytes of code at the expense of some
 speed, define this symbol to \f(CW1\fR. Currently only used for gcc to override
 some inlining decisions, saves roughly 30% codesize of amd64.
+.IP "\s-1EV_PID_HASHSIZE\s0" 4
+.IX Item "EV_PID_HASHSIZE"
+\&\f(CW\*(C`ev_child\*(C'\fR watchers use a small hash table to distribute workload by
+pid. The default size is \f(CW16\fR (or \f(CW1\fR with \f(CW\*(C`EV_MINIMAL\*(C'\fR), usually more
+than enough. If you need to manage thousands of children you might want to
+increase this value.
 .IP "\s-1EV_COMMON\s0" 4
 .IX Item "EV_COMMON"
 By default, all watchers have a \f(CW\*(C`void *data\*(C'\fR member. By redefining
