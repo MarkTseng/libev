@@ -709,6 +709,15 @@ received events. Callbacks of both watcher types can start and stop as
 many watchers as they want, and all of them will be taken into account
 (for example, a \f(CW\*(C`ev_prepare\*(C'\fR watcher might start an idle watcher to keep
 \&\f(CW\*(C`ev_loop\*(C'\fR from blocking).
+.ie n .IP """EV_EMBED""" 4
+.el .IP "\f(CWEV_EMBED\fR" 4
+.IX Item "EV_EMBED"
+The embedded event loop specified in the \f(CW\*(C`ev_embed\*(C'\fR watcher needs attention.
+.ie n .IP """EV_FORK""" 4
+.el .IP "\f(CWEV_FORK\fR" 4
+.IX Item "EV_FORK"
+The event loop has been resumed in the child process after fork (see
+\&\f(CW\*(C`ev_fork\*(C'\fR).
 .ie n .IP """EV_ERROR""" 4
 .el .IP "\f(CWEV_ERROR\fR" 4
 .IX Item "EV_ERROR"
@@ -1615,6 +1624,21 @@ apropriate way for embedded loops.
 .IP "struct ev_loop *loop [read\-only]" 4
 .IX Item "struct ev_loop *loop [read-only]"
 The embedded event loop.
+.ie n .Sh """ev_fork"" \- the audacity to resume the event loop after a fork"
+.el .Sh "\f(CWev_fork\fP \- the audacity to resume the event loop after a fork"
+.IX Subsection "ev_fork - the audacity to resume the event loop after a fork"
+Fork watchers are called when a \f(CW\*(C`fork ()\*(C'\fR was detected (usually because
+whoever is a good citizen cared to tell libev about it by calling
+\&\f(CW\*(C`ev_default_fork\*(C'\fR or \f(CW\*(C`ev_loop_fork\*(C'\fR). The invocation is done before the
+event loop blocks next and before \f(CW\*(C`ev_check\*(C'\fR watchers are being called,
+and only in the child after the fork. If whoever good citizen calling
+\&\f(CW\*(C`ev_default_fork\*(C'\fR cheats and calls it in the wrong process, the fork
+handlers will be invoked, too, of course.
+.IP "ev_fork_init (ev_signal *, callback)" 4
+.IX Item "ev_fork_init (ev_signal *, callback)"
+Initialises and configures the fork watcher \- it has no parameters of any
+kind. There is a \f(CW\*(C`ev_fork_set\*(C'\fR macro, but using it is utterly pointless,
+believe me.
 .SH "OTHER FUNCTIONS"
 .IX Header "OTHER FUNCTIONS"
 There are some other functions of possible interest. Described. Here. Now.
@@ -1793,6 +1817,71 @@ the constructor.
 \&  {
 \&    io.start (fd, ev::READ);
 \&  }
+.Ve
+.SH "MACRO MAGIC"
+.IX Header "MACRO MAGIC"
+Libev can be compiled with a variety of options, the most fundemantal is
+\&\f(CW\*(C`EV_MULTIPLICITY\*(C'\fR. This option determines wether (most) functions and
+callbacks have an initial \f(CW\*(C`struct ev_loop *\*(C'\fR argument.
+.PP
+To make it easier to write programs that cope with either variant, the
+following macros are defined:
+.ie n .IP """EV_A""\fR, \f(CW""EV_A_""" 4
+.el .IP "\f(CWEV_A\fR, \f(CWEV_A_\fR" 4
+.IX Item "EV_A, EV_A_"
+This provides the loop \fIargument\fR for functions, if one is required (\*(L"ev
+loop argument\*(R"). The \f(CW\*(C`EV_A\*(C'\fR form is used when this is the sole argument,
+\&\f(CW\*(C`EV_A_\*(C'\fR is used when other arguments are following. Example:
+.Sp
+.Vb 3
+\&  ev_unref (EV_A);
+\&  ev_timer_add (EV_A_ watcher);
+\&  ev_loop (EV_A_ 0);
+.Ve
+.Sp
+It assumes the variable \f(CW\*(C`loop\*(C'\fR of type \f(CW\*(C`struct ev_loop *\*(C'\fR is in scope,
+which is often provided by the following macro.
+.ie n .IP """EV_P""\fR, \f(CW""EV_P_""" 4
+.el .IP "\f(CWEV_P\fR, \f(CWEV_P_\fR" 4
+.IX Item "EV_P, EV_P_"
+This provides the loop \fIparameter\fR for functions, if one is required (\*(L"ev
+loop parameter\*(R"). The \f(CW\*(C`EV_P\*(C'\fR form is used when this is the sole parameter,
+\&\f(CW\*(C`EV_P_\*(C'\fR is used when other parameters are following. Example:
+.Sp
+.Vb 2
+\&  // this is how ev_unref is being declared
+\&  static void ev_unref (EV_P);
+.Ve
+.Sp
+.Vb 2
+\&  // this is how you can declare your typical callback
+\&  static void cb (EV_P_ ev_timer *w, int revents)
+.Ve
+.Sp
+It declares a parameter \f(CW\*(C`loop\*(C'\fR of type \f(CW\*(C`struct ev_loop *\*(C'\fR, quite
+suitable for use with \f(CW\*(C`EV_A\*(C'\fR.
+.ie n .IP """EV_DEFAULT""\fR, \f(CW""EV_DEFAULT_""" 4
+.el .IP "\f(CWEV_DEFAULT\fR, \f(CWEV_DEFAULT_\fR" 4
+.IX Item "EV_DEFAULT, EV_DEFAULT_"
+Similar to the other two macros, this gives you the value of the default
+loop, if multiple loops are supported (\*(L"ev loop default\*(R").
+.PP
+Example: Declare and initialise a check watcher, working regardless of
+wether multiple loops are supported or not.
+.PP
+.Vb 5
+\&  static void
+\&  check_cb (EV_P_ ev_timer *w, int revents)
+\&  {
+\&    ev_check_stop (EV_A_ w);
+\&  }
+.Ve
+.PP
+.Vb 4
+\&  ev_check check;
+\&  ev_check_init (&check, check_cb);
+\&  ev_check_start (EV_DEFAULT_ &check);
+\&  ev_loop (EV_DEFAULT_ 0);
 .Ve
 .SH "EMBEDDING"
 .IX Header "EMBEDDING"
@@ -2021,6 +2110,10 @@ defined to be \f(CW0\fR, then they are not.
 .IP "\s-1EV_STAT_ENABLE\s0" 4
 .IX Item "EV_STAT_ENABLE"
 If undefined or defined to be \f(CW1\fR, then stat watchers are supported. If
+defined to be \f(CW0\fR, then they are not.
+.IP "\s-1EV_FORK_ENABLE\s0" 4
+.IX Item "EV_FORK_ENABLE"
+If undefined or defined to be \f(CW1\fR, then fork watchers are supported. If
 defined to be \f(CW0\fR, then they are not.
 .IP "\s-1EV_MINIMAL\s0" 4
 .IX Item "EV_MINIMAL"

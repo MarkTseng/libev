@@ -52,10 +52,13 @@ namespace ev {
     TIMEOUT  = EV_TIMEOUT,
     PERIODIC = EV_PERIODIC,
     SIGNAL   = EV_SIGNAL,
+    CHILD    = EV_CHILD,
+    STAT     = EV_STAT,
     IDLE     = EV_IDLE,
     CHECK    = EV_CHECK,
     PREPARE  = EV_PREPARE,
-    CHILD    = EV_CHILD,
+    FORK     = EV_FORK,
+    EMBED    = EV_EMBED,
     ERROR    = EV_ERROR,
   };
 

@@ -80,5 +80,11 @@ VARx(struct ev_check **, checks)
 VARx(int, checkmax)
 VARx(int, checkcnt)
 
+#if EV_FORK_ENABLE || EV_GENWRAP
+VARx(struct ev_fork **, forks)
+VARx(int, forkmax)
+VARx(int, forkcnt)
+#endif
+
 #undef VARx
 

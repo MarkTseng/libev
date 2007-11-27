@@ -50,7 +50,6 @@ called C<ev_tstamp>, which is what you should use too. It usually aliases
 to the C<double> type in C, and when you need to do any calculations on
 it, you should treat it as such.
 
-
 =head1 GLOBAL FUNCTIONS
 
 These functions can be called anytime, even before initialising the
@@ -566,6 +565,15 @@ received events. Callbacks of both watcher types can start and stop as
 many watchers as they want, and all of them will be taken into account
 (for example, a C<ev_prepare> watcher might start an idle watcher to keep
 C<ev_loop> from blocking).
+
+=item C<EV_EMBED>
+
+The embedded event loop specified in the C<ev_embed> watcher needs attention.
+
+=item C<EV_FORK>
+
+The event loop has been resumed in the child process after fork (see
+C<ev_fork>).
 
 =item C<EV_ERROR>
 
@@ -1472,6 +1480,27 @@ The embedded event loop.
 =back
 
 
+=head2 C<ev_fork> - the audacity to resume the event loop after a fork
+
+Fork watchers are called when a C<fork ()> was detected (usually because
+whoever is a good citizen cared to tell libev about it by calling
+C<ev_default_fork> or C<ev_loop_fork>). The invocation is done before the
+event loop blocks next and before C<ev_check> watchers are being called,
+and only in the child after the fork. If whoever good citizen calling
+C<ev_default_fork> cheats and calls it in the wrong process, the fork
+handlers will be invoked, too, of course.
+
+=over 4
+
+=item ev_fork_init (ev_signal *, callback)
+
+Initialises and configures the fork watcher - it has no parameters of any
+kind. There is a C<ev_fork_set> macro, but using it is utterly pointless,
+believe me.
+
+=back
+
+
 =head1 OTHER FUNCTIONS
 
 There are some other functions of possible interest. Described. Here. Now.
@@ -1665,6 +1694,68 @@ the constructor.
   {
     io.start (fd, ev::READ);
   }
+
+
+=head1 MACRO MAGIC
+
+Libev can be compiled with a variety of options, the most fundemantal is
+C<EV_MULTIPLICITY>. This option determines wether (most) functions and
+callbacks have an initial C<struct ev_loop *> argument.
+
+To make it easier to write programs that cope with either variant, the
+following macros are defined:
+
+=over 4
+
+=item C<EV_A>, C<EV_A_>
+
+This provides the loop I<argument> for functions, if one is required ("ev
+loop argument"). The C<EV_A> form is used when this is the sole argument,
+C<EV_A_> is used when other arguments are following. Example:
+
+  ev_unref (EV_A);
+  ev_timer_add (EV_A_ watcher);
+  ev_loop (EV_A_ 0);
+
+It assumes the variable C<loop> of type C<struct ev_loop *> is in scope,
+which is often provided by the following macro.
+
+=item C<EV_P>, C<EV_P_>
+
+This provides the loop I<parameter> for functions, if one is required ("ev
+loop parameter"). The C<EV_P> form is used when this is the sole parameter,
+C<EV_P_> is used when other parameters are following. Example:
+
+  // this is how ev_unref is being declared
+  static void ev_unref (EV_P);
+
+  // this is how you can declare your typical callback
+  static void cb (EV_P_ ev_timer *w, int revents)
+
+It declares a parameter C<loop> of type C<struct ev_loop *>, quite
+suitable for use with C<EV_A>.
+
+=item C<EV_DEFAULT>, C<EV_DEFAULT_>
+
+Similar to the other two macros, this gives you the value of the default
+loop, if multiple loops are supported ("ev loop default").
+
+=back
+
+Example: Declare and initialise a check watcher, working regardless of
+wether multiple loops are supported or not.
+
+  static void
+  check_cb (EV_P_ ev_timer *w, int revents)
+  {
+    ev_check_stop (EV_A_ w);
+  }
+
+  ev_check check;
+  ev_check_init (&check, check_cb);
+  ev_check_start (EV_DEFAULT_ &check);
+  ev_loop (EV_DEFAULT_ 0);
+
 
 =head1 EMBEDDING
 
@@ -1895,6 +1986,11 @@ defined to be C<0>, then they are not.
 =item EV_STAT_ENABLE
 
 If undefined or defined to be C<1>, then stat watchers are supported. If
+defined to be C<0>, then they are not.
+
+=item EV_FORK_ENABLE
+
+If undefined or defined to be C<1>, then fork watchers are supported. If
 defined to be C<0>, then they are not.
 
 =item EV_MINIMAL

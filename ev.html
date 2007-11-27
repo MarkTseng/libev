@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Tue Nov 27 09:20:40 2007" />
+	<meta name="created" content="Tue Nov 27 11:59:06 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -37,11 +37,13 @@
 <li><a href="#code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do...</a></li>
 <li><a href="#code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop!</a></li>
 <li><a href="#code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough...</a></li>
+<li><a href="#code_ev_fork_code_the_audacity_to_re"><code>ev_fork</code> - the audacity to resume the event loop after a fork</a></li>
 </ul>
 </li>
 <li><a href="#OTHER_FUNCTIONS">OTHER FUNCTIONS</a></li>
 <li><a href="#LIBEVENT_EMULATION">LIBEVENT EMULATION</a></li>
 <li><a href="#C_SUPPORT">C++ SUPPORT</a></li>
+<li><a href="#MACRO_MAGIC">MACRO MAGIC</a></li>
 <li><a href="#EMBEDDING">EMBEDDING</a>
 <ul><li><a href="#FILESETS">FILESETS</a>
 <ul><li><a href="#CORE_EVENT_LOOP">CORE EVENT LOOP</a></li>
@@ -115,10 +117,6 @@ the beginning of 1970, details are complicated, don't ask). This type is
 called <code>ev_tstamp</code>, which is what you should use too. It usually aliases
 to the <code>double</code> type in C, and when you need to do any calculations on
 it, you should treat it as such.</p>
-
-
-
-
 
 </div>
 <h1 id="GLOBAL_FUNCTIONS">GLOBAL FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
@@ -607,6 +605,15 @@ received events. Callbacks of both watcher types can start and stop as
 many watchers as they want, and all of them will be taken into account
 (for example, a <code>ev_prepare</code> watcher might start an idle watcher to keep
 <code>ev_loop</code> from blocking).</p>
+	</dd>
+	<dt><code>EV_EMBED</code></dt>
+	<dd>
+		<p>The embedded event loop specified in the <code>ev_embed</code> watcher needs attention.</p>
+	</dd>
+	<dt><code>EV_FORK</code></dt>
+	<dd>
+		<p>The event loop has been resumed in the child process after fork (see
+<code>ev_fork</code>).</p>
 	</dd>
 	<dt><code>EV_ERROR</code></dt>
 	<dd>
@@ -1482,6 +1489,29 @@ apropriate way for embedded loops.</p>
 
 
 </div>
+<h2 id="code_ev_fork_code_the_audacity_to_re"><code>ev_fork</code> - the audacity to resume the event loop after a fork</h2>
+<div id="code_ev_fork_code_the_audacity_to_re-2">
+<p>Fork watchers are called when a <code>fork ()</code> was detected (usually because
+whoever is a good citizen cared to tell libev about it by calling
+<code>ev_default_fork</code> or <code>ev_loop_fork</code>). The invocation is done before the
+event loop blocks next and before <code>ev_check</code> watchers are being called,
+and only in the child after the fork. If whoever good citizen calling
+<code>ev_default_fork</code> cheats and calls it in the wrong process, the fork
+handlers will be invoked, too, of course.</p>
+<dl>
+	<dt>ev_fork_init (ev_signal *, callback)</dt>
+	<dd>
+		<p>Initialises and configures the fork watcher - it has no parameters of any
+kind. There is a <code>ev_fork_set</code> macro, but using it is utterly pointless,
+believe me.</p>
+	</dd>
+</dl>
+
+
+
+
+
+</div>
 <h1 id="OTHER_FUNCTIONS">OTHER FUNCTIONS</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="OTHER_FUNCTIONS_CONTENT">
 <p>There are some other functions of possible interest. Described. Here. Now.</p>
@@ -1657,6 +1687,70 @@ the constructor.</p>
   {
     io.start (fd, ev::READ);
   }
+
+
+
+
+</pre>
+
+</div>
+<h1 id="MACRO_MAGIC">MACRO MAGIC</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="MACRO_MAGIC_CONTENT">
+<p>Libev can be compiled with a variety of options, the most fundemantal is
+<code>EV_MULTIPLICITY</code>. This option determines wether (most) functions and
+callbacks have an initial <code>struct ev_loop *</code> argument.</p>
+<p>To make it easier to write programs that cope with either variant, the
+following macros are defined:</p>
+<dl>
+	<dt><code>EV_A</code>, <code>EV_A_</code></dt>
+	<dd>
+		<p>This provides the loop <i>argument</i> for functions, if one is required (&quot;ev
+loop argument&quot;). The <code>EV_A</code> form is used when this is the sole argument,
+<code>EV_A_</code> is used when other arguments are following. Example:</p>
+<pre>  ev_unref (EV_A);
+  ev_timer_add (EV_A_ watcher);
+  ev_loop (EV_A_ 0);
+
+</pre>
+		<p>It assumes the variable <code>loop</code> of type <code>struct ev_loop *</code> is in scope,
+which is often provided by the following macro.</p>
+	</dd>
+	<dt><code>EV_P</code>, <code>EV_P_</code></dt>
+	<dd>
+		<p>This provides the loop <i>parameter</i> for functions, if one is required (&quot;ev
+loop parameter&quot;). The <code>EV_P</code> form is used when this is the sole parameter,
+<code>EV_P_</code> is used when other parameters are following. Example:</p>
+<pre>  // this is how ev_unref is being declared
+  static void ev_unref (EV_P);
+
+  // this is how you can declare your typical callback
+  static void cb (EV_P_ ev_timer *w, int revents)
+
+</pre>
+		<p>It declares a parameter <code>loop</code> of type <code>struct ev_loop *</code>, quite
+suitable for use with <code>EV_A</code>.</p>
+	</dd>
+	<dt><code>EV_DEFAULT</code>, <code>EV_DEFAULT_</code></dt>
+	<dd>
+		<p>Similar to the other two macros, this gives you the value of the default
+loop, if multiple loops are supported (&quot;ev loop default&quot;).</p>
+	</dd>
+</dl>
+<p>Example: Declare and initialise a check watcher, working regardless of
+wether multiple loops are supported or not.</p>
+<pre>  static void
+  check_cb (EV_P_ ev_timer *w, int revents)
+  {
+    ev_check_stop (EV_A_ w);
+  }
+
+  ev_check check;
+  ev_check_init (&amp;check, check_cb);
+  ev_check_start (EV_DEFAULT_ &amp;check);
+  ev_loop (EV_DEFAULT_ 0);
+
+
+
 
 </pre>
 
@@ -1891,6 +1985,11 @@ defined to be <code>0</code>, then they are not.</p>
 	<dt>EV_STAT_ENABLE</dt>
 	<dd>
 		<p>If undefined or defined to be <code>1</code>, then stat watchers are supported. If
+defined to be <code>0</code>, then they are not.</p>
+	</dd>
+	<dt>EV_FORK_ENABLE</dt>
+	<dd>
+		<p>If undefined or defined to be <code>1</code>, then fork watchers are supported. If
 defined to be <code>0</code>, then they are not.</p>
 	</dd>
 	<dt>EV_MINIMAL</dt>

@@ -56,6 +56,10 @@ typedef double ev_tstamp;
 # define EV_STAT_ENABLE 1
 #endif
 
+#ifndef EV_FORK_ENABLE
+# define EV_FORK_ENABLE 1
+#endif
+
 #ifndef EV_EMBED_ENABLE
 # define EV_EMBED_ENABLE 1
 #endif
@@ -73,15 +77,15 @@ struct ev_loop;
 # define EV_P_ EV_P,
 # define EV_A loop
 # define EV_A_ EV_A,
-# define EV_DEFAULT_A ev_default_loop (0)
-# define EV_DEFAULT_A_ EV_DEFAULT_A,
+# define EV_DEFAULT ev_default_loop (0)
+# define EV_DEFAULT_ EV_DEFAULT,
 #else
 # define EV_P void
 # define EV_P_
 # define EV_A
 # define EV_A_
-# define EV_DEFAULT_A
-# define EV_DEFAULT_A_
+# define EV_DEFAULT
+# define EV_DEFAULT_
 
 # undef EV_EMBED_ENABLE
 #endif
@@ -94,12 +98,13 @@ struct ev_loop;
 #define EV_TIMEOUT  0x00000100L /* timer timed out */
 #define EV_PERIODIC 0x00000200L /* periodic timer timed out */
 #define EV_SIGNAL   0x00000400L /* signal was received */
-#define EV_IDLE     0x00000800L /* event loop is idling */
-#define EV_PREPARE  0x00001000L /* event loop about to poll */
-#define EV_CHECK    0x00002000L /* event loop finished poll */
-#define EV_CHILD    0x00004000L /* child/pid had status change */
-#define EV_EMBED    0x00008000L /* embedded event loop needs sweep */
-#define EV_STAT     0x00010000L /* stat data changed */
+#define EV_CHILD    0x00000800L /* child/pid had status change */
+#define EV_STAT     0x00001000L /* stat data changed */
+#define EV_IDLE     0x00002000L /* event loop is idling */
+#define EV_PREPARE  0x00004000L /* event loop about to poll */
+#define EV_CHECK    0x00008000L /* event loop finished poll */
+#define EV_EMBED    0x00010000L /* embedded event loop needs sweep */
+#define EV_FORK     0x00020000L /* event loop resumed in child */
 #define EV_ERROR    0x80000000L /* sent when an error occurs */
 
 /* can be used to add custom fields to all watchers, while losing binary compatibility */
@@ -255,6 +260,14 @@ typedef struct ev_check
   EV_WATCHER (ev_check)
 } ev_check;
 
+#if EV_FORK_ENABLE
+/* the callback gets invoked before check in the child process when a fork was detected */
+typedef struct ev_fork
+{
+  EV_WATCHER (ev_fork)
+} ev_fork;
+#endif
+
 #if EV_EMBED_ENABLE
 /* used to embed an event loop inside another */
 /* the callback gets invoked when the event loop has handled events, and can be 0 */
@@ -276,6 +289,7 @@ union ev_any_watcher
   struct ev_io io;
   struct ev_timer timer;
   struct ev_periodic periodic;
+  struct ev_signal signal;
   struct ev_child child;
 #if EV_STAT_ENABLE
   struct ev_stat stat;
@@ -283,7 +297,9 @@ union ev_any_watcher
   struct ev_idle idle;
   struct ev_prepare prepare;
   struct ev_check check;
-  struct ev_signal signal;
+#if EV_FORK_ENABLE
+  struct ev_fork fork;
+#endif
 #if EV_EMBED_ENABLE
   struct ev_embed embed;
 #endif
@@ -413,6 +429,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_prepare_set(ev)                  /* nop, yes, this is a serious in-joke */
 #define ev_check_set(ev)                    /* nop, yes, this is a serious in-joke */
 #define ev_embed_set(ev,loop_)              do { (ev)->loop = (loop_); } while (0)
+#define ev_fork_set(ev)                     /* nop, yes, this is a serious in-joke */
 
 #define ev_io_init(ev,cb,fd,events)         do { ev_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
 #define ev_timer_init(ev,cb,after,repeat)   do { ev_init ((ev), (cb)); ev_timer_set ((ev),(after),(repeat)); } while (0)
@@ -424,6 +441,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_prepare_init(ev,cb)              do { ev_init ((ev), (cb)); ev_prepare_set ((ev)); } while (0)
 #define ev_check_init(ev,cb)                do { ev_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
 #define ev_embed_init(ev,cb,loop)           do { ev_init ((ev), (cb)); ev_embed_set ((ev),(loop)); } while (0)
+#define ev_fork_init(ev,cb)                 do { ev_init ((ev), (cb)); ev_fork_set ((ev)); } while (0)
 
 #define ev_is_pending(ev)                   (0 + ((ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
 #define ev_is_active(ev)                    (0 + ((ev_watcher *)(void *)(ev))->active) /* ro, true when the watcher has been started */
@@ -482,6 +500,11 @@ void ev_prepare_stop   (EV_P_ ev_prepare *w);
 
 void ev_check_start    (EV_P_ ev_check *w);
 void ev_check_stop     (EV_P_ ev_check *w);
+
+# if EV_FORK_ENABLE
+void ev_fork_start     (EV_P_ ev_fork *w);
+void ev_fork_stop      (EV_P_ ev_fork *w);
+# endif
 
 # if EV_EMBED_ENABLE
 /* only supported when loop to be embedded is in fact embeddable */

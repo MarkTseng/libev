@@ -1278,6 +1278,14 @@ ev_loop (EV_P_ int flags)
 
   while (activecnt)
     {
+      /* we might have forked, so reify kernel state if necessary */
+      if (expect_false (postfork))
+        if (forkcnt)
+          {
+            queue_events (EV_A_ (W *)forks, forkcnt, EV_FORK);
+            call_pending (EV_A);
+          }
+
       /* queue check watchers (and execute them) */
       if (expect_false (preparecnt))
         {
@@ -1824,6 +1832,35 @@ ev_embed_stop (EV_P_ ev_embed *w)
     return;
 
   ev_io_stop (EV_A_ &w->io);
+
+  ev_stop (EV_A_ (W)w);
+}
+#endif
+
+#if EV_FORK_ENABLE
+void
+ev_fork_start (EV_P_ ev_fork *w)
+{
+  if (expect_false (ev_is_active (w)))
+    return;
+
+  ev_start (EV_A_ (W)w, ++forkcnt);
+  array_needsize (ev_fork *, forks, forkmax, forkcnt, EMPTY2);
+  forks [forkcnt - 1] = w;
+}
+
+void
+ev_fork_stop (EV_P_ ev_fork *w)
+{
+  ev_clear_pending (EV_A_ (W)w);
+  if (expect_false (!ev_is_active (w)))
+    return;
+
+  {
+    int active = ((W)w)->active;
+    forks [active - 1] = forks [--forkcnt];
+    ((W)forks [active - 1])->active = active;
+  }
 
   ev_stop (EV_A_ (W)w);
 }

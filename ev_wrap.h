@@ -51,3 +51,6 @@
 #define checks ((loop)->checks)
 #define checkmax ((loop)->checkmax)
 #define checkcnt ((loop)->checkcnt)
+#define forks ((loop)->forks)
+#define forkmax ((loop)->forkmax)
+#define forkcnt ((loop)->forkcnt)
