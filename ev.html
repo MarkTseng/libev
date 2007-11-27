@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Tue Nov 27 20:38:24 2007" />
+	<meta name="created" content="Tue Nov 27 21:14:27 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -68,7 +68,47 @@
 </div>
 <h1 id="SYNOPSIS">SYNOPSIS</h1><p><a href="#TOP" class="toplink">Top</a></p>
 <div id="SYNOPSIS_CONTENT">
-<pre>  #include &lt;ev.h&gt;
+<pre>  /* this is the only header you need */
+  #include &lt;ev.h&gt;
+
+  /* what follows is a fully working example program */
+  ev_io stdin_watcher;
+  ev_timer timeout_watcher;
+
+  /* called when data readable on stdin */
+  static void
+  stdin_cb (EV_P_ struct ev_io *w, int revents)
+  {
+    /* puts (&quot;stdin ready&quot;); */
+    ev_io_stop (EV_A_ w); /* just a syntax example */
+    ev_unloop (EV_A_ EVUNLOOP_ALL); /* leave all loop calls */
+  }
+
+  static void
+  timeout_cb (EV_P_ struct ev_timer *w, int revents)
+  {
+    /* puts (&quot;timeout&quot;); */
+    ev_unloop (EV_A_ EVUNLOOP_ONE); /* leave one loop call */
+  }
+
+  int
+  main (void)
+  {
+    struct ev_loop *loop = ev_default_loop (0);
+
+    /* initialise an io watcher, then start it */
+    ev_io_init (&amp;stdin_watcher, stdin_cb, /*STDIN_FILENO*/ 0, EV_READ);
+    ev_io_start (loop, &amp;stdin_watcher);
+
+    /* simple non-repeating 5.5 second timeout */
+    ev_timer_init (&amp;timeout_watcher, timeout_cb, 5.5, 0.);
+    ev_timer_start (loop, &amp;timeout_watcher);
+
+    /* loop till timeout or data ready */
+    ev_loop (loop, 0);
+
+    return 0;
+  }
 
 </pre>
 
