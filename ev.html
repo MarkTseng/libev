@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Wed Nov 28 12:31:29 2007" />
+	<meta name="created" content="Wed Nov 28 18:32:11 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -232,13 +232,14 @@ might be supported on the current system, you would need to look at
 recommended ones.</p>
 		<p>See the description of <code>ev_embed</code> watchers for more info.</p>
 	</dd>
-	<dt>ev_set_allocator (void *(*cb)(void *ptr, size_t size))</dt>
+	<dt>ev_set_allocator (void *(*cb)(void *ptr, long size))</dt>
 	<dd>
-		<p>Sets the allocation function to use (the prototype and semantics are
-identical to the realloc C function). It is used to allocate and free
-memory (no surprises here). If it returns zero when memory needs to be
-allocated, the library might abort or take some potentially destructive
-action. The default is your system realloc function.</p>
+		<p>Sets the allocation function to use (the prototype is similar - the
+semantics is identical - to the realloc C function). It is used to
+allocate and free memory (no surprises here). If it returns zero when
+memory needs to be allocated, the library might abort or take some
+potentially destructive action. The default is your system realloc
+function.</p>
 		<p>You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.</p>

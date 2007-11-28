@@ -283,22 +283,22 @@ syserr (const char *msg)
     }
 }
 
-static void *(*alloc)(void *ptr, size_t size) = realloc;
+static void *(*alloc)(void *ptr, long size);
 
 void
-ev_set_allocator (void *(*cb)(void *ptr, size_t size))
+ev_set_allocator (void *(*cb)(void *ptr, long size))
 {
   alloc = cb;
 }
 
 inline_speed void *
-ev_realloc (void *ptr, size_t size)
+ev_realloc (void *ptr, long size)
 {
-  ptr = alloc (ptr, size);
+  ptr = alloc ? alloc (ptr, size) : realloc (ptr, size);
 
   if (!ptr && size)
     {
-      fprintf (stderr, "libev: cannot allocate %ld bytes, aborting.", (long)size);
+      fprintf (stderr, "libev: cannot allocate %ld bytes, aborting.", size);
       abort ();
     }
 
@@ -326,12 +326,12 @@ typedef struct
   int events;
 } ANPENDING;
 
+#if EV_USE_INOTIFY
 typedef struct
 {
-#if EV_USE_INOTIFY
   WL head;
-#endif
 } ANFS;
+#endif
 
 #if EV_MULTIPLICITY
 

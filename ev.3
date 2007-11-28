@@ -307,13 +307,14 @@ might be supported on the current system, you would need to look at
 recommended ones.
 .Sp
 See the description of \f(CW\*(C`ev_embed\*(C'\fR watchers for more info.
-.IP "ev_set_allocator (void *(*cb)(void *ptr, size_t size))" 4
-.IX Item "ev_set_allocator (void *(*cb)(void *ptr, size_t size))"
-Sets the allocation function to use (the prototype and semantics are
-identical to the realloc C function). It is used to allocate and free
-memory (no surprises here). If it returns zero when memory needs to be
-allocated, the library might abort or take some potentially destructive
-action. The default is your system realloc function.
+.IP "ev_set_allocator (void *(*cb)(void *ptr, long size))" 4
+.IX Item "ev_set_allocator (void *(*cb)(void *ptr, long size))"
+Sets the allocation function to use (the prototype is similar \- the
+semantics is identical \- to the realloc C function). It is used to
+allocate and free memory (no surprises here). If it returns zero when
+memory needs to be allocated, the library might abort or take some
+potentially destructive action. The default is your system realloc
+function.
 .Sp
 You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,

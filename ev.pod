@@ -165,13 +165,14 @@ recommended ones.
 
 See the description of C<ev_embed> watchers for more info.
 
-=item ev_set_allocator (void *(*cb)(void *ptr, size_t size))
+=item ev_set_allocator (void *(*cb)(void *ptr, long size))
 
-Sets the allocation function to use (the prototype and semantics are
-identical to the realloc C function). It is used to allocate and free
-memory (no surprises here). If it returns zero when memory needs to be
-allocated, the library might abort or take some potentially destructive
-action. The default is your system realloc function.
+Sets the allocation function to use (the prototype is similar - the
+semantics is identical - to the realloc C function). It is used to
+allocate and free memory (no surprises here). If it returns zero when
+memory needs to be allocated, the library might abort or take some
+potentially destructive action. The default is your system realloc
+function.
 
 You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
