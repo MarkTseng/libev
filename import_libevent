@@ -80,7 +80,6 @@ perl -ne '
    s/\bepoll_sub.c\b//g;
    s/\bevent-internal.h\b//g;
    s/\bevsignal.h\b//g;
-   s/-Wall//;
    s/^(man_MANS\s*=)/$1 ev.3 /;
    s/^(EXTRA_DIST\s*=)/$1 libev.m4 ev.h ev_vars.h ev_wrap.h event_compat.h ev_epoll.c ev_select.c ev_poll.c ev_kqueue.c ev_port.c ev_win32.c ev.3 ev.pod ev.html /;
    s/^(include_HEADERS\s*=)/$1 ev.h event_compat.h /;
@@ -91,6 +90,8 @@ perl -ne '
 ' <$LE/Makefile.am >Makefile.am
 
 perl -ne '
+   #s/-Wall/-Wall -Wno-comment -Wunused-function -Wno-unused-value/;
+   s/-Wall//g;
    s/libevent/libev/g;
    s/AC_LIBOBJ\(select\)/: ;/g;
    s/AC_LIBOBJ\(poll\)/: ;/g;
