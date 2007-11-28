@@ -96,6 +96,14 @@ extern "C" {
 #  endif
 # endif
 
+# ifndef EV_USE_INOTIFY
+#  if HAVE_INOTIFY_INIT && HAVE_SYS_INOTIFY_H
+#   define EV_USE_INOTIFY 1
+#  else
+#   define EV_USE_INOTIFY 0
+#  endif
+# endif
+
 #endif
 
 #include <math.h>
@@ -111,6 +119,12 @@ extern "C" {
 #include <time.h>
 
 #include <signal.h>
+
+#ifdef EV_H
+# include EV_H
+#else
+# include "ev.h"
+#endif
 
 #ifndef _WIN32
 # include <sys/time.h>
@@ -158,11 +172,23 @@ extern "C" {
 # define EV_USE_PORT 0
 #endif
 
+#ifndef EV_USE_INOTIFY
+# define EV_USE_INOTIFY 0
+#endif
+
 #ifndef EV_PID_HASHSIZE
 # if EV_MINIMAL
 #  define EV_PID_HASHSIZE 1
 # else
 #  define EV_PID_HASHSIZE 16
+# endif
+#endif
+
+#ifndef EV_INOTIFY_HASHSIZE
+# if EV_MINIMAL
+#  define EV_INOTIFY_HASHSIZE 1
+# else
+#  define EV_INOTIFY_HASHSIZE 16
 # endif
 #endif
 
@@ -182,17 +208,19 @@ extern "C" {
 # include <winsock.h>
 #endif
 
+#if !EV_STAT_ENABLE
+# define EV_USE_INOTIFY 0
+#endif
+
+#if EV_USE_INOTIFY
+# include <sys/inotify.h>
+#endif
+
 /**/
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 59.743 /* never wait longer than this time (to detect time jumps) */
 /*#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds */
-
-#ifdef EV_H
-# include EV_H
-#else
-# include "ev.h"
-#endif
 
 #if __GNUC__ >= 3
 # define expect(expr,value)         __builtin_expect ((expr),(value))
@@ -297,6 +325,13 @@ typedef struct
   W w;
   int events;
 } ANPENDING;
+
+typedef struct
+{
+#if EV_USE_INOTIFY
+  WL head;
+#endif
+} ANFS;
 
 #if EV_MULTIPLICITY
 
@@ -881,6 +916,11 @@ loop_init (EV_P_ unsigned int flags)
         flags |= ev_recommended_backends ();
 
       backend = 0;
+      backend_fd = -1;
+#if EV_USE_INOTIFY
+      fs_fd = -2;
+#endif
+
 #if EV_USE_PORT
       if (!backend && (flags & EVBACKEND_PORT  )) backend = port_init   (EV_A_ flags);
 #endif
@@ -906,6 +946,14 @@ static void noinline
 loop_destroy (EV_P)
 {
   int i;
+
+#if EV_USE_INOTIFY
+  if (fs_fd >= 0)
+    close (fs_fd);
+#endif
+
+  if (backend_fd >= 0)
+    close (backend_fd);
 
 #if EV_USE_PORT
   if (backend == EVBACKEND_PORT  ) port_destroy   (EV_A);
@@ -1667,6 +1715,127 @@ ev_child_stop (EV_P_ ev_child *w)
 #define DEF_STAT_INTERVAL 5.0074891
 #define MIN_STAT_INTERVAL 0.1074891
 
+void noinline stat_timer_cb (EV_P_ ev_timer *w_, int revents);
+
+#if EV_USE_INOTIFY
+# define EV_INOTIFY_BUFSIZE ((PATH_MAX + sizeof (struct inotify_event)) + 2048)
+
+static void noinline
+infy_add (EV_P_ ev_stat *w)
+{
+  w->wd = inotify_add_watch (fs_fd, w->path, IN_ATTRIB | IN_DELETE_SELF | IN_MOVE_SELF | IN_MODIFY | IN_DONT_FOLLOW | IN_MASK_ADD);
+
+  if (w->wd < 0)
+    {
+      ev_timer_start (EV_A_ &w->timer); /* this is not race-free, so we still need to recheck periodically */
+
+      /* monitor some parent directory for speedup hints */
+      if (errno == ENOENT || errno == EACCES)
+        {
+          char path [PATH_MAX];
+          strcpy (path, w->path);
+
+          do
+            {
+              int mask = IN_MASK_ADD | IN_DELETE_SELF | IN_MOVE_SELF
+                       | (errno == EACCES ? IN_ATTRIB : IN_CREATE | IN_MOVED_TO);
+
+              char *pend = strrchr (path, '/');
+
+              if (!pend)
+                break; /* whoops, no '/', complain to your admin */
+
+              *pend = 0;
+              w->wd = inotify_add_watch (fs_fd, path, IN_DELETE_SELF | IN_CREATE | IN_MOVED_TO | IN_MASK_ADD);
+            } 
+          while (w->wd < 0 && (errno == ENOENT || errno == EACCES));
+        }
+    }
+  else
+    ev_timer_stop (EV_A_ &w->timer); /* we can watch this in a race-free way */
+
+  if (w->wd >= 0)
+    wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
+}
+
+static void noinline
+infy_del (EV_P_ ev_stat *w)
+{
+  WL w_;
+  int slot;
+  int wd = w->wd;
+
+  if (wd < 0)
+    return;
+
+  w->wd = -2;
+  slot = wd & (EV_INOTIFY_HASHSIZE - 1);
+  wlist_del (&fs_hash [slot].head, (WL)w);
+
+  /* remove this watcher, if others are watching it, they will rearm */
+  inotify_rm_watch (fs_fd, wd);
+}
+
+static void noinline
+infy_wd (EV_P_ int slot, int wd, struct inotify_event *ev)
+{
+  if (slot < 0)
+    /* overflow, need to check for all hahs slots */
+    for (slot = 0; slot < EV_INOTIFY_HASHSIZE; ++slot)
+      infy_wd (EV_A_ slot, wd, ev);
+  else
+    {
+      WL w_;
+
+      for (w_ = fs_hash [slot & (EV_INOTIFY_HASHSIZE - 1)].head; w_; )
+        {
+          ev_stat *w = (ev_stat *)w_;
+          w_ = w_->next; /* lets us remove this watcher and all before it */
+
+          if (w->wd == wd || wd == -1)
+            {
+              if (ev->mask & (IN_IGNORED | IN_UNMOUNT | IN_DELETE_SELF))
+                {
+                  w->wd = -1;
+                  infy_add (EV_A_ w); /* re-add, no matter what */
+                }
+
+              stat_timer_cb (EV_P_ &w->timer, 0);
+            }
+        }
+    }
+}
+
+static void
+infy_cb (EV_P_ ev_io *w, int revents)
+{
+  char buf [EV_INOTIFY_BUFSIZE];
+  struct inotify_event *ev = (struct inotify_event *)buf;
+  int ofs;
+  int len = read (fs_fd, buf, sizeof (buf));
+
+  for (ofs = 0; ofs < len; ofs += sizeof (struct inotify_event) + ev->len)
+    infy_wd (EV_A_ ev->wd, ev->wd, ev);
+}
+
+void inline_size
+infy_init (EV_P)
+{
+  if (fs_fd != -2)
+    return;
+
+  fs_fd = inotify_init ();
+
+  if (fs_fd >= 0)
+    {
+      ev_io_init (&fs_w, infy_cb, fs_fd, EV_READ);
+      ev_set_priority (&fs_w, EV_MAXPRI);
+      ev_io_start (EV_A_ &fs_w);
+    }
+}
+
+#endif
+
 void
 ev_stat_stat (EV_P_ ev_stat *w)
 {
@@ -1676,7 +1845,7 @@ ev_stat_stat (EV_P_ ev_stat *w)
     w->attr.st_nlink = 1;
 }
 
-static void
+void noinline
 stat_timer_cb (EV_P_ ev_timer *w_, int revents)
 {
   ev_stat *w = (ev_stat *)(((char *)w_) - offsetof (ev_stat, timer));
@@ -1687,7 +1856,15 @@ stat_timer_cb (EV_P_ ev_timer *w_, int revents)
   ev_stat_stat (EV_A_ w);
 
   if (memcmp (&w->prev, &w->attr, sizeof (ev_statdata)))
-    ev_feed_event (EV_A_ w, EV_STAT);
+    {
+      #if EV_USE_INOTIFY
+        infy_del (EV_A_ w);
+        infy_add (EV_A_ w);
+        ev_stat_stat (EV_A_ w); /* avoid race... */
+      #endif
+
+      ev_feed_event (EV_A_ w, EV_STAT);
+    }
 }
 
 void
@@ -1707,7 +1884,15 @@ ev_stat_start (EV_P_ ev_stat *w)
 
   ev_timer_init (&w->timer, stat_timer_cb, w->interval, w->interval);
   ev_set_priority (&w->timer, ev_priority (w));
-  ev_timer_start (EV_A_ &w->timer);
+
+#if EV_USE_INOTIFY
+  infy_init (EV_A);
+
+  if (fs_fd >= 0)
+    infy_add (EV_A_ w);
+  else
+#endif
+    ev_timer_start (EV_A_ &w->timer);
 
   ev_start (EV_A_ (W)w, 1);
 }
@@ -1719,6 +1904,9 @@ ev_stat_stop (EV_P_ ev_stat *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
+#if EV_USE_INOTIFY
+  infy_del (EV_A_ w);
+#endif
   ev_timer_stop (EV_A_ &w->timer);
 
   ev_stop (EV_A_ (W)w);

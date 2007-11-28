@@ -220,23 +220,25 @@ typedef struct ev_child
 
 #if EV_STAT_ENABLE
 /* st_nlink = 0 means missing file or other error */
-#ifdef _WIN32
+# ifdef _WIN32
 typedef struct _stati64 ev_statdata;
-#else
+# else
 typedef struct stat ev_statdata;
-#endif
+# endif
 
 /* invoked each time the stat data changes for a given path */
 /* revent EV_STAT */
 typedef struct ev_stat
 {
-  EV_WATCHER (ev_stat)
+  EV_WATCHER_LIST (ev_stat)
 
   ev_timer timer;     /* private */
   ev_tstamp interval; /* ro */
   const char *path;   /* ro */
   ev_statdata prev;   /* ro */
   ev_statdata attr;   /* ro */
+
+  int wd; /* wd for inotify, fd for kqueue */
 } ev_stat;
 #endif
 
@@ -426,7 +428,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_periodic_set(ev,at_,ival_,res_)  do { (ev)->at = (at_); (ev)->interval = (ival_); (ev)->reschedule_cb= (res_); } while (0)
 #define ev_signal_set(ev,signum_)           do { (ev)->signum = (signum_); } while (0)
 #define ev_child_set(ev,pid_)               do { (ev)->pid = (pid_); } while (0)
-#define ev_stat_set(ev,path_,interval_)     do { (ev)->path = (path_); (ev)->interval = (interval_); } while (0)
+#define ev_stat_set(ev,path_,interval_)     do { (ev)->path = (path_); (ev)->interval = (interval_); (ev)->wd = -2; } while (0)
 #define ev_idle_set(ev)                     /* nop, yes, this is a serious in-joke */
 #define ev_prepare_set(ev)                  /* nop, yes, this is a serious in-joke */
 #define ev_check_set(ev)                    /* nop, yes, this is a serious in-joke */

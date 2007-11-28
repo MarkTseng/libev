@@ -36,7 +36,7 @@
 #include <string.h>
 #include <errno.h>
 
-static void
+void inline_speed
 kqueue_change (EV_P_ int fd, int filter, int flags, int fflags)
 {
   struct kevent *ke;
@@ -142,7 +142,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
     }
 }
 
-static int
+int inline_size
 kqueue_init (EV_P_ int flags)
 {
   struct kevent ch, ev;
@@ -168,16 +168,14 @@ kqueue_init (EV_P_ int flags)
   return EVBACKEND_KQUEUE;
 }
 
-static void
+void inline_size
 kqueue_destroy (EV_P)
 {
-  close (backend_fd);
-
   ev_free (kqueue_events);
   ev_free (kqueue_changes);
 }
 
-static void
+void inline_size
 kqueue_fork (EV_P)
 {
   close (backend_fd);

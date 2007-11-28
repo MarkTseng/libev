@@ -200,7 +200,7 @@ select_poll (EV_P_ ev_tstamp timeout)
 #endif
 }
 
-static int
+int inline_size
 select_init (EV_P_ int flags)
 {
   backend_fudge  = 1e-2; /* needed to compensate for select returning early, very conservative */
@@ -224,7 +224,7 @@ select_init (EV_P_ int flags)
   return EVBACKEND_SELECT;
 }
 
-static void
+void inline_size
 select_destroy (EV_P)
 {
   ev_free (vec_ri);

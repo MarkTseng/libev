@@ -108,7 +108,7 @@ port_poll (EV_P_ ev_tstamp timeout)
     }
 }
 
-static int
+int inline_size
 port_init (EV_P_ int flags)
 {
   /* Initalize the kernel queue */
@@ -127,15 +127,13 @@ port_init (EV_P_ int flags)
   return EVBACKEND_PORT;
 }
 
-static void
+void inline_size
 port_destroy (EV_P)
 {
-  close (backend_fd);
-
   ev_free (port_events);
 }
 
-static void
+void inline_size
 port_fork (EV_P)
 {
   close (backend_fd);

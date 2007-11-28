@@ -2016,6 +2016,12 @@ backend for Solaris 10 systems.
 
 reserved for future expansion, works like the USE symbols above.
 
+=item EV_USE_INOTIFY
+
+If defined to be C<1>, libev will compile in support for the Linux inotify
+interface to speed up C<ev_stat> watchers. Its actual availability will
+be detected at runtime.
+
 =item EV_H
 
 The name of the F<ev.h> header file used to include it. The default if
@@ -2080,7 +2086,15 @@ some inlining decisions, saves roughly 30% codesize of amd64.
 C<ev_child> watchers use a small hash table to distribute workload by
 pid. The default size is C<16> (or C<1> with C<EV_MINIMAL>), usually more
 than enough. If you need to manage thousands of children you might want to
-increase this value.
+increase this value (I<must> be a power of two).
+
+=item EV_INOTIFY_HASHSIZE
+
+C<ev_staz> watchers use a small hash table to distribute workload by
+inotify watch id. The default size is C<16> (or C<1> with C<EV_MINIMAL>),
+usually more than enough. If you need to manage thousands of C<ev_stat>
+watchers you might want to increase this value (I<must> be a power of
+two).
 
 =item EV_COMMON
 
@@ -2150,7 +2164,7 @@ documentation for C<ev_default_init>.
 
 =item Stopping check/prepare/idle watchers: O(1)
 
-=item Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % 16))
+=item Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))
 
 =item Finding the next timer per loop iteration: O(1)
 

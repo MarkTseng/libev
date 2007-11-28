@@ -2,7 +2,7 @@
 
 VARx(ev_tstamp, now_floor) /* last time we refreshed rt_time */
 VARx(ev_tstamp, mn_now)    /* monotonic clock "now" */
-VARx(ev_tstamp, rtmn_diff)      /* difference realtime - monotonic time */
+VARx(ev_tstamp, rtmn_diff) /* difference realtime - monotonic time */
 VARx(int, backend)
 
 VARx(ev_tstamp, backend_fudge) /* assumed typical timer resolution */
@@ -11,7 +11,7 @@ VAR (backend_poll  , void (*backend_poll)(EV_P_ ev_tstamp timeout))
 VARx(int, backend_fd)
 
 VARx(int, postfork)  /* true if we need to recreate kernel state after fork */
-VARx(int, activecnt) /* number of active events */
+VARx(int, activecnt) /* total number of active events ("refcount") */
 
 #if EV_USE_SELECT || EV_GENWRAP
 VARx(void *, vec_ri)
@@ -84,6 +84,12 @@ VARx(int, checkcnt)
 VARx(struct ev_fork **, forks)
 VARx(int, forkmax)
 VARx(int, forkcnt)
+#endif
+
+#if EV_USE_INOTIFY || EV_GENWRAP
+VARx(int, fs_fd)
+VARx(ev_io, fs_w);
+VAR (fs_hash, ANFS fs_hash [EV_INOTIFY_HASHSIZE])
 #endif
 
 #undef VARx

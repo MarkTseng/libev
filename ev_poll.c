@@ -1,5 +1,5 @@
 /*
- * libev epoll fd activity backend
+ * libev poll fd activity backend
  *
  * Copyright (c) 2007 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
@@ -105,7 +105,7 @@ poll_poll (EV_P_ ev_tstamp timeout)
       );
 }
 
-static int
+int inline_size
 poll_init (EV_P_ int flags)
 {
   backend_fudge  = 1e-3; /* needed to compensate for select returning early, very conservative */
@@ -118,7 +118,7 @@ poll_init (EV_P_ int flags)
   return EVBACKEND_POLL;
 }
 
-static void
+void inline_size
 poll_destroy (EV_P)
 {
   ev_free (pollidxs);

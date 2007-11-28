@@ -79,7 +79,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
     }
 }
 
-static int
+int inline_size
 epoll_init (EV_P_ int flags)
 {
   backend_fd = epoll_create (256);
@@ -99,15 +99,13 @@ epoll_init (EV_P_ int flags)
   return EVBACKEND_EPOLL;
 }
 
-static void
+void inline_size
 epoll_destroy (EV_P)
 {
-  close (backend_fd);
-
   ev_free (epoll_events);
 }
 
-static void
+void inline_size
 epoll_fork (EV_P)
 {
   close (backend_fd);
