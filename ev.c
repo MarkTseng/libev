@@ -987,6 +987,8 @@ loop_destroy (EV_P)
   backend = 0;
 }
 
+void inline_size infy_fork (EV_P);
+
 void inline_size
 loop_fork (EV_P)
 {
@@ -998,6 +1000,9 @@ loop_fork (EV_P)
 #endif
 #if EV_USE_EPOLL
   if (backend == EVBACKEND_EPOLL ) epoll_fork  (EV_A);
+#endif
+#if EV_USE_INOTIFY
+  infy_fork (EV_A);
 #endif
 
   if (ev_is_active (&sigev))
@@ -1830,6 +1835,38 @@ infy_init (EV_P)
       ev_io_init (&fs_w, infy_cb, fs_fd, EV_READ);
       ev_set_priority (&fs_w, EV_MAXPRI);
       ev_io_start (EV_A_ &fs_w);
+    }
+}
+
+void inline_size
+infy_fork (EV_P)
+{
+  int slot;
+
+  if (fs_fd < 0)
+    return;
+
+  close (fs_fd);
+  fs_fd = inotify_init ();
+
+  for (slot = 0; slot < EV_INOTIFY_HASHSIZE; ++slot)
+    {
+      WL w_ = fs_hash [slot].head;
+      fs_hash [slot].head = 0;
+
+      while (w_)
+        {
+          ev_stat *w = (ev_stat *)w_;
+          w_ = w_->next; /* lets us add this watcher */
+
+          w->wd = -1;
+
+          if (fs_fd >= 0)
+            infy_add (EV_A_ w); /* re-add, no matter what */
+          else
+            ev_timer_start (EV_A_ &w->timer);
+        }
+
     }
 }
 
