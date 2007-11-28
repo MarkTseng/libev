@@ -55,5 +55,5 @@
 #define forkmax ((loop)->forkmax)
 #define forkcnt ((loop)->forkcnt)
 #define fs_fd ((loop)->fs_fd)
-#define fs_w ((loop)->fs_w);
+#define fs_w ((loop)->fs_w)
 #define fs_hash ((loop)->fs_hash)

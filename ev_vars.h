@@ -88,7 +88,7 @@ VARx(int, forkcnt)
 
 #if EV_USE_INOTIFY || EV_GENWRAP
 VARx(int, fs_fd)
-VARx(ev_io, fs_w);
+VARx(ev_io, fs_w)
 VAR (fs_hash, ANFS fs_hash [EV_INOTIFY_HASHSIZE])
 #endif
 

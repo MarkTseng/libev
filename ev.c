@@ -1718,7 +1718,7 @@ ev_child_stop (EV_P_ ev_child *w)
 void noinline stat_timer_cb (EV_P_ ev_timer *w_, int revents);
 
 #if EV_USE_INOTIFY
-# define EV_INOTIFY_BUFSIZE ((PATH_MAX + sizeof (struct inotify_event)) + 2048)
+# define EV_INOTIFY_BUFSIZE 8192
 
 static void noinline
 infy_add (EV_P_ ev_stat *w)
@@ -1730,9 +1730,9 @@ infy_add (EV_P_ ev_stat *w)
       ev_timer_start (EV_A_ &w->timer); /* this is not race-free, so we still need to recheck periodically */
 
       /* monitor some parent directory for speedup hints */
-      if (errno == ENOENT || errno == EACCES)
+      if ((errno == ENOENT || errno == EACCES) && strlen (w->path) < 4096)
         {
-          char path [PATH_MAX];
+          char path [4096];
           strcpy (path, w->path);
 
           do
@@ -1746,7 +1746,7 @@ infy_add (EV_P_ ev_stat *w)
                 break; /* whoops, no '/', complain to your admin */
 
               *pend = 0;
-              w->wd = inotify_add_watch (fs_fd, path, IN_DELETE_SELF | IN_CREATE | IN_MOVED_TO | IN_MASK_ADD);
+              w->wd = inotify_add_watch (fs_fd, path, mask);
             } 
           while (w->wd < 0 && (errno == ENOENT || errno == EACCES));
         }
@@ -1761,7 +1761,6 @@ infy_add (EV_P_ ev_stat *w)
 static void noinline
 infy_del (EV_P_ ev_stat *w)
 {
-  WL w_;
   int slot;
   int wd = w->wd;
 
@@ -1800,7 +1799,7 @@ infy_wd (EV_P_ int slot, int wd, struct inotify_event *ev)
                   infy_add (EV_A_ w); /* re-add, no matter what */
                 }
 
-              stat_timer_cb (EV_P_ &w->timer, 0);
+              stat_timer_cb (EV_A_ &w->timer, 0);
             }
         }
     }
