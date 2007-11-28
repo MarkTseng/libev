@@ -212,12 +212,13 @@ details of the event, and then hand it over to libev by \fIstarting\fR the
 watcher.
 .SH "FEATURES"
 .IX Header "FEATURES"
-Libev supports \f(CW\*(C`select\*(C'\fR, \f(CW\*(C`poll\*(C'\fR, the linux-specific \f(CW\*(C`epoll\*(C'\fR, the
-bsd-specific \f(CW\*(C`kqueue\*(C'\fR and the solaris-specific event port mechanisms
-for file descriptor events (\f(CW\*(C`ev_io\*(C'\fR), relative timers (\f(CW\*(C`ev_timer\*(C'\fR),
-absolute timers with customised rescheduling (\f(CW\*(C`ev_periodic\*(C'\fR), synchronous
-signals (\f(CW\*(C`ev_signal\*(C'\fR), process status change events (\f(CW\*(C`ev_child\*(C'\fR), and
-event watchers dealing with the event loop mechanism itself (\f(CW\*(C`ev_idle\*(C'\fR,
+Libev supports \f(CW\*(C`select\*(C'\fR, \f(CW\*(C`poll\*(C'\fR, the Linux-specific \f(CW\*(C`epoll\*(C'\fR, the
+BSD-specific \f(CW\*(C`kqueue\*(C'\fR and the Solaris-specific event port mechanisms
+for file descriptor events (\f(CW\*(C`ev_io\*(C'\fR), the Linux \f(CW\*(C`inotify\*(C'\fR interface
+(for \f(CW\*(C`ev_stat\*(C'\fR), relative timers (\f(CW\*(C`ev_timer\*(C'\fR), absolute timers
+with customised rescheduling (\f(CW\*(C`ev_periodic\*(C'\fR), synchronous signals
+(\f(CW\*(C`ev_signal\*(C'\fR), process status change events (\f(CW\*(C`ev_child\*(C'\fR), and event
+watchers dealing with the event loop mechanism itself (\f(CW\*(C`ev_idle\*(C'\fR,
 \&\f(CW\*(C`ev_embed\*(C'\fR, \f(CW\*(C`ev_prepare\*(C'\fR and \f(CW\*(C`ev_check\*(C'\fR watchers) as well as
 file watchers (\f(CW\*(C`ev_stat\*(C'\fR) and even limited support for fork events
 (\f(CW\*(C`ev_fork\*(C'\fR).
