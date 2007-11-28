@@ -591,7 +591,6 @@ fd_rearm_all (EV_P)
 {
   int fd;
 
-  /* this should be highly optimised to not do anything but set a flag */
   for (fd = 0; fd < anfdmax; ++fd)
     if (anfds [fd].events)
       {
@@ -1272,10 +1271,10 @@ time_update (EV_P)
           /* loop a few times, before making important decisions.
            * on the choice of "4": one iteration isn't enough,
            * in case we get preempted during the calls to
-           * ev_time and get_clock. a second call is almost guarenteed
+           * ev_time and get_clock. a second call is almost guaranteed
            * to succeed in that case, though. and looping a few more times
            * doesn't hurt either as we only do this on time-jumps or
-           * in the unlikely event of getting preempted here.
+           * in the unlikely event of having been preempted here.
            */
           for (i = 4; --i; )
             {
@@ -1307,7 +1306,7 @@ time_update (EV_P)
           periodics_reschedule (EV_A);
 #endif
 
-          /* adjust timers. this is easy, as the offset is the same for all */
+          /* adjust timers. this is easy, as the offset is the same for all of them */
           for (i = 0; i < timercnt; ++i)
             ((WT)timers [i])->at += ev_rt_now - mn_now;
         }
@@ -1339,15 +1338,15 @@ ev_loop (EV_P_ int flags)
 
   while (activecnt)
     {
-      /* we might have forked, so reify kernel state if necessary */
-      #if EV_FORK_ENABLE
-        if (expect_false (postfork))
-          if (forkcnt)
-            {
-              queue_events (EV_A_ (W *)forks, forkcnt, EV_FORK);
-              call_pending (EV_A);
-            }
-      #endif
+#if EV_FORK_ENABLE
+      /* we might have forked, so queue fork handlers */
+      if (expect_false (postfork))
+        if (forkcnt)
+          {
+            queue_events (EV_A_ (W *)forks, forkcnt, EV_FORK);
+            call_pending (EV_A);
+          }
+#endif
 
       /* queue check watchers (and execute them) */
       if (expect_false (preparecnt))
@@ -1365,7 +1364,7 @@ ev_loop (EV_P_ int flags)
 
       /* calculate blocking time */
       {
-        double block;
+        ev_tstamp block;
 
         if (flags & EVLOOP_NONBLOCK || idlecnt)
           block = 0.; /* do not block at all */
@@ -1720,7 +1719,7 @@ ev_child_stop (EV_P_ ev_child *w)
 #define DEF_STAT_INTERVAL 5.0074891
 #define MIN_STAT_INTERVAL 0.1074891
 
-void noinline stat_timer_cb (EV_P_ ev_timer *w_, int revents);
+static void noinline stat_timer_cb (EV_P_ ev_timer *w_, int revents);
 
 #if EV_USE_INOTIFY
 # define EV_INOTIFY_BUFSIZE 8192
@@ -1881,7 +1880,7 @@ ev_stat_stat (EV_P_ ev_stat *w)
     w->attr.st_nlink = 1;
 }
 
-void noinline
+static void noinline
 stat_timer_cb (EV_P_ ev_timer *w_, int revents)
 {
   ev_stat *w = (ev_stat *)(((char *)w_) - offsetof (ev_stat, timer));
