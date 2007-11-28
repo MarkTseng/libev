@@ -1891,8 +1891,20 @@ stat_timer_cb (EV_P_ ev_timer *w_, int revents)
   w->prev = w->attr;
   ev_stat_stat (EV_A_ w);
 
-  if (memcmp (&w->prev, &w->attr, sizeof (ev_statdata)))
-    {
+  /* memcmp doesn't work on netbsd, they.... do stuff to their struct stat */
+  if (
+    w->prev.st_dev      != w->attr.st_dev
+    || w->prev.st_ino   != w->attr.st_ino
+    || w->prev.st_mode  != w->attr.st_mode
+    || w->prev.st_nlink != w->attr.st_nlink
+    || w->prev.st_uid   != w->attr.st_uid
+    || w->prev.st_gid   != w->attr.st_gid
+    || w->prev.st_rdev  != w->attr.st_rdev
+    || w->prev.st_size  != w->attr.st_size
+    || w->prev.st_atime != w->attr.st_atime
+    || w->prev.st_mtime != w->attr.st_mtime
+    || w->prev.st_ctime != w->attr.st_ctime
+  ) {
       #if EV_USE_INOTIFY
         infy_del (EV_A_ w);
         infy_add (EV_A_ w);
