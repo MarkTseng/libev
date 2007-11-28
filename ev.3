@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-11-27" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-11-28" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -1385,7 +1385,7 @@ otherwise always forced to be at least one) and all the other fields of
 the stat buffer having unspecified contents.
 .PP
 Since there is no standard to do this, the portable implementation simply
-calls \f(CW\*(C`stat (2)\*(C'\fR regulalry on the path to see if it changed somehow. You
+calls \f(CW\*(C`stat (2)\*(C'\fR regularly on the path to see if it changed somehow. You
 can specify a recommended polling interval for this case. If you specify
 a polling interval of \f(CW0\fR (highly recommended!) then a \fIsuitable,
 unspecified default\fR value will be used (which you can expect to be around
@@ -1397,8 +1397,13 @@ This watcher type is not meant for massive numbers of stat watchers,
 as even with OS-supported change notifications, this can be
 resource\-intensive.
 .PP
-At the time of this writing, no specific \s-1OS\s0 backends are implemented, but
-if demand increases, at least a kqueue and inotify backend will be added.
+At the time of this writing, only the Linux inotify interface is
+implemented (implementing kqueue support is left as an exercise for the
+reader). Inotify will be used to give hints only and should not change the
+semantics of \f(CW\*(C`ev_stat\*(C'\fR watchers, which means that libev sometimes needs
+to fall back to regular polling again even with inotify, but changes are
+usually detected immediately, and if the file exists there will be no
+polling.
 .IP "ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)" 4
 .IX Item "ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)"
 .PD 0
@@ -2172,6 +2177,11 @@ backend for Solaris 10 systems.
 .IP "\s-1EV_USE_DEVPOLL\s0" 4
 .IX Item "EV_USE_DEVPOLL"
 reserved for future expansion, works like the \s-1USE\s0 symbols above.
+.IP "\s-1EV_USE_INOTIFY\s0" 4
+.IX Item "EV_USE_INOTIFY"
+If defined to be \f(CW1\fR, libev will compile in support for the Linux inotify
+interface to speed up \f(CW\*(C`ev_stat\*(C'\fR watchers. Its actual availability will
+be detected at runtime.
 .IP "\s-1EV_H\s0" 4
 .IX Item "EV_H"
 The name of the \fIev.h\fR header file used to include it. The default if
@@ -2226,7 +2236,14 @@ some inlining decisions, saves roughly 30% codesize of amd64.
 \&\f(CW\*(C`ev_child\*(C'\fR watchers use a small hash table to distribute workload by
 pid. The default size is \f(CW16\fR (or \f(CW1\fR with \f(CW\*(C`EV_MINIMAL\*(C'\fR), usually more
 than enough. If you need to manage thousands of children you might want to
-increase this value.
+increase this value (\fImust\fR be a power of two).
+.IP "\s-1EV_INOTIFY_HASHSIZE\s0" 4
+.IX Item "EV_INOTIFY_HASHSIZE"
+\&\f(CW\*(C`ev_staz\*(C'\fR watchers use a small hash table to distribute workload by
+inotify watch id. The default size is \f(CW16\fR (or \f(CW1\fR with \f(CW\*(C`EV_MINIMAL\*(C'\fR),
+usually more than enough. If you need to manage thousands of \f(CW\*(C`ev_stat\*(C'\fR
+watchers you might want to increase this value (\fImust\fR be a power of
+two).
 .IP "\s-1EV_COMMON\s0" 4
 .IX Item "EV_COMMON"
 By default, all watchers have a \f(CW\*(C`void *data\*(C'\fR member. By redefining
@@ -2300,8 +2317,8 @@ documentation for \f(CW\*(C`ev_default_init\*(C'\fR.
 .IX Item "Starting io/check/prepare/idle/signal/child watchers: O(1)"
 .IP "Stopping check/prepare/idle watchers: O(1)" 4
 .IX Item "Stopping check/prepare/idle watchers: O(1)"
-.IP "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % 16))" 4
-.IX Item "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % 16))"
+.IP "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % \s-1EV_PID_HASHSIZE\s0))" 4
+.IX Item "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))"
 .IP "Finding the next timer per loop iteration: O(1)" 4
 .IX Item "Finding the next timer per loop iteration: O(1)"
 .IP "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)" 4

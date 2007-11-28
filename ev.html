@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Wed Nov 28 12:27:27 2007" />
+	<meta name="created" content="Wed Nov 28 12:31:29 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -135,12 +135,13 @@ watcher.</p>
 </div>
 <h1 id="FEATURES">FEATURES</h1>
 <div id="FEATURES_CONTENT">
-<p>Libev supports <code>select</code>, <code>poll</code>, the linux-specific <code>epoll</code>, the
-bsd-specific <code>kqueue</code> and the solaris-specific event port mechanisms
-for file descriptor events (<code>ev_io</code>), relative timers (<code>ev_timer</code>),
-absolute timers with customised rescheduling (<code>ev_periodic</code>), synchronous
-signals (<code>ev_signal</code>), process status change events (<code>ev_child</code>), and
-event watchers dealing with the event loop mechanism itself (<code>ev_idle</code>,
+<p>Libev supports <code>select</code>, <code>poll</code>, the Linux-specific <code>epoll</code>, the
+BSD-specific <code>kqueue</code> and the Solaris-specific event port mechanisms
+for file descriptor events (<code>ev_io</code>), the Linux <code>inotify</code> interface
+(for <code>ev_stat</code>), relative timers (<code>ev_timer</code>), absolute timers
+with customised rescheduling (<code>ev_periodic</code>), synchronous signals
+(<code>ev_signal</code>), process status change events (<code>ev_child</code>), and event
+watchers dealing with the event loop mechanism itself (<code>ev_idle</code>,
 <code>ev_embed</code>, <code>ev_prepare</code> and <code>ev_check</code> watchers) as well as
 file watchers (<code>ev_stat</code>) and even limited support for fork events
 (<code>ev_fork</code>).</p>

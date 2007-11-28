@@ -65,12 +65,13 @@ watcher.
 
 =head1 FEATURES
 
-Libev supports C<select>, C<poll>, the linux-specific C<epoll>, the
-bsd-specific C<kqueue> and the solaris-specific event port mechanisms
-for file descriptor events (C<ev_io>), relative timers (C<ev_timer>),
-absolute timers with customised rescheduling (C<ev_periodic>), synchronous
-signals (C<ev_signal>), process status change events (C<ev_child>), and
-event watchers dealing with the event loop mechanism itself (C<ev_idle>,
+Libev supports C<select>, C<poll>, the Linux-specific C<epoll>, the
+BSD-specific C<kqueue> and the Solaris-specific event port mechanisms
+for file descriptor events (C<ev_io>), the Linux C<inotify> interface
+(for C<ev_stat>), relative timers (C<ev_timer>), absolute timers
+with customised rescheduling (C<ev_periodic>), synchronous signals
+(C<ev_signal>), process status change events (C<ev_child>), and event
+watchers dealing with the event loop mechanism itself (C<ev_idle>,
 C<ev_embed>, C<ev_prepare> and C<ev_check> watchers) as well as
 file watchers (C<ev_stat>) and even limited support for fork events
 (C<ev_fork>).
