@@ -1224,7 +1224,7 @@ otherwise always forced to be at least one) and all the other fields of
 the stat buffer having unspecified contents.
 
 Since there is no standard to do this, the portable implementation simply
-calls C<stat (2)> regulalry on the path to see if it changed somehow. You
+calls C<stat (2)> regularly on the path to see if it changed somehow. You
 can specify a recommended polling interval for this case. If you specify
 a polling interval of C<0> (highly recommended!) then a I<suitable,
 unspecified default> value will be used (which you can expect to be around
@@ -1236,8 +1236,13 @@ This watcher type is not meant for massive numbers of stat watchers,
 as even with OS-supported change notifications, this can be
 resource-intensive.
 
-At the time of this writing, no specific OS backends are implemented, but
-if demand increases, at least a kqueue and inotify backend will be added.
+At the time of this writing, only the Linux inotify interface is
+implemented (implementing kqueue support is left as an exercise for the
+reader). Inotify will be used to give hints only and should not change the
+semantics of C<ev_stat> watchers, which means that libev sometimes needs
+to fall back to regular polling again even with inotify, but changes are
+usually detected immediately, and if the file exists there will be no
+polling.
 
 =over 4
 

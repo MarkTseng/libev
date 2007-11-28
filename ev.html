@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Tue Nov 27 21:38:05 2007" />
+	<meta name="created" content="Wed Nov 28 12:27:27 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1249,7 +1249,7 @@ not exist&quot; is signified by the <code>st_nlink</code> field being zero (whic
 otherwise always forced to be at least one) and all the other fields of
 the stat buffer having unspecified contents.</p>
 <p>Since there is no standard to do this, the portable implementation simply
-calls <code>stat (2)</code> regulalry on the path to see if it changed somehow. You
+calls <code>stat (2)</code> regularly on the path to see if it changed somehow. You
 can specify a recommended polling interval for this case. If you specify
 a polling interval of <code>0</code> (highly recommended!) then a <i>suitable,
 unspecified default</i> value will be used (which you can expect to be around
@@ -1259,8 +1259,13 @@ usually overkill.</p>
 <p>This watcher type is not meant for massive numbers of stat watchers,
 as even with OS-supported change notifications, this can be
 resource-intensive.</p>
-<p>At the time of this writing, no specific OS backends are implemented, but
-if demand increases, at least a kqueue and inotify backend will be added.</p>
+<p>At the time of this writing, only the Linux inotify interface is
+implemented (implementing kqueue support is left as an exercise for the
+reader). Inotify will be used to give hints only and should not change the
+semantics of <code>ev_stat</code> watchers, which means that libev sometimes needs
+to fall back to regular polling again even with inotify, but changes are
+usually detected immediately, and if the file exists there will be no
+polling.</p>
 <dl>
 	<dt>ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)</dt>
 	<dt>ev_stat_set (ev_stat *, const char *path, ev_tstamp interval)</dt>
@@ -2017,6 +2022,12 @@ backend for Solaris 10 systems.</p>
 	<dd>
 		<p>reserved for future expansion, works like the USE symbols above.</p>
 	</dd>
+	<dt>EV_USE_INOTIFY</dt>
+	<dd>
+		<p>If defined to be <code>1</code>, libev will compile in support for the Linux inotify
+interface to speed up <code>ev_stat</code> watchers. Its actual availability will
+be detected at runtime.</p>
+	</dd>
 	<dt>EV_H</dt>
 	<dd>
 		<p>The name of the <cite>ev.h</cite> header file used to include it. The default if
@@ -2081,7 +2092,15 @@ some inlining decisions, saves roughly 30% codesize of amd64.</p>
 		<p><code>ev_child</code> watchers use a small hash table to distribute workload by
 pid. The default size is <code>16</code> (or <code>1</code> with <code>EV_MINIMAL</code>), usually more
 than enough. If you need to manage thousands of children you might want to
-increase this value.</p>
+increase this value (<i>must</i> be a power of two).</p>
+	</dd>
+	<dt>EV_INOTIFY_HASHSIZE</dt>
+	<dd>
+		<p><code>ev_staz</code> watchers use a small hash table to distribute workload by
+inotify watch id. The default size is <code>16</code> (or <code>1</code> with <code>EV_MINIMAL</code>),
+usually more than enough. If you need to manage thousands of <code>ev_stat</code>
+watchers you might want to increase this value (<i>must</i> be a power of
+two).</p>
 	</dd>
 	<dt>EV_COMMON</dt>
 	<dd>
@@ -2148,7 +2167,7 @@ documentation for <code>ev_default_init</code>.</p>
 				<dt>Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)</dt>
 				<dt>Starting io/check/prepare/idle/signal/child watchers: O(1)</dt>
 				<dt>Stopping check/prepare/idle watchers: O(1)</dt>
-				<dt>Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % 16))</dt>
+				<dt>Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))</dt>
 				<dt>Finding the next timer per loop iteration: O(1)</dt>
 				<dt>Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)</dt>
 				<dt>Activating one watcher: O(1)</dt>
