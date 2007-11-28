@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Wed Nov 28 18:32:11 2007" />
+	<meta name="created" content="Wed Nov 28 19:29:25 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1250,6 +1250,8 @@ not exist&quot; is a status change like any other. The condition &quot;path does
 not exist&quot; is signified by the <code>st_nlink</code> field being zero (which is
 otherwise always forced to be at least one) and all the other fields of
 the stat buffer having unspecified contents.</p>
+<p>The path <i>should</i> be absolute and <i>must not</i> end in a slash. If it is
+relative and your working directory changes, the behaviour is undefined.</p>
 <p>Since there is no standard to do this, the portable implementation simply
 calls <code>stat (2)</code> regularly on the path to see if it changed somehow. You
 can specify a recommended polling interval for this case. If you specify

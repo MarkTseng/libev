@@ -1225,6 +1225,9 @@ not exist" is signified by the C<st_nlink> field being zero (which is
 otherwise always forced to be at least one) and all the other fields of
 the stat buffer having unspecified contents.
 
+The path I<should> be absolute and I<must not> end in a slash. If it is
+relative and your working directory changes, the behaviour is undefined.
+
 Since there is no standard to do this, the portable implementation simply
 calls C<stat (2)> regularly on the path to see if it changed somehow. You
 can specify a recommended polling interval for this case. If you specify
