@@ -312,6 +312,7 @@ union ev_any_watcher
 #define EVFLAG_AUTO       0x00000000UL /* not quite a mask */
 /* flag bits */
 #define EVFLAG_NOENV      0x01000000UL /* do NOT consult environment */
+#define EVFLAG_FORKCHECK  0x02000000UL /* check for a fork in each iteration */
 /* method bits to be ored together */
 #define EVBACKEND_SELECT  0x00000001UL /* about anywhere */
 #define EVBACKEND_POLL    0x00000002UL /* !win */

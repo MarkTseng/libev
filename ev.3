@@ -413,6 +413,26 @@ or setgid) then libev will \fInot\fR look at the environment variable
 override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.
+.ie n .IP """EVFLAG_FORKCHECK""" 4
+.el .IP "\f(CWEVFLAG_FORKCHECK\fR" 4
+.IX Item "EVFLAG_FORKCHECK"
+Instead of calling \f(CW\*(C`ev_default_fork\*(C'\fR or \f(CW\*(C`ev_loop_fork\*(C'\fR manually after
+a fork, you can also make libev check for a fork in each iteration by
+enabling this flag.
+.Sp
+This works by calling \f(CW\*(C`getpid ()\*(C'\fR on every iteration of the loop,
+and thus this might slow down your event loop if you do a lot of loop
+iterations and little real work, but is usually not noticable (on my
+Linux system for example, \f(CW\*(C`getpid\*(C'\fR is actually a simple 5\-insn sequence
+without a syscall and thus \fIvery\fR fast, but my Linux system also has
+\&\f(CW\*(C`pthread_atfork\*(C'\fR which is even faster).
+.Sp
+The big advantage of this flag is that you can forget about fork (and
+forget about forgetting to tell libev about forking) when you use this
+flag.
+.Sp
+This flag setting cannot be overriden or specified in the \f(CW\*(C`LIBEV_FLAGS\*(C'\fR
+environment variable.
 .ie n .IP """EVBACKEND_SELECT""  (value 1, portable select backend)" 4
 .el .IP "\f(CWEVBACKEND_SELECT\fR  (value 1, portable select backend)" 4
 .IX Item "EVBACKEND_SELECT  (value 1, portable select backend)"

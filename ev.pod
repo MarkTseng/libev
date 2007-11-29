@@ -268,6 +268,26 @@ override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.
 
+=item C<EVFLAG_FORKCHECK>
+
+Instead of calling C<ev_default_fork> or C<ev_loop_fork> manually after
+a fork, you can also make libev check for a fork in each iteration by
+enabling this flag.
+
+This works by calling C<getpid ()> on every iteration of the loop,
+and thus this might slow down your event loop if you do a lot of loop
+iterations and little real work, but is usually not noticable (on my
+Linux system for example, C<getpid> is actually a simple 5-insn sequence
+without a syscall and thus I<very> fast, but my Linux system also has
+C<pthread_atfork> which is even faster).
+
+The big advantage of this flag is that you can forget about fork (and
+forget about forgetting to tell libev about forking) when you use this
+flag.
+
+This flag setting cannot be overriden or specified in the C<LIBEV_FLAGS>
+environment variable.
+
 =item C<EVBACKEND_SELECT>  (value 1, portable select backend)
 
 This is your standard select(2) backend. Not I<completely> standard, as

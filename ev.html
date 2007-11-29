@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Thu Nov 29 13:21:20 2007" />
+	<meta name="created" content="Thu Nov 29 18:28:02 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -327,6 +327,23 @@ or setgid) then libev will <i>not</i> look at the environment variable
 override the flags completely if it is found in the environment. This is
 useful to try out specific backends to test their performance, or to work
 around bugs.</p>
+				</dd>
+				<dt><code>EVFLAG_FORKCHECK</code></dt>
+				<dd>
+					<p>Instead of calling <code>ev_default_fork</code> or <code>ev_loop_fork</code> manually after
+a fork, you can also make libev check for a fork in each iteration by
+enabling this flag.</p>
+					<p>This works by calling <code>getpid ()</code> on every iteration of the loop,
+and thus this might slow down your event loop if you do a lot of loop
+iterations and little real work, but is usually not noticable (on my
+Linux system for example, <code>getpid</code> is actually a simple 5-insn sequence
+without a syscall and thus <i>very</i> fast, but my Linux system also has
+<code>pthread_atfork</code> which is even faster).</p>
+					<p>The big advantage of this flag is that you can forget about fork (and
+forget about forgetting to tell libev about forking) when you use this
+flag.</p>
+					<p>This flag setting cannot be overriden or specified in the <code>LIBEV_FLAGS</code>
+environment variable.</p>
 				</dd>
 				<dt><code>EVBACKEND_SELECT</code>  (value 1, portable select backend)</dt>
 				<dd>

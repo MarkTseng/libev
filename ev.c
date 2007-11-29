@@ -906,6 +906,12 @@ loop_init (EV_P_ unsigned int flags)
       now_floor = mn_now;
       rtmn_diff = ev_rt_now - mn_now;
 
+      /* pid check not overridable via env */
+#ifndef _WIN32
+      if (flags & EVFLAG_FORKCHECK)
+        curpid = getpid ();
+#endif
+
       if (!(flags & EVFLAG_NOENV)
           && !enable_secure ()
           && getenv ("LIBEV_FLAGS"))
@@ -1336,8 +1342,19 @@ ev_loop (EV_P_ int flags)
             ? EVUNLOOP_ONE
             : EVUNLOOP_CANCEL;
 
+  call_pending (EV_A); /* in case we recurse, ensure ordering stays nice and clean */
+
   while (activecnt)
     {
+#ifndef _WIN32
+      if (expect_false (curpid)) /* penalise the forking check even more */
+        if (expect_false (getpid () != curpid))
+          {
+            curpid = getpid ();
+            postfork = 1;
+          }
+#endif
+
 #if EV_FORK_ENABLE
       /* we might have forked, so queue fork handlers */
       if (expect_false (postfork))
