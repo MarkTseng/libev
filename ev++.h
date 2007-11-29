@@ -250,6 +250,7 @@ namespace ev {
 
     void start (const char *path, ev_tstamp interval = 0.)
     {
+      stop ();
       set (path, interval);
       start ();
     }
@@ -275,17 +276,10 @@ namespace ev {
 
   #if EV_EMBED_ENABLE
   EV_BEGIN_WATCHER (embed, embed)
-    void set (struct ev_loop *loop)
-    {
-      int active = is_active ();
-      if (active) stop ();
-      ev_embed_set (static_cast<ev_embed *>(this), loop);
-      if (active) start ();
-    }
-
     void start (struct ev_loop *embedded_loop)
     {
-      set (embedded_loop);
+      stop ();
+      ev_embed_set (static_cast<ev_embed *>(this), embedded_loop);
       start ();
     }
 
