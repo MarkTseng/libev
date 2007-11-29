@@ -160,13 +160,8 @@ x_cb_io (EV_P_ struct ev_io *w, int revents)
 {
   struct event *ev = (struct event *)(((char *)w) - offsetof (struct event, iosig.io));
 
-  if (revents & EV_ERROR)
+  if ((revents & EV_ERROR) || !(ev->ev_events & EV_PERSIST))
     event_del (ev);
-  else if (!(ev->ev_events & EV_PERSIST) && ev_is_active (w))
-    {
-      ev_io_stop (EV_A_ w);
-      ev->ev_flags &= ~EVLIST_INSERTED;
-    }
 
   x_cb (ev, revents);
 }
@@ -237,8 +232,10 @@ int event_add (struct event *ev, struct timeval *tv)
       ev->ev_flags |= EVLIST_TIMEOUT;
     }
   else
-    if (ev_is_active (&ev->to))
+    {
       ev_timer_stop (EV_A_ &ev->to);
+      ev->ev_flags &= ~EVLIST_TIMEOUT;
+    }
 
   ev->ev_flags |= EVLIST_ACTIVE;
 
@@ -250,17 +247,9 @@ int event_del (struct event *ev)
   dLOOPev;
 
   if (ev->ev_events & EV_SIGNAL)
-    {
-      /* sig */
-      if (ev_is_active (&ev->iosig.sig))
-        ev_signal_stop (EV_A_ &ev->iosig.sig);
-    }
+    ev_signal_stop (EV_A_ &ev->iosig.sig);
   else if (ev->ev_events & (EV_READ | EV_WRITE))
-    {
-      /* io */
-      if (ev_is_active (&ev->iosig.io))
-        ev_io_stop (EV_A_ &ev->iosig.io);
-    }
+    ev_io_stop (EV_A_ &ev->iosig.io);
 
   if (ev_is_active (&ev->to))
     ev_timer_stop (EV_A_ &ev->to);
