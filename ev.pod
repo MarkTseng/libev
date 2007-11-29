@@ -1850,8 +1850,9 @@ loop, if multiple loops are supported ("ev loop default").
 
 =back
 
-Example: Declare and initialise a check watcher, working regardless of
-wether multiple loops are supported or not.
+Example: Declare and initialise a check watcher, utilising the above
+macros so it will work regardless of wether multiple loops are supported
+or not.
 
   static void
   check_cb (EV_P_ ev_timer *w, int revents)
@@ -1863,7 +1864,6 @@ wether multiple loops are supported or not.
   ev_check_init (&check, check_cb);
   ev_check_start (EV_DEFAULT_ &check);
   ev_loop (EV_DEFAULT_ 0);
-
 
 =head1 EMBEDDING
 
@@ -1913,7 +1913,7 @@ in your include path (e.g. in libev/ when using -Ilibev):
 
   ev_win32.c      required on win32 platforms only
 
-  ev_select.c     only when select backend is enabled (which is by default)
+  ev_select.c     only when select backend is enabled (which is enabled by default)
   ev_poll.c       only when poll backend is enabled (disabled by default)
   ev_epoll.c      only when the epoll backend is enabled (disabled by default)
   ev_kqueue.c     only when the kqueue backend is enabled (disabled by default)
@@ -2165,12 +2165,17 @@ will be compiled. It is pretty complex because it provides its own header
 file.
 
 The usage in rxvt-unicode is simpler. It has a F<ev_cpp.h> header file
-that everybody includes and which overrides some autoconf choices:
+that everybody includes and which overrides some configure choices:
 
+  #define EV_MINIMAL 1
   #define EV_USE_POLL 0
   #define EV_MULTIPLICITY 0
-  #define EV_PERIODICS 0
+  #define EV_PERIODIC_ENABLE 0
+  #define EV_STAT_ENABLE 0
+  #define EV_FORK_ENABLE 0
   #define EV_CONFIG_H <config.h>
+  #define EV_MINPRI 0
+  #define EV_MAXPRI 0
 
   #include "ev++.h"
 
