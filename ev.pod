@@ -1459,7 +1459,8 @@ pseudo-code only of course:
   static void
   adns_prepare_cb (ev_loop *loop, ev_prepare *w, int revents)
   {
-    int timeout = 3600000;truct pollfd fds [nfd];
+    int timeout = 3600000;
+    struct pollfd fds [nfd];
     // actual code will need to loop here and realloc etc.
     adns_beforepoll (ads, fds, &nfd, &timeout, timeval_from (ev_time ()));
 
