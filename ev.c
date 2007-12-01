@@ -1344,7 +1344,7 @@ ev_loop (EV_P_ int flags)
 
   call_pending (EV_A); /* in case we recurse, ensure ordering stays nice and clean */
 
-  while (expect_false (!activecnt))
+  do
     {
 #ifndef _WIN32
       if (expect_false (curpid)) /* penalise the forking check even more */
@@ -1442,9 +1442,8 @@ ev_loop (EV_P_ int flags)
 
       call_pending (EV_A);
 
-      if (expect_false (loop_done))
-        break;
     }
+  while (expect_true (activecnt && !loop_done));
 
   if (loop_done == EVUNLOOP_ONE)
     loop_done = EVUNLOOP_CANCEL;
