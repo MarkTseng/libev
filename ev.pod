@@ -276,7 +276,7 @@ enabling this flag.
 
 This works by calling C<getpid ()> on every iteration of the loop,
 and thus this might slow down your event loop if you do a lot of loop
-iterations and little real work, but is usually not noticable (on my
+iterations and little real work, but is usually not noticeable (on my
 Linux system for example, C<getpid> is actually a simple 5-insn sequence
 without a syscall and thus I<very> fast, but my Linux system also has
 C<pthread_atfork> which is even faster).
