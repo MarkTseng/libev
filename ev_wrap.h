@@ -4,6 +4,7 @@
 #define rtmn_diff ((loop)->rtmn_diff)
 #define backend ((loop)->backend)
 #define activecnt ((loop)->activecnt)
+#define loop_count ((loop)->loop_count);
 #define backend_fudge ((loop)->backend_fudge)
 #define backend_modify ((loop)->backend_modify)
 #define backend_poll ((loop)->backend_poll)

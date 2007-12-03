@@ -432,6 +432,16 @@ Like C<ev_default_fork>, but acts on an event loop created by
 C<ev_loop_new>. Yes, you have to call this on every allocated event loop
 after fork, and how you do this is entirely your own problem.
 
+=item unsigned int ev_loop_count (loop)
+
+Returns the count of loop iterations for the loop, which is identical to
+the number of times libev did poll for new events. It starts at C<0> and
+happily wraps around with enough iterations.
+
+This value can sometimes be useful as a generation counter of sorts (it
+"ticks" the number of loop iterations), as it roughly corresponds with
+C<ev_prepare> and C<ev_check> calls.
+
 =item unsigned int ev_backend (loop)
 
 Returns one of the C<EVBACKEND_*> flags indicating the event backend in

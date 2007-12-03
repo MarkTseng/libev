@@ -5,6 +5,7 @@ VARx(ev_tstamp, mn_now)    /* monotonic clock "now" */
 VARx(ev_tstamp, rtmn_diff) /* difference realtime - monotonic time */
 VARx(int, backend)
 VARx(int, activecnt) /* total number of active events ("refcount") */
+VARx(unsigned int, loop_count); /* total number of loop iterations/blocks */
 
 VARx(ev_tstamp, backend_fudge) /* assumed typical timer resolution */
 VAR (backend_modify, void (*backend_modify)(EV_P_ int fd, int oev, int nev))

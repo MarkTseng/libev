@@ -388,6 +388,7 @@ void ev_default_destroy (void); /* destroy the default loop */
 void ev_default_fork (void);
 
 unsigned int ev_backend (EV_P);
+unsigned int ev_loop_count (EV_P);
 #endif
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */

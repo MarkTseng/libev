@@ -888,6 +888,12 @@ ev_backend (EV_P)
   return backend;
 }
 
+unsigned int
+ev_loop_count (EV_P)
+{
+  return loop_count;
+}
+
 static void noinline
 loop_init (EV_P_ unsigned int flags)
 {
@@ -1420,6 +1426,7 @@ ev_loop (EV_P_ int flags)
             if (expect_false (block < 0.)) block = 0.;
           }
 
+        ++loop_count;
         backend_poll (EV_A_ block);
       }
 
