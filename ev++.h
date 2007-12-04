@@ -71,7 +71,8 @@ namespace ev {
 
     void operator ()(int events = EV_UNDEF)
     {
-      return e_cb (static_cast<ev_watcher *>(this)) (events);
+      return ev_cb (static_cast<ev_watcher *>(this))
+        (static_cast<ev_watcher *>(this), events);
     }
 
     bool is_active () const
