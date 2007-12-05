@@ -398,23 +398,44 @@ ev_now (EV_P)
 }
 #endif
 
-#define array_roundsize(type,n) (((n) | 4) & ~3)
+int inline_size
+array_nextsize (int elem, int cur, int cnt)
+{
+  int ncur = cur + 1;
 
-#define array_needsize(type,base,cur,cnt,init)			\
-  if (expect_false ((cnt) > cur))				\
-    {								\
-      int newcnt = cur;						\
-      do							\
-        {							\
-          newcnt = array_roundsize (type, newcnt << 1);		\
-        }							\
-      while ((cnt) > newcnt);					\
-      								\
-      base = (type *)ev_realloc (base, sizeof (type) * (newcnt));\
-      init (base + cur, newcnt - cur);				\
-      cur = newcnt;						\
+  do
+    ncur <<= 1;
+  while (cnt > ncur);
+
+  /* if size > 4096, round to 4096 - 4 * longs to accomodate malloc overhead */
+  if (elem * ncur > 4096)
+    {
+      ncur *= elem;
+      ncur = (ncur + elem + 4095 + sizeof (void *) * 4) & ~4095;
+      ncur = ncur - sizeof (void *) * 4;
+      ncur /= elem;
     }
 
+  return ncur;
+}
+
+inline_speed void *
+array_realloc (int elem, void *base, int *cur, int cnt)
+{
+  *cur = array_nextsize (elem, *cur, cnt);
+  return ev_realloc (base, elem * *cur);
+}
+
+#define array_needsize(type,base,cur,cnt,init)			\
+  if (expect_false ((cnt) > (cur)))				\
+    {								\
+      int ocur_ = (cur);					\
+      (base) = (type *)array_realloc				\
+         (sizeof (type), (base), &(cur), (cnt));		\
+      init ((base) + (ocur_), (cur) - ocur_);			\
+    }
+
+#if 0
 #define array_slim(type,stem)					\
   if (stem ## max < array_roundsize (stem ## cnt >> 2))		\
     {								\
@@ -422,6 +443,7 @@ ev_now (EV_P)
       base = (type *)ev_realloc (base, sizeof (type) * (stem ## max));\
       fprintf (stderr, "slimmed down " # stem " to %d\n", stem ## max);/*D*/\
     }
+#endif
 
 #define array_free(stem, idx) \
   ev_free (stem ## s idx); stem ## cnt idx = stem ## max idx = 0;

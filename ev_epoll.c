@@ -74,7 +74,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
   if (expect_false (eventcnt == epoll_eventmax))
     {
       ev_free (epoll_events);
-      epoll_eventmax = array_roundsize (epoll_events, epoll_eventmax << 1);
+      epoll_eventmax = array_nextsize (sizeof (struct epoll_event), epoll_eventmax, epoll_eventmax + 1);
       epoll_events = (struct epoll_event *)ev_malloc (sizeof (struct epoll_event) * epoll_eventmax);
     }
 }

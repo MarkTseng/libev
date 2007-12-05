@@ -103,7 +103,7 @@ port_poll (EV_P_ ev_tstamp timeout)
   if (expect_false (nget == port_eventmax))
     {
       ev_free (port_events);
-      port_eventmax = array_roundsize (port_event_t, port_eventmax << 1);
+      port_eventmax = array_nextsize (sizeof (port_event_t), port_eventmax, port_eventmax + 1);
       port_events = (port_event_t *)ev_malloc (sizeof (port_event_t) * port_eventmax);
     }
 }

@@ -83,7 +83,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
   if (kqueue_changecnt > kqueue_eventmax)
     {
       ev_free (kqueue_events);
-      kqueue_eventmax = array_roundsize (struct kevent, kqueue_changecnt);
+      kqueue_eventmax = array_nextsize (sizeof (struct kevent), kqueue_eventmax, kqueue_changecnt);
       kqueue_events = (struct kevent *)ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
     }
 
@@ -137,7 +137,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
   if (expect_false (res == kqueue_eventmax))
     {
       ev_free (kqueue_events);
-      kqueue_eventmax = array_roundsize (struct kevent, kqueue_eventmax << 1);
+      kqueue_eventmax = array_nextsize (sizeof (struct kevent), kqueue_eventmax, kqueue_eventmax + 1);
       kqueue_events = (struct kevent *)ev_malloc (sizeof (struct kevent) * kqueue_eventmax);
     }
 }
