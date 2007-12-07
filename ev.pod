@@ -2257,6 +2257,12 @@ In this section the complexities of (many of) the algorithms used inside
 libev will be explained. For complexity discussions about backends see the
 documentation for C<ev_default_init>.
 
+All of the following are about amortised time: If an array needs to be
+extended, libev needs to realloc and move the whole array, but this
+happens asymptotically never with higher number of elements, so O(1) might
+mean it might do a lengthy realloc operation in rare cases, but on average
+it is much faster and asymptotically approaches constant time.
+
 =over 4
 
 =item Starting and stopping timer/periodic watchers: O(log skipped_other_timers)
@@ -2272,11 +2278,7 @@ as only the relative motion in the event queue has to be paid for.
 
 =item Starting io/check/prepare/idle/signal/child watchers: O(1)
 
-These just add the watcher into an array or at the head of a list. If
-the array needs to be extended libev needs to realloc and move the whole
-array, but this happen asymptotically less and less with more watchers,
-thus amortised O(1).
-
+These just add the watcher into an array or at the head of a list.
 =item Stopping check/prepare/idle watchers: O(1)
 
 =item Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))

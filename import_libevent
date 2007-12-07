@@ -1,5 +1,14 @@
 #!/bin/sh
 
+if ! [ -e evbuffer.c ]; then
+   echo do not run this programm unless you know what you are doing
+   exit 1
+fi
+
+# this program combines libev and libevent into a single package
+
+cvs update -AdP
+
 LE=../libevent-1.4.0-beta
 
 cp $LE/evdns.h .
