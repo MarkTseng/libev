@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Thu Nov 29 21:05:58 2007" />
+	<meta name="created" content="Fri Dec  7 17:49:47 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -335,7 +335,7 @@ a fork, you can also make libev check for a fork in each iteration by
 enabling this flag.</p>
 					<p>This works by calling <code>getpid ()</code> on every iteration of the loop,
 and thus this might slow down your event loop if you do a lot of loop
-iterations and little real work, but is usually not noticable (on my
+iterations and little real work, but is usually not noticeable (on my
 Linux system for example, <code>getpid</code> is actually a simple 5-insn sequence
 without a syscall and thus <i>very</i> fast, but my Linux system also has
 <code>pthread_atfork</code> which is even faster).</p>
@@ -482,6 +482,15 @@ do not need to care.</p>
 		<p>Like <code>ev_default_fork</code>, but acts on an event loop created by
 <code>ev_loop_new</code>. Yes, you have to call this on every allocated event loop
 after fork, and how you do this is entirely your own problem.</p>
+	</dd>
+	<dt>unsigned int ev_loop_count (loop)</dt>
+	<dd>
+		<p>Returns the count of loop iterations for the loop, which is identical to
+the number of times libev did poll for new events. It starts at <code>0</code> and
+happily wraps around with enough iterations.</p>
+		<p>This value can sometimes be useful as a generation counter of sorts (it
+&quot;ticks&quot; the number of loop iterations), as it roughly corresponds with
+<code>ev_prepare</code> and <code>ev_check</code> calls.</p>
 	</dd>
 	<dt>unsigned int ev_backend (loop)</dt>
 	<dd>
@@ -770,6 +779,26 @@ libev (e.g. you cnanot <code>free ()</code> it).</p>
 	<dd>
 		<p>Change the callback. You can change the callback at virtually any time
 (modulo threads).</p>
+	</dd>
+	<dt>ev_set_priority (ev_TYPE *watcher, priority)</dt>
+	<dt>int ev_priority (ev_TYPE *watcher)</dt>
+	<dd>
+		<p>Set and query the priority of the watcher. The priority is a small
+integer between <code>EV_MAXPRI</code> (default: <code>2</code>) and <code>EV_MINPRI</code>
+(default: <code>-2</code>). Pending watchers with higher priority will be invoked
+before watchers with lower priority, but priority will not keep watchers
+from being executed (except for <code>ev_idle</code> watchers).</p>
+		<p>This means that priorities are <i>only</i> used for ordering callback
+invocation after new events have been received. This is useful, for
+example, to reduce latency after idling, or more often, to bind two
+watchers on the same event and make sure one is called first.</p>
+		<p>If you need to suppress invocation when higher priority events are pending
+you need to look at <code>ev_idle</code> watchers, which provide this functionality.</p>
+		<p>The default priority used by watchers when no priority has been set is
+always <code>0</code>, which is supposed to not be too high and not be too low :).</p>
+		<p>Setting a priority outside the range of <code>EV_MINPRI</code> to <code>EV_MAXPRI</code> is
+fine, as long as you do not mind that the priority value you query might
+or might not have been adjusted to be within valid range.</p>
 	</dd>
 </dl>
 
@@ -1360,13 +1389,15 @@ was some error while <code>stat</code>ing the file.</p>
 </div>
 <h2 id="code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do...</h2>
 <div id="code_ev_idle_code_when_you_ve_got_no-2">
-<p>Idle watchers trigger events when there are no other events are pending
-(prepare, check and other idle watchers do not count). That is, as long
-as your process is busy handling sockets or timeouts (or even signals,
-imagine) it will not be triggered. But when your process is idle all idle
-watchers are being called again and again, once per event loop iteration -
-until stopped, that is, or your process receives more events and becomes
-busy.</p>
+<p>Idle watchers trigger events when no other events of the same or higher
+priority are pending (prepare, check and other idle watchers do not
+count).</p>
+<p>That is, as long as your process is busy handling sockets or timeouts
+(or even signals, imagine) of the same or higher priority it will not be
+triggered. But when your process is idle (or only lower-priority watchers
+are pending), the idle watchers are being called once per event loop
+iteration - until stopped, that is, or your process receives more events
+and becomes busy again with higher priority stuff.</p>
 <p>The most noteworthy effect is that as long as any idle watchers are
 active, the process will not block when waiting for new events.</p>
 <p>Apart from keeping your process non-blocking (which is a useful
@@ -1466,7 +1497,8 @@ pseudo-code only of course:</p>
   static void
   adns_prepare_cb (ev_loop *loop, ev_prepare *w, int revents)
   {
-    int timeout = 3600000;truct pollfd fds [nfd];
+    int timeout = 3600000;
+    struct pollfd fds [nfd];
     // actual code will need to loop here and realloc etc.
     adns_beforepoll (ads, fds, &amp;nfd, &amp;timeout, timeval_from (ev_time ()));
 
@@ -2083,6 +2115,12 @@ argument. Instead, all functions act on the single default loop.</p>
 	<dt>EV_PERIODIC_ENABLE</dt>
 	<dd>
 		<p>If undefined or defined to be <code>1</code>, then periodic timers are supported. If
+defined to be <code>0</code>, then they are not. Disabling them saves a few kB of
+code.</p>
+	</dd>
+	<dt>EV_IDLE_ENABLE</dt>
+	<dd>
+		<p>If undefined or defined to be <code>1</code>, then idle watchers are supported. If
 defined to be <code>0</code>, then they are not. Disabling them saves a few kB of
 code.</p>
 	</dd>

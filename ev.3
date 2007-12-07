@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-11-29" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-12-07" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -422,7 +422,7 @@ enabling this flag.
 .Sp
 This works by calling \f(CW\*(C`getpid ()\*(C'\fR on every iteration of the loop,
 and thus this might slow down your event loop if you do a lot of loop
-iterations and little real work, but is usually not noticable (on my
+iterations and little real work, but is usually not noticeable (on my
 Linux system for example, \f(CW\*(C`getpid\*(C'\fR is actually a simple 5\-insn sequence
 without a syscall and thus \fIvery\fR fast, but my Linux system also has
 \&\f(CW\*(C`pthread_atfork\*(C'\fR which is even faster).
@@ -583,6 +583,15 @@ do not need to care.
 Like \f(CW\*(C`ev_default_fork\*(C'\fR, but acts on an event loop created by
 \&\f(CW\*(C`ev_loop_new\*(C'\fR. Yes, you have to call this on every allocated event loop
 after fork, and how you do this is entirely your own problem.
+.IP "unsigned int ev_loop_count (loop)" 4
+.IX Item "unsigned int ev_loop_count (loop)"
+Returns the count of loop iterations for the loop, which is identical to
+the number of times libev did poll for new events. It starts at \f(CW0\fR and
+happily wraps around with enough iterations.
+.Sp
+This value can sometimes be useful as a generation counter of sorts (it
+\&\*(L"ticks\*(R" the number of loop iterations), as it roughly corresponds with
+\&\f(CW\*(C`ev_prepare\*(C'\fR and \f(CW\*(C`ev_check\*(C'\fR calls.
 .IP "unsigned int ev_backend (loop)" 4
 .IX Item "unsigned int ev_backend (loop)"
 Returns one of the \f(CW\*(C`EVBACKEND_*\*(C'\fR flags indicating the event backend in
@@ -887,6 +896,32 @@ Returns the callback currently set on the watcher.
 .IX Item "ev_cb_set (ev_TYPE *watcher, callback)"
 Change the callback. You can change the callback at virtually any time
 (modulo threads).
+.IP "ev_set_priority (ev_TYPE *watcher, priority)" 4
+.IX Item "ev_set_priority (ev_TYPE *watcher, priority)"
+.PD 0
+.IP "int ev_priority (ev_TYPE *watcher)" 4
+.IX Item "int ev_priority (ev_TYPE *watcher)"
+.PD
+Set and query the priority of the watcher. The priority is a small
+integer between \f(CW\*(C`EV_MAXPRI\*(C'\fR (default: \f(CW2\fR) and \f(CW\*(C`EV_MINPRI\*(C'\fR
+(default: \f(CW\*(C`\-2\*(C'\fR). Pending watchers with higher priority will be invoked
+before watchers with lower priority, but priority will not keep watchers
+from being executed (except for \f(CW\*(C`ev_idle\*(C'\fR watchers).
+.Sp
+This means that priorities are \fIonly\fR used for ordering callback
+invocation after new events have been received. This is useful, for
+example, to reduce latency after idling, or more often, to bind two
+watchers on the same event and make sure one is called first.
+.Sp
+If you need to suppress invocation when higher priority events are pending
+you need to look at \f(CW\*(C`ev_idle\*(C'\fR watchers, which provide this functionality.
+.Sp
+The default priority used by watchers when no priority has been set is
+always \f(CW0\fR, which is supposed to not be too high and not be too low :).
+.Sp
+Setting a priority outside the range of \f(CW\*(C`EV_MINPRI\*(C'\fR to \f(CW\*(C`EV_MAXPRI\*(C'\fR is
+fine, as long as you do not mind that the priority value you query might
+or might not have been adjusted to be within valid range.
 .Sh "\s-1ASSOCIATING\s0 \s-1CUSTOM\s0 \s-1DATA\s0 \s-1WITH\s0 A \s-1WATCHER\s0"
 .IX Subsection "ASSOCIATING CUSTOM DATA WITH A WATCHER"
 Each watcher has, by default, a member \f(CW\*(C`void *data\*(C'\fR that you can change
@@ -1501,13 +1536,16 @@ Example: Watch \f(CW\*(C`/etc/passwd\*(C'\fR for attribute changes.
 .ie n .Sh """ev_idle"" \- when you've got nothing better to do..."
 .el .Sh "\f(CWev_idle\fP \- when you've got nothing better to do..."
 .IX Subsection "ev_idle - when you've got nothing better to do..."
-Idle watchers trigger events when there are no other events are pending
-(prepare, check and other idle watchers do not count). That is, as long
-as your process is busy handling sockets or timeouts (or even signals,
-imagine) it will not be triggered. But when your process is idle all idle
-watchers are being called again and again, once per event loop iteration \-
-until stopped, that is, or your process receives more events and becomes
-busy.
+Idle watchers trigger events when no other events of the same or higher
+priority are pending (prepare, check and other idle watchers do not
+count).
+.PP
+That is, as long as your process is busy handling sockets or timeouts
+(or even signals, imagine) of the same or higher priority it will not be
+triggered. But when your process is idle (or only lower-priority watchers
+are pending), the idle watchers are being called once per event loop
+iteration \- until stopped, that is, or your process receives more events
+and becomes busy again with higher priority stuff.
 .PP
 The most noteworthy effect is that as long as any idle watchers are
 active, the process will not block when waiting for new events.
@@ -1612,12 +1650,13 @@ pseudo-code only of course:
 \&  }
 .Ve
 .PP
-.Vb 7
+.Vb 8
 \&  // create io watchers for each fd and a timer before blocking
 \&  static void
 \&  adns_prepare_cb (ev_loop *loop, ev_prepare *w, int revents)
 \&  {
-\&    int timeout = 3600000;truct pollfd fds [nfd];
+\&    int timeout = 3600000;
+\&    struct pollfd fds [nfd];
 \&    // actual code will need to loop here and realloc etc.
 \&    adns_beforepoll (ads, fds, &nfd, &timeout, timeval_from (ev_time ()));
 .Ve
@@ -2240,6 +2279,11 @@ argument. Instead, all functions act on the single default loop.
 .IP "\s-1EV_PERIODIC_ENABLE\s0" 4
 .IX Item "EV_PERIODIC_ENABLE"
 If undefined or defined to be \f(CW1\fR, then periodic timers are supported. If
+defined to be \f(CW0\fR, then they are not. Disabling them saves a few kB of
+code.
+.IP "\s-1EV_IDLE_ENABLE\s0" 4
+.IX Item "EV_IDLE_ENABLE"
+If undefined or defined to be \f(CW1\fR, then idle watchers are supported. If
 defined to be \f(CW0\fR, then they are not. Disabling them saves a few kB of
 code.
 .IP "\s-1EV_EMBED_ENABLE\s0" 4
