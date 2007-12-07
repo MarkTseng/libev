@@ -885,7 +885,7 @@ C<EAGAIN> is far preferable to a program hanging until some data arrives.
 
 If you cannot run the fd in non-blocking mode (for example you should not
 play around with an Xlib connection), then you have to seperately re-test
-wether a file descriptor is really ready with a known-to-be good interface
+whether a file descriptor is really ready with a known-to-be good interface
 such as poll (fortunately in our Xlib example, Xlib already does this on
 its own, so its quite safe to use).
 
@@ -1846,7 +1846,7 @@ the constructor.
 =head1 MACRO MAGIC
 
 Libev can be compiled with a variety of options, the most fundemantal is
-C<EV_MULTIPLICITY>. This option determines wether (most) functions and
+C<EV_MULTIPLICITY>. This option determines whether (most) functions and
 callbacks have an initial C<struct ev_loop *> argument.
 
 To make it easier to write programs that cope with either variant, the
@@ -1890,7 +1890,7 @@ loop, if multiple loops are supported ("ev loop default").
 =back
 
 Example: Declare and initialise a check watcher, utilising the above
-macros so it will work regardless of wether multiple loops are supported
+macros so it will work regardless of whether multiple loops are supported
 or not.
 
   static void

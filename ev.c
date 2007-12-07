@@ -1268,7 +1268,7 @@ periodics_reschedule (EV_P)
 void inline_size
 idle_reify (EV_P)
 {
-  if (expect_false (!idleall))
+  if (expect_false (idleall))
     {
       int pri;
 

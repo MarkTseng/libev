@@ -1042,7 +1042,7 @@ it is best to always use non-blocking I/O: An extra \f(CW\*(C`read\*(C'\fR(2) re
 .PP
 If you cannot run the fd in non-blocking mode (for example you should not
 play around with an Xlib connection), then you have to seperately re-test
-wether a file descriptor is really ready with a known-to-be good interface
+whether a file descriptor is really ready with a known-to-be good interface
 such as poll (fortunately in our Xlib example, Xlib already does this on
 its own, so its quite safe to use).
 .IP "ev_io_init (ev_io *, callback, int fd, int events)" 4
@@ -1993,7 +1993,7 @@ the constructor.
 .SH "MACRO MAGIC"
 .IX Header "MACRO MAGIC"
 Libev can be compiled with a variety of options, the most fundemantal is
-\&\f(CW\*(C`EV_MULTIPLICITY\*(C'\fR. This option determines wether (most) functions and
+\&\f(CW\*(C`EV_MULTIPLICITY\*(C'\fR. This option determines whether (most) functions and
 callbacks have an initial \f(CW\*(C`struct ev_loop *\*(C'\fR argument.
 .PP
 To make it easier to write programs that cope with either variant, the
@@ -2039,7 +2039,7 @@ Similar to the other two macros, this gives you the value of the default
 loop, if multiple loops are supported (\*(L"ev loop default\*(R").
 .PP
 Example: Declare and initialise a check watcher, utilising the above
-macros so it will work regardless of wether multiple loops are supported
+macros so it will work regardless of whether multiple loops are supported
 or not.
 .PP
 .Vb 5

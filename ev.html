@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Dec  7 17:49:47 2007" />
+	<meta name="created" content="Fri Dec  7 19:03:06 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -919,7 +919,7 @@ it is best to always use non-blocking I/O: An extra <code>read</code>(2) returni
 <code>EAGAIN</code> is far preferable to a program hanging until some data arrives.</p>
 <p>If you cannot run the fd in non-blocking mode (for example you should not
 play around with an Xlib connection), then you have to seperately re-test
-wether a file descriptor is really ready with a known-to-be good interface
+whether a file descriptor is really ready with a known-to-be good interface
 such as poll (fortunately in our Xlib example, Xlib already does this on
 its own, so its quite safe to use).</p>
 <dl>
@@ -1834,7 +1834,7 @@ the constructor.</p>
 <h1 id="MACRO_MAGIC">MACRO MAGIC</h1>
 <div id="MACRO_MAGIC_CONTENT">
 <p>Libev can be compiled with a variety of options, the most fundemantal is
-<code>EV_MULTIPLICITY</code>. This option determines wether (most) functions and
+<code>EV_MULTIPLICITY</code>. This option determines whether (most) functions and
 callbacks have an initial <code>struct ev_loop *</code> argument.</p>
 <p>To make it easier to write programs that cope with either variant, the
 following macros are defined:</p>
@@ -1874,7 +1874,7 @@ loop, if multiple loops are supported (&quot;ev loop default&quot;).</p>
 	</dd>
 </dl>
 <p>Example: Declare and initialise a check watcher, utilising the above
-macros so it will work regardless of wether multiple loops are supported
+macros so it will work regardless of whether multiple loops are supported
 or not.</p>
 <pre>  static void
   check_cb (EV_P_ ev_timer *w, int revents)
