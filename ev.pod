@@ -50,6 +50,10 @@ libev - a high performance full-featured event loop written in C
 
 =head1 DESCRIPTION
 
+The newest version of this document is also available as a html-formatted
+web page you might find easier to navigate when reading it for the first
+time: L<http://cvs.schmorp.de/libev/ev.html>.
+
 Libev is an event loop: you register interest in certain events (such as a
 file descriptor being readable or a timeout occuring), and it will manage
 these event sources and provide your program with events.
@@ -2125,6 +2129,23 @@ additional independent event loops. Otherwise there will be no support
 for multiple event loops and there is no first event loop pointer
 argument. Instead, all functions act on the single default loop.
 
+=item EV_MINPRI
+
+=item EV_MAXPRI
+
+The range of allowed priorities. C<EV_MINPRI> must be smaller or equal to
+C<EV_MAXPRI>, but otherwise there are no non-obvious limitations. You can
+provide for more priorities by overriding those symbols (usually defined
+to be C<-2> and C<2>, respectively).
+
+When doing priority-based operations, libev usually has to linearly search
+all the priorities, so having many of them (hundreds) uses a lot of space
+and time, so using the defaults of five priorities (-2 .. +2) is usually
+fine.
+
+If your embedding app does not need any priorities, defining these both to
+C<0> will save some memory and cpu.
+
 =item EV_PERIODIC_ENABLE
 
 If undefined or defined to be C<1>, then periodic timers are supported. If
@@ -2240,19 +2261,44 @@ documentation for C<ev_default_init>.
 
 =item Starting and stopping timer/periodic watchers: O(log skipped_other_timers)
 
+This means that, when you have a watcher that triggers in one hour and
+there are 100 watchers that would trigger before that then inserting will
+have to skip those 100 watchers.
+
 =item Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)
 
+That means that for changing a timer costs less than removing/adding them
+as only the relative motion in the event queue has to be paid for.
+
 =item Starting io/check/prepare/idle/signal/child watchers: O(1)
+
+These just add the watcher into an array or at the head of a list. If
+the array needs to be extended libev needs to realloc and move the whole
+array, but this happen asymptotically less and less with more watchers,
+thus amortised O(1).
 
 =item Stopping check/prepare/idle watchers: O(1)
 
 =item Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))
 
+These watchers are stored in lists then need to be walked to find the
+correct watcher to remove. The lists are usually short (you don't usually
+have many watchers waiting for the same fd or signal).
+
 =item Finding the next timer per loop iteration: O(1)
 
 =item Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)
 
+A change means an I/O watcher gets started or stopped, which requires
+libev to recalculate its status (and possibly tell the kernel).
+
 =item Activating one watcher: O(1)
+
+=item Priority handling: O(number_of_priorities)
+
+Priorities are implemented by allocating some space for each
+priority. When doing priority-based operations, libev usually has to
+linearly search all the priorities.
 
 =back
 

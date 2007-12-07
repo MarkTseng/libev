@@ -43,15 +43,15 @@ cp $LE/log.c .
 cp $LE/log.h .
 cp $LE/strlcpy.c .
 rsync -a $LE/WIN32* $LE/sample $LE/test $LE/compat . --del
-rename 's/libevent/libev/' WIN32-Prj/lib*
+#rename 's/libevent/libev/' WIN32-Prj/lib*
 cp $LE/aclocal.m4 .
 #cp $LE/acconfig.h .
 cp $LE/config.h.in .
 cp $LE/event_rpcgen.py .
 cp $LE/*.3 .
 
-perl -i -pe 's/libevent/libev/g' sample/Makefile.am
-perl -i -pe 's/libevent/libev/g' test/Makefile.am
+#perl -i -pe 's/libevent/libev/g' sample/Makefile.am
+#perl -i -pe 's/libevent/libev/g' test/Makefile.am
 
 perl -i -pe 's/#include <event.h>$/#include "event.h"/' test/*.c
 
@@ -85,14 +85,15 @@ perl -ne '
    s/^(include_HEADERS\s*=)/$1 ev.h event_compat.h ev++.h /;
    s/^(CORE_SRC\s*=)/$1 ev.c /;
    s/^(SYS_LIBS\s*=)/$1 -lm /;
-   s/libevent/libev/g;
+   #s/libevent/libev/g;
    print;
 ' <$LE/Makefile.am >Makefile.am
 
 perl -ne '
    #s/-Wall/-Wall -Wno-comment -Wunused-function -Wno-unused-value/;
    s/-Wall//g;
-   s/libevent/libev/g;
+   #s/libevent/libev/g;
+   s/AM_INIT_AUTOMAKE\s*\(.*,(.*)\)/AM_INIT_AUTOMAKE(libevent-$1+libev,1.7)/;
    s/AC_LIBOBJ\(select\)/: ;/g;
    s/AC_LIBOBJ\(poll\)/: ;/g;
    s/AC_LIBOBJ\(kqueue\)/: ;/g;

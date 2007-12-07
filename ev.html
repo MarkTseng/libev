@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Dec  7 19:03:06 2007" />
+	<meta name="created" content="Fri Dec  7 20:07:44 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -121,6 +121,9 @@
 </div>
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 <div id="DESCRIPTION_CONTENT">
+<p>The newest version of this document is also available as a html-formatted
+web page you might find easier to navigate when reading it for the first
+time: <a href="http://cvs.schmorp.de/libev/ev.html">http://cvs.schmorp.de/libev/ev.html</a>.</p>
 <p>Libev is an event loop: you register interest in certain events (such as a
 file descriptor being readable or a timeout occuring), and it will manage
 these event sources and provide your program with events.</p>
@@ -2112,6 +2115,20 @@ additional independent event loops. Otherwise there will be no support
 for multiple event loops and there is no first event loop pointer
 argument. Instead, all functions act on the single default loop.</p>
 	</dd>
+	<dt>EV_MINPRI</dt>
+	<dt>EV_MAXPRI</dt>
+	<dd>
+		<p>The range of allowed priorities. <code>EV_MINPRI</code> must be smaller or equal to
+<code>EV_MAXPRI</code>, but otherwise there are no non-obvious limitations. You can
+provide for more priorities by overriding those symbols (usually defined
+to be <code>-2</code> and <code>2</code>, respectively).</p>
+		<p>When doing priority-based operations, libev usually has to linearly search
+all the priorities, so having many of them (hundreds) uses a lot of space
+and time, so using the defaults of five priorities (-2 .. +2) is usually
+fine.</p>
+		<p>If your embedding app does not need any priorities, defining these both to
+<code>0</code> will save some memory and cpu.</p>
+	</dd>
 	<dt>EV_PERIODIC_ENABLE</dt>
 	<dd>
 		<p>If undefined or defined to be <code>1</code>, then periodic timers are supported. If
@@ -2227,13 +2244,43 @@ documentation for <code>ev_default_init</code>.</p>
 		<p>
 			<dl>
 				<dt>Starting and stopping timer/periodic watchers: O(log skipped_other_timers)</dt>
+				<dd>
+					<p>This means that, when you have a watcher that triggers in one hour and
+there are 100 watchers that would trigger before that then inserting will
+have to skip those 100 watchers.</p>
+				</dd>
 				<dt>Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)</dt>
+				<dd>
+					<p>That means that for changing a timer costs less than removing/adding them
+as only the relative motion in the event queue has to be paid for.</p>
+				</dd>
 				<dt>Starting io/check/prepare/idle/signal/child watchers: O(1)</dt>
+				<dd>
+					<p>These just add the watcher into an array or at the head of a list. If
+the array needs to be extended libev needs to realloc and move the whole
+array, but this happen asymptotically less and less with more watchers,
+thus amortised O(1).</p>
+				</dd>
 				<dt>Stopping check/prepare/idle watchers: O(1)</dt>
 				<dt>Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))</dt>
+				<dd>
+					<p>These watchers are stored in lists then need to be walked to find the
+correct watcher to remove. The lists are usually short (you don't usually
+have many watchers waiting for the same fd or signal).</p>
+				</dd>
 				<dt>Finding the next timer per loop iteration: O(1)</dt>
 				<dt>Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)</dt>
+				<dd>
+					<p>A change means an I/O watcher gets started or stopped, which requires
+libev to recalculate its status (and possibly tell the kernel).</p>
+				</dd>
 				<dt>Activating one watcher: O(1)</dt>
+				<dt>Priority handling: O(number_of_priorities)</dt>
+				<dd>
+					<p>Priorities are implemented by allocating some space for each
+priority. When doing priority-based operations, libev usually has to
+linearly search all the priorities.</p>
+				</dd>
 			</dl>
 		</p>
 

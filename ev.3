@@ -198,6 +198,10 @@ libev \- a high performance full\-featured event loop written in C
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
+The newest version of this document is also available as a html-formatted
+web page you might find easier to navigate when reading it for the first
+time: <http://cvs.schmorp.de/libev/ev.html>.
+.PP
 Libev is an event loop: you register interest in certain events (such as a
 file descriptor being readable or a timeout occuring), and it will manage
 these event sources and provide your program with events.
@@ -2276,6 +2280,24 @@ will have the \f(CW\*(C`struct ev_loop *\*(C'\fR as first argument, and you can 
 additional independent event loops. Otherwise there will be no support
 for multiple event loops and there is no first event loop pointer
 argument. Instead, all functions act on the single default loop.
+.IP "\s-1EV_MINPRI\s0" 4
+.IX Item "EV_MINPRI"
+.PD 0
+.IP "\s-1EV_MAXPRI\s0" 4
+.IX Item "EV_MAXPRI"
+.PD
+The range of allowed priorities. \f(CW\*(C`EV_MINPRI\*(C'\fR must be smaller or equal to
+\&\f(CW\*(C`EV_MAXPRI\*(C'\fR, but otherwise there are no non-obvious limitations. You can
+provide for more priorities by overriding those symbols (usually defined
+to be \f(CW\*(C`\-2\*(C'\fR and \f(CW2\fR, respectively).
+.Sp
+When doing priority-based operations, libev usually has to linearly search
+all the priorities, so having many of them (hundreds) uses a lot of space
+and time, so using the defaults of five priorities (\-2 .. +2) is usually
+fine.
+.Sp
+If your embedding app does not need any priorities, defining these both to
+\&\f(CW0\fR will save some memory and cpu.
 .IP "\s-1EV_PERIODIC_ENABLE\s0" 4
 .IX Item "EV_PERIODIC_ENABLE"
 If undefined or defined to be \f(CW1\fR, then periodic timers are supported. If
@@ -2387,24 +2409,47 @@ documentation for \f(CW\*(C`ev_default_init\*(C'\fR.
 .RS 4
 .IP "Starting and stopping timer/periodic watchers: O(log skipped_other_timers)" 4
 .IX Item "Starting and stopping timer/periodic watchers: O(log skipped_other_timers)"
-.PD 0
+This means that, when you have a watcher that triggers in one hour and
+there are 100 watchers that would trigger before that then inserting will
+have to skip those 100 watchers.
 .IP "Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)" 4
 .IX Item "Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)"
+That means that for changing a timer costs less than removing/adding them
+as only the relative motion in the event queue has to be paid for.
 .IP "Starting io/check/prepare/idle/signal/child watchers: O(1)" 4
 .IX Item "Starting io/check/prepare/idle/signal/child watchers: O(1)"
+These just add the watcher into an array or at the head of a list. If
+the array needs to be extended libev needs to realloc and move the whole
+array, but this happen asymptotically less and less with more watchers,
+thus amortised O(1).
 .IP "Stopping check/prepare/idle watchers: O(1)" 4
 .IX Item "Stopping check/prepare/idle watchers: O(1)"
+.PD 0
 .IP "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % \s-1EV_PID_HASHSIZE\s0))" 4
 .IX Item "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))"
+.PD
+These watchers are stored in lists then need to be walked to find the
+correct watcher to remove. The lists are usually short (you don't usually
+have many watchers waiting for the same fd or signal).
 .IP "Finding the next timer per loop iteration: O(1)" 4
 .IX Item "Finding the next timer per loop iteration: O(1)"
+.PD 0
 .IP "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)" 4
 .IX Item "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)"
+.PD
+A change means an I/O watcher gets started or stopped, which requires
+libev to recalculate its status (and possibly tell the kernel).
 .IP "Activating one watcher: O(1)" 4
 .IX Item "Activating one watcher: O(1)"
+.PD 0
+.IP "Priority handling: O(number_of_priorities)" 4
+.IX Item "Priority handling: O(number_of_priorities)"
+.PD
+Priorities are implemented by allocating some space for each
+priority. When doing priority-based operations, libev usually has to
+linearly search all the priorities.
 .RE
 .RS 4
-.PD
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 Marc Lehmann <libev@schmorp.de>.
