@@ -1751,12 +1751,12 @@ of them macros) into the global namespace. All C++ specific things are
 put into the C<ev> namespace. It should support all the same embedding
 options as F<ev.h>, most notably C<EV_MULTIPLICITY>.
 
-Care has been taken to keep the overhead low. The only data member added
-to the C-style watchers is the event loop the watcher is associated with
-(or no additional members at all if you disable C<EV_MULTIPLICITY> when
-embedding libev).
+Care has been taken to keep the overhead low. The only data member the C++
+classes add (compared to plain C-style watchers) is the event loop pointer
+that the watcher is associated with (or no additional members at all if
+you disable C<EV_MULTIPLICITY> when embedding libev).
 
-Currently, functions and static and non-static member functions can be
+Currently, functions, and static and non-static member functions can be
 used as callbacks. Other types should be easy to add as long as they only
 need one additional pointer for context. If you need support for other
 types of functors please contact the author (preferably after implementing

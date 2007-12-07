@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Dec  7 21:13:07 2007" />
+	<meta name="created" content="Fri Dec  7 21:19:14 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1742,11 +1742,11 @@ the callback model to a model using method callbacks on objects.</p>
 of them macros) into the global namespace. All C++ specific things are
 put into the <code>ev</code> namespace. It should support all the same embedding
 options as <cite>ev.h</cite>, most notably <code>EV_MULTIPLICITY</code>.</p>
-<p>Care has been taken to keep the overhead low. The only data member added
-to the C-style watchers is the event loop the watcher is associated with
-(or no additional members at all if you disable <code>EV_MULTIPLICITY</code> when
-embedding libev).</p>
-<p>Currently, functions and static and non-static member functions can be
+<p>Care has been taken to keep the overhead low. The only data member the C++
+classes add (compared to plain C-style watchers) is the event loop pointer
+that the watcher is associated with (or no additional members at all if
+you disable <code>EV_MULTIPLICITY</code> when embedding libev).</p>
+<p>Currently, functions, and static and non-static member functions can be
 used as callbacks. Other types should be easy to add as long as they only
 need one additional pointer for context. If you need support for other
 types of functors please contact the author (preferably after implementing

@@ -1901,12 +1901,12 @@ of them macros) into the global namespace. All \*(C+ specific things are
 put into the \f(CW\*(C`ev\*(C'\fR namespace. It should support all the same embedding
 options as \fIev.h\fR, most notably \f(CW\*(C`EV_MULTIPLICITY\*(C'\fR.
 .PP
-Care has been taken to keep the overhead low. The only data member added
-to the C\-style watchers is the event loop the watcher is associated with
-(or no additional members at all if you disable \f(CW\*(C`EV_MULTIPLICITY\*(C'\fR when
-embedding libev).
+Care has been taken to keep the overhead low. The only data member the \*(C+
+classes add (compared to plain C\-style watchers) is the event loop pointer
+that the watcher is associated with (or no additional members at all if
+you disable \f(CW\*(C`EV_MULTIPLICITY\*(C'\fR when embedding libev).
 .PP
-Currently, functions and static and non-static member functions can be
+Currently, functions, and static and non-static member functions can be
 used as callbacks. Other types should be easy to add as long as they only
 need one additional pointer for context. If you need support for other
 types of functors please contact the author (preferably after implementing
