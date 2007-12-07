@@ -81,8 +81,8 @@ perl -ne '
    s/\bevent-internal.h\b//g;
    s/\bevsignal.h\b//g;
    s/^(man_MANS\s*=)/$1 ev.3 /;
-   s/^(EXTRA_DIST\s*=)/$1 libev.m4 ev.h ev_vars.h ev_wrap.h event_compat.h ev_epoll.c ev_select.c ev_poll.c ev_kqueue.c ev_port.c ev_win32.c ev.3 ev.pod ev.html /;
-   s/^(include_HEADERS\s*=)/$1 ev.h event_compat.h /;
+   s/^(EXTRA_DIST\s*=)/$1 libev.m4 ev.h ev_vars.h ev_wrap.h event_compat.h ev++.h ev_epoll.c ev_select.c ev_poll.c ev_kqueue.c ev_port.c ev_win32.c ev.3 ev.pod ev.html /;
+   s/^(include_HEADERS\s*=)/$1 ev.h event_compat.h ev++.h /;
    s/^(CORE_SRC\s*=)/$1 ev.c /;
    s/^(SYS_LIBS\s*=)/$1 -lm /;
    s/libevent/libev/g;

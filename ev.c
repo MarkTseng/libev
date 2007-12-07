@@ -243,9 +243,9 @@ extern "C" {
 #define expect_true(expr)  expect ((expr) != 0, 1)
 
 #define NUMPRI    (EV_MAXPRI - EV_MINPRI + 1)
-#define ABSPRI(w) ((w)->priority - EV_MINPRI)
+#define ABSPRI(w) (((W)w)->priority - EV_MINPRI)
 
-#define EMPTY0      /* required for microsofts broken pseudo-c compiler */
+#define EMPTY       /* required for microsofts broken pseudo-c compiler */
 #define EMPTY2(a,b) /* used to suppress some warnings */
 
 typedef ev_watcher *W;
@@ -788,9 +788,9 @@ child_reap (EV_P_ ev_signal *sw, int chain, int pid, int status)
   for (w = (ev_child *)childs [chain & (EV_PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
     if (w->pid == pid || !w->pid)
       {
-        ev_priority (w) = ev_priority (sw); /* need to do it *now* */
-        w->rpid         = pid;
-        w->rstatus      = status;
+        ev_set_priority (w, ev_priority (sw)); /* need to do it *now* */
+        w->rpid    = pid;
+        w->rstatus = status;
         ev_feed_event (EV_A_ (W)w, EV_CHILD);
       }
 }
@@ -1005,17 +1005,21 @@ loop_destroy (EV_P)
 #endif
 
   for (i = NUMPRI; i--; )
-    array_free (pending, [i]);
+    {
+      array_free (pending, [i]);
+#if EV_IDLE_ENABLE
+      array_free (idle, [i]);
+#endif
+    }
 
   /* have to use the microsoft-never-gets-it-right macro */
-  array_free (fdchange, EMPTY0);
-  array_free (timer, EMPTY0);
+  array_free (fdchange, EMPTY);
+  array_free (timer, EMPTY);
 #if EV_PERIODIC_ENABLE
-  array_free (periodic, EMPTY0);
+  array_free (periodic, EMPTY);
 #endif
-  array_free (idle, EMPTY0);
-  array_free (prepare, EMPTY0);
-  array_free (check, EMPTY0);
+  array_free (prepare, EMPTY);
+  array_free (check, EMPTY);
 
   backend = 0;
 }
@@ -1161,18 +1165,6 @@ ev_default_fork (void)
 
 /*****************************************************************************/
 
-int inline_size
-any_pending (EV_P)
-{
-  int pri;
-
-  for (pri = NUMPRI; pri--; )
-    if (pendingcnt [pri])
-      return 1;
-
-  return 0;
-}
-
 void inline_speed
 call_pending (EV_P)
 {
@@ -1269,6 +1261,29 @@ periodics_reschedule (EV_P)
   /* now rebuild the heap */
   for (i = periodiccnt >> 1; i--; )
     downheap ((WT *)periodics, periodiccnt, i);
+}
+#endif
+
+#if EV_IDLE_ENABLE
+void inline_size
+idle_reify (EV_P)
+{
+  if (expect_false (!idleall))
+    {
+      int pri;
+
+      for (pri = NUMPRI; pri--; )
+        {
+          if (pendingcnt [pri])
+            break;
+
+          if (idlecnt [pri])
+            {
+              queue_events (EV_A_ (W *)idles [pri], idlecnt [pri], EV_IDLE);
+              break;
+            }
+        }
+    }
 }
 #endif
 
@@ -1414,7 +1429,7 @@ ev_loop (EV_P_ int flags)
       {
         ev_tstamp block;
 
-        if (expect_false (flags & EVLOOP_NONBLOCK || idlecnt || !activecnt))
+        if (expect_false (flags & EVLOOP_NONBLOCK || idleall || !activecnt))
           block = 0.; /* do not block at all */
         else
           {
@@ -1461,9 +1476,10 @@ ev_loop (EV_P_ int flags)
       periodics_reify (EV_A); /* absolute timers called first */
 #endif
 
+#if EV_IDLE_ENABLE
       /* queue idle watchers unless other events are pending */
-      if (idlecnt && !any_pending (EV_A))
-        queue_events (EV_A_ (W *)idles, idlecnt, EV_IDLE);
+      idle_reify (EV_A);
+#endif
 
       /* queue check watchers, to be executed first */
       if (expect_false (checkcnt))
@@ -1518,12 +1534,19 @@ ev_clear_pending (EV_P_ W w)
     }
 }
 
+void inline_size
+pri_adjust (EV_P_ W w)
+{
+  int pri = w->priority;
+  pri = pri < EV_MINPRI ? EV_MINPRI : pri;
+  pri = pri > EV_MAXPRI ? EV_MAXPRI : pri;
+  w->priority = pri;
+}
+
 void inline_speed
 ev_start (EV_P_ W w, int active)
 {
-  if (w->priority < EV_MINPRI) w->priority = EV_MINPRI;
-  if (w->priority > EV_MAXPRI) w->priority = EV_MAXPRI;
-
+  pri_adjust (EV_A_ w);
   w->active = active;
   ev_ref (EV_A);
 }
@@ -2008,15 +2031,24 @@ ev_stat_stop (EV_P_ ev_stat *w)
 }
 #endif
 
+#if EV_IDLE_ENABLE
 void
 ev_idle_start (EV_P_ ev_idle *w)
 {
   if (expect_false (ev_is_active (w)))
     return;
 
-  ev_start (EV_A_ (W)w, ++idlecnt);
-  array_needsize (ev_idle *, idles, idlemax, idlecnt, EMPTY2);
-  idles [idlecnt - 1] = w;
+  pri_adjust (EV_A_ (W)w);
+
+  {
+    int active = ++idlecnt [ABSPRI (w)];
+
+    ++idleall;
+    ev_start (EV_A_ (W)w, active);
+
+    array_needsize (ev_idle *, idles [ABSPRI (w)], idlemax [ABSPRI (w)], active, EMPTY2);
+    idles [ABSPRI (w)][active - 1] = w;
+  }
 }
 
 void
@@ -2028,12 +2060,15 @@ ev_idle_stop (EV_P_ ev_idle *w)
 
   {
     int active = ((W)w)->active;
-    idles [active - 1] = idles [--idlecnt];
-    ((W)idles [active - 1])->active = active;
-  }
 
-  ev_stop (EV_A_ (W)w);
+    idles [ABSPRI (w)][active - 1] = idles [ABSPRI (w)][--idlecnt [ABSPRI (w)]];
+    ((W)idles [ABSPRI (w)][active - 1])->active = active;
+
+    ev_stop (EV_A_ (W)w);
+    --idleall;
+  }
 }
+#endif
 
 void
 ev_prepare_start (EV_P_ ev_prepare *w)

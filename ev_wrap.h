@@ -47,6 +47,7 @@
 #define idles ((loop)->idles)
 #define idlemax ((loop)->idlemax)
 #define idlecnt ((loop)->idlecnt)
+#define idleall ((loop)->idleall)
 #define prepares ((loop)->prepares)
 #define preparemax ((loop)->preparemax)
 #define preparecnt ((loop)->preparecnt)

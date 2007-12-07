@@ -73,9 +73,12 @@ VARx(int, periodicmax)
 VARx(int, periodiccnt)
 #endif
 
-VARx(struct ev_idle **, idles)
-VARx(int, idlemax)
-VARx(int, idlecnt)
+#if EV_IDLE_ENABLE || EV_GENWRAP
+VAR (idles, ev_idle **idles [NUMPRI])
+VAR (idlemax, int idlemax [NUMPRI])
+VAR (idlecnt, int idlecnt [NUMPRI])
+#endif
+VARx(int, idleall) /* total number */
 
 VARx(struct ev_prepare **, prepares)
 VARx(int, preparemax)

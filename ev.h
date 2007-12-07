@@ -56,6 +56,10 @@ typedef double ev_tstamp;
 # define EV_STAT_ENABLE 1
 #endif
 
+#ifndef EV_IDLE_ENABLE
+# define EV_IDLE_ENABLE 1
+#endif
+
 #ifndef EV_FORK_ENABLE
 # define EV_FORK_ENABLE 1
 #endif
@@ -240,12 +244,14 @@ typedef struct ev_stat
 } ev_stat;
 #endif
 
+#if EV_IDLE_ENABLE
 /* invoked when the nothing else needs to be done, keeps the process from blocking */
 /* revent EV_IDLE */
 typedef struct ev_idle
 {
   EV_WATCHER (ev_idle)
 } ev_idle;
+#endif
 
 /* invoked for each run of the mainloop, just before the blocking call */
 /* you can still change events in any way you like */
@@ -296,7 +302,9 @@ union ev_any_watcher
 #if EV_STAT_ENABLE
   struct ev_stat stat;
 #endif
+#if EV_IDLE_ENABLE
   struct ev_idle idle;
+#endif
   struct ev_prepare prepare;
   struct ev_check check;
 #if EV_FORK_ENABLE
@@ -416,11 +424,11 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 
 /* these may evaluate ev multiple times, and the other arguments at most once */
 /* either use ev_init + ev_TYPE_set, or the ev_TYPE_init macro, below, to first initialise a watcher */
-#define ev_init(ev,cb_) do {				\
+#define ev_init(ev,cb_) do {			\
   ((ev_watcher *)(void *)(ev))->active   =	\
   ((ev_watcher *)(void *)(ev))->pending  =	\
   ((ev_watcher *)(void *)(ev))->priority = 0;	\
-  ev_set_cb ((ev), cb_);					\
+  ev_set_cb ((ev), cb_);			\
 } while (0)
 
 #define ev_io_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
@@ -450,9 +458,9 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_is_pending(ev)                   (0 + ((ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
 #define ev_is_active(ev)                    (0 + ((ev_watcher *)(void *)(ev))->active) /* ro, true when the watcher has been started */
 
-#define ev_priority(ev)                     ((ev_watcher *)(void *)(ev))->priority /* rw */
+#define ev_priority(ev)                     ((((ev_watcher *)(void *)(ev))->priority) + 0)
 #define ev_cb(ev)                           (ev)->cb /* rw */
-#define ev_set_priority(ev,pri)             ev_priority (ev) = (pri)
+#define ev_set_priority(ev,pri)             ((ev_watcher *)(void *)(ev))->priority = (pri)
 
 #ifndef ev_set_cb
 # define ev_set_cb(ev,cb_)                  ev_cb (ev) = (cb_)
@@ -496,8 +504,10 @@ void ev_stat_stop      (EV_P_ ev_stat *w);
 void ev_stat_stat      (EV_P_ ev_stat *w);
 # endif
 
+# if EV_IDLE_ENABLE
 void ev_idle_start     (EV_P_ ev_idle *w);
 void ev_idle_stop      (EV_P_ ev_idle *w);
+# endif
 
 void ev_prepare_start  (EV_P_ ev_prepare *w);
 void ev_prepare_stop   (EV_P_ ev_prepare *w);

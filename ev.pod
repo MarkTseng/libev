@@ -746,6 +746,31 @@ Returns the callback currently set on the watcher.
 Change the callback. You can change the callback at virtually any time
 (modulo threads).
 
+=item ev_set_priority (ev_TYPE *watcher, priority)
+
+=item int ev_priority (ev_TYPE *watcher)
+
+Set and query the priority of the watcher. The priority is a small
+integer between C<EV_MAXPRI> (default: C<2>) and C<EV_MINPRI>
+(default: C<-2>). Pending watchers with higher priority will be invoked
+before watchers with lower priority, but priority will not keep watchers
+from being executed (except for C<ev_idle> watchers).
+
+This means that priorities are I<only> used for ordering callback
+invocation after new events have been received. This is useful, for
+example, to reduce latency after idling, or more often, to bind two
+watchers on the same event and make sure one is called first.
+
+If you need to suppress invocation when higher priority events are pending
+you need to look at C<ev_idle> watchers, which provide this functionality.
+
+The default priority used by watchers when no priority has been set is
+always C<0>, which is supposed to not be too high and not be too low :).
+
+Setting a priority outside the range of C<EV_MINPRI> to C<EV_MAXPRI> is
+fine, as long as you do not mind that the priority value you query might
+or might not have been adjusted to be within valid range.
+
 =back
 
 
@@ -1353,13 +1378,16 @@ Example: Watch C</etc/passwd> for attribute changes.
 
 =head2 C<ev_idle> - when you've got nothing better to do...
 
-Idle watchers trigger events when there are no other events are pending
-(prepare, check and other idle watchers do not count). That is, as long
-as your process is busy handling sockets or timeouts (or even signals,
-imagine) it will not be triggered. But when your process is idle all idle
-watchers are being called again and again, once per event loop iteration -
-until stopped, that is, or your process receives more events and becomes
-busy.
+Idle watchers trigger events when no other events of the same or higher
+priority are pending (prepare, check and other idle watchers do not
+count).
+
+That is, as long as your process is busy handling sockets or timeouts
+(or even signals, imagine) of the same or higher priority it will not be
+triggered. But when your process is idle (or only lower-priority watchers
+are pending), the idle watchers are being called once per event loop
+iteration - until stopped, that is, or your process receives more events
+and becomes busy again with higher priority stuff.
 
 The most noteworthy effect is that as long as any idle watchers are
 active, the process will not block when waiting for new events.
@@ -2100,6 +2128,12 @@ argument. Instead, all functions act on the single default loop.
 =item EV_PERIODIC_ENABLE
 
 If undefined or defined to be C<1>, then periodic timers are supported. If
+defined to be C<0>, then they are not. Disabling them saves a few kB of
+code.
+
+=item EV_IDLE_ENABLE
+
+If undefined or defined to be C<1>, then idle watchers are supported. If
 defined to be C<0>, then they are not. Disabling them saves a few kB of
 code.
 
