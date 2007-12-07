@@ -1896,12 +1896,21 @@ To use it,
 \&  #include <ev++.h>
 .Ve
 .PP
-(it is not installed by default). This automatically includes \fIev.h\fR
-and puts all of its definitions (many of them macros) into the global
-namespace. All \*(C+ specific things are put into the \f(CW\*(C`ev\*(C'\fR namespace.
+This automatically includes \fIev.h\fR and puts all of its definitions (many
+of them macros) into the global namespace. All \*(C+ specific things are
+put into the \f(CW\*(C`ev\*(C'\fR namespace. It should support all the same embedding
+options as \fIev.h\fR, most notably \f(CW\*(C`EV_MULTIPLICITY\*(C'\fR.
 .PP
-It should support all the same embedding options as \fIev.h\fR, most notably
-\&\f(CW\*(C`EV_MULTIPLICITY\*(C'\fR.
+Care has been taken to keep the overhead low. The only data member added
+to the C\-style watchers is the event loop the watcher is associated with
+(or no additional members at all if you disable \f(CW\*(C`EV_MULTIPLICITY\*(C'\fR when
+embedding libev).
+.PP
+Currently, functions and static and non-static member functions can be
+used as callbacks. Other types should be easy to add as long as they only
+need one additional pointer for context. If you need support for other
+types of functors please contact the author (preferably after implementing
+it).
 .PP
 Here is a list of things available in the \f(CW\*(C`ev\*(C'\fR namespace:
 .ie n .IP """ev::READ""\fR, \f(CW""ev::WRITE"" etc." 4
@@ -1923,21 +1932,61 @@ defines by many implementations.
 .Sp
 All of those classes have these methods:
 .RS 4
-.IP "ev::TYPE::TYPE (object *, object::method *)" 4
-.IX Item "ev::TYPE::TYPE (object *, object::method *)"
+.IP "ev::TYPE::TYPE ()" 4
+.IX Item "ev::TYPE::TYPE ()"
 .PD 0
-.IP "ev::TYPE::TYPE (object *, object::method *, struct ev_loop *)" 4
-.IX Item "ev::TYPE::TYPE (object *, object::method *, struct ev_loop *)"
+.IP "ev::TYPE::TYPE (struct ev_loop *)" 4
+.IX Item "ev::TYPE::TYPE (struct ev_loop *)"
 .IP "ev::TYPE::~TYPE" 4
 .IX Item "ev::TYPE::~TYPE"
 .PD
-The constructor takes a pointer to an object and a method pointer to
-the event handler callback to call in this class. The constructor calls
-\&\f(CW\*(C`ev_init\*(C'\fR for you, which means you have to call the \f(CW\*(C`set\*(C'\fR method
-before starting it. If you do not specify a loop then the constructor
-automatically associates the default loop with this watcher.
+The constructor (optionally) takes an event loop to associate the watcher
+with. If it is omitted, it will use \f(CW\*(C`EV_DEFAULT\*(C'\fR.
+.Sp
+The constructor calls \f(CW\*(C`ev_init\*(C'\fR for you, which means you have to call the
+\&\f(CW\*(C`set\*(C'\fR method before starting it.
+.Sp
+It will not set a callback, however: You have to call the templated \f(CW\*(C`set\*(C'\fR
+method to set a callback before you can start the watcher.
+.Sp
+(The reason why you have to use a method is a limitation in \*(C+ which does
+not allow explicit template arguments for constructors).
 .Sp
 The destructor automatically stops the watcher if it is active.
+.IP "w\->set<class, &class::method> (object *)" 4
+.IX Item "w->set<class, &class::method> (object *)"
+This method sets the callback method to call. The method has to have a
+signature of \f(CW\*(C`void (*)(ev_TYPE &, int)\*(C'\fR, it receives the watcher as
+first argument and the \f(CW\*(C`revents\*(C'\fR as second. The object must be given as
+parameter and is stored in the \f(CW\*(C`data\*(C'\fR member of the watcher.
+.Sp
+This method synthesizes efficient thunking code to call your method from
+the C callback that libev requires. If your compiler can inline your
+callback (i.e. it is visible to it at the place of the \f(CW\*(C`set\*(C'\fR call and
+your compiler is good :), then the method will be fully inlined into the
+thunking function, making it as fast as a direct C callback.
+.Sp
+Example: simple class declaration and watcher initialisation
+.Sp
+.Vb 4
+\&  struct myclass
+\&  {
+\&    void io_cb (ev::io &w, int revents) { }
+\&  }
+.Ve
+.Sp
+.Vb 3
+\&  myclass obj;
+\&  ev::io iow;
+\&  iow.set <myclass, &myclass::io_cb> (&obj);
+.Ve
+.IP "w\->set (void (*function)(watcher &w, int), void *data = 0)" 4
+.IX Item "w->set (void (*function)(watcher &w, int), void *data = 0)"
+Also sets a callback, but uses a static method or plain function as
+callback. The optional \f(CW\*(C`data\*(C'\fR argument will be stored in the watcher's
+\&\f(CW\*(C`data\*(C'\fR member and is free for you to use.
+.Sp
+See the method\-\f(CW\*(C`set\*(C'\fR above for more details.
 .IP "w\->set (struct ev_loop *)" 4
 .IX Item "w->set (struct ev_loop *)"
 Associates a different \f(CW\*(C`struct ev_loop\*(C'\fR with this watcher. You can only
@@ -1945,12 +1994,13 @@ do this when the watcher is inactive (and not pending either).
 .IP "w\->set ([args])" 4
 .IX Item "w->set ([args])"
 Basically the same as \f(CW\*(C`ev_TYPE_set\*(C'\fR, with the same args. Must be
-called at least once.  Unlike the C counterpart, an active watcher gets
-automatically stopped and restarted.
+called at least once. Unlike the C counterpart, an active watcher gets
+automatically stopped and restarted when reconfiguring it with this
+method.
 .IP "w\->start ()" 4
 .IX Item "w->start ()"
-Starts the watcher. Note that there is no \f(CW\*(C`loop\*(C'\fR argument as the
-constructor already takes the loop.
+Starts the watcher. Note that there is no \f(CW\*(C`loop\*(C'\fR argument, as the
+constructor already stores the event loop.
 .IP "w\->stop ()" 4
 .IX Item "w->stop ()"
 Stops the watcher if it is active. Again, no \f(CW\*(C`loop\*(C'\fR argument.
@@ -1986,11 +2036,14 @@ the constructor.
 \&  }
 .Ve
 .PP
-.Vb 6
+.Vb 4
 \&  myclass::myclass (int fd)
-\&  : io   (this, &myclass::io_cb),
-\&    idle (this, &myclass::idle_cb)
 \&  {
+\&    io  .set <myclass, &myclass::io_cb  > (this);
+\&    idle.set <myclass, &myclass::idle_cb> (this);
+.Ve
+.PP
+.Vb 2
 \&    io.start (fd, ev::READ);
 \&  }
 .Ve

@@ -1746,12 +1746,21 @@ To use it,
    
   #include <ev++.h>
 
-(it is not installed by default). This automatically includes F<ev.h>
-and puts all of its definitions (many of them macros) into the global
-namespace. All C++ specific things are put into the C<ev> namespace.
+This automatically includes F<ev.h> and puts all of its definitions (many
+of them macros) into the global namespace. All C++ specific things are
+put into the C<ev> namespace. It should support all the same embedding
+options as F<ev.h>, most notably C<EV_MULTIPLICITY>.
 
-It should support all the same embedding options as F<ev.h>, most notably
-C<EV_MULTIPLICITY>.
+Care has been taken to keep the overhead low. The only data member added
+to the C-style watchers is the event loop the watcher is associated with
+(or no additional members at all if you disable C<EV_MULTIPLICITY> when
+embedding libev).
+
+Currently, functions and static and non-static member functions can be
+used as callbacks. Other types should be easy to add as long as they only
+need one additional pointer for context. If you need support for other
+types of functors please contact the author (preferably after implementing
+it).
 
 Here is a list of things available in the C<ev> namespace:
 
@@ -1777,19 +1786,57 @@ All of those classes have these methods:
 
 =over 4
 
-=item ev::TYPE::TYPE (object *, object::method *)
+=item ev::TYPE::TYPE ()
 
-=item ev::TYPE::TYPE (object *, object::method *, struct ev_loop *)
+=item ev::TYPE::TYPE (struct ev_loop *)
 
 =item ev::TYPE::~TYPE
 
-The constructor takes a pointer to an object and a method pointer to
-the event handler callback to call in this class. The constructor calls
-C<ev_init> for you, which means you have to call the C<set> method
-before starting it. If you do not specify a loop then the constructor
-automatically associates the default loop with this watcher.
+The constructor (optionally) takes an event loop to associate the watcher
+with. If it is omitted, it will use C<EV_DEFAULT>.
+
+The constructor calls C<ev_init> for you, which means you have to call the
+C<set> method before starting it.
+
+It will not set a callback, however: You have to call the templated C<set>
+method to set a callback before you can start the watcher.
+
+(The reason why you have to use a method is a limitation in C++ which does
+not allow explicit template arguments for constructors).
 
 The destructor automatically stops the watcher if it is active.
+
+=item w->set<class, &class::method> (object *)
+
+This method sets the callback method to call. The method has to have a
+signature of C<void (*)(ev_TYPE &, int)>, it receives the watcher as
+first argument and the C<revents> as second. The object must be given as
+parameter and is stored in the C<data> member of the watcher.
+
+This method synthesizes efficient thunking code to call your method from
+the C callback that libev requires. If your compiler can inline your
+callback (i.e. it is visible to it at the place of the C<set> call and
+your compiler is good :), then the method will be fully inlined into the
+thunking function, making it as fast as a direct C callback.
+
+Example: simple class declaration and watcher initialisation
+
+  struct myclass
+  {
+    void io_cb (ev::io &w, int revents) { }
+  }
+
+  myclass obj;
+  ev::io iow;
+  iow.set <myclass, &myclass::io_cb> (&obj);
+
+=item w->set (void (*function)(watcher &w, int), void *data = 0)
+
+Also sets a callback, but uses a static method or plain function as
+callback. The optional C<data> argument will be stored in the watcher's
+C<data> member and is free for you to use.
+
+See the method-C<set> above for more details.
 
 =item w->set (struct ev_loop *)
 
@@ -1799,13 +1846,14 @@ do this when the watcher is inactive (and not pending either).
 =item w->set ([args])
 
 Basically the same as C<ev_TYPE_set>, with the same args. Must be
-called at least once.  Unlike the C counterpart, an active watcher gets
-automatically stopped and restarted.
+called at least once. Unlike the C counterpart, an active watcher gets
+automatically stopped and restarted when reconfiguring it with this
+method.
 
 =item w->start ()
 
-Starts the watcher. Note that there is no C<loop> argument as the
-constructor already takes the loop.
+Starts the watcher. Note that there is no C<loop> argument, as the
+constructor already stores the event loop.
 
 =item w->stop ()
 
@@ -1840,9 +1888,10 @@ the constructor.
   }
 
   myclass::myclass (int fd)
-  : io   (this, &myclass::io_cb),
-    idle (this, &myclass::idle_cb)
   {
+    io  .set <myclass, &myclass::io_cb  > (this);
+    idle.set <myclass, &myclass::idle_cb> (this);
+
     io.start (fd, ev::READ);
   }
 

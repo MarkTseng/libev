@@ -56,10 +56,10 @@ namespace ev {
       (obj->*method) (*self, revents);
     }
 
-    template<void (*function)(watcher &w, int)>
+    template<void (*function)(watcher &w, int), void *data = 0>
     void set ()
     {
-      set_ (0, function_thunk<function>);
+      set_ (data, function_thunk<function>);
     }
 
     template<void (*function)(watcher &w, int)>

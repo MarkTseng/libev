@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Dec  7 20:23:46 2007" />
+	<meta name="created" content="Fri Dec  7 21:13:07 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1738,11 +1738,19 @@ the callback model to a model using method callbacks on objects.</p>
 <pre>  #include &lt;ev++.h&gt;
 
 </pre>
-<p>(it is not installed by default). This automatically includes <cite>ev.h</cite>
-and puts all of its definitions (many of them macros) into the global
-namespace. All C++ specific things are put into the <code>ev</code> namespace.</p>
-<p>It should support all the same embedding options as <cite>ev.h</cite>, most notably
-<code>EV_MULTIPLICITY</code>.</p>
+<p>This automatically includes <cite>ev.h</cite> and puts all of its definitions (many
+of them macros) into the global namespace. All C++ specific things are
+put into the <code>ev</code> namespace. It should support all the same embedding
+options as <cite>ev.h</cite>, most notably <code>EV_MULTIPLICITY</code>.</p>
+<p>Care has been taken to keep the overhead low. The only data member added
+to the C-style watchers is the event loop the watcher is associated with
+(or no additional members at all if you disable <code>EV_MULTIPLICITY</code> when
+embedding libev).</p>
+<p>Currently, functions and static and non-static member functions can be
+used as callbacks. Other types should be easy to add as long as they only
+need one additional pointer for context. If you need support for other
+types of functors please contact the author (preferably after implementing
+it).</p>
 <p>Here is a list of things available in the <code>ev</code> namespace:</p>
 <dl>
 	<dt><code>ev::READ</code>, <code>ev::WRITE</code> etc.</dt>
@@ -1763,16 +1771,49 @@ defines by many implementations.</p>
 		<p>All of those classes have these methods:</p>
 		<p>
 			<dl>
-				<dt>ev::TYPE::TYPE (object *, object::method *)</dt>
-				<dt>ev::TYPE::TYPE (object *, object::method *, struct ev_loop *)</dt>
+				<dt>ev::TYPE::TYPE ()</dt>
+				<dt>ev::TYPE::TYPE (struct ev_loop *)</dt>
 				<dt>ev::TYPE::~TYPE</dt>
 				<dd>
-					<p>The constructor takes a pointer to an object and a method pointer to
-the event handler callback to call in this class. The constructor calls
-<code>ev_init</code> for you, which means you have to call the <code>set</code> method
-before starting it. If you do not specify a loop then the constructor
-automatically associates the default loop with this watcher.</p>
+					<p>The constructor (optionally) takes an event loop to associate the watcher
+with. If it is omitted, it will use <code>EV_DEFAULT</code>.</p>
+					<p>The constructor calls <code>ev_init</code> for you, which means you have to call the
+<code>set</code> method before starting it.</p>
+					<p>It will not set a callback, however: You have to call the templated <code>set</code>
+method to set a callback before you can start the watcher.</p>
+					<p>(The reason why you have to use a method is a limitation in C++ which does
+not allow explicit template arguments for constructors).</p>
 					<p>The destructor automatically stops the watcher if it is active.</p>
+				</dd>
+				<dt>w-&gt;set&lt;class, &amp;class::method&gt; (object *)</dt>
+				<dd>
+					<p>This method sets the callback method to call. The method has to have a
+signature of <code>void (*)(ev_TYPE &amp;, int)</code>, it receives the watcher as
+first argument and the <code>revents</code> as second. The object must be given as
+parameter and is stored in the <code>data</code> member of the watcher.</p>
+					<p>This method synthesizes efficient thunking code to call your method from
+the C callback that libev requires. If your compiler can inline your
+callback (i.e. it is visible to it at the place of the <code>set</code> call and
+your compiler is good :), then the method will be fully inlined into the
+thunking function, making it as fast as a direct C callback.</p>
+					<p>Example: simple class declaration and watcher initialisation</p>
+<pre>  struct myclass
+  {
+    void io_cb (ev::io &amp;w, int revents) { }
+  }
+
+  myclass obj;
+  ev::io iow;
+  iow.set &lt;myclass, &amp;myclass::io_cb&gt; (&amp;obj);
+
+</pre>
+				</dd>
+				<dt>w-&gt;set (void (*function)(watcher &amp;w, int), void *data = 0)</dt>
+				<dd>
+					<p>Also sets a callback, but uses a static method or plain function as
+callback. The optional <code>data</code> argument will be stored in the watcher's
+<code>data</code> member and is free for you to use.</p>
+					<p>See the method-<code>set</code> above for more details.</p>
 				</dd>
 				<dt>w-&gt;set (struct ev_loop *)</dt>
 				<dd>
@@ -1782,13 +1823,14 @@ do this when the watcher is inactive (and not pending either).</p>
 				<dt>w-&gt;set ([args])</dt>
 				<dd>
 					<p>Basically the same as <code>ev_TYPE_set</code>, with the same args. Must be
-called at least once.  Unlike the C counterpart, an active watcher gets
-automatically stopped and restarted.</p>
+called at least once. Unlike the C counterpart, an active watcher gets
+automatically stopped and restarted when reconfiguring it with this
+method.</p>
 				</dd>
 				<dt>w-&gt;start ()</dt>
 				<dd>
-					<p>Starts the watcher. Note that there is no <code>loop</code> argument as the
-constructor already takes the loop.</p>
+					<p>Starts the watcher. Note that there is no <code>loop</code> argument, as the
+constructor already stores the event loop.</p>
 				</dd>
 				<dt>w-&gt;stop ()</dt>
 				<dd>
@@ -1822,9 +1864,10 @@ the constructor.</p>
   }
 
   myclass::myclass (int fd)
-  : io   (this, &amp;myclass::io_cb),
-    idle (this, &amp;myclass::idle_cb)
   {
+    io  .set &lt;myclass, &amp;myclass::io_cb  &gt; (this);
+    idle.set &lt;myclass, &amp;myclass::idle_cb&gt; (this);
+
     io.start (fd, ev::READ);
   }
 
