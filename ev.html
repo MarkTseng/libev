@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Dec  8 16:30:24 2007" />
+	<meta name="created" content="Sat Dec  8 23:11:11 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -531,8 +531,9 @@ external event in conjunction with something not expressible using other
 libev watchers. However, a pair of <code>ev_prepare</code>/<code>ev_check</code> watchers is
 usually a better approach for this kind of thing.</p>
 		<p>Here are the gory details of what <code>ev_loop</code> does:</p>
-<pre>   * If there are no active watchers (reference count is zero), return.
-   - Queue prepare watchers and then call all outstanding watchers.
+<pre>   - Before the first iteration, call any pending watchers.
+   * If there are no active watchers (reference count is zero), return.
+   - Queue all prepare watchers and then call all outstanding watchers.
    - If we have been forked, recreate the kernel state.
    - Update the kernel state with all outstanding changes.
    - Update the &quot;event loop time&quot;.
@@ -1485,6 +1486,15 @@ with priority higher than or equal to the event loop and one coroutine
 of lower priority, but only once, using idle watchers to keep the event
 loop from blocking if lower-priority coroutines are active, thus mapping
 low-priority coroutines to idle/background tasks).</p>
+<p>It is recommended to give <code>ev_check</code> watchers highest (<code>EV_MAXPRI</code>)
+priority, to ensure that they are being run before any other watchers
+after the poll. Also, <code>ev_check</code> watchers (and <code>ev_prepare</code> watchers,
+too) should not activate (&quot;feed&quot;) events into libev. While libev fully
+supports this, they will be called before other <code>ev_check</code> watchers did
+their job. As <code>ev_check</code> watchers are often used to embed other event
+loops those other event loops might be in an unusable state until their
+<code>ev_check</code> watcher ran (always remind yourself to coexist peacefully with
+others).</p>
 <dl>
 	<dt>ev_prepare_init (ev_prepare *, callback)</dt>
 	<dt>ev_check_init (ev_check *, callback)</dt>

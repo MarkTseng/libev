@@ -1416,7 +1416,7 @@ ev_loop (EV_P_ int flags)
           }
 #endif
 
-      /* queue check watchers (and execute them) */
+      /* queue prepare watchers (and execute them) */
       if (expect_false (preparecnt))
         {
           queue_events (EV_A_ (W *)prepares, preparecnt, EV_PREPARE);

@@ -488,8 +488,9 @@ usually a better approach for this kind of thing.
 
 Here are the gory details of what C<ev_loop> does:
 
+   - Before the first iteration, call any pending watchers.
    * If there are no active watchers (reference count is zero), return.
-   - Queue prepare watchers and then call all outstanding watchers.
+   - Queue all prepare watchers and then call all outstanding watchers.
    - If we have been forked, recreate the kernel state.
    - Update the kernel state with all outstanding changes.
    - Update the "event loop time".
@@ -1482,6 +1483,16 @@ with priority higher than or equal to the event loop and one coroutine
 of lower priority, but only once, using idle watchers to keep the event
 loop from blocking if lower-priority coroutines are active, thus mapping
 low-priority coroutines to idle/background tasks).
+
+It is recommended to give C<ev_check> watchers highest (C<EV_MAXPRI>)
+priority, to ensure that they are being run before any other watchers
+after the poll. Also, C<ev_check> watchers (and C<ev_prepare> watchers,
+too) should not activate ("feed") events into libev. While libev fully
+supports this, they will be called before other C<ev_check> watchers did
+their job. As C<ev_check> watchers are often used to embed other event
+loops those other event loops might be in an unusable state until their
+C<ev_check> watcher ran (always remind yourself to coexist peacefully with
+others).
 
 =over 4
 

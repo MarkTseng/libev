@@ -636,9 +636,10 @@ usually a better approach for this kind of thing.
 .Sp
 Here are the gory details of what \f(CW\*(C`ev_loop\*(C'\fR does:
 .Sp
-.Vb 18
+.Vb 19
+\&   - Before the first iteration, call any pending watchers.
 \&   * If there are no active watchers (reference count is zero), return.
-\&   - Queue prepare watchers and then call all outstanding watchers.
+\&   - Queue all prepare watchers and then call all outstanding watchers.
 \&   - If we have been forked, recreate the kernel state.
 \&   - Update the kernel state with all outstanding changes.
 \&   - Update the "event loop time".
@@ -1636,6 +1637,16 @@ with priority higher than or equal to the event loop and one coroutine
 of lower priority, but only once, using idle watchers to keep the event
 loop from blocking if lower-priority coroutines are active, thus mapping
 low-priority coroutines to idle/background tasks).
+.PP
+It is recommended to give \f(CW\*(C`ev_check\*(C'\fR watchers highest (\f(CW\*(C`EV_MAXPRI\*(C'\fR)
+priority, to ensure that they are being run before any other watchers
+after the poll. Also, \f(CW\*(C`ev_check\*(C'\fR watchers (and \f(CW\*(C`ev_prepare\*(C'\fR watchers,
+too) should not activate (\*(L"feed\*(R") events into libev. While libev fully
+supports this, they will be called before other \f(CW\*(C`ev_check\*(C'\fR watchers did
+their job. As \f(CW\*(C`ev_check\*(C'\fR watchers are often used to embed other event
+loops those other event loops might be in an unusable state until their
+\&\f(CW\*(C`ev_check\*(C'\fR watcher ran (always remind yourself to coexist peacefully with
+others).
 .IP "ev_prepare_init (ev_prepare *, callback)" 4
 .IX Item "ev_prepare_init (ev_prepare *, callback)"
 .PD 0
