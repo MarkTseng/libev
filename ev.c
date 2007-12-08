@@ -1525,12 +1525,30 @@ wlist_del (WL *head, WL elem)
 }
 
 void inline_speed
-ev_clear_pending (EV_P_ W w)
+clear_pending (EV_P_ W w)
 {
   if (w->pending)
     {
       pendings [ABSPRI (w)][w->pending - 1].w = 0;
       w->pending = 0;
+    }
+}
+
+void
+ev_clear_pending (EV_P_ void *w, int invoke)
+{
+  W w_ = (W)w;
+  int pending = w_->pending;
+
+  if (pending)
+    {
+      ANPENDING *p = pendings [ABSPRI (w_)] + pending - 1;
+
+      w_->pending = 0;
+      p->w = 0;
+
+      if (invoke)
+        EV_CB_INVOKE (w_, p->events);
     }
 }
 
@@ -1580,7 +1598,7 @@ ev_io_start (EV_P_ ev_io *w)
 void
 ev_io_stop (EV_P_ ev_io *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -1613,7 +1631,7 @@ ev_timer_start (EV_P_ ev_timer *w)
 void
 ev_timer_stop (EV_P_ ev_timer *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -1681,7 +1699,7 @@ ev_periodic_start (EV_P_ ev_periodic *w)
 void
 ev_periodic_stop (EV_P_ ev_periodic *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -1745,7 +1763,7 @@ ev_signal_start (EV_P_ ev_signal *w)
 void
 ev_signal_stop (EV_P_ ev_signal *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -1772,7 +1790,7 @@ ev_child_start (EV_P_ ev_child *w)
 void
 ev_child_stop (EV_P_ ev_child *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -2018,7 +2036,7 @@ ev_stat_start (EV_P_ ev_stat *w)
 void
 ev_stat_stop (EV_P_ ev_stat *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -2054,7 +2072,7 @@ ev_idle_start (EV_P_ ev_idle *w)
 void
 ev_idle_stop (EV_P_ ev_idle *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -2084,7 +2102,7 @@ ev_prepare_start (EV_P_ ev_prepare *w)
 void
 ev_prepare_stop (EV_P_ ev_prepare *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -2111,7 +2129,7 @@ ev_check_start (EV_P_ ev_check *w)
 void
 ev_check_stop (EV_P_ ev_check *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -2163,7 +2181,7 @@ ev_embed_start (EV_P_ ev_embed *w)
 void
 ev_embed_stop (EV_P_ ev_embed *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 
@@ -2188,7 +2206,7 @@ ev_fork_start (EV_P_ ev_fork *w)
 void
 ev_fork_stop (EV_P_ ev_fork *w)
 {
-  ev_clear_pending (EV_A_ (W)w);
+  clear_pending (EV_A_ (W)w);
   if (expect_false (!ev_is_active (w)))
     return;
 

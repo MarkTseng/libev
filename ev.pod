@@ -738,8 +738,9 @@ it.
 Returns a true value iff the watcher is pending, (i.e. it has outstanding
 events but its callback has not yet been invoked). As long as a watcher
 is pending (but not active) you must not call an init function on it (but
-C<ev_TYPE_set> is safe) and you must make sure the watcher is available to
-libev (e.g. you cnanot C<free ()> it).
+C<ev_TYPE_set> is safe), you must not change its priority, and you must
+make sure the watcher is available to libev (e.g. you cannot C<free ()>
+it).
 
 =item callback ev_cb (ev_TYPE *watcher)
 
@@ -767,6 +768,9 @@ watchers on the same event and make sure one is called first.
 
 If you need to suppress invocation when higher priority events are pending
 you need to look at C<ev_idle> watchers, which provide this functionality.
+
+You I<must not> change the priority of a watcher as long as it is active or
+pending.
 
 The default priority used by watchers when no priority has been set is
 always C<0>, which is supposed to not be too high and not be too low :).
