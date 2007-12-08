@@ -1534,22 +1534,20 @@ clear_pending (EV_P_ W w)
     }
 }
 
-void
-ev_clear_pending (EV_P_ void *w, int invoke)
+int
+ev_clear_pending (EV_P_ void *w)
 {
   W w_ = (W)w;
   int pending = w_->pending;
 
-  if (pending)
-    {
-      ANPENDING *p = pendings [ABSPRI (w_)] + pending - 1;
+  if (!pending)
+    return 0;
 
-      w_->pending = 0;
-      p->w = 0;
+  w_->pending = 0;
+  ANPENDING *p = pendings [ABSPRI (w_)] + pending - 1;
+  p->w = 0;
 
-      if (invoke)
-        EV_CB_INVOKE (w_, p->events);
-    }
+  return p->events;
 }
 
 void inline_size
