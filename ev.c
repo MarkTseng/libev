@@ -224,23 +224,24 @@ extern "C" {
 
 #if __GNUC__ >= 3
 # define expect(expr,value)         __builtin_expect ((expr),(value))
-# define inline_size                static inline /* inline for codesize */
-# if EV_MINIMAL
-#  define noinline                  __attribute__ ((noinline))
-#  define inline_speed              static noinline
-# else
-#  define noinline
-#  define inline_speed              static inline
-# endif
+# define noinline                   __attribute__ ((noinline))
 #else
 # define expect(expr,value)         (expr)
-# define inline_speed               static
-# define inline_size                static
 # define noinline
+# if __STDC_VERSION__ < 199901L
+#  define inline
+# endif
 #endif
 
 #define expect_false(expr) expect ((expr) != 0, 0)
 #define expect_true(expr)  expect ((expr) != 0, 1)
+#define inline_size        static inline
+
+#if EV_MINIMAL
+# define inline_speed      static noinline
+#else
+# define inline_speed      static inline
+#endif
 
 #define NUMPRI    (EV_MAXPRI - EV_MINPRI + 1)
 #define ABSPRI(w) (((W)w)->priority - EV_MINPRI)

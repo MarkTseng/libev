@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Fri Dec  7 21:19:14 2007" />
+	<meta name="created" content="Sat Dec  8 15:27:35 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -771,8 +771,9 @@ it.</p>
 		<p>Returns a true value iff the watcher is pending, (i.e. it has outstanding
 events but its callback has not yet been invoked). As long as a watcher
 is pending (but not active) you must not call an init function on it (but
-<code>ev_TYPE_set</code> is safe) and you must make sure the watcher is available to
-libev (e.g. you cnanot <code>free ()</code> it).</p>
+<code>ev_TYPE_set</code> is safe), you must not change its priority, and you must
+make sure the watcher is available to libev (e.g. you cannot <code>free ()</code>
+it).</p>
 	</dd>
 	<dt>callback ev_cb (ev_TYPE *watcher)</dt>
 	<dd>
@@ -797,11 +798,25 @@ example, to reduce latency after idling, or more often, to bind two
 watchers on the same event and make sure one is called first.</p>
 		<p>If you need to suppress invocation when higher priority events are pending
 you need to look at <code>ev_idle</code> watchers, which provide this functionality.</p>
+		<p>You <i>must not</i> change the priority of a watcher as long as it is active or
+pending.</p>
 		<p>The default priority used by watchers when no priority has been set is
 always <code>0</code>, which is supposed to not be too high and not be too low :).</p>
 		<p>Setting a priority outside the range of <code>EV_MINPRI</code> to <code>EV_MAXPRI</code> is
 fine, as long as you do not mind that the priority value you query might
 or might not have been adjusted to be within valid range.</p>
+	</dd>
+	<dt>ev_invoke (loop, ev_TYPE *watcher, int revents)</dt>
+	<dd>
+		<p>Invoke the <code>watcher</code> with the given <code>loop</code> and <code>revents</code>. Neither
+<code>loop</code> nor <code>revents</code> need to be valid as long as the watcher callback
+can deal with that fact.</p>
+	</dd>
+	<dt>int ev_clear_pending (loop, ev_TYPE *watcher)</dt>
+	<dd>
+		<p>If the watcher is pending, this function returns clears its pending status
+and returns its <code>revents</code> bitset (as if its callback was invoked). If the
+watcher isn't pending it does nothing and returns <code>0</code>.</p>
 	</dd>
 </dl>
 
@@ -1808,12 +1823,18 @@ thunking function, making it as fast as a direct C callback.</p>
 
 </pre>
 				</dd>
-				<dt>w-&gt;set (void (*function)(watcher &amp;w, int), void *data = 0)</dt>
+				<dt>w-&gt;set&lt;function&gt; (void *data = 0)</dt>
 				<dd>
 					<p>Also sets a callback, but uses a static method or plain function as
 callback. The optional <code>data</code> argument will be stored in the watcher's
 <code>data</code> member and is free for you to use.</p>
+					<p>The prototype of the <code>function</code> must be <code>void (*)(ev::TYPE &amp;w, int)</code>.</p>
 					<p>See the method-<code>set</code> above for more details.</p>
+					<p>Example:</p>
+<pre>  static void io_cb (ev::io &amp;w, int revents) { }
+  iow.set &lt;io_cb&gt; ();
+
+</pre>
 				</dd>
 				<dt>w-&gt;set (struct ev_loop *)</dt>
 				<dd>

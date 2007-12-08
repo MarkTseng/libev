@@ -1846,13 +1846,20 @@ Example: simple class declaration and watcher initialisation
   ev::io iow;
   iow.set <myclass, &myclass::io_cb> (&obj);
 
-=item w->set (void (*function)(watcher &w, int), void *data = 0)
+=item w->set<function> (void *data = 0)
 
 Also sets a callback, but uses a static method or plain function as
 callback. The optional C<data> argument will be stored in the watcher's
 C<data> member and is free for you to use.
 
+The prototype of the C<function> must be C<void (*)(ev::TYPE &w, int)>.
+
 See the method-C<set> above for more details.
+
+Example:
+
+  static void io_cb (ev::io &w, int revents) { }
+  iow.set <io_cb> ();
 
 =item w->set (struct ev_loop *)
 

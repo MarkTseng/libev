@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-12-07" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-12-08" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -891,8 +891,9 @@ it.
 Returns a true value iff the watcher is pending, (i.e. it has outstanding
 events but its callback has not yet been invoked). As long as a watcher
 is pending (but not active) you must not call an init function on it (but
-\&\f(CW\*(C`ev_TYPE_set\*(C'\fR is safe) and you must make sure the watcher is available to
-libev (e.g. you cnanot \f(CW\*(C`free ()\*(C'\fR it).
+\&\f(CW\*(C`ev_TYPE_set\*(C'\fR is safe), you must not change its priority, and you must
+make sure the watcher is available to libev (e.g. you cannot \f(CW\*(C`free ()\*(C'\fR
+it).
 .IP "callback ev_cb (ev_TYPE *watcher)" 4
 .IX Item "callback ev_cb (ev_TYPE *watcher)"
 Returns the callback currently set on the watcher.
@@ -920,12 +921,25 @@ watchers on the same event and make sure one is called first.
 If you need to suppress invocation when higher priority events are pending
 you need to look at \f(CW\*(C`ev_idle\*(C'\fR watchers, which provide this functionality.
 .Sp
+You \fImust not\fR change the priority of a watcher as long as it is active or
+pending.
+.Sp
 The default priority used by watchers when no priority has been set is
 always \f(CW0\fR, which is supposed to not be too high and not be too low :).
 .Sp
 Setting a priority outside the range of \f(CW\*(C`EV_MINPRI\*(C'\fR to \f(CW\*(C`EV_MAXPRI\*(C'\fR is
 fine, as long as you do not mind that the priority value you query might
 or might not have been adjusted to be within valid range.
+.IP "ev_invoke (loop, ev_TYPE *watcher, int revents)" 4
+.IX Item "ev_invoke (loop, ev_TYPE *watcher, int revents)"
+Invoke the \f(CW\*(C`watcher\*(C'\fR with the given \f(CW\*(C`loop\*(C'\fR and \f(CW\*(C`revents\*(C'\fR. Neither
+\&\f(CW\*(C`loop\*(C'\fR nor \f(CW\*(C`revents\*(C'\fR need to be valid as long as the watcher callback
+can deal with that fact.
+.IP "int ev_clear_pending (loop, ev_TYPE *watcher)" 4
+.IX Item "int ev_clear_pending (loop, ev_TYPE *watcher)"
+If the watcher is pending, this function returns clears its pending status
+and returns its \f(CW\*(C`revents\*(C'\fR bitset (as if its callback was invoked). If the
+watcher isn't pending it does nothing and returns \f(CW0\fR.
 .Sh "\s-1ASSOCIATING\s0 \s-1CUSTOM\s0 \s-1DATA\s0 \s-1WITH\s0 A \s-1WATCHER\s0"
 .IX Subsection "ASSOCIATING CUSTOM DATA WITH A WATCHER"
 Each watcher has, by default, a member \f(CW\*(C`void *data\*(C'\fR that you can change
@@ -1980,13 +1994,22 @@ Example: simple class declaration and watcher initialisation
 \&  ev::io iow;
 \&  iow.set <myclass, &myclass::io_cb> (&obj);
 .Ve
-.IP "w\->set (void (*function)(watcher &w, int), void *data = 0)" 4
-.IX Item "w->set (void (*function)(watcher &w, int), void *data = 0)"
+.IP "w\->set<function> (void *data = 0)" 4
+.IX Item "w->set<function> (void *data = 0)"
 Also sets a callback, but uses a static method or plain function as
 callback. The optional \f(CW\*(C`data\*(C'\fR argument will be stored in the watcher's
 \&\f(CW\*(C`data\*(C'\fR member and is free for you to use.
 .Sp
+The prototype of the \f(CW\*(C`function\*(C'\fR must be \f(CW\*(C`void (*)(ev::TYPE &w, int)\*(C'\fR.
+.Sp
 See the method\-\f(CW\*(C`set\*(C'\fR above for more details.
+.Sp
+Example:
+.Sp
+.Vb 2
+\&  static void io_cb (ev::io &w, int revents) { }
+\&  iow.set <io_cb> ();
+.Ve
 .IP "w\->set (struct ev_loop *)" 4
 .IX Item "w->set (struct ev_loop *)"
 Associates a different \f(CW\*(C`struct ev_loop\*(C'\fR with this watcher. You can only
