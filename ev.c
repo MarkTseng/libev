@@ -509,7 +509,8 @@ fd_event (EV_P_ int fd, int revents)
 void
 ev_feed_fd_event (EV_P_ int fd, int revents)
 {
-  fd_event (EV_A_ fd, revents);
+  if (fd >= 0 && fd < anfdmax)
+    fd_event (EV_A_ fd, revents);
 }
 
 void inline_size
@@ -1164,6 +1165,12 @@ ev_default_fork (void)
 }
 
 /*****************************************************************************/
+
+void
+ev_invoke (EV_P_ void *w, int revents)
+{
+  EV_CB_INVOKE ((W)w, revents);
+}
 
 void inline_speed
 call_pending (EV_P)

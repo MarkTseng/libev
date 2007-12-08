@@ -779,6 +779,18 @@ Setting a priority outside the range of C<EV_MINPRI> to C<EV_MAXPRI> is
 fine, as long as you do not mind that the priority value you query might
 or might not have been adjusted to be within valid range.
 
+=item ev_invoke (loop, ev_TYPE *watcher, int revents)
+
+Invoke the C<watcher> with the given C<loop> and C<revents>. Neither
+C<loop> nor C<revents> need to be valid as long as the watcher callback
+can deal with that fact.
+
+=item int ev_clear_pending (loop, ev_TYPE *watcher)
+
+If the watcher is pending, this function returns clears its pending status
+and returns its C<revents> bitset (as if its callback was invoked). If the
+watcher isn't pending it does nothing and returns C<0>.
+
 =back
 
 
