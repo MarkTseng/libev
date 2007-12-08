@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Dec  8 15:31:35 2007" />
+	<meta name="created" content="Sat Dec  8 16:30:24 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1494,21 +1494,23 @@ parameters of any kind. There are <code>ev_prepare_set</code> and <code>ev_check
 macros, but using them is utterly, utterly and completely pointless.</p>
 	</dd>
 </dl>
-<p>Example: To include a library such as adns, you would add IO watchers
-and a timeout watcher in a prepare handler, as required by libadns, and
-in a check watcher, destroy them and call into libadns. What follows is
-pseudo-code only of course:</p>
+<p>There are a number of principal ways to embed other event loops or modules
+into libev. Here are some ideas on how to include libadns into libev
+(there is a Perl module named <code>EV::ADNS</code> that does this, which you could
+use for an actually working example. Another Perl module named <code>EV::Glib</code>
+embeds a Glib main context into libev, and finally, <code>Glib::EV</code> embeds EV
+into the Glib event loop).</p>
+<p>Method 1: Add IO watchers and a timeout watcher in a prepare handler,
+and in a check watcher, destroy them and call into libadns. What follows
+is pseudo-code only of course. This requires you to either use a low
+priority for the check watcher or use <code>ev_clear_pending</code> explicitly, as
+the callbacks for the IO/timeout watchers might not have been called yet.</p>
 <pre>  static ev_io iow [nfd];
   static ev_timer tw;
 
   static void
   io_cb (ev_loop *loop, ev_io *w, int revents)
   {
-    // set the relevant poll flags
-    // could also call adns_processreadable etc. here
-    struct pollfd *fd = (struct pollfd *)w-&gt;data;
-    if (revents &amp; EV_READ ) fd-&gt;revents |= fd-&gt;events &amp; POLLIN;
-    if (revents &amp; EV_WRITE) fd-&gt;revents |= fd-&gt;events &amp; POLLOUT;
   }
 
   // create io watchers for each fd and a timer before blocking
@@ -1524,7 +1526,7 @@ pseudo-code only of course:</p>
     ev_timer_init (&amp;tw, 0, timeout * 1e-3);
     ev_timer_start (loop, &amp;tw);
 
-    // create on ev_io per pollfd
+    // create one ev_io per pollfd
     for (int i = 0; i &lt; nfd; ++i)
       {
         ev_io_init (iow + i, io_cb, fds [i].fd,
@@ -1532,7 +1534,6 @@ pseudo-code only of course:</p>
            | (fds [i].events &amp; POLLOUT ? EV_WRITE : 0)));
 
         fds [i].revents = 0;
-        iow [i].data = fds + i;
         ev_io_start (loop, iow + i);
       }
   }
@@ -1544,9 +1545,77 @@ pseudo-code only of course:</p>
     ev_timer_stop (loop, &amp;tw);
 
     for (int i = 0; i &lt; nfd; ++i)
-      ev_io_stop (loop, iow + i);
+      {
+        // set the relevant poll flags
+        // could also call adns_processreadable etc. here
+        struct pollfd *fd = fds + i;
+        int revents = ev_clear_pending (iow + i);
+        if (revents &amp; EV_READ ) fd-&gt;revents |= fd-&gt;events &amp; POLLIN;
+        if (revents &amp; EV_WRITE) fd-&gt;revents |= fd-&gt;events &amp; POLLOUT;
+
+        // now stop the watcher
+        ev_io_stop (loop, iow + i);
+      }
 
     adns_afterpoll (adns, fds, nfd, timeval_from (ev_now (loop));
+  }
+
+</pre>
+<p>Method 2: This would be just like method 1, but you run <code>adns_afterpoll</code>
+in the prepare watcher and would dispose of the check watcher.</p>
+<p>Method 3: If the module to be embedded supports explicit event
+notification (adns does), you can also make use of the actual watcher
+callbacks, and only destroy/create the watchers in the prepare watcher.</p>
+<pre>  static void
+  timer_cb (EV_P_ ev_timer *w, int revents)
+  {
+    adns_state ads = (adns_state)w-&gt;data;
+    update_now (EV_A);
+
+    adns_processtimeouts (ads, &amp;tv_now);
+  }
+
+  static void
+  io_cb (EV_P_ ev_io *w, int revents)
+  {
+    adns_state ads = (adns_state)w-&gt;data;
+    update_now (EV_A);
+
+    if (revents &amp; EV_READ ) adns_processreadable  (ads, w-&gt;fd, &amp;tv_now);
+    if (revents &amp; EV_WRITE) adns_processwriteable (ads, w-&gt;fd, &amp;tv_now);
+  }
+
+  // do not ever call adns_afterpoll
+
+</pre>
+<p>Method 4: Do not use a prepare or check watcher because the module you
+want to embed is too inflexible to support it. Instead, youc na override
+their poll function.  The drawback with this solution is that the main
+loop is now no longer controllable by EV. The <code>Glib::EV</code> module does
+this.</p>
+<pre>  static gint
+  event_poll_func (GPollFD *fds, guint nfds, gint timeout)
+  {
+    int got_events = 0;
+
+    for (n = 0; n &lt; nfds; ++n)
+      // create/start io watcher that sets the relevant bits in fds[n] and increment got_events
+
+    if (timeout &gt;= 0)
+      // create/start timer
+
+    // poll
+    ev_loop (EV_A_ 0);
+
+    // stop timer again
+    if (timeout &gt;= 0)
+      ev_timer_stop (EV_A_ &amp;to);
+
+    // stop io watchers again - their callbacks should have set
+    for (n = 0; n &lt; nfds; ++n)
+      ev_io_stop (EV_A_ iow [n]);
+
+    return got_events;
   }
 
 

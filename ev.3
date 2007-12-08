@@ -1646,25 +1646,28 @@ Initialises and configures the prepare or check watcher \- they have no
 parameters of any kind. There are \f(CW\*(C`ev_prepare_set\*(C'\fR and \f(CW\*(C`ev_check_set\*(C'\fR
 macros, but using them is utterly, utterly and completely pointless.
 .PP
-Example: To include a library such as adns, you would add \s-1IO\s0 watchers
-and a timeout watcher in a prepare handler, as required by libadns, and
-in a check watcher, destroy them and call into libadns. What follows is
-pseudo-code only of course:
+There are a number of principal ways to embed other event loops or modules
+into libev. Here are some ideas on how to include libadns into libev
+(there is a Perl module named \f(CW\*(C`EV::ADNS\*(C'\fR that does this, which you could
+use for an actually working example. Another Perl module named \f(CW\*(C`EV::Glib\*(C'\fR
+embeds a Glib main context into libev, and finally, \f(CW\*(C`Glib::EV\*(C'\fR embeds \s-1EV\s0
+into the Glib event loop).
+.PP
+Method 1: Add \s-1IO\s0 watchers and a timeout watcher in a prepare handler,
+and in a check watcher, destroy them and call into libadns. What follows
+is pseudo-code only of course. This requires you to either use a low
+priority for the check watcher or use \f(CW\*(C`ev_clear_pending\*(C'\fR explicitly, as
+the callbacks for the IO/timeout watchers might not have been called yet.
 .PP
 .Vb 2
 \&  static ev_io iow [nfd];
 \&  static ev_timer tw;
 .Ve
 .PP
-.Vb 9
+.Vb 4
 \&  static void
 \&  io_cb (ev_loop *loop, ev_io *w, int revents)
 \&  {
-\&    // set the relevant poll flags
-\&    // could also call adns_processreadable etc. here
-\&    struct pollfd *fd = (struct pollfd *)w->data;
-\&    if (revents & EV_READ ) fd->revents |= fd->events & POLLIN;
-\&    if (revents & EV_WRITE) fd->revents |= fd->events & POLLOUT;
 \&  }
 .Ve
 .PP
@@ -1686,7 +1689,7 @@ pseudo-code only of course:
 .Ve
 .PP
 .Vb 6
-\&    // create on ev_io per pollfd
+\&    // create one ev_io per pollfd
 \&    for (int i = 0; i < nfd; ++i)
 \&      {
 \&        ev_io_init (iow + i, io_cb, fds [i].fd,
@@ -1694,9 +1697,8 @@ pseudo-code only of course:
 \&           | (fds [i].events & POLLOUT ? EV_WRITE : 0)));
 .Ve
 .PP
-.Vb 5
+.Vb 4
 \&        fds [i].revents = 0;
-\&        iow [i].data = fds + i;
 \&        ev_io_start (loop, iow + i);
 \&      }
 \&  }
@@ -1710,13 +1712,108 @@ pseudo-code only of course:
 \&    ev_timer_stop (loop, &tw);
 .Ve
 .PP
-.Vb 2
+.Vb 8
 \&    for (int i = 0; i < nfd; ++i)
-\&      ev_io_stop (loop, iow + i);
+\&      {
+\&        // set the relevant poll flags
+\&        // could also call adns_processreadable etc. here
+\&        struct pollfd *fd = fds + i;
+\&        int revents = ev_clear_pending (iow + i);
+\&        if (revents & EV_READ ) fd->revents |= fd->events & POLLIN;
+\&        if (revents & EV_WRITE) fd->revents |= fd->events & POLLOUT;
+.Ve
+.PP
+.Vb 3
+\&        // now stop the watcher
+\&        ev_io_stop (loop, iow + i);
+\&      }
 .Ve
 .PP
 .Vb 2
 \&    adns_afterpoll (adns, fds, nfd, timeval_from (ev_now (loop));
+\&  }
+.Ve
+.PP
+Method 2: This would be just like method 1, but you run \f(CW\*(C`adns_afterpoll\*(C'\fR
+in the prepare watcher and would dispose of the check watcher.
+.PP
+Method 3: If the module to be embedded supports explicit event
+notification (adns does), you can also make use of the actual watcher
+callbacks, and only destroy/create the watchers in the prepare watcher.
+.PP
+.Vb 5
+\&  static void
+\&  timer_cb (EV_P_ ev_timer *w, int revents)
+\&  {
+\&    adns_state ads = (adns_state)w->data;
+\&    update_now (EV_A);
+.Ve
+.PP
+.Vb 2
+\&    adns_processtimeouts (ads, &tv_now);
+\&  }
+.Ve
+.PP
+.Vb 5
+\&  static void
+\&  io_cb (EV_P_ ev_io *w, int revents)
+\&  {
+\&    adns_state ads = (adns_state)w->data;
+\&    update_now (EV_A);
+.Ve
+.PP
+.Vb 3
+\&    if (revents & EV_READ ) adns_processreadable  (ads, w->fd, &tv_now);
+\&    if (revents & EV_WRITE) adns_processwriteable (ads, w->fd, &tv_now);
+\&  }
+.Ve
+.PP
+.Vb 1
+\&  // do not ever call adns_afterpoll
+.Ve
+.PP
+Method 4: Do not use a prepare or check watcher because the module you
+want to embed is too inflexible to support it. Instead, youc na override
+their poll function.  The drawback with this solution is that the main
+loop is now no longer controllable by \s-1EV\s0. The \f(CW\*(C`Glib::EV\*(C'\fR module does
+this.
+.PP
+.Vb 4
+\&  static gint
+\&  event_poll_func (GPollFD *fds, guint nfds, gint timeout)
+\&  {
+\&    int got_events = 0;
+.Ve
+.PP
+.Vb 2
+\&    for (n = 0; n < nfds; ++n)
+\&      // create/start io watcher that sets the relevant bits in fds[n] and increment got_events
+.Ve
+.PP
+.Vb 2
+\&    if (timeout >= 0)
+\&      // create/start timer
+.Ve
+.PP
+.Vb 2
+\&    // poll
+\&    ev_loop (EV_A_ 0);
+.Ve
+.PP
+.Vb 3
+\&    // stop timer again
+\&    if (timeout >= 0)
+\&      ev_timer_stop (EV_A_ &to);
+.Ve
+.PP
+.Vb 3
+\&    // stop io watchers again - their callbacks should have set
+\&    for (n = 0; n < nfds; ++n)
+\&      ev_io_stop (EV_A_ iow [n]);
+.Ve
+.PP
+.Vb 2
+\&    return got_events;
 \&  }
 .Ve
 .ie n .Sh """ev_embed"" \- when one backend isn't enough..."
