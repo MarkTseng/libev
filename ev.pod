@@ -119,14 +119,14 @@ you actually want to know.
 
 =item int ev_version_minor ()
 
-You can find out the major and minor API/ABI version numbers of the library
+You can find out the major and minor ABI version numbers of the library
 you linked against by calling the functions C<ev_version_major> and
 C<ev_version_minor>. If you want, you can compare against the global
 symbols C<EV_VERSION_MAJOR> and C<EV_VERSION_MINOR>, which specify the
 version of the library your program was compiled against.
 
-These version numbers refer to the API and ABI version of the library, not
-the release version.
+These version numbers refer to the ABI version of the library, not the
+release version.
 
 Usually, it's a good idea to terminate if the major versions mismatch,
 as this indicates an incompatible change. Minor versions are usually

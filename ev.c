@@ -1239,7 +1239,7 @@ periodics_reify (EV_P)
         }
       else if (w->interval)
         {
-          ((WT)w)->at += floor ((ev_rt_now - ((WT)w)->at) / w->interval + 1.) * w->interval;
+          ((WT)w)->at = w->offset + floor ((ev_rt_now - w->offset) / w->interval + 1.) * w->interval;
           assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
@@ -1263,7 +1263,7 @@ periodics_reschedule (EV_P)
       if (w->reschedule_cb)
         ((WT)w)->at = w->reschedule_cb (w, ev_rt_now);
       else if (w->interval)
-        ((WT)w)->at += ceil ((ev_rt_now - ((WT)w)->at) / w->interval) * w->interval;
+        ((WT)w)->at = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
     }
 
   /* now rebuild the heap */
@@ -1692,8 +1692,10 @@ ev_periodic_start (EV_P_ ev_periodic *w)
     {
       assert (("ev_periodic_start called with negative interval value", w->interval >= 0.));
       /* this formula differs from the one in periodic_reify because we do not always round up */
-      ((WT)w)->at += ceil ((ev_rt_now - ((WT)w)->at) / w->interval) * w->interval;
+      ((WT)w)->at = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
     }
+  else
+    ((WT)w)->at = w->offset;
 
   ev_start (EV_A_ (W)w, ++periodiccnt);
   array_needsize (ev_periodic *, periodics, periodicmax, periodiccnt, EMPTY2);

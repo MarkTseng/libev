@@ -261,14 +261,17 @@ you actually want to know.
 .IP "int ev_version_minor ()" 4
 .IX Item "int ev_version_minor ()"
 .PD
-You can find out the major and minor version numbers of the library
+You can find out the major and minor \s-1API/ABI\s0 version numbers of the library
 you linked against by calling the functions \f(CW\*(C`ev_version_major\*(C'\fR and
 \&\f(CW\*(C`ev_version_minor\*(C'\fR. If you want, you can compare against the global
 symbols \f(CW\*(C`EV_VERSION_MAJOR\*(C'\fR and \f(CW\*(C`EV_VERSION_MINOR\*(C'\fR, which specify the
 version of the library your program was compiled against.
 .Sp
+These version numbers refer to the \s-1API\s0 and \s-1ABI\s0 version of the library, not
+the release version.
+.Sp
 Usually, it's a good idea to terminate if the major versions mismatch,
-as this indicates an incompatible change.  Minor versions are usually
+as this indicates an incompatible change. Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.
 .Sp
