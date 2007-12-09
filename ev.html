@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sat Dec  8 23:11:11 2007" />
+	<meta name="created" content="Sun Dec  9 20:30:11 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -1099,10 +1099,10 @@ to trigger &quot;at&quot; some specific point in time. For example, if you tell 
 periodic watcher to trigger in 10 seconds (by specifiying e.g. <code>ev_now ()
 + 10.</code>) and then reset your system clock to the last year, then it will
 take a year to trigger the event (unlike an <code>ev_timer</code>, which would trigger
-roughly 10 seconds later and of course not if you reset your system time
-again).</p>
+roughly 10 seconds later).</p>
 <p>They can also be used to implement vastly more complex timers, such as
-triggering an event on eahc midnight, local time.</p>
+triggering an event on each midnight, local time or other, complicated,
+rules.</p>
 <p>As with timers, the callback is guarenteed to be invoked only when the
 time (<code>at</code>) has been passed, but if multiple periodic timers become ready
 during the same loop iteration then order of execution is undefined.</p>
@@ -1114,18 +1114,18 @@ during the same loop iteration then order of execution is undefined.</p>
 operation, and we will explain them from simplest to complex:</p>
 		<p>
 			<dl>
-				<dt>* absolute timer (interval = reschedule_cb = 0)</dt>
+				<dt>* absolute timer (at = time, interval = reschedule_cb = 0)</dt>
 				<dd>
 					<p>In this configuration the watcher triggers an event at the wallclock time
 <code>at</code> and doesn't repeat. It will not adjust when a time jump occurs,
 that is, if it is to be run at January 1st 2011 then it will run when the
 system time reaches or surpasses this time.</p>
 				</dd>
-				<dt>* non-repeating interval timer (interval &gt; 0, reschedule_cb = 0)</dt>
+				<dt>* non-repeating interval timer (at = offset, interval &gt; 0, reschedule_cb = 0)</dt>
 				<dd>
 					<p>In this mode the watcher will always be scheduled to time out at the next
-<code>at + N * interval</code> time (for some integer N) and then repeat, regardless
-of any time jumps.</p>
+<code>at + N * interval</code> time (for some integer N, which can also be negative)
+and then repeat, regardless of any time jumps.</p>
 					<p>This can be used to create timers that do not drift with respect to system
 time:</p>
 <pre>   ev_periodic_set (&amp;periodic, 0., 3600., 0);
@@ -1138,8 +1138,11 @@ by 3600.</p>
 					<p>Another way to think about it (for the mathematically inclined) is that
 <code>ev_periodic</code> will try to run the callback in this mode at the next possible
 time where <code>time = at (mod interval)</code>, regardless of any time jumps.</p>
+					<p>For numerical stability it is preferable that the <code>at</code> value is near
+<code>ev_now ()</code> (the current time), but there is no range requirement for
+this value.</p>
 				</dd>
-				<dt>* manual reschedule mode (reschedule_cb = callback)</dt>
+				<dt>* manual reschedule mode (at and interval ignored, reschedule_cb = callback)</dt>
 				<dd>
 					<p>In this mode the values for <code>interval</code> and <code>at</code> are both being
 ignored. Instead, each time the periodic watcher gets scheduled, the
@@ -1148,7 +1151,7 @@ current time as second argument.</p>
 					<p>NOTE: <i>This callback MUST NOT stop or destroy any periodic watcher,
 ever, or make any event loop modifications</i>. If you need to stop it,
 return <code>now + 1e30</code> (or so, fudge fudge) and stop it afterwards (e.g. by
-starting a prepare watcher).</p>
+starting an <code>ev_prepare</code> watcher, which is legal).</p>
 					<p>Its prototype is <code>ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
 ev_tstamp now)</code>, e.g.:</p>
 <pre>   static ev_tstamp my_rescheduler (struct ev_periodic *w, ev_tstamp now)
@@ -1178,6 +1181,13 @@ reason I omitted it as an example).</p>
 when you changed some parameters or the reschedule callback would return
 a different time than the last time it was called (e.g. in a crond like
 program when the crontabs have changed).</p>
+	</dd>
+	<dt>ev_tstamp offset [read-write]</dt>
+	<dd>
+		<p>When repeating, this contains the offset value, otherwise this is the
+absolute point in time (the <code>at</code> value passed to <code>ev_periodic_set</code>).</p>
+		<p>Can be modified any time, but changes only take effect when the periodic
+timer fires or <code>ev_periodic_again</code> is being called.</p>
 	</dd>
 	<dt>ev_tstamp interval [read-write]</dt>
 	<dd>
