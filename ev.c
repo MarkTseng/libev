@@ -1548,14 +1548,15 @@ ev_clear_pending (EV_P_ void *w)
   W w_ = (W)w;
   int pending = w_->pending;
 
-  if (!pending)
+  if (expect_true (pending))
+    {
+      ANPENDING *p = pendings [ABSPRI (w_)] + pending - 1;
+      w_->pending = 0;
+      p->w = 0;
+      return p->events;
+    }
+  else
     return 0;
-
-  w_->pending = 0;
-  ANPENDING *p = pendings [ABSPRI (w_)] + pending - 1;
-  p->w = 0;
-
-  return p->events;
 }
 
 void inline_size
