@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sun Dec  9 20:30:11 2007" />
+	<meta name="created" content="Sun Dec  9 20:45:16 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -187,13 +187,15 @@ you actually want to know.</p>
 	<dt>int ev_version_major ()</dt>
 	<dt>int ev_version_minor ()</dt>
 	<dd>
-		<p>You can find out the major and minor version numbers of the library
+		<p>You can find out the major and minor API/ABI version numbers of the library
 you linked against by calling the functions <code>ev_version_major</code> and
 <code>ev_version_minor</code>. If you want, you can compare against the global
 symbols <code>EV_VERSION_MAJOR</code> and <code>EV_VERSION_MINOR</code>, which specify the
 version of the library your program was compiled against.</p>
+		<p>These version numbers refer to the API and ABI version of the library, not
+the release version.</p>
 		<p>Usually, it's a good idea to terminate if the major versions mismatch,
-as this indicates an incompatible change.  Minor versions are usually
+as this indicates an incompatible change. Minor versions are usually
 compatible to older versions, so a larger minor version alone is usually
 not a problem.</p>
 		<p>Example: Make sure we haven't accidentally been linked against the wrong

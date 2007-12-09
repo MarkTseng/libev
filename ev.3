@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-12-08" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-12-09" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -1237,11 +1237,11 @@ to trigger \*(L"at\*(R" some specific point in time. For example, if you tell a
 periodic watcher to trigger in 10 seconds (by specifiying e.g. \f(CW\*(C`ev_now ()
 + 10.\*(C'\fR) and then reset your system clock to the last year, then it will
 take a year to trigger the event (unlike an \f(CW\*(C`ev_timer\*(C'\fR, which would trigger
-roughly 10 seconds later and of course not if you reset your system time
-again).
+roughly 10 seconds later).
 .PP
 They can also be used to implement vastly more complex timers, such as
-triggering an event on eahc midnight, local time.
+triggering an event on each midnight, local time or other, complicated,
+rules.
 .PP
 As with timers, the callback is guarenteed to be invoked only when the
 time (\f(CW\*(C`at\*(C'\fR) has been passed, but if multiple periodic timers become ready
@@ -1255,17 +1255,17 @@ during the same loop iteration then order of execution is undefined.
 Lots of arguments, lets sort it out... There are basically three modes of
 operation, and we will explain them from simplest to complex:
 .RS 4
-.IP "* absolute timer (interval = reschedule_cb = 0)" 4
-.IX Item "absolute timer (interval = reschedule_cb = 0)"
+.IP "* absolute timer (at = time, interval = reschedule_cb = 0)" 4
+.IX Item "absolute timer (at = time, interval = reschedule_cb = 0)"
 In this configuration the watcher triggers an event at the wallclock time
 \&\f(CW\*(C`at\*(C'\fR and doesn't repeat. It will not adjust when a time jump occurs,
 that is, if it is to be run at January 1st 2011 then it will run when the
 system time reaches or surpasses this time.
-.IP "* non-repeating interval timer (interval > 0, reschedule_cb = 0)" 4
-.IX Item "non-repeating interval timer (interval > 0, reschedule_cb = 0)"
+.IP "* non-repeating interval timer (at = offset, interval > 0, reschedule_cb = 0)" 4
+.IX Item "non-repeating interval timer (at = offset, interval > 0, reschedule_cb = 0)"
 In this mode the watcher will always be scheduled to time out at the next
-\&\f(CW\*(C`at + N * interval\*(C'\fR time (for some integer N) and then repeat, regardless
-of any time jumps.
+\&\f(CW\*(C`at + N * interval\*(C'\fR time (for some integer N, which can also be negative)
+and then repeat, regardless of any time jumps.
 .Sp
 This can be used to create timers that do not drift with respect to system
 time:
@@ -1282,8 +1282,12 @@ by 3600.
 Another way to think about it (for the mathematically inclined) is that
 \&\f(CW\*(C`ev_periodic\*(C'\fR will try to run the callback in this mode at the next possible
 time where \f(CW\*(C`time = at (mod interval)\*(C'\fR, regardless of any time jumps.
-.IP "* manual reschedule mode (reschedule_cb = callback)" 4
-.IX Item "manual reschedule mode (reschedule_cb = callback)"
+.Sp
+For numerical stability it is preferable that the \f(CW\*(C`at\*(C'\fR value is near
+\&\f(CW\*(C`ev_now ()\*(C'\fR (the current time), but there is no range requirement for
+this value.
+.IP "* manual reschedule mode (at and interval ignored, reschedule_cb = callback)" 4
+.IX Item "manual reschedule mode (at and interval ignored, reschedule_cb = callback)"
 In this mode the values for \f(CW\*(C`interval\*(C'\fR and \f(CW\*(C`at\*(C'\fR are both being
 ignored. Instead, each time the periodic watcher gets scheduled, the
 reschedule callback will be called with the watcher as first, and the
@@ -1292,7 +1296,7 @@ current time as second argument.
 \&\s-1NOTE:\s0 \fIThis callback \s-1MUST\s0 \s-1NOT\s0 stop or destroy any periodic watcher,
 ever, or make any event loop modifications\fR. If you need to stop it,
 return \f(CW\*(C`now + 1e30\*(C'\fR (or so, fudge fudge) and stop it afterwards (e.g. by
-starting a prepare watcher).
+starting an \f(CW\*(C`ev_prepare\*(C'\fR watcher, which is legal).
 .Sp
 Its prototype is \f(CW\*(C`ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
 ev_tstamp now)\*(C'\fR, e.g.:
@@ -1326,6 +1330,13 @@ Simply stops and restarts the periodic watcher again. This is only useful
 when you changed some parameters or the reschedule callback would return
 a different time than the last time it was called (e.g. in a crond like
 program when the crontabs have changed).
+.IP "ev_tstamp offset [read\-write]" 4
+.IX Item "ev_tstamp offset [read-write]"
+When repeating, this contains the offset value, otherwise this is the
+absolute point in time (the \f(CW\*(C`at\*(C'\fR value passed to \f(CW\*(C`ev_periodic_set\*(C'\fR).
+.Sp
+Can be modified any time, but changes only take effect when the periodic
+timer fires or \f(CW\*(C`ev_periodic_again\*(C'\fR is being called.
 .IP "ev_tstamp interval [read\-write]" 4
 .IX Item "ev_tstamp interval [read-write]"
 The current interval value. Can be modified any time, but changes only
