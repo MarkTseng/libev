@@ -153,7 +153,6 @@ kqueue_init (EV_P_ int flags)
 
   fcntl (backend_fd, F_SETFD, FD_CLOEXEC); /* not sure if necessary, hopefully doesn't hurt */
 
-  /* fudge *might* be zero from the documentation, but bsd docs are notoriously wrong */
   backend_fudge  = 1e-3; /* needed to compensate for kevent returning early */
   backend_modify = kqueue_modify;
   backend_poll   = kqueue_poll;

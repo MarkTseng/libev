@@ -203,7 +203,7 @@ select_poll (EV_P_ ev_tstamp timeout)
 int inline_size
 select_init (EV_P_ int flags)
 {
-  backend_fudge  = 0; /* needed to compensate for select returning early, very conservative */
+  backend_fudge  = 0.; /* posix says this is zero */
   backend_modify = select_modify;
   backend_poll   = select_poll;
 
