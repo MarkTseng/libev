@@ -92,7 +92,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
   res = kevent (backend_fd, kqueue_changes, kqueue_changecnt, kqueue_events, kqueue_eventmax, &ts);
   kqueue_changecnt = 0;
 
-  if (res < 0)
+  if (expect_false (res < 0))
     { 
       if (errno != EINTR)
         syserr ("(libev) kevent");

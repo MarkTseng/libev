@@ -90,7 +90,7 @@ select_modify (EV_P_ int fd, int oev, int nev)
     int word = fd / NFDBITS;
     int mask = 1UL << (fd % NFDBITS);
 
-    if (vec_max < word + 1)
+    if (expect_false (vec_max < word + 1))
       {
         int new_max = word + 1;
 
@@ -134,7 +134,7 @@ select_poll (EV_P_ ev_tstamp timeout)
 
   res = select (vec_max * NFDBITS, (fd_set *)vec_ro, (fd_set *)vec_wo, 0, &tv);
 
-  if (res < 0)
+  if (expect_false (res < 0))
     {
       #if EV_SELECT_IS_WINSOCKET
       errno = WSAGetLastError ();
@@ -168,7 +168,7 @@ select_poll (EV_P_ ev_tstamp timeout)
           if (FD_ISSET (handle, (fd_set *)vec_ro)) events |= EV_READ;
           if (FD_ISSET (handle, (fd_set *)vec_wo)) events |= EV_WRITE;
 
-          if (events)
+          if (expect_true (events))
             fd_event (EV_A_ fd, events);
         }
   }
@@ -191,7 +191,7 @@ select_poll (EV_P_ ev_tstamp timeout)
               events |= word_r & mask ? EV_READ  : 0;
               events |= word_w & mask ? EV_WRITE : 0;
 
-              if (events)
+              if (expect_true (events))
                 fd_event (EV_A_ word * NFDBITS + bit, events);
             }
       }

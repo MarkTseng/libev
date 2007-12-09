@@ -420,7 +420,7 @@ array_nextsize (int elem, int cur, int cnt)
   return ncur;
 }
 
-inline_speed void *
+static noinline void *
 array_realloc (int elem, void *base, int *cur, int cnt)
 {
   *cur = array_nextsize (elem, *cur, cnt);
@@ -455,17 +455,17 @@ void noinline
 ev_feed_event (EV_P_ void *w, int revents)
 {
   W w_ = (W)w;
+  int pri = ABSPRI (w_);
 
   if (expect_false (w_->pending))
+    pendings [pri][w_->pending - 1].events |= revents;
+  else
     {
-      pendings [ABSPRI (w_)][w_->pending - 1].events |= revents;
-      return;
+      w_->pending = ++pendingcnt [pri];
+      array_needsize (ANPENDING, pendings [pri], pendingmax [pri], w_->pending, EMPTY2);
+      pendings [pri][w_->pending - 1].w      = w_;
+      pendings [pri][w_->pending - 1].events = revents;
     }
-
-  w_->pending = ++pendingcnt [ABSPRI (w_)];
-  array_needsize (ANPENDING, pendings [ABSPRI (w_)], pendingmax [ABSPRI (w_)], pendingcnt [ABSPRI (w_)], EMPTY2);
-  pendings [ABSPRI (w_)][w_->pending - 1].w      = w_;
-  pendings [ABSPRI (w_)][w_->pending - 1].events = revents;
 }
 
 void inline_size
@@ -751,7 +751,7 @@ sigcb (EV_P_ ev_io *iow, int revents)
       ev_feed_signal_event (EV_A_ signum + 1);
 }
 
-void inline_size
+void inline_speed
 fd_intern (int fd)
 {
 #ifdef _WIN32
@@ -1584,7 +1584,7 @@ ev_stop (EV_P_ W w)
 
 /*****************************************************************************/
 
-void
+void noinline
 ev_io_start (EV_P_ ev_io *w)
 {
   int fd = w->fd;
@@ -1601,7 +1601,7 @@ ev_io_start (EV_P_ ev_io *w)
   fd_change (EV_A_ fd);
 }
 
-void
+void noinline
 ev_io_stop (EV_P_ ev_io *w)
 {
   clear_pending (EV_A_ (W)w);
@@ -1616,7 +1616,7 @@ ev_io_stop (EV_P_ ev_io *w)
   fd_change (EV_A_ w->fd);
 }
 
-void
+void noinline
 ev_timer_start (EV_P_ ev_timer *w)
 {
   if (expect_false (ev_is_active (w)))
@@ -1634,7 +1634,7 @@ ev_timer_start (EV_P_ ev_timer *w)
   /*assert (("internal timer heap corruption", timers [((W)w)->active - 1] == w));*/
 }
 
-void
+void noinline
 ev_timer_stop (EV_P_ ev_timer *w)
 {
   clear_pending (EV_A_ (W)w);
@@ -1658,7 +1658,7 @@ ev_timer_stop (EV_P_ ev_timer *w)
   ev_stop (EV_A_ (W)w);
 }
 
-void
+void noinline
 ev_timer_again (EV_P_ ev_timer *w)
 {
   if (ev_is_active (w))
@@ -1679,7 +1679,7 @@ ev_timer_again (EV_P_ ev_timer *w)
 }
 
 #if EV_PERIODIC_ENABLE
-void
+void noinline
 ev_periodic_start (EV_P_ ev_periodic *w)
 {
   if (expect_false (ev_is_active (w)))
@@ -1702,7 +1702,7 @@ ev_periodic_start (EV_P_ ev_periodic *w)
   /*assert (("internal periodic heap corruption", periodics [((W)w)->active - 1] == w));*/
 }
 
-void
+void noinline
 ev_periodic_stop (EV_P_ ev_periodic *w)
 {
   clear_pending (EV_A_ (W)w);
@@ -1724,7 +1724,7 @@ ev_periodic_stop (EV_P_ ev_periodic *w)
   ev_stop (EV_A_ (W)w);
 }
 
-void
+void noinline
 ev_periodic_again (EV_P_ ev_periodic *w)
 {
   /* TODO: use adjustheap and recalculation */
@@ -1737,7 +1737,7 @@ ev_periodic_again (EV_P_ ev_periodic *w)
 # define SA_RESTART 0
 #endif
 
-void
+void noinline
 ev_signal_start (EV_P_ ev_signal *w)
 {
 #if EV_MULTIPLICITY
@@ -1766,7 +1766,7 @@ ev_signal_start (EV_P_ ev_signal *w)
     }
 }
 
-void
+void noinline
 ev_signal_stop (EV_P_ ev_signal *w)
 {
   clear_pending (EV_A_ (W)w);

@@ -31,7 +31,7 @@
 
 #include <poll.h>
 
-static void
+void inline_size
 pollidx_init (int *base, int count)
 {
   while (count--)
@@ -67,7 +67,7 @@ poll_modify (EV_P_ int fd, int oev, int nev)
     {
       pollidxs [fd] = -1;
 
-      if (idx < --pollcnt)
+      if (expect_true (idx < --pollcnt))
         {
           polls [idx] = polls [pollcnt];
           pollidxs [polls [idx].fd] = idx;
@@ -81,7 +81,7 @@ poll_poll (EV_P_ ev_tstamp timeout)
   int i;
   int res = poll (polls, pollcnt, (int)ceil (timeout * 1000.));
 
-  if (res < 0)
+  if (expect_false (res < 0))
     {
       if (errno == EBADF)
         fd_ebadf (EV_A);
@@ -94,7 +94,7 @@ poll_poll (EV_P_ ev_tstamp timeout)
     }
 
   for (i = 0; i < pollcnt; ++i)
-    if (polls [i].revents & POLLNVAL)
+    if (expect_false (polls [i].revents & POLLNVAL))
       fd_kill (EV_A_ polls [i].fd);
     else
       fd_event (

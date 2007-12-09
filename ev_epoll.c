@@ -42,7 +42,7 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
       (nev & EV_READ ? EPOLLIN : 0)
       | (nev & EV_WRITE ? EPOLLOUT : 0);
 
-  if (epoll_ctl (backend_fd, mode, fd, &ev))
+  if (expect_false (epoll_ctl (backend_fd, mode, fd, &ev)))
     if (errno != ENOENT /* on ENOENT the fd went away, so try to do the right thing */
         || (nev && epoll_ctl (backend_fd, EPOLL_CTL_ADD, fd, &ev)))
       fd_kill (EV_A_ fd);
@@ -54,7 +54,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
   int i;
   int eventcnt = epoll_wait (backend_fd, epoll_events, epoll_eventmax, (int)ceil (timeout * 1000.));
 
-  if (eventcnt < 0)
+  if (expect_false (eventcnt < 0))
     {
       if (errno != EINTR)
         syserr ("(libev) epoll_wait");
