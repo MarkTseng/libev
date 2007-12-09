@@ -89,7 +89,7 @@ epoll_init (EV_P_ int flags)
 
   fcntl (backend_fd, F_SETFD, FD_CLOEXEC);
 
-  backend_fudge  = 1e-3; /* needed to compensate for epoll returning early */
+  backend_fudge  = 2e-4; /* needed to compensate for epoll returning early */
   backend_modify = epoll_modify;
   backend_poll   = epoll_poll;
 
