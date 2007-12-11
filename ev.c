@@ -1239,7 +1239,7 @@ periodics_reify (EV_P)
         }
       else if (w->interval)
         {
-          ((WT)w)->at = w->offset + floor ((ev_rt_now - w->offset) / w->interval + 1.) * w->interval;
+          ((WT)w)->at = w->offset + (floor ((ev_rt_now - w->offset) / w->interval) + 1.) * w->interval;
           assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
