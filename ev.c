@@ -1306,69 +1306,61 @@ idle_reify (EV_P)
 }
 #endif
 
-int inline_size
-time_update_monotonic (EV_P)
-{
-  mn_now = get_clock ();
-
-  if (expect_true (mn_now - now_floor < MIN_TIMEJUMP * .5))
-    {
-      ev_rt_now = rtmn_diff + mn_now;
-      return 0;
-    }
-  else
-    {
-      now_floor = mn_now;
-      ev_rt_now = ev_time ();
-      return 1;
-    }
-}
-
-void inline_size
-time_update (EV_P)
+void inline_speed
+time_update (EV_P_ ev_tstamp max_block)
 {
   int i;
 
 #if EV_USE_MONOTONIC
   if (expect_true (have_monotonic))
     {
-      if (time_update_monotonic (EV_A))
+      ev_tstamp odiff = rtmn_diff;
+
+      mn_now = get_clock ();
+
+      /* only fetch the realtime clock every 0.5*MIN_TIMEJUMP seconds */
+      /* interpolate in the meantime */
+      if (expect_true (mn_now - now_floor < MIN_TIMEJUMP * .5))
         {
-          ev_tstamp odiff = rtmn_diff;
+          ev_rt_now = rtmn_diff + mn_now;
+          return;
+        }
 
-          /* loop a few times, before making important decisions.
-           * on the choice of "4": one iteration isn't enough,
-           * in case we get preempted during the calls to
-           * ev_time and get_clock. a second call is almost guaranteed
-           * to succeed in that case, though. and looping a few more times
-           * doesn't hurt either as we only do this on time-jumps or
-           * in the unlikely event of having been preempted here.
-           */
-          for (i = 4; --i; )
-            {
-              rtmn_diff = ev_rt_now - mn_now;
+      now_floor = mn_now;
+      ev_rt_now = ev_time ();
 
-              if (fabs (odiff - rtmn_diff) < MIN_TIMEJUMP)
-                return; /* all is well */
+      /* loop a few times, before making important decisions.
+       * on the choice of "4": one iteration isn't enough,
+       * in case we get preempted during the calls to
+       * ev_time and get_clock. a second call is almost guaranteed
+       * to succeed in that case, though. and looping a few more times
+       * doesn't hurt either as we only do this on time-jumps or
+       * in the unlikely event of having been preempted here.
+       */
+      for (i = 4; --i; )
+        {
+          rtmn_diff = ev_rt_now - mn_now;
 
-              ev_rt_now = ev_time ();
-              mn_now    = get_clock ();
-              now_floor = mn_now;
-            }
+          if (fabs (odiff - rtmn_diff) < MIN_TIMEJUMP)
+            return; /* all is well */
+
+          ev_rt_now = ev_time ();
+          mn_now    = get_clock ();
+          now_floor = mn_now;
+        }
 
 # if EV_PERIODIC_ENABLE
-          periodics_reschedule (EV_A);
+      periodics_reschedule (EV_A);
 # endif
-          /* no timer adjustment, as the monotonic clock doesn't jump */
-          /* timers_reschedule (EV_A_ rtmn_diff - odiff) */
-        }
+      /* no timer adjustment, as the monotonic clock doesn't jump */
+      /* timers_reschedule (EV_A_ rtmn_diff - odiff) */
     }
   else
 #endif
     {
       ev_rt_now = ev_time ();
 
-      if (expect_false (mn_now > ev_rt_now || mn_now < ev_rt_now - MAX_BLOCKTIME - MIN_TIMEJUMP))
+      if (expect_false (mn_now > ev_rt_now || ev_rt_now > mn_now + max_block + MIN_TIMEJUMP))
         {
 #if EV_PERIODIC_ENABLE
           periodics_reschedule (EV_A);
@@ -1452,15 +1444,7 @@ ev_loop (EV_P_ int flags)
         else
           {
             /* update time to cancel out callback processing overhead */
-#if EV_USE_MONOTONIC
-            if (expect_true (have_monotonic))
-              time_update_monotonic (EV_A);
-            else
-#endif
-              {
-                ev_rt_now = ev_time ();
-                mn_now    = ev_rt_now;
-              }
+            time_update (EV_A_ 1e100);
 
             block = MAX_BLOCKTIME;
 
@@ -1483,10 +1467,10 @@ ev_loop (EV_P_ int flags)
 
         ++loop_count;
         backend_poll (EV_A_ block);
-      }
 
-      /* update ev_rt_now, do magic */
-      time_update (EV_A);
+        /* update ev_rt_now, do magic */
+        time_update (EV_A_ block);
+      }
 
       /* queue pending timers and reschedule them */
       timers_reify (EV_A); /* relative timers called last */
