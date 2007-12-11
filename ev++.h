@@ -22,10 +22,10 @@ namespace ev {
       ev_init (this, 0);
     }
 
-    void set_ (void *data, void (*cb)(EV_P_ watcher *w, int revents))
+    void set_ (void *data, void (*cb)(EV_P_ ev_watcher *w, int revents))
     {
       this->data = data;
-      ev_set_cb (static_cast<watcher *>(this), cb);
+      ev_set_cb (static_cast<ev_watcher *>(this), cb);
     }
 
     template<class K, void (K::*method)(watcher &w, int)>
@@ -35,10 +35,10 @@ namespace ev {
     }
 
     template<class K, void (K::*method)(watcher &w, int)>
-    static void method_thunk (EV_P_ watcher *w, int revents)
+    static void method_thunk (EV_P_ ev_watcher *w, int revents)
     {
       K *obj = static_cast<K *>(w->data);
-      (obj->*method) (*w, revents);
+      (obj->*method) (*static_cast<watcher *>(w), revents);
     }
 
     template<class K, void (K::*method)(watcher &w, int) const>
@@ -48,10 +48,10 @@ namespace ev {
     }
 
     template<class K, void (K::*method)(watcher &w, int) const>
-    static void const_method_thunk (EV_P_ watcher *w, int revents)
+    static void const_method_thunk (EV_P_ ev_watcher *w, int revents)
     {
       K *obj = static_cast<K *>(w->data);
-      (obj->*method) (*w, revents);
+      (static_cast<K *>(w->data)->*method) (*static_cast<watcher *>(w), revents);
     }
 
     template<void (*function)(watcher &w, int)>
@@ -61,9 +61,9 @@ namespace ev {
     }
 
     template<void (*function)(watcher &w, int)>
-    static void function_thunk (EV_P_ watcher *w, int revents)
+    static void function_thunk (EV_P_ ev_watcher *w, int revents)
     {
-      function (*w, revents);
+      function (*static_cast<watcher *>(w), revents);
     }
 
     void operator ()(int events = EV_UNDEF)

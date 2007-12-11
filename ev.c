@@ -1233,7 +1233,7 @@ periodics_reify (EV_P)
       /* first reschedule or stop timer */
       if (w->reschedule_cb)
         {
-          ((WT)w)->at = w->reschedule_cb (w, ev_rt_now + 0.0001);
+          ((WT)w)->at = w->reschedule_cb (w, ev_rt_now + 0.0001220703125 /* 1/8192 */);
           assert (("ev_periodic reschedule callback returned time in the past", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
