@@ -223,8 +223,7 @@ extern "C" {
  * It is added to ev_rt_now when scheduling periodics
  * to ensure progress, time-wise, even when rounding
  * errors are against us.
- * This value is good at least till the year 4000
- * and intervals up to 20 years.
+ * This value is good at least till the year 4000.
  * Better solutions welcome.
  */
 #define TIME_EPSILON  0.0001220703125 /* 1/8192 */
@@ -1250,7 +1249,8 @@ periodics_reify (EV_P)
         }
       else if (w->interval)
         {
-          ((WT)w)->at = w->offset + floor ((ev_rt_now + TIME_EPSILON - w->offset) / w->interval + 1.) * w->interval;
+          ((WT)w)->at = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
+          if (((WT)w)->at - ev_rt_now <= TIME_EPSILON) ((WT)w)->at += w->interval;
           assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
@@ -1373,7 +1373,6 @@ time_update (EV_P)
 #if EV_PERIODIC_ENABLE
           periodics_reschedule (EV_A);
 #endif
-
           /* adjust timers. this is easy, as the offset is the same for all of them */
           for (i = 0; i < timercnt; ++i)
             ((WT)timers [i])->at += ev_rt_now - mn_now;
