@@ -218,9 +218,20 @@ extern "C" {
 
 /**/
 
+/*
+ * This is used to avoid floating point rounding problems.
+ * It is added to ev_rt_now when scheduling periodics
+ * to ensure progress, time-wise, even when rounding
+ * errors are against us.
+ * This value is good at least till the year 4000
+ * and intervals up to 20 years.
+ * Better solutions welcome.
+ */
+#define TIME_EPSILON  0.0001220703125 /* 1/8192 */
+
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 59.743 /* never wait longer than this time (to detect time jumps) */
-/*#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds */
+/*#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds, TODO */
 
 #if __GNUC__ >= 3
 # define expect(expr,value)         __builtin_expect ((expr),(value))
@@ -1233,13 +1244,13 @@ periodics_reify (EV_P)
       /* first reschedule or stop timer */
       if (w->reschedule_cb)
         {
-          ((WT)w)->at = w->reschedule_cb (w, ev_rt_now + 0.0001220703125 /* 1/8192 */);
+          ((WT)w)->at = w->reschedule_cb (w, ev_rt_now + TIME_EPSILON);
           assert (("ev_periodic reschedule callback returned time in the past", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
       else if (w->interval)
         {
-          ((WT)w)->at = w->offset + (floor ((ev_rt_now - w->offset) / w->interval) + 1.) * w->interval;
+          ((WT)w)->at = w->offset + floor ((ev_rt_now + TIME_EPSILON - w->offset) / w->interval + 1.) * w->interval;
           assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ((WT)w)->at > ev_rt_now));
           downheap ((WT *)periodics, periodiccnt, 0);
         }
