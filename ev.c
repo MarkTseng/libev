@@ -1754,8 +1754,21 @@ ev_signal_start (EV_P_ ev_signal *w)
 
   assert (("ev_signal_start called with illegal signal number", w->signum > 0));
 
+  {
+#ifndef _WIN32
+    sigset_t full, prev;
+    sigfillset (&full);
+    sigprocmask (SIG_SETMASK, &full, &prev);
+#endif
+
+    array_needsize (ANSIG, signals, signalmax, w->signum, signals_init);
+
+#ifndef _WIN32
+    sigprocmask (SIG_SETMASK, &prev, 0);
+#endif
+  }
+
   ev_start (EV_A_ (W)w, 1);
-  array_needsize (ANSIG, signals, signalmax, w->signum, signals_init);
   wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
 
   if (!((WL)w)->next)
