@@ -478,7 +478,7 @@ ev_feed_event (EV_P_ void *w, int revents)
     }
 }
 
-void inline_size
+void inline_speed
 queue_events (EV_P_ W *events, int eventcnt, int type)
 {
   int i;
@@ -640,11 +640,16 @@ upheap (WT *heap, int k)
 {
   WT w = heap [k];
 
-  while (k && heap [k >> 1]->at > w->at)
+  while (k)
     {
-      heap [k] = heap [k >> 1];
+      int p = (k - 1) >> 1;
+
+      if (heap [p]->at <= w->at)
+        break;
+
+      heap [k] = heap [p];
       ((W)heap [k])->active = k + 1;
-      k >>= 1;
+      k = p;
     }
 
   heap [k] = w;
@@ -657,19 +662,23 @@ downheap (WT *heap, int N, int k)
 {
   WT w = heap [k];
 
-  while (k < (N >> 1))
+  for (;;)
     {
-      int j = k << 1;
+      int c = (k << 1) + 1;
 
-      if (j + 1 < N && heap [j]->at > heap [j + 1]->at)
-        ++j;
-
-      if (w->at <= heap [j]->at)
+      if (c >= N)
         break;
 
-      heap [k] = heap [j];
+      c += c + 1 < N && heap [c]->at > heap [c + 1]->at
+           ? 1 : 0;
+
+      if (w->at <= heap [c]->at)
+        break;
+
+      heap [k] = heap [c];
       ((W)heap [k])->active = k + 1;
-      k = j;
+
+      k = c;
     }
 
   heap [k] = w;
