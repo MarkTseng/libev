@@ -794,7 +794,7 @@ siginit (EV_P)
 
 /*****************************************************************************/
 
-static ev_child *childs [EV_PID_HASHSIZE];
+static WL childs [EV_PID_HASHSIZE];
 
 #ifndef _WIN32
 
@@ -1599,7 +1599,7 @@ ev_io_start (EV_P_ ev_io *w)
 
   ev_start (EV_A_ (W)w, 1);
   array_needsize (ANFD, anfds, anfdmax, fd + 1, anfds_init);
-  wlist_add ((WL *)&anfds[fd].head, (WL)w);
+  wlist_add (&anfds[fd].head, (WL)w);
 
   fd_change (EV_A_ fd);
 }
@@ -1613,7 +1613,7 @@ ev_io_stop (EV_P_ ev_io *w)
 
   assert (("ev_io_start called with illegal fd (must stay constant after start!)", w->fd >= 0 && w->fd < anfdmax));
 
-  wlist_del ((WL *)&anfds[w->fd].head, (WL)w);
+  wlist_del (&anfds[w->fd].head, (WL)w);
   ev_stop (EV_A_ (W)w);
 
   fd_change (EV_A_ w->fd);
@@ -1768,7 +1768,7 @@ ev_signal_start (EV_P_ ev_signal *w)
   }
 
   ev_start (EV_A_ (W)w, 1);
-  wlist_add ((WL *)&signals [w->signum - 1].head, (WL)w);
+  wlist_add (&signals [w->signum - 1].head, (WL)w);
 
   if (!((WL)w)->next)
     {
@@ -1791,7 +1791,7 @@ ev_signal_stop (EV_P_ ev_signal *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  wlist_del ((WL *)&signals [w->signum - 1].head, (WL)w);
+  wlist_del (&signals [w->signum - 1].head, (WL)w);
   ev_stop (EV_A_ (W)w);
 
   if (!signals [w->signum - 1].head)
@@ -1808,7 +1808,7 @@ ev_child_start (EV_P_ ev_child *w)
     return;
 
   ev_start (EV_A_ (W)w, 1);
-  wlist_add ((WL *)&childs [w->pid & (EV_PID_HASHSIZE - 1)], (WL)w);
+  wlist_add (&childs [w->pid & (EV_PID_HASHSIZE - 1)], (WL)w);
 }
 
 void
@@ -1818,7 +1818,7 @@ ev_child_stop (EV_P_ ev_child *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  wlist_del ((WL *)&childs [w->pid & (EV_PID_HASHSIZE - 1)], (WL)w);
+  wlist_del (&childs [w->pid & (EV_PID_HASHSIZE - 1)], (WL)w);
   ev_stop (EV_A_ (W)w);
 }
 
