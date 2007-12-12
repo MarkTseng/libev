@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Wed Dec 12 05:53:55 2007" />
+	<meta name="created" content="Wed Dec 12 18:55:04 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -31,16 +31,41 @@
 <li><a href="#WATCHER_TYPES">WATCHER TYPES</a>
 <ul><li><a href="#code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable?</a>
 <ul><li><a href="#The_special_problem_of_disappearing_">The special problem of disappearing file descriptors</a></li>
+<li><a href="#Watcher_Specific_Functions">Watcher-Specific Functions</a></li>
 </ul>
 </li>
-<li><a href="#code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally repeating timeouts</a></li>
-<li><a href="#code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron?</a></li>
-<li><a href="#code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled!</a></li>
-<li><a href="#code_ev_child_code_watch_out_for_pro"><code>ev_child</code> - watch out for process status changes</a></li>
-<li><a href="#code_ev_stat_code_did_the_file_attri"><code>ev_stat</code> - did the file attributes just change?</a></li>
-<li><a href="#code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do...</a></li>
-<li><a href="#code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop!</a></li>
-<li><a href="#code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough...</a></li>
+<li><a href="#code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally repeating timeouts</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
+<li><a href="#code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron?</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_-3">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
+<li><a href="#code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled!</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_-4">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
+<li><a href="#code_ev_child_code_watch_out_for_pro"><code>ev_child</code> - watch out for process status changes</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_-5">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
+<li><a href="#code_ev_stat_code_did_the_file_attri"><code>ev_stat</code> - did the file attributes just change?</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_-6">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
+<li><a href="#code_ev_idle_code_when_you_ve_got_no"><code>ev_idle</code> - when you've got nothing better to do...</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_-7">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
+<li><a href="#code_ev_prepare_code_and_code_ev_che"><code>ev_prepare</code> and <code>ev_check</code> - customise your event loop!</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_-8">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
+<li><a href="#code_ev_embed_code_when_one_backend_"><code>ev_embed</code> - when one backend isn't enough...</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_-9">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
 <li><a href="#code_ev_fork_code_the_audacity_to_re"><code>ev_fork</code> - the audacity to resume the event loop after a fork</a></li>
 </ul>
 </li>
@@ -970,6 +995,10 @@ optimisations to libev.</p>
 
 
 
+
+</div>
+<h3 id="Watcher_Specific_Functions">Watcher-Specific Functions</h3>
+<div id="Watcher_Specific_Functions_CONTENT">
 <dl>
 	<dt>ev_io_init (ev_io *, callback, int fd, int events)</dt>
 	<dt>ev_io_set (ev_io *, int fd, int events)</dt>
@@ -1030,6 +1059,10 @@ on the current time, use something like this to adjust for this:</p>
 <p>The callback is guarenteed to be invoked only when its timeout has passed,
 but if multiple timers become ready during the same loop iteration then
 order of execution is undefined.</p>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2">
 <dl>
 	<dt>ev_timer_init (ev_timer *, callback, ev_tstamp after, ev_tstamp repeat)</dt>
 	<dt>ev_timer_set (ev_timer *, ev_tstamp after, ev_tstamp repeat)</dt>
@@ -1135,6 +1168,10 @@ rules.</p>
 <p>As with timers, the callback is guarenteed to be invoked only when the
 time (<code>at</code>) has been passed, but if multiple periodic timers become ready
 during the same loop iteration then order of execution is undefined.</p>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_-3">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2">
 <dl>
 	<dt>ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)</dt>
 	<dt>ev_periodic_set (ev_periodic *, ev_tstamp after, ev_tstamp repeat, reschedule_cb)</dt>
@@ -1281,6 +1318,10 @@ with the kernel (thus it coexists with your own signal handlers as long
 as you don't register any with libev). Similarly, when the last signal
 watcher for a signal is stopped libev will reset the signal handler to
 SIG_DFL (regardless of what it was set to before).</p>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_-4">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2-2">
 <dl>
 	<dt>ev_signal_init (ev_signal *, callback, int signum)</dt>
 	<dt>ev_signal_set (ev_signal *, int signum)</dt>
@@ -1303,6 +1344,10 @@ of the <code>SIGxxx</code> constants).</p>
 <div id="code_ev_child_code_watch_out_for_pro-2">
 <p>Child watchers trigger when your process receives a SIGCHLD in response to
 some child status changes (most typically when a child of yours dies).</p>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_-5">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2-3">
 <dl>
 	<dt>ev_child_init (ev_child *, callback, int pid)</dt>
 	<dt>ev_child_set (ev_child *, int pid)</dt>
@@ -1375,6 +1420,10 @@ semantics of <code>ev_stat</code> watchers, which means that libev sometimes nee
 to fall back to regular polling again even with inotify, but changes are
 usually detected immediately, and if the file exists there will be no
 polling.</p>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_-6">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2-4">
 <dl>
 	<dt>ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)</dt>
 	<dt>ev_stat_set (ev_stat *, const char *path, ev_tstamp interval)</dt>
@@ -1462,6 +1511,10 @@ active, the process will not block when waiting for new events.</p>
 effect on its own sometimes), idle watchers are a good place to do
 &quot;pseudo-background processing&quot;, or delay processing stuff to after the
 event loop has handled all outstanding events.</p>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_-7">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2-5">
 <dl>
 	<dt>ev_idle_init (ev_signal *, callback)</dt>
 	<dd>
@@ -1534,6 +1587,10 @@ their job. As <code>ev_check</code> watchers are often used to embed other event
 loops those other event loops might be in an unusable state until their
 <code>ev_check</code> watcher ran (always remind yourself to coexist peacefully with
 others).</p>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_-8">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2-6">
 <dl>
 	<dt>ev_prepare_init (ev_prepare *, callback)</dt>
 	<dt>ev_check_init (ev_check *, callback)</dt>
@@ -1735,6 +1792,10 @@ create it, and if that fails, use the normal loop for everything:</p>
     loop_lo = loop_hi;
 
 </pre>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_-9">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2-7">
 <dl>
 	<dt>ev_embed_init (ev_embed *, callback, struct ev_loop *embedded_loop)</dt>
 	<dt>ev_embed_set (ev_embed *, callback, struct ev_loop *embedded_loop)</dt>

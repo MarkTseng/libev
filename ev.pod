@@ -935,6 +935,8 @@ the libev application should not optimise around libev but should leave
 optimisations to libev.
 
 
+=head3 Watcher-Specific Functions
+
 =over 4
 
 =item ev_io_init (ev_io *, callback, int fd, int events)
@@ -996,6 +998,8 @@ on the current time, use something like this to adjust for this:
 The callback is guarenteed to be invoked only when its timeout has passed,
 but if multiple timers become ready during the same loop iteration then
 order of execution is undefined.
+
+=head3 Watcher-Specific Functions and Data Members
 
 =over 4
 
@@ -1110,6 +1114,8 @@ rules.
 As with timers, the callback is guarenteed to be invoked only when the
 time (C<at>) has been passed, but if multiple periodic timers become ready
 during the same loop iteration then order of execution is undefined.
+
+=head3 Watcher-Specific Functions and Data Members
 
 =over 4
 
@@ -1266,6 +1272,8 @@ as you don't register any with libev). Similarly, when the last signal
 watcher for a signal is stopped libev will reset the signal handler to
 SIG_DFL (regardless of what it was set to before).
 
+=head3 Watcher-Specific Functions and Data Members
+
 =over 4
 
 =item ev_signal_init (ev_signal *, callback, int signum)
@@ -1286,6 +1294,8 @@ The signal the watcher watches out for.
 
 Child watchers trigger when your process receives a SIGCHLD in response to
 some child status changes (most typically when a child of yours dies).
+
+=head3 Watcher-Specific Functions and Data Members
 
 =over 4
 
@@ -1363,6 +1373,8 @@ semantics of C<ev_stat> watchers, which means that libev sometimes needs
 to fall back to regular polling again even with inotify, but changes are
 usually detected immediately, and if the file exists there will be no
 polling.
+
+=head3 Watcher-Specific Functions and Data Members
 
 =over 4
 
@@ -1455,6 +1467,8 @@ effect on its own sometimes), idle watchers are a good place to do
 "pseudo-background processing", or delay processing stuff to after the
 event loop has handled all outstanding events.
 
+=head3 Watcher-Specific Functions and Data Members
+
 =over 4
 
 =item ev_idle_init (ev_signal *, callback)
@@ -1530,6 +1544,8 @@ their job. As C<ev_check> watchers are often used to embed other event
 loops those other event loops might be in an unusable state until their
 C<ev_check> watcher ran (always remind yourself to coexist peacefully with
 others).
+
+=head3 Watcher-Specific Functions and Data Members
 
 =over 4
 
@@ -1740,6 +1756,8 @@ create it, and if that fails, use the normal loop for everything:
     }
   else
     loop_lo = loop_hi;
+
+=head3 Watcher-Specific Functions and Data Members
 
 =over 4
 

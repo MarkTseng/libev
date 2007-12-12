@@ -1089,6 +1089,9 @@ descriptor even if the file descriptor number itself did not change.
 This is how one would do it normally anyway, the important point is that
 the libev application should not optimise around libev but should leave
 optimisations to libev.
+.PP
+\fIWatcher-Specific Functions\fR
+.IX Subsection "Watcher-Specific Functions"
 .IP "ev_io_init (ev_io *, callback, int fd, int events)" 4
 .IX Item "ev_io_init (ev_io *, callback, int fd, int events)"
 .PD 0
@@ -1151,6 +1154,9 @@ on the current time, use something like this to adjust for this:
 The callback is guarenteed to be invoked only when its timeout has passed,
 but if multiple timers become ready during the same loop iteration then
 order of execution is undefined.
+.PP
+\fIWatcher-Specific Functions and Data Members\fR
+.IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_timer_init (ev_timer *, callback, ev_tstamp after, ev_tstamp repeat)" 4
 .IX Item "ev_timer_init (ev_timer *, callback, ev_tstamp after, ev_tstamp repeat)"
 .PD 0
@@ -1271,6 +1277,9 @@ rules.
 As with timers, the callback is guarenteed to be invoked only when the
 time (\f(CW\*(C`at\*(C'\fR) has been passed, but if multiple periodic timers become ready
 during the same loop iteration then order of execution is undefined.
+.PP
+\fIWatcher-Specific Functions and Data Members\fR
+.IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)" 4
 .IX Item "ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)"
 .PD 0
@@ -1431,6 +1440,9 @@ with the kernel (thus it coexists with your own signal handlers as long
 as you don't register any with libev). Similarly, when the last signal
 watcher for a signal is stopped libev will reset the signal handler to
 \&\s-1SIG_DFL\s0 (regardless of what it was set to before).
+.PP
+\fIWatcher-Specific Functions and Data Members\fR
+.IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_signal_init (ev_signal *, callback, int signum)" 4
 .IX Item "ev_signal_init (ev_signal *, callback, int signum)"
 .PD 0
@@ -1447,6 +1459,9 @@ The signal the watcher watches out for.
 .IX Subsection "ev_child - watch out for process status changes"
 Child watchers trigger when your process receives a \s-1SIGCHLD\s0 in response to
 some child status changes (most typically when a child of yours dies).
+.PP
+\fIWatcher-Specific Functions and Data Members\fR
+.IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_child_init (ev_child *, callback, int pid)" 4
 .IX Item "ev_child_init (ev_child *, callback, int pid)"
 .PD 0
@@ -1521,6 +1536,9 @@ semantics of \f(CW\*(C`ev_stat\*(C'\fR watchers, which means that libev sometime
 to fall back to regular polling again even with inotify, but changes are
 usually detected immediately, and if the file exists there will be no
 polling.
+.PP
+\fIWatcher-Specific Functions and Data Members\fR
+.IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)" 4
 .IX Item "ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)"
 .PD 0
@@ -1609,6 +1627,9 @@ Apart from keeping your process non-blocking (which is a useful
 effect on its own sometimes), idle watchers are a good place to do
 \&\*(L"pseudo\-background processing\*(R", or delay processing stuff to after the
 event loop has handled all outstanding events.
+.PP
+\fIWatcher-Specific Functions and Data Members\fR
+.IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_idle_init (ev_signal *, callback)" 4
 .IX Item "ev_idle_init (ev_signal *, callback)"
 Initialises and configures the idle watcher \- it has no parameters of any
@@ -1683,6 +1704,9 @@ their job. As \f(CW\*(C`ev_check\*(C'\fR watchers are often used to embed other 
 loops those other event loops might be in an unusable state until their
 \&\f(CW\*(C`ev_check\*(C'\fR watcher ran (always remind yourself to coexist peacefully with
 others).
+.PP
+\fIWatcher-Specific Functions and Data Members\fR
+.IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_prepare_init (ev_prepare *, callback)" 4
 .IX Item "ev_prepare_init (ev_prepare *, callback)"
 .PD 0
@@ -1939,6 +1963,9 @@ create it, and if that fails, use the normal loop for everything:
 \&  else
 \&    loop_lo = loop_hi;
 .Ve
+.PP
+\fIWatcher-Specific Functions and Data Members\fR
+.IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_embed_init (ev_embed *, callback, struct ev_loop *embedded_loop)" 4
 .IX Item "ev_embed_init (ev_embed *, callback, struct ev_loop *embedded_loop)"
 .PD 0
