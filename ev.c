@@ -535,10 +535,10 @@ fd_reify (EV_P)
       ANFD *anfd = anfds + fd;
       ev_io *w;
 
-      int events = 0;
+      unsigned char events = 0;
 
       for (w = (ev_io *)anfd->head; w; w = (ev_io *)((WL)w)->next)
-        events |= w->events;
+        events |= (unsigned char)w->events;
 
 #if EV_SELECT_IS_WINSOCKET
       if (events)
@@ -549,10 +549,16 @@ fd_reify (EV_P)
         }
 #endif
 
-      anfd->reify = 0;
+      {
+        unsigned char o_events = anfd->events;
+        unsigned char o_reify  = anfd->reify;
 
-      backend_modify (EV_A_ fd, anfd->events, events);
-      anfd->events = events;
+        anfd->reify  = 0;
+        anfd->events = events;
+
+        if (o_events != events || o_reify & EV_IOFDSET)
+          backend_modify (EV_A_ fd, o_events, events);
+      }
     }
 
   fdchangecnt = 0;
@@ -562,7 +568,7 @@ void inline_size
 fd_change (EV_P_ int fd, int flags)
 {
   unsigned char reify = anfds [fd].reify;
-  anfds [fd].reify |= flags | 1;
+  anfds [fd].reify |= flags;
 
   if (expect_true (!reify))
     {
@@ -630,7 +636,7 @@ fd_rearm_all (EV_P)
     if (anfds [fd].events)
       {
         anfds [fd].events = 0;
-        fd_change (EV_A_ fd, EV_IOFDSET);
+        fd_change (EV_A_ fd, EV_IOFDSET | 1);
       }
 }
 
@@ -1602,8 +1608,8 @@ ev_io_start (EV_P_ ev_io *w)
   array_needsize (ANFD, anfds, anfdmax, fd + 1, anfds_init);
   wlist_add (&anfds[fd].head, (WL)w);
 
-  fd_change (EV_A_ fd, w->events & EV_IOFDSET);
-  w->events &= ~ EV_IOFDSET;
+  fd_change (EV_A_ fd, w->events & EV_IOFDSET | 1);
+  w->events &= ~EV_IOFDSET;
 }
 
 void noinline
@@ -1618,7 +1624,7 @@ ev_io_stop (EV_P_ ev_io *w)
   wlist_del (&anfds[w->fd].head, (WL)w);
   ev_stop (EV_A_ (W)w);
 
-  fd_change (EV_A_ w->fd, 0);
+  fd_change (EV_A_ w->fd, 1);
 }
 
 void noinline
