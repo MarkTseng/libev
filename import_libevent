@@ -103,7 +103,7 @@ perl -ne '
    #s/-Wall/-Wall -Wno-comment -Wunused-function -Wno-unused-value/;
    s/-Wall//g;
    #s/libevent/libev/g;
-   s/AM_INIT_AUTOMAKE\s*\(.*,(.*)\)/AM_INIT_AUTOMAKE(libevent-$1+libev,1.8)/;
+   s/AM_INIT_AUTOMAKE\s*\(.*,(.*)\)/AM_INIT_AUTOMAKE(libevent-$1+libev,1.81)/;
    s/AC_LIBOBJ\(select\)/: ;/g;
    s/AC_LIBOBJ\(poll\)/: ;/g;
    s/AC_LIBOBJ\(kqueue\)/: ;/g;
