@@ -2021,16 +2021,16 @@ constructor already stores the event loop.
 
 Stops the watcher if it is active. Again, no C<loop> argument.
 
-=item w->again ()       C<ev::timer>, C<ev::periodic> only
+=item w->again () (C<ev::timer>, C<ev::periodic> only)
 
 For C<ev::timer> and C<ev::periodic>, this invokes the corresponding
 C<ev_TYPE_again> function.
 
-=item w->sweep ()       C<ev::embed> only
+=item w->sweep () (C<ev::embed> only)
 
 Invokes C<ev_embed_sweep>.
 
-=item w->update ()      C<ev::stat> only
+=item w->update () (C<ev::stat> only)
 
 Invokes C<ev_stat_stat>.
 
@@ -2060,9 +2060,9 @@ the constructor.
 
 =head1 MACRO MAGIC
 
-Libev can be compiled with a variety of options, the most fundemantal is
-C<EV_MULTIPLICITY>. This option determines whether (most) functions and
-callbacks have an initial C<struct ev_loop *> argument.
+Libev can be compiled with a variety of options, the most fundamantal
+of which is C<EV_MULTIPLICITY>. This option determines whether (most)
+functions and callbacks have an initial C<struct ev_loop *> argument.
 
 To make it easier to write programs that cope with either variant, the
 following macros are defined:
