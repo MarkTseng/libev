@@ -1794,6 +1794,8 @@ and only in the child after the fork. If whoever good citizen calling
 C<ev_default_fork> cheats and calls it in the wrong process, the fork
 handlers will be invoked, too, of course.
 
+=head3 Watcher-Specific Functions and Data Members
+
 =over 4
 
 =item ev_fork_init (ev_signal *, callback)

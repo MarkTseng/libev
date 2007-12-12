@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Wed Dec 12 18:55:04 2007" />
+	<meta name="created" content="Wed Dec 12 18:55:28 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -66,7 +66,10 @@
 <ul><li><a href="#Watcher_Specific_Functions_and_Data_-9">Watcher-Specific Functions and Data Members</a></li>
 </ul>
 </li>
-<li><a href="#code_ev_fork_code_the_audacity_to_re"><code>ev_fork</code> - the audacity to resume the event loop after a fork</a></li>
+<li><a href="#code_ev_fork_code_the_audacity_to_re"><code>ev_fork</code> - the audacity to resume the event loop after a fork</a>
+<ul><li><a href="#Watcher_Specific_Functions_and_Data_-10">Watcher-Specific Functions and Data Members</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#OTHER_FUNCTIONS">OTHER FUNCTIONS</a></li>
@@ -1832,6 +1835,10 @@ event loop blocks next and before <code>ev_check</code> watchers are being calle
 and only in the child after the fork. If whoever good citizen calling
 <code>ev_default_fork</code> cheats and calls it in the wrong process, the fork
 handlers will be invoked, too, of course.</p>
+
+</div>
+<h3 id="Watcher_Specific_Functions_and_Data_-10">Watcher-Specific Functions and Data Members</h3>
+<div id="Watcher_Specific_Functions_and_Data_-2-8">
 <dl>
 	<dt>ev_fork_init (ev_signal *, callback)</dt>
 	<dd>
