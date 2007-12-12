@@ -63,12 +63,12 @@ VARx(int *, fdchanges)
 VARx(int, fdchangemax)
 VARx(int, fdchangecnt)
 
-VARx(struct ev_timer **, timers)
+VARx(WT *, timers)
 VARx(int, timermax)
 VARx(int, timercnt)
 
 #if EV_PERIODIC_ENABLE || EV_GENWRAP
-VARx(struct ev_periodic **, periodics)
+VARx(WT *, periodics)
 VARx(int, periodicmax)
 VARx(int, periodiccnt)
 #endif
