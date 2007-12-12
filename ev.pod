@@ -913,6 +913,28 @@ whether a file descriptor is really ready with a known-to-be good interface
 such as poll (fortunately in our Xlib example, Xlib already does this on
 its own, so its quite safe to use).
 
+=head3 The special problem of disappearing file descriptors
+
+Some backends (e.g kqueue, epoll) need to be told about closing a file
+descriptor (either by calling C<close> explicitly or by any other means,
+such as C<dup>). The reason is that you register interest in some file
+descriptor, but when it goes away, the operating system will silently drop
+this interest. If another file descriptor with the same number then is
+registered with libev, there is no efficient way to see that this is, in
+fact, a different file descriptor.
+
+To avoid having to explicitly tell libev about such cases, libev follows
+the following policy:  Each time C<ev_io_set> is being called, libev
+will assume that this is potentially a new file descriptor, otherwise
+it is assumed that the file descriptor stays the same. That means that
+you I<have> to call C<ev_io_set> (or C<ev_io_init>) when you change the
+descriptor even if the file descriptor number itself did not change.
+
+This is how one would do it normally anyway, the important point is that
+the libev application should not optimise around libev but should leave
+optimisations to libev.
+
+
 =over 4
 
 =item ev_io_init (ev_io *, callback, int fd, int events)

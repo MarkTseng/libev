@@ -6,7 +6,7 @@
 	<meta name="description" content="Pod documentation for libev" />
 	<meta name="inputfile" content="&lt;standard input&gt;" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Sun Dec  9 20:47:27 2007" />
+	<meta name="created" content="Wed Dec 12 05:53:55 2007" />
 	<meta name="generator" content="Pod::Xhtml 1.57" />
 <link rel="stylesheet" href="http://res.tst.eu/pod.css"/></head>
 <body>
@@ -29,7 +29,10 @@
 </ul>
 </li>
 <li><a href="#WATCHER_TYPES">WATCHER TYPES</a>
-<ul><li><a href="#code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable?</a></li>
+<ul><li><a href="#code_ev_io_code_is_this_file_descrip"><code>ev_io</code> - is this file descriptor readable or writable?</a>
+<ul><li><a href="#The_special_problem_of_disappearing_">The special problem of disappearing file descriptors</a></li>
+</ul>
+</li>
 <li><a href="#code_ev_timer_code_relative_and_opti"><code>ev_timer</code> - relative and optionally repeating timeouts</a></li>
 <li><a href="#code_ev_periodic_code_to_cron_or_not"><code>ev_periodic</code> - to cron or not to cron?</a></li>
 <li><a href="#code_ev_signal_code_signal_me_when_a"><code>ev_signal</code> - signal me when a signal gets signalled!</a></li>
@@ -943,6 +946,30 @@ play around with an Xlib connection), then you have to seperately re-test
 whether a file descriptor is really ready with a known-to-be good interface
 such as poll (fortunately in our Xlib example, Xlib already does this on
 its own, so its quite safe to use).</p>
+
+</div>
+<h3 id="The_special_problem_of_disappearing_">The special problem of disappearing file descriptors</h3>
+<div id="The_special_problem_of_disappearing_-2">
+<p>Some backends (e.g kqueue, epoll) need to be told about closing a file
+descriptor (either by calling <code>close</code> explicitly or by any other means,
+such as <code>dup</code>). The reason is that you register interest in some file
+descriptor, but when it goes away, the operating system will silently drop
+this interest. If another file descriptor with the same number then is
+registered with libev, there is no efficient way to see that this is, in
+fact, a different file descriptor.</p>
+<p>To avoid having to explicitly tell libev about such cases, libev follows
+the following policy:  Each time <code>ev_io_set</code> is being called, libev
+will assume that this is potentially a new file descriptor, otherwise
+it is assumed that the file descriptor stays the same. That means that
+you <i>have</i> to call <code>ev_io_set</code> (or <code>ev_io_init</code>) when you change the
+descriptor even if the file descriptor number itself did not change.</p>
+<p>This is how one would do it normally anyway, the important point is that
+the libev application should not optimise around libev but should leave
+optimisations to libev.</p>
+
+
+
+
 <dl>
 	<dt>ev_io_init (ev_io *, callback, int fd, int events)</dt>
 	<dt>ev_io_set (ev_io *, int fd, int events)</dt>

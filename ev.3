@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-12-09" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH "<STANDARD INPUT>" 1 "2007-12-12" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -1067,6 +1067,28 @@ play around with an Xlib connection), then you have to seperately re-test
 whether a file descriptor is really ready with a known-to-be good interface
 such as poll (fortunately in our Xlib example, Xlib already does this on
 its own, so its quite safe to use).
+.PP
+\fIThe special problem of disappearing file descriptors\fR
+.IX Subsection "The special problem of disappearing file descriptors"
+.PP
+Some backends (e.g kqueue, epoll) need to be told about closing a file
+descriptor (either by calling \f(CW\*(C`close\*(C'\fR explicitly or by any other means,
+such as \f(CW\*(C`dup\*(C'\fR). The reason is that you register interest in some file
+descriptor, but when it goes away, the operating system will silently drop
+this interest. If another file descriptor with the same number then is
+registered with libev, there is no efficient way to see that this is, in
+fact, a different file descriptor.
+.PP
+To avoid having to explicitly tell libev about such cases, libev follows
+the following policy:  Each time \f(CW\*(C`ev_io_set\*(C'\fR is being called, libev
+will assume that this is potentially a new file descriptor, otherwise
+it is assumed that the file descriptor stays the same. That means that
+you \fIhave\fR to call \f(CW\*(C`ev_io_set\*(C'\fR (or \f(CW\*(C`ev_io_init\*(C'\fR) when you change the
+descriptor even if the file descriptor number itself did not change.
+.PP
+This is how one would do it normally anyway, the important point is that
+the libev application should not optimise around libev but should leave
+optimisations to libev.
 .IP "ev_io_init (ev_io *, callback, int fd, int events)" 4
 .IX Item "ev_io_init (ev_io *, callback, int fd, int events)"
 .PD 0
