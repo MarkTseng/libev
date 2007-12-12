@@ -559,16 +559,17 @@ fd_reify (EV_P)
 }
 
 void inline_size
-fd_change (EV_P_ int fd)
+fd_change (EV_P_ int fd, int flags)
 {
-  if (expect_false (anfds [fd].reify))
-    return;
+  unsigned char reify = anfds [fd].reify;
+  anfds [fd].reify |= flags | 1;
 
-  anfds [fd].reify = 1;
-
-  ++fdchangecnt;
-  array_needsize (int, fdchanges, fdchangemax, fdchangecnt, EMPTY2);
-  fdchanges [fdchangecnt - 1] = fd;
+  if (expect_true (!reify))
+    {
+      ++fdchangecnt;
+      array_needsize (int, fdchanges, fdchangemax, fdchangecnt, EMPTY2);
+      fdchanges [fdchangecnt - 1] = fd;
+    }
 }
 
 void inline_speed
@@ -629,7 +630,7 @@ fd_rearm_all (EV_P)
     if (anfds [fd].events)
       {
         anfds [fd].events = 0;
-        fd_change (EV_A_ fd);
+        fd_change (EV_A_ fd, EV_IOFDSET);
       }
 }
 
@@ -1601,7 +1602,8 @@ ev_io_start (EV_P_ ev_io *w)
   array_needsize (ANFD, anfds, anfdmax, fd + 1, anfds_init);
   wlist_add (&anfds[fd].head, (WL)w);
 
-  fd_change (EV_A_ fd);
+  fd_change (EV_A_ fd, w->events & EV_IOFDSET);
+  w->events &= ~ EV_IOFDSET;
 }
 
 void noinline
@@ -1616,7 +1618,7 @@ ev_io_stop (EV_P_ ev_io *w)
   wlist_del (&anfds[w->fd].head, (WL)w);
   ev_stop (EV_A_ (W)w);
 
-  fd_change (EV_A_ w->fd);
+  fd_change (EV_A_ w->fd, 0);
 }
 
 void noinline

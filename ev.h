@@ -99,6 +99,7 @@ struct ev_loop;
 #define EV_NONE           0x00L /* no events */
 #define EV_READ           0x01L /* ev_io detected read will not block */
 #define EV_WRITE          0x02L /* ev_io detected write will not block */
+#define EV_IOFDSET        0x80L /* internal use only */
 #define EV_TIMEOUT  0x00000100L /* timer timed out */
 #define EV_PERIODIC 0x00000200L /* periodic timer timed out */
 #define EV_SIGNAL   0x00000400L /* signal was received */
@@ -432,7 +433,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
   ev_set_cb ((ev), cb_);			\
 } while (0)
 
-#define ev_io_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_); } while (0)
+#define ev_io_set(ev,fd_,events_)           do { (ev)->fd = (fd_); (ev)->events = (events_) | EV_IOFDSET; } while (0)
 #define ev_timer_set(ev,after_,repeat_)     do { (ev)->at = (after_); (ev)->repeat = (repeat_); } while (0)
 #define ev_periodic_set(ev,ofs_,ival_,res_) do { (ev)->offset = (ofs_); (ev)->interval = (ival_); (ev)->reschedule_cb= (res_); } while (0)
 #define ev_signal_set(ev,signum_)           do { (ev)->signum = (signum_); } while (0)
