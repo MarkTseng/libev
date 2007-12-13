@@ -29,23 +29,64 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * general notes about epoll:
+ *
+ * a) epoll silently removes fds from the fd set. as nothing tells us
+ *    that an fd has been removed otherwise, we have to continually
+ *    "rearm" fds that we suspect *might* have changed (same
+ *    problem with kqueue, but much less costly there).
+ * b) the fact that ADD != MOD creates a lot of extra syscalls due to a)
+ *    and seems not to have any advantage.
+ * c) the inability to handle fork or file descriptors (think dup)
+ *    limits the applicability over poll, so this is not a generic
+ *    poll replacement.
+ *
+ * lots of "weird code" and complication handling in this file is due
+ * to these design problems with epoll, as we try very hard to avoid
+ * epoll_ctl syscalls for common usage patterns.
+ */
+
 #include <sys/epoll.h>
 
 static void
 epoll_modify (EV_P_ int fd, int oev, int nev)
 {
-  int mode = nev ? oev ? EPOLL_CTL_MOD : EPOLL_CTL_ADD : EPOLL_CTL_DEL;
-
   struct epoll_event ev;
-  ev.data.u64 = fd; /* use u64 to fully initialise the struct, for nicer strace etc. */
-  ev.events =
-      (nev & EV_READ ? EPOLLIN : 0)
-      | (nev & EV_WRITE ? EPOLLOUT : 0);
 
-  if (expect_false (epoll_ctl (backend_fd, mode, fd, &ev)))
-    if (errno != ENOENT /* on ENOENT the fd went away, so try to do the right thing */
-        || (nev && epoll_ctl (backend_fd, EPOLL_CTL_ADD, fd, &ev)))
-      fd_kill (EV_A_ fd);
+  /*
+   * we handle EPOLL_CTL_DEL by ignoring it here
+   * on the assumption that the fd is gone anyways
+   * if that is wrong, we have to handle the spurious
+   * event in epoll_poll.
+   */
+  if (!nev)
+    return;
+
+  ev.data.u64 = fd; /* use u64 to fully initialise the struct, for nicer strace etc. */
+  ev.events   = (nev & EV_READ  ? EPOLLIN  : 0)
+              | (nev & EV_WRITE ? EPOLLOUT : 0);
+
+  if (expect_true (!epoll_ctl (backend_fd, oev ? EPOLL_CTL_MOD : EPOLL_CTL_ADD, fd, &ev)))
+    return;
+
+  if (expect_true (errno == ENOENT))
+    {
+      /* on ENOENT the fd went away, so try to do the right thing */
+      if (!nev)
+        return;
+
+      if (!epoll_ctl (backend_fd, EPOLL_CTL_ADD, fd, &ev))
+        return;
+    }
+  else if (expect_true (errno == EEXIST))
+    {
+      /* on EEXIST we ignored a previous DEL */
+      if (!epoll_ctl (backend_fd, EPOLL_CTL_MOD, fd, &ev))
+        return;
+    }
+
+  fd_kill (EV_A_ fd);
 }
 
 static void
@@ -63,12 +104,25 @@ epoll_poll (EV_P_ ev_tstamp timeout)
     }
 
   for (i = 0; i < eventcnt; ++i)
-    fd_event (
-      EV_A_
-      epoll_events [i].data.u64,
-      (epoll_events [i].events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
-      | (epoll_events [i].events & (EPOLLIN | EPOLLERR | EPOLLHUP) ? EV_READ : 0)
-    );
+    {
+      struct epoll_event *ev = epoll_events + i;
+
+      int fd   = ev->data.u64;
+      int got  = (ev->events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
+               | (ev->events & (EPOLLIN  | EPOLLERR | EPOLLHUP) ? EV_READ  : 0);
+      int want = anfds [fd].events;
+
+      if (expect_false (got & ~want))
+        {
+          /* we received an event but are not interested in it, try mod or del */
+          ev->events = (want & EV_READ  ? EPOLLIN  : 0)
+                     | (want & EV_WRITE ? EPOLLOUT : 0);
+
+          epoll_ctl (backend_fd, want ? EPOLL_CTL_MOD : EPOLL_CTL_DEL, fd, ev);
+        }
+
+      fd_event (EV_A_ fd, got);
+    }
 
   /* if the receive array was full, increase its size */
   if (expect_false (eventcnt == epoll_eventmax))
