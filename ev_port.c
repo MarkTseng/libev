@@ -36,6 +36,25 @@
 #include <string.h>
 #include <errno.h>
 
+void inline_speed
+port_associate_and_check (EV_P_ int fd, int ev)
+{
+  if (0 >
+      port_associate (
+         backend_fd, PORT_SOURCE_FD, fd,
+         (ev & EV_READ ? POLLIN : 0)
+         | (ev & EV_WRITE ? POLLOUT : 0),
+         0
+      )
+  )
+    {
+      if (errno == EBADFD)
+        fd_kill (EV_A_ fd);
+      else
+        syserr ("(libev) port_associate");
+    }
+}
+
 static void
 port_modify (EV_P_ int fd, int oev, int nev)
 {
@@ -47,20 +66,8 @@ port_modify (EV_P_ int fd, int oev, int nev)
       if (oev)
         port_dissociate (backend_fd, PORT_SOURCE_FD, fd);
     }
-  else if (0 >
-      port_associate (
-         backend_fd, PORT_SOURCE_FD, fd,
-         (nev & EV_READ ? POLLIN : 0)
-         | (nev & EV_WRITE ? POLLOUT : 0),
-         0
-      )
-  )
-    {
-      if (errno == EBADFD)
-        fd_kill (EV_A_ fd);
-      else
-        syserr ("(libev) port_associate");
-    } 
+  else
+    port_associate_and_check (EV_A_ fd, nev);
 }
 
 static void
@@ -95,8 +102,7 @@ port_poll (EV_P_ ev_tstamp timeout)
             | (port_events [i].portev_events & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
           );
 
-          anfds [fd].events = 0; /* event received == disassociated */
-          fd_change (EV_A_ fd); /* need to reify later */
+          port_associate_and_check (EV_A_ fd, anfds [fd].events);
         }
     }
 
