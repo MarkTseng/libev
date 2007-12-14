@@ -204,16 +204,17 @@ extern "C" {
 # define EV_USE_REALTIME 0
 #endif
 
-#if EV_SELECT_IS_WINSOCKET
-# include <winsock.h>
-#endif
-
 #if !EV_STAT_ENABLE
+# undef EV_USE_INOTIFY
 # define EV_USE_INOTIFY 0
 #endif
 
 #if EV_USE_INOTIFY
 # include <sys/inotify.h>
+#endif
+
+#if EV_SELECT_IS_WINSOCKET
+# include <winsock.h>
 #endif
 
 /**/
@@ -232,7 +233,7 @@ extern "C" {
 #define MAX_BLOCKTIME 59.743 /* never wait longer than this time (to detect time jumps) */
 /*#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds, TODO */
 
-#if __GNUC__ >= 3
+#if __GNUC__ >= 4
 # define expect(expr,value)         __builtin_expect ((expr),(value))
 # define noinline                   __attribute__ ((noinline))
 #else
