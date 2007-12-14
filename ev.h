@@ -120,7 +120,7 @@ struct ev_loop;
 # define EV_PROTOTYPES 1
 #endif
 
-#define EV_VERSION_MAJOR 2
+#define EV_VERSION_MAJOR 1
 #define EV_VERSION_MINOR 0
 
 #ifndef EV_CB_DECLARE
