@@ -28,6 +28,7 @@ namespace ev {
       ev_set_cb (static_cast<ev_watcher *>(this), cb);
     }
 
+    // method callback
     template<class K, void (K::*method)(watcher &w, int)>
     void set (K *object)
     {
@@ -41,6 +42,7 @@ namespace ev {
       (obj->*method) (*static_cast<watcher *>(w), revents);
     }
 
+    // const method callback
     template<class K, void (K::*method)(watcher &w, int) const>
     void set (const K *object)
     {
@@ -54,6 +56,7 @@ namespace ev {
       (static_cast<K *>(w->data)->*method) (*static_cast<watcher *>(w), revents);
     }
 
+    // function callback
     template<void (*function)(watcher &w, int)>
     void set (void *data = 0)
     {
@@ -64,6 +67,20 @@ namespace ev {
     static void function_thunk (EV_P_ ev_watcher *w, int revents)
     {
       function (*static_cast<watcher *>(w), revents);
+    }
+
+    // simple callback
+    template<class K, void (K::*method)()>
+    void set (K *object)
+    {
+      set_ (object, method_noargs_thunk<K, method>);
+    }
+
+    template<class K, void (K::*method)()>
+    static void method_noargs_thunk (EV_P_ ev_watcher *w, int revents)
+    {
+      K *obj = static_cast<K *>(w->data);
+      (obj->*method) ();
     }
 
     void operator ()(int events = EV_UNDEF)
