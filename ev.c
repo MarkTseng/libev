@@ -1040,6 +1040,8 @@ loop_destroy (EV_P)
 #endif
     }
 
+  ev_free (anfds); anfdmax = 0;
+
   /* have to use the microsoft-never-gets-it-right macro */
   array_free (fdchange, EMPTY);
   array_free (timer, EMPTY);
@@ -1048,6 +1050,7 @@ loop_destroy (EV_P)
 #endif
   array_free (prepare, EMPTY);
   array_free (check, EMPTY);
+  array_free (fork, EMPTY);
 
   backend = 0;
 }
