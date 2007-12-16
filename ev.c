@@ -1048,9 +1048,11 @@ loop_destroy (EV_P)
 #if EV_PERIODIC_ENABLE
   array_free (periodic, EMPTY);
 #endif
+#if EV_FORK_ENABLE
+  array_free (fork, EMPTY);
+#endif
   array_free (prepare, EMPTY);
   array_free (check, EMPTY);
-  array_free (fork, EMPTY);
 
   backend = 0;
 }
