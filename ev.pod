@@ -100,7 +100,9 @@ Libev represents time as a single floating point number, representing the
 the beginning of 1970, details are complicated, don't ask). This type is
 called C<ev_tstamp>, which is what you should use too. It usually aliases
 to the C<double> type in C, and when you need to do any calculations on
-it, you should treat it as such.
+it, you should treat it as some floatingpoint value. Unlike the name
+component C<stamp> might indicate, it is also used for time differences
+throughout libev.
 
 =head1 GLOBAL FUNCTIONS
 
