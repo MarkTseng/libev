@@ -409,7 +409,7 @@ calling this function, or cope with the fact afterwards (which is usually
 the easiest thing, you can just ignore the watchers and/or C<free ()> them
 for example).
 
-Not that certain global state, such as signal state, will not be freed by
+Note that certain global state, such as signal state, will not be freed by
 this function, and related watchers (such as signal and child watchers)
 would need to be stopped manually.
 
