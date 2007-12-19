@@ -2447,6 +2447,31 @@ their default definitions. One possible use for overriding these is to
 avoid the C<struct ev_loop *> as first argument in all cases, or to use
 method calls instead of plain function calls in C++.
 
+=head2 EXPORTED API SYMBOLS
+
+If you need to re-export the API (e.g. via a dll) and you need a list of
+exported symbols, you can use the provided F<Symbol.*> files which list
+all public symbols, one per line:
+
+  Symbols.ev      for libev proper
+  Symbols.event   for the libevent emulation
+
+This can also be used to rename all public symbols to avoid clashes with
+multiple versions of libev linked together (which is obviously bad in
+itself, but sometimes it is inconvinient to avoid this).
+
+A sed comamnd like this will create wrapper C<#define>'s that you need to
+include before including F<ev.h>:
+
+   <Symbols.ev sed -e "s/.*/#define & myprefix_&/" >wrap.h
+
+This would create a file F<wrap.h> which essentially looks like this:
+
+   #define ev_backend     myprefix_ev_backend
+   #define ev_check_start myprefix_ev_check_start
+   #define ev_check_stop  myprefix_ev_check_stop
+   ...
+
 =head2 EXAMPLES
 
 For a real-world example of a program the includes libev

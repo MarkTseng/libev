@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "EV 1"
-.TH EV 1 "2007-12-18" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH EV 1 "2007-12-19" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -2631,6 +2631,36 @@ definition and a statement, respectively. See the \fIev.v\fR header file for
 their default definitions. One possible use for overriding these is to
 avoid the \f(CW\*(C`struct ev_loop *\*(C'\fR as first argument in all cases, or to use
 method calls instead of plain function calls in \*(C+.
+.Sh "\s-1EXPORTED\s0 \s-1API\s0 \s-1SYMBOLS\s0"
+.IX Subsection "EXPORTED API SYMBOLS"
+If you need to re-export the \s-1API\s0 (e.g. via a dll) and you need a list of
+exported symbols, you can use the provided \fISymbol.*\fR files which list
+all public symbols, one per line:
+.Sp
+.Vb 2
+\&  Symbols.ev      for libev proper
+\&  Symbols.event   for the libevent emulation
+.Ve
+.Sp
+This can also be used to rename all public symbols to avoid clashes with
+multiple versions of libev linked together (which is obviously bad in
+itself, but sometimes it is inconvinient to avoid this).
+.Sp
+A sed comamnd like this will create wrapper \f(CW\*(C`#define\*(C'\fR's that you need to
+include before including \fIev.h\fR:
+.Sp
+.Vb 1
+\&   <Symbols.ev sed -e "s/.*/#define & myprefix_&/" >wrap.h
+.Ve
+.Sp
+This would create a file \fIwrap.h\fR which essentially looks like this:
+.Sp
+.Vb 4
+\&   #define ev_backend     myprefix_ev_backend
+\&   #define ev_check_start myprefix_ev_check_start
+\&   #define ev_check_stop  myprefix_ev_check_stop
+\&   ...
+.Ve
 .Sh "\s-1EXAMPLES\s0"
 .IX Subsection "EXAMPLES"
 For a real-world example of a program the includes libev
