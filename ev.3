@@ -128,8 +128,8 @@
 .rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
-.IX Title ""<STANDARD INPUT>" 1"
-.TH "<STANDARD INPUT>" 1 "2007-12-12" "perl v5.8.8" "User Contributed Perl Documentation"
+.IX Title "EV 1"
+.TH EV 1 "2007-12-18" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -245,7 +245,9 @@ Libev represents time as a single floating point number, representing the
 the beginning of 1970, details are complicated, don't ask). This type is
 called \f(CW\*(C`ev_tstamp\*(C'\fR, which is what you should use too. It usually aliases
 to the \f(CW\*(C`double\*(C'\fR type in C, and when you need to do any calculations on
-it, you should treat it as such.
+it, you should treat it as some floatingpoint value. Unlike the name
+component \f(CW\*(C`stamp\*(C'\fR might indicate, it is also used for time differences
+throughout libev.
 .SH "GLOBAL FUNCTIONS"
 .IX Header "GLOBAL FUNCTIONS"
 These functions can be called anytime, even before initialising the
@@ -557,8 +559,17 @@ etc.). None of the active event watchers will be stopped in the normal
 sense, so e.g. \f(CW\*(C`ev_is_active\*(C'\fR might still return true. It is your
 responsibility to either stop all watchers cleanly yoursef \fIbefore\fR
 calling this function, or cope with the fact afterwards (which is usually
-the easiest thing, youc na just ignore the watchers and/or \f(CW\*(C`free ()\*(C'\fR them
+the easiest thing, you can just ignore the watchers and/or \f(CW\*(C`free ()\*(C'\fR them
 for example).
+.Sp
+Not that certain global state, such as signal state, will not be freed by
+this function, and related watchers (such as signal and child watchers)
+would need to be stopped manually.
+.Sp
+In general it is not advisable to call this function except in the
+rare occasion where you really need to free e.g. the signal handling
+pipe fds. If you need dynamically allocated loops it is better to use
+\&\f(CW\*(C`ev_loop_new\*(C'\fR and \f(CW\*(C`ev_loop_destroy\*(C'\fR).
 .IP "ev_loop_destroy (loop)" 4
 .IX Item "ev_loop_destroy (loop)"
 Like \f(CW\*(C`ev_default_destroy\*(C'\fR, but destroys an event loop created by an
@@ -1381,6 +1392,10 @@ called.
 The current reschedule callback, or \f(CW0\fR, if this functionality is
 switched off. Can be changed any time, but changes only take effect when
 the periodic timer fires or \f(CW\*(C`ev_periodic_again\*(C'\fR is being called.
+.IP "ev_tstamp at [read\-only]" 4
+.IX Item "ev_tstamp at [read-only]"
+When active, contains the absolute time that the watcher is supposed to
+trigger next.
 .PP
 Example: Call a callback every hour, or, more precisely, whenever the
 system clock is divisible by 3600. The callback invocation times have
@@ -2201,18 +2216,18 @@ constructor already stores the event loop.
 .IP "w\->stop ()" 4
 .IX Item "w->stop ()"
 Stops the watcher if it is active. Again, no \f(CW\*(C`loop\*(C'\fR argument.
-.ie n .IP "w\->again ()       ""ev::timer""\fR, \f(CW""ev::periodic"" only" 4
-.el .IP "w\->again ()       \f(CWev::timer\fR, \f(CWev::periodic\fR only" 4
-.IX Item "w->again ()       ev::timer, ev::periodic only"
+.ie n .IP "w\->again () (""ev::timer""\fR, \f(CW""ev::periodic"" only)" 4
+.el .IP "w\->again () (\f(CWev::timer\fR, \f(CWev::periodic\fR only)" 4
+.IX Item "w->again () (ev::timer, ev::periodic only)"
 For \f(CW\*(C`ev::timer\*(C'\fR and \f(CW\*(C`ev::periodic\*(C'\fR, this invokes the corresponding
 \&\f(CW\*(C`ev_TYPE_again\*(C'\fR function.
-.ie n .IP "w\->sweep ()       ""ev::embed"" only" 4
-.el .IP "w\->sweep ()       \f(CWev::embed\fR only" 4
-.IX Item "w->sweep ()       ev::embed only"
+.ie n .IP "w\->sweep () (""ev::embed"" only)" 4
+.el .IP "w\->sweep () (\f(CWev::embed\fR only)" 4
+.IX Item "w->sweep () (ev::embed only)"
 Invokes \f(CW\*(C`ev_embed_sweep\*(C'\fR.
-.ie n .IP "w\->update ()      ""ev::stat"" only" 4
-.el .IP "w\->update ()      \f(CWev::stat\fR only" 4
-.IX Item "w->update ()      ev::stat only"
+.ie n .IP "w\->update () (""ev::stat"" only)" 4
+.el .IP "w\->update () (\f(CWev::stat\fR only)" 4
+.IX Item "w->update () (ev::stat only)"
 Invokes \f(CW\*(C`ev_stat_stat\*(C'\fR.
 .RE
 .RS 4
@@ -2246,9 +2261,9 @@ the constructor.
 .Ve
 .SH "MACRO MAGIC"
 .IX Header "MACRO MAGIC"
-Libev can be compiled with a variety of options, the most fundemantal is
-\&\f(CW\*(C`EV_MULTIPLICITY\*(C'\fR. This option determines whether (most) functions and
-callbacks have an initial \f(CW\*(C`struct ev_loop *\*(C'\fR argument.
+Libev can be compiled with a variety of options, the most fundamantal
+of which is \f(CW\*(C`EV_MULTIPLICITY\*(C'\fR. This option determines whether (most)
+functions and callbacks have an initial \f(CW\*(C`struct ev_loop *\*(C'\fR argument.
 .PP
 To make it easier to write programs that cope with either variant, the
 following macros are defined:

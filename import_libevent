@@ -11,7 +11,6 @@ cvs update -AdP libev
 rsync -avP libev/. . --exclude CVS
 
 rm -f configure.ac
-mv LICENSE.libevent LICENSE
 
 LE=../libevent-1.4.0-beta
 
@@ -94,7 +93,7 @@ perl -ne '
    s/\bevent-internal.h\b//g;
    s/\bevsignal.h\b//g;
    s/^(man_MANS\s*=)/$1 ev.3 /;
-   s/^(EXTRA_DIST\s*=)/$1 LICENSE libev.m4 ev.h ev_vars.h ev_wrap.h event_compat.h ev++.h ev_epoll.c ev_select.c ev_poll.c ev_kqueue.c ev_port.c ev_win32.c ev.3 ev.pod /;
+   s/^(EXTRA_DIST\s*=)/$1 libev.m4 ev.h ev_vars.h ev_wrap.h event_compat.h ev++.h ev_epoll.c ev_select.c ev_poll.c ev_kqueue.c ev_port.c ev_win32.c ev.3 ev.pod /;
    s/^(include_HEADERS\s*=)/$1 ev.h event_compat.h ev++.h /;
    s/^(CORE_SRC\s*=)/$1 ev.c /;
    s/^(SYS_LIBS\s*=)/$1 -lm /;
