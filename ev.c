@@ -2184,7 +2184,7 @@ ev_check_stop (EV_P_ ev_check *w)
 void noinline
 ev_embed_sweep (EV_P_ ev_embed *w)
 {
-  ev_loop (w->loop, EVLOOP_NONBLOCK);
+  ev_loop (w->other, EVLOOP_NONBLOCK);
 }
 
 static void
@@ -2205,7 +2205,7 @@ ev_embed_start (EV_P_ ev_embed *w)
     return;
 
   {
-    struct ev_loop *loop = w->loop;
+    struct ev_loop *loop = w->other;
     assert (("loop to be embedded is not embeddable", backend & ev_embeddable_backends ()));
     ev_io_init (&w->io, embed_cb, backend_fd, EV_READ);
   }
@@ -2321,6 +2321,10 @@ ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, vo
       ev_timer_start (EV_A_ &once->to);
     }
 }
+
+#if EV_MULTIPLICITY
+  #include "ev_wrap.h"
+#endif
 
 #ifdef __cplusplus
 }

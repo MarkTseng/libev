@@ -1793,7 +1793,7 @@ Make a single, non-blocking sweep over the embedded loop. This works
 similarly to C<ev_loop (embedded_loop, EVLOOP_NONBLOCK)>, but in the most
 apropriate way for embedded loops.
 
-=item struct ev_loop *loop [read-only]
+=item struct ev_loop *other [read-only]
 
 The embedded event loop.
 
@@ -2142,7 +2142,7 @@ applications. Examples of applications that embed it include the Deliantra
 Game Server, the EV perl module, the GNU Virtual Private Ethernet (gvpe)
 and rxvt-unicode.
 
-The goal is to enable you to just copy the neecssary files into your
+The goal is to enable you to just copy the necessary files into your
 source directory without having to change even a single line in them, so
 you can easily upgrade by simply copying (or having a checked-out copy of
 libev somewhere in your source tree).

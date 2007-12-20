@@ -286,7 +286,7 @@ typedef struct ev_embed
   EV_WATCHER (ev_embed)
 
   ev_io io; /* private */
-  struct ev_loop *loop; /* ro */
+  struct ev_loop *other; /* ro */
 } ev_embed;
 #endif
 
@@ -442,7 +442,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_idle_set(ev)                     /* nop, yes, this is a serious in-joke */
 #define ev_prepare_set(ev)                  /* nop, yes, this is a serious in-joke */
 #define ev_check_set(ev)                    /* nop, yes, this is a serious in-joke */
-#define ev_embed_set(ev,loop_)              do { (ev)->loop = (loop_); } while (0)
+#define ev_embed_set(ev,other_)             do { (ev)->other = (other_); } while (0)
 #define ev_fork_set(ev)                     /* nop, yes, this is a serious in-joke */
 
 #define ev_io_init(ev,cb,fd,events)         do { ev_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
@@ -454,7 +454,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_idle_init(ev,cb)                 do { ev_init ((ev), (cb)); ev_idle_set ((ev)); } while (0)
 #define ev_prepare_init(ev,cb)              do { ev_init ((ev), (cb)); ev_prepare_set ((ev)); } while (0)
 #define ev_check_init(ev,cb)                do { ev_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
-#define ev_embed_init(ev,cb,loop)           do { ev_init ((ev), (cb)); ev_embed_set ((ev),(loop)); } while (0)
+#define ev_embed_init(ev,cb,other)          do { ev_init ((ev), (cb)); ev_embed_set ((ev),(other)); } while (0)
 #define ev_fork_init(ev,cb)                 do { ev_init ((ev), (cb)); ev_fork_set ((ev)); } while (0)
 
 #define ev_is_pending(ev)                   (0 + ((ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
