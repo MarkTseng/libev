@@ -1,7 +1,11 @@
 #ifndef EVPP_H__
 #define EVPP_H__
 
-#include "ev.h"
+#ifdef EV_H
+# include EV_H
+#else
+# include <ev.h>
+#endif
 
 namespace ev {
 
