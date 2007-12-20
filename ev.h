@@ -120,7 +120,7 @@ struct ev_loop;
 # define EV_PROTOTYPES 1
 #endif
 
-#define EV_VERSION_MAJOR 1
+#define EV_VERSION_MAJOR 2
 #define EV_VERSION_MINOR 0
 
 #ifndef EV_CB_DECLARE
@@ -285,8 +285,14 @@ typedef struct ev_embed
 {
   EV_WATCHER (ev_embed)
 
-  ev_io io; /* private */
   struct ev_loop *other; /* ro */
+  ev_io io;              /* private */
+  ev_prepare prepare;    /* private */
+  ev_check check;        /* unused */
+  ev_timer timer;        /* unused */
+  ev_periodic periodic;  /* unused */
+  ev_idle idle;          /* unused */
+  ev_fork fork;          /* unused */
 } ev_embed;
 #endif
 

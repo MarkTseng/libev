@@ -2188,7 +2188,7 @@ ev_embed_sweep (EV_P_ ev_embed *w)
 }
 
 static void
-embed_cb (EV_P_ ev_io *io, int revents)
+embed_io_cb (EV_P_ ev_io *io, int revents)
 {
   ev_embed *w = (ev_embed *)(((char *)io) - offsetof (ev_embed, io));
 
@@ -2196,6 +2196,14 @@ embed_cb (EV_P_ ev_io *io, int revents)
     ev_feed_event (EV_A_ (W)w, EV_EMBED);
   else
     ev_embed_sweep (loop, w);
+}
+
+static void
+embed_prepare_cb (EV_P_ ev_prepare *prepare, int revents)
+{
+  ev_embed *w = (ev_embed *)(((char *)prepare) - offsetof (ev_embed, prepare));
+
+  fd_reify (w->other);
 }
 
 void
@@ -2207,11 +2215,15 @@ ev_embed_start (EV_P_ ev_embed *w)
   {
     struct ev_loop *loop = w->other;
     assert (("loop to be embedded is not embeddable", backend & ev_embeddable_backends ()));
-    ev_io_init (&w->io, embed_cb, backend_fd, EV_READ);
+    ev_io_init (&w->io, embed_io_cb, backend_fd, EV_READ);
   }
 
   ev_set_priority (&w->io, ev_priority (w));
   ev_io_start (EV_A_ &w->io);
+
+  ev_prepare_init (&w->prepare, embed_prepare_cb);
+  ev_set_priority (&w->prepare, EV_MINPRI);
+  ev_prepare_start (EV_A_ &w->prepare);
 
   ev_start (EV_A_ (W)w, 1);
 }
@@ -2224,6 +2236,7 @@ ev_embed_stop (EV_P_ ev_embed *w)
     return;
 
   ev_io_stop (EV_A_ &w->io);
+  ev_prepare_stop (EV_A_ &w->prepare);
 
   ev_stop (EV_A_ (W)w);
 }
