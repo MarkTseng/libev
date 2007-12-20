@@ -333,8 +333,8 @@ need to use non-blocking I/O or other means to avoid blocking when no data
 
 Kqueue deserves special mention, as at the time of this writing, it
 was broken on all BSDs except NetBSD (usually it doesn't work with
-anything but sockets and pipes, except on Darwin, where of course its
-completely useless). For this reason its not being "autodetected"
+anything but sockets and pipes, except on Darwin, where of course it's
+completely useless). For this reason it's not being "autodetected"
 unless you explicitly specify it explicitly in the flags (i.e. using
 C<EVBACKEND_KQUEUE>).
 
@@ -2252,8 +2252,8 @@ If defined to be C<1>, libev will try to detect the availability of the
 realtime clock option at compiletime (and assume its availability at
 runtime if successful). Otherwise no use of the realtime clock option will
 be attempted. This effectively replaces C<gettimeofday> by C<clock_get
-(CLOCK_REALTIME, ...)> and will not normally affect correctness. See tzhe note about libraries
-in the description of C<EV_USE_MONOTONIC>, though.
+(CLOCK_REALTIME, ...)> and will not normally affect correctness. See the
+note about libraries in the description of C<EV_USE_MONOTONIC>, though.
 
 =item EV_USE_SELECT
 
