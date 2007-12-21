@@ -951,7 +951,7 @@ This is how one would do it normally anyway, the important point is that
 the libev application should not optimise around libev but should leave
 optimisations to libev.
 
-=head3 Ths special problem of dup'ed file descriptors
+=head3 The special problem of dup'ed file descriptors
 
 Some backends (e.g. epoll), cannot register events for file descriptors,
 but only events for the underlying file descriptions. That menas when you
