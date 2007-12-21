@@ -2215,7 +2215,7 @@ ev_embed_start (EV_P_ ev_embed *w)
   {
     struct ev_loop *loop = w->other;
     assert (("loop to be embedded is not embeddable", backend & ev_embeddable_backends ()));
-    ev_io_init (&w->io, embed_io_cb, backend_fd, EV_WRITE);
+    ev_io_init (&w->io, embed_io_cb, backend_fd, EV_READ);
   }
 
   ev_set_priority (&w->io, ev_priority (w));
