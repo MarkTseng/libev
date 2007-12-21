@@ -319,7 +319,7 @@ but it scales phenomenally better. While poll and select usually scale
 like O(total_fds) where n is the total number of fds (or the highest fd),
 epoll scales either O(1) or O(active_fds). The epoll design has a number
 of shortcomings, such as silently dropping events in some hard-to-detect
-cases and rewuiring a syscall per fd change, no fork support and bad
+cases and rewiring a syscall per fd change, no fork support and bad
 support for dup:
 
 While stopping, setting and starting an I/O watcher in the same iteration
