@@ -927,8 +927,8 @@ ev_recommended_backends (void)
 unsigned int
 ev_embeddable_backends (void)
 {
-  return EVBACKEND_EPOLL
-       | EVBACKEND_KQUEUE
+  /* epoll embeddability broken on all linux versions up to at least 2.6.23 */
+  return EVBACKEND_KQUEUE
        | EVBACKEND_PORT;
 }
 
