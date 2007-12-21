@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "EV 1"
-.TH EV 1 "2007-12-19" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH EV 1 "2007-12-21" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -203,7 +203,7 @@ web page you might find easier to navigate when reading it for the first
 time: <http://cvs.schmorp.de/libev/ev.html>.
 .PP
 Libev is an event loop: you register interest in certain events (such as a
-file descriptor being readable or a timeout occuring), and it will manage
+file descriptor being readable or a timeout occurring), and it will manage
 these event sources and provide your program with events.
 .PP
 To do this, it must take more or less complete control over your process
@@ -461,15 +461,18 @@ lot of inactive fds). It scales similarly to select, i.e. O(total_fds).
 .el .IP "\f(CWEVBACKEND_EPOLL\fR   (value 4, Linux)" 4
 .IX Item "EVBACKEND_EPOLL   (value 4, Linux)"
 For few fds, this backend is a bit little slower than poll and select,
-but it scales phenomenally better. While poll and select usually scale like
-O(total_fds) where n is the total number of fds (or the highest fd), epoll scales
-either O(1) or O(active_fds).
+but it scales phenomenally better. While poll and select usually scale
+like O(total_fds) where n is the total number of fds (or the highest fd),
+epoll scales either O(1) or O(active_fds). The epoll design has a number
+of shortcomings, such as silently dropping events in some hard-to-detect
+cases and rewuiring a syscall per fd change, no fork support and bad
+support for dup:
 .Sp
-While stopping and starting an I/O watcher in the same iteration will
-result in some caching, there is still a syscall per such incident
+While stopping, setting and starting an I/O watcher in the same iteration
+will result in some caching, there is still a syscall per such incident
 (because the fd could point to a different file description now), so its
-best to avoid that. Also, \fIdup()\fRed file descriptors might not work very
-well if you register events for both fds.
+best to avoid that. Also, \f(CW\*(C`dup ()\*(C'\fR'ed file descriptors might not work
+very well if you register events for both fds.
 .Sp
 Please note that epoll sometimes generates spurious notifications, so you
 need to use non-blocking I/O or other means to avoid blocking when no data
@@ -478,17 +481,20 @@ need to use non-blocking I/O or other means to avoid blocking when no data
 .el .IP "\f(CWEVBACKEND_KQUEUE\fR  (value 8, most \s-1BSD\s0 clones)" 4
 .IX Item "EVBACKEND_KQUEUE  (value 8, most BSD clones)"
 Kqueue deserves special mention, as at the time of this writing, it
-was broken on all BSDs except NetBSD (usually it doesn't work with
-anything but sockets and pipes, except on Darwin, where of course its
-completely useless). For this reason its not being \*(L"autodetected\*(R"
+was broken on \fIall\fR BSDs (usually it doesn't work with anything but
+sockets and pipes, except on Darwin, where of course it's completely
+useless. On NetBSD, it seems to work for all the \s-1FD\s0 types I tested, so it
+is used by default there). For this reason it's not being \*(L"autodetected\*(R"
 unless you explicitly specify it explicitly in the flags (i.e. using
-\&\f(CW\*(C`EVBACKEND_KQUEUE\*(C'\fR).
+\&\f(CW\*(C`EVBACKEND_KQUEUE\*(C'\fR) or libev was compiled on a known-to-be-good (\-enough)
+system like NetBSD.
 .Sp
 It scales in the same way as the epoll backend, but the interface to the
-kernel is more efficient (which says nothing about its actual speed, of
-course). While starting and stopping an I/O watcher does not cause an
-extra syscall as with epoll, it still adds up to four event changes per
-incident, so its best to avoid that.
+kernel is more efficient (which says nothing about its actual speed,
+of course). While stopping, setting and starting an I/O watcher does
+never cause an extra syscall as with epoll, it still adds up to two event
+changes per incident, support for \f(CW\*(C`fork ()\*(C'\fR is very bad and it drops fds
+silently in similarly hard-to-detetc cases.
 .ie n .IP """EVBACKEND_DEVPOLL"" (value 16, Solaris 8)" 4
 .el .IP "\f(CWEVBACKEND_DEVPOLL\fR (value 16, Solaris 8)" 4
 .IX Item "EVBACKEND_DEVPOLL (value 16, Solaris 8)"
@@ -496,10 +502,10 @@ This is not implemented yet (and might never be).
 .ie n .IP """EVBACKEND_PORT""    (value 32, Solaris 10)" 4
 .el .IP "\f(CWEVBACKEND_PORT\fR    (value 32, Solaris 10)" 4
 .IX Item "EVBACKEND_PORT    (value 32, Solaris 10)"
-This uses the Solaris 10 port mechanism. As with everything on Solaris,
+This uses the Solaris 10 event port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).
 .Sp
-Please note that solaris ports can result in a lot of spurious
+Please note that solaris event ports can deliver a lot of spurious
 notifications, so you need to use non-blocking I/O or other means to avoid
 blocking when no data (or space) is available.
 .ie n .IP """EVBACKEND_ALL""" 4
@@ -562,7 +568,7 @@ calling this function, or cope with the fact afterwards (which is usually
 the easiest thing, you can just ignore the watchers and/or \f(CW\*(C`free ()\*(C'\fR them
 for example).
 .Sp
-Not that certain global state, such as signal state, will not be freed by
+Note that certain global state, such as signal state, will not be freed by
 this function, and related watchers (such as signal and child watchers)
 would need to be stopped manually.
 .Sp
@@ -620,7 +626,7 @@ Returns the current \*(L"event loop time\*(R", which is the time the event loop
 received events and started processing them. This timestamp does not
 change as long as callbacks are being processed, and this is also the base
 time used for relative timers. You can treat it as the timestamp of the
-event occuring (or more correctly, libev finding out about it).
+event occurring (or more correctly, libev finding out about it).
 .IP "ev_loop (loop, int flags)" 4
 .IX Item "ev_loop (loop, int flags)"
 Finally, this is it, the event handler. This function usually is called
@@ -1082,7 +1088,7 @@ its own, so its quite safe to use).
 \fIThe special problem of disappearing file descriptors\fR
 .IX Subsection "The special problem of disappearing file descriptors"
 .PP
-Some backends (e.g kqueue, epoll) need to be told about closing a file
+Some backends (e.g. kqueue, epoll) need to be told about closing a file
 descriptor (either by calling \f(CW\*(C`close\*(C'\fR explicitly or by any other means,
 such as \f(CW\*(C`dup\*(C'\fR). The reason is that you register interest in some file
 descriptor, but when it goes away, the operating system will silently drop
@@ -1100,6 +1106,30 @@ descriptor even if the file descriptor number itself did not change.
 This is how one would do it normally anyway, the important point is that
 the libev application should not optimise around libev but should leave
 optimisations to libev.
+.PP
+\fIThs special problem of dup'ed file descriptors\fR
+.IX Subsection "Ths special problem of dup'ed file descriptors"
+.PP
+Some backends (e.g. epoll), cannot register events for file descriptors,
+but only events for the underlying file descriptions. That menas when you
+have \f(CW\*(C`dup ()\*(C'\fR'ed file descriptors and register events for them, only one
+file descriptor might actually receive events.
+.PP
+There is no workaorund possible except not registering events
+for potentially \f(CW\*(C`dup ()\*(C'\fR'ed file descriptors or to resort to
+\&\f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR.
+.PP
+\fIThe special problem of fork\fR
+.IX Subsection "The special problem of fork"
+.PP
+Some backends (epoll, kqueue) do not support \f(CW\*(C`fork ()\*(C'\fR at all or exhibit
+useless behaviour. Libev fully supports fork, but needs to be told about
+it in the child.
+.PP
+To support fork in your programs, you either have to call
+\&\f(CW\*(C`ev_default_fork ()\*(C'\fR or \f(CW\*(C`ev_loop_fork ()\*(C'\fR after a fork in the child,
+enable \f(CW\*(C`EVFLAG_FORKCHECK\*(C'\fR, or resort to \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or
+\&\f(CW\*(C`EVBACKEND_POLL\*(C'\fR.
 .PP
 \fIWatcher-Specific Functions\fR
 .IX Subsection "Watcher-Specific Functions"
@@ -1908,7 +1938,7 @@ this.
 This is a rather advanced watcher type that lets you embed one event loop
 into another (currently only \f(CW\*(C`ev_io\*(C'\fR events are supported in the embedded
 loop, other types of watchers might be handled in a delayed or incorrect
-fashion and must not be used).
+fashion and must not be used). (See portability notes, below).
 .PP
 There are primarily two reasons you would want that: work around bugs and
 prioritise I/O.
@@ -1978,6 +2008,21 @@ create it, and if that fails, use the normal loop for everything:
 \&  else
 \&    loop_lo = loop_hi;
 .Ve
+.Sh "Portability notes"
+.IX Subsection "Portability notes"
+Kqueue is nominally embeddable, but this is broken on all BSDs that I
+tried, in various ways. Usually the embedded event loop will simply never
+receive events, sometimes it will only trigger a few times, sometimes in a
+loop. Epoll is also nominally embeddable, but many Linux kernel versions
+will always eport the epoll fd as ready, even when no events are pending.
+.PP
+While libev allows embedding these backends (they are contained in
+\&\f(CW\*(C`ev_embeddable_backends ()\*(C'\fR), take extreme care that it will actually
+work.
+.PP
+When in doubt, create a dynamic event loop forced to use sockets (this
+usually works) and possibly another thread and a pipe or so to report to
+your main event loop.
 .PP
 \fIWatcher-Specific Functions and Data Members\fR
 .IX Subsection "Watcher-Specific Functions and Data Members"
@@ -1997,8 +2042,8 @@ if you do not want thta, you need to temporarily stop the embed watcher).
 Make a single, non-blocking sweep over the embedded loop. This works
 similarly to \f(CW\*(C`ev_loop (embedded_loop, EVLOOP_NONBLOCK)\*(C'\fR, but in the most
 apropriate way for embedded loops.
-.IP "struct ev_loop *loop [read\-only]" 4
-.IX Item "struct ev_loop *loop [read-only]"
+.IP "struct ev_loop *other [read\-only]" 4
+.IX Item "struct ev_loop *other [read-only]"
 The embedded event loop.
 .ie n .Sh """ev_fork"" \- the audacity to resume the event loop after a fork"
 .el .Sh "\f(CWev_fork\fP \- the audacity to resume the event loop after a fork"
@@ -2332,7 +2377,7 @@ applications. Examples of applications that embed it include the Deliantra
 Game Server, the \s-1EV\s0 perl module, the \s-1GNU\s0 Virtual Private Ethernet (gvpe)
 and rxvt\-unicode.
 .PP
-The goal is to enable you to just copy the neecssary files into your
+The goal is to enable you to just copy the necessary files into your
 source directory without having to change even a single line in them, so
 you can easily upgrade by simply copying (or having a checked-out copy of
 libev somewhere in your source tree).
@@ -2447,7 +2492,7 @@ If defined to be \f(CW1\fR, libev will try to detect the availability of the
 monotonic clock option at both compiletime and runtime. Otherwise no use
 of the monotonic clock option will be attempted. If you enable this, you
 usually have to link against librt or something similar. Enabling it when
-the functionality isn't available is safe, though, althoguh you have
+the functionality isn't available is safe, though, although you have
 to make sure you link against any libraries where the \f(CW\*(C`clock_gettime\*(C'\fR
 function is hiding in (often \fI\-lrt\fR).
 .IP "\s-1EV_USE_REALTIME\s0" 4
@@ -2456,8 +2501,8 @@ If defined to be \f(CW1\fR, libev will try to detect the availability of the
 realtime clock option at compiletime (and assume its availability at
 runtime if successful). Otherwise no use of the realtime clock option will
 be attempted. This effectively replaces \f(CW\*(C`gettimeofday\*(C'\fR by \f(CW\*(C`clock_get
-(CLOCK_REALTIME, ...)\*(C'\fR and will not normally affect correctness. See tzhe note about libraries
-in the description of \f(CW\*(C`EV_USE_MONOTONIC\*(C'\fR, though.
+(CLOCK_REALTIME, ...)\*(C'\fR and will not normally affect correctness. See the
+note about libraries in the description of \f(CW\*(C`EV_USE_MONOTONIC\*(C'\fR, though.
 .IP "\s-1EV_USE_SELECT\s0" 4
 .IX Item "EV_USE_SELECT"
 If undefined or defined to be \f(CW1\fR, libev will compile in support for the
@@ -2627,7 +2672,7 @@ For example, the perl \s-1EV\s0 module uses something like this:
 .PD
 Can be used to change the callback member declaration in each watcher,
 and the way callbacks are invoked and set. Must expand to a struct member
-definition and a statement, respectively. See the \fIev.v\fR header file for
+definition and a statement, respectively. See the \fIev.h\fR header file for
 their default definitions. One possible use for overriding these is to
 avoid the \f(CW\*(C`struct ev_loop *\*(C'\fR as first argument in all cases, or to use
 method calls instead of plain function calls in \*(C+.
@@ -2646,7 +2691,7 @@ This can also be used to rename all public symbols to avoid clashes with
 multiple versions of libev linked together (which is obviously bad in
 itself, but sometimes it is inconvinient to avoid this).
 .Sp
-A sed comamnd like this will create wrapper \f(CW\*(C`#define\*(C'\fR's that you need to
+A sed command like this will create wrapper \f(CW\*(C`#define\*(C'\fR's that you need to
 include before including \fIev.h\fR:
 .Sp
 .Vb 1

@@ -315,15 +315,18 @@ lot of inactive fds). It scales similarly to select, i.e. O(total_fds).
 =item C<EVBACKEND_EPOLL>   (value 4, Linux)
 
 For few fds, this backend is a bit little slower than poll and select,
-but it scales phenomenally better. While poll and select usually scale like
-O(total_fds) where n is the total number of fds (or the highest fd), epoll scales
-either O(1) or O(active_fds).
+but it scales phenomenally better. While poll and select usually scale
+like O(total_fds) where n is the total number of fds (or the highest fd),
+epoll scales either O(1) or O(active_fds). The epoll design has a number
+of shortcomings, such as silently dropping events in some hard-to-detect
+cases and rewuiring a syscall per fd change, no fork support and bad
+support for dup:
 
-While stopping and starting an I/O watcher in the same iteration will
-result in some caching, there is still a syscall per such incident
+While stopping, setting and starting an I/O watcher in the same iteration
+will result in some caching, there is still a syscall per such incident
 (because the fd could point to a different file description now), so its
-best to avoid that. Also, dup()ed file descriptors might not work very
-well if you register events for both fds.
+best to avoid that. Also, C<dup ()>'ed file descriptors might not work
+very well if you register events for both fds.
 
 Please note that epoll sometimes generates spurious notifications, so you
 need to use non-blocking I/O or other means to avoid blocking when no data
@@ -332,17 +335,20 @@ need to use non-blocking I/O or other means to avoid blocking when no data
 =item C<EVBACKEND_KQUEUE>  (value 8, most BSD clones)
 
 Kqueue deserves special mention, as at the time of this writing, it
-was broken on all BSDs except NetBSD (usually it doesn't work with
-anything but sockets and pipes, except on Darwin, where of course it's
-completely useless). For this reason it's not being "autodetected"
+was broken on I<all> BSDs (usually it doesn't work with anything but
+sockets and pipes, except on Darwin, where of course it's completely
+useless. On NetBSD, it seems to work for all the FD types I tested, so it
+is used by default there). For this reason it's not being "autodetected"
 unless you explicitly specify it explicitly in the flags (i.e. using
-C<EVBACKEND_KQUEUE>).
+C<EVBACKEND_KQUEUE>) or libev was compiled on a known-to-be-good (-enough)
+system like NetBSD.
 
 It scales in the same way as the epoll backend, but the interface to the
-kernel is more efficient (which says nothing about its actual speed, of
-course). While starting and stopping an I/O watcher does not cause an
-extra syscall as with epoll, it still adds up to four event changes per
-incident, so its best to avoid that.
+kernel is more efficient (which says nothing about its actual speed,
+of course). While stopping, setting and starting an I/O watcher does
+never cause an extra syscall as with epoll, it still adds up to two event
+changes per incident, support for C<fork ()> is very bad and it drops fds
+silently in similarly hard-to-detetc cases.
 
 =item C<EVBACKEND_DEVPOLL> (value 16, Solaris 8)
 
@@ -350,10 +356,10 @@ This is not implemented yet (and might never be).
 
 =item C<EVBACKEND_PORT>    (value 32, Solaris 10)
 
-This uses the Solaris 10 port mechanism. As with everything on Solaris,
+This uses the Solaris 10 event port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).
 
-Please note that solaris ports can result in a lot of spurious
+Please note that solaris event ports can deliver a lot of spurious
 notifications, so you need to use non-blocking I/O or other means to avoid
 blocking when no data (or space) is available.
 
@@ -926,7 +932,7 @@ its own, so its quite safe to use).
 
 =head3 The special problem of disappearing file descriptors
 
-Some backends (e.g kqueue, epoll) need to be told about closing a file
+Some backends (e.g. kqueue, epoll) need to be told about closing a file
 descriptor (either by calling C<close> explicitly or by any other means,
 such as C<dup>). The reason is that you register interest in some file
 descriptor, but when it goes away, the operating system will silently drop
@@ -944,6 +950,28 @@ descriptor even if the file descriptor number itself did not change.
 This is how one would do it normally anyway, the important point is that
 the libev application should not optimise around libev but should leave
 optimisations to libev.
+
+=head3 Ths special problem of dup'ed file descriptors
+
+Some backends (e.g. epoll), cannot register events for file descriptors,
+but only events for the underlying file descriptions. That menas when you
+have C<dup ()>'ed file descriptors and register events for them, only one
+file descriptor might actually receive events.
+
+There is no workaorund possible except not registering events
+for potentially C<dup ()>'ed file descriptors or to resort to
+C<EVBACKEND_SELECT> or C<EVBACKEND_POLL>.
+
+=head3 The special problem of fork
+
+Some backends (epoll, kqueue) do not support C<fork ()> at all or exhibit
+useless behaviour. Libev fully supports fork, but needs to be told about
+it in the child.
+
+To support fork in your programs, you either have to call
+C<ev_default_fork ()> or C<ev_loop_fork ()> after a fork in the child,
+enable C<EVFLAG_FORKCHECK>, or resort to C<EVBACKEND_SELECT> or
+C<EVBACKEND_POLL>.
 
 
 =head3 Watcher-Specific Functions
@@ -1708,7 +1736,7 @@ this.
 This is a rather advanced watcher type that lets you embed one event loop
 into another (currently only C<ev_io> events are supported in the embedded
 loop, other types of watchers might be handled in a delayed or incorrect
-fashion and must not be used).
+fashion and must not be used). (See portability notes, below).
 
 There are primarily two reasons you would want that: work around bugs and
 prioritise I/O.
@@ -1772,6 +1800,22 @@ create it, and if that fails, use the normal loop for everything:
     }
   else
     loop_lo = loop_hi;
+
+=head2 Portability notes
+
+Kqueue is nominally embeddable, but this is broken on all BSDs that I
+tried, in various ways. Usually the embedded event loop will simply never
+receive events, sometimes it will only trigger a few times, sometimes in a
+loop. Epoll is also nominally embeddable, but many Linux kernel versions
+will always eport the epoll fd as ready, even when no events are pending.
+
+While libev allows embedding these backends (they are contained in
+C<ev_embeddable_backends ()>), take extreme care that it will actually
+work.
+
+When in doubt, create a dynamic event loop forced to use sockets (this
+usually works) and possibly another thread and a pipe or so to report to
+your main event loop.
 
 =head3 Watcher-Specific Functions and Data Members
 
