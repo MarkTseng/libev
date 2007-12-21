@@ -55,7 +55,7 @@ web page you might find easier to navigate when reading it for the first
 time: L<http://cvs.schmorp.de/libev/ev.html>.
 
 Libev is an event loop: you register interest in certain events (such as a
-file descriptor being readable or a timeout occuring), and it will manage
+file descriptor being readable or a timeout occurring), and it will manage
 these event sources and provide your program with events.
 
 To do this, it must take more or less complete control over your process
@@ -471,7 +471,7 @@ Returns the current "event loop time", which is the time the event loop
 received events and started processing them. This timestamp does not
 change as long as callbacks are being processed, and this is also the base
 time used for relative timers. You can treat it as the timestamp of the
-event occuring (or more correctly, libev finding out about it).
+event occurring (or more correctly, libev finding out about it).
 
 =item ev_loop (loop, int flags)
 
@@ -2242,7 +2242,7 @@ If defined to be C<1>, libev will try to detect the availability of the
 monotonic clock option at both compiletime and runtime. Otherwise no use
 of the monotonic clock option will be attempted. If you enable this, you
 usually have to link against librt or something similar. Enabling it when
-the functionality isn't available is safe, though, althoguh you have
+the functionality isn't available is safe, though, although you have
 to make sure you link against any libraries where the C<clock_gettime>
 function is hiding in (often F<-lrt>).
 
@@ -2442,7 +2442,7 @@ For example, the perl EV module uses something like this:
 
 Can be used to change the callback member declaration in each watcher,
 and the way callbacks are invoked and set. Must expand to a struct member
-definition and a statement, respectively. See the F<ev.v> header file for
+definition and a statement, respectively. See the F<ev.c> header file for
 their default definitions. One possible use for overriding these is to
 avoid the C<struct ev_loop *> as first argument in all cases, or to use
 method calls instead of plain function calls in C++.
@@ -2460,7 +2460,7 @@ This can also be used to rename all public symbols to avoid clashes with
 multiple versions of libev linked together (which is obviously bad in
 itself, but sometimes it is inconvinient to avoid this).
 
-A sed comamnd like this will create wrapper C<#define>'s that you need to
+A sed command like this will create wrapper C<#define>'s that you need to
 include before including F<ev.h>:
 
    <Symbols.ev sed -e "s/.*/#define & myprefix_&/" >wrap.h
