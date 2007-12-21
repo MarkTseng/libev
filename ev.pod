@@ -2442,7 +2442,7 @@ For example, the perl EV module uses something like this:
 
 Can be used to change the callback member declaration in each watcher,
 and the way callbacks are invoked and set. Must expand to a struct member
-definition and a statement, respectively. See the F<ev.c> header file for
+definition and a statement, respectively. See the F<ev.h> header file for
 their default definitions. One possible use for overriding these is to
 avoid the C<struct ev_loop *> as first argument in all cases, or to use
 method calls instead of plain function calls in C++.
