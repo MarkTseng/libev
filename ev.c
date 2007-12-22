@@ -980,11 +980,6 @@ ev_embeddable_backends (void)
   /* please fix it and tell me how to detect the fix */
   flags &= ~EVBACKEND_EPOLL;
 
-#ifdef __APPLE__
-  /* is there anything thats not broken on darwin? */
-  flags &= ~EVBACKEND_KQUEUE;
-#endif
-
   return flags;
 }
 
