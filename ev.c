@@ -282,7 +282,9 @@ typedef ev_watcher *W;
 typedef ev_watcher_list *WL;
 typedef ev_watcher_time *WT;
 
-static int have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
+/* sig_atomic_t is used to avoid per-thread variables or locking but still */
+/* giving it a reasonably high chance of working on typical architetcures */
+static sig_atomic_t have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
 
 #ifdef _WIN32
 # include "ev_win32.c"
