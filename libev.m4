@@ -14,11 +14,11 @@ AC_CHECK_FUNC(clock_gettime, [], [
    fi
 ])
 
-AC_CHECK_FUNC(nanonsleep, [], [ 
+AC_CHECK_FUNC(nanosleep, [], [ 
    if test -z "$LIBEV_M4_AVOID_LIBRT"; then
-      AC_CHECK_LIB(rt, nanonsleep) 
-      unset ac_cv_func_nanonsleep
-      AC_CHECK_FUNCS(nanonsleep)
+      AC_CHECK_LIB(rt, nanosleep) 
+      unset ac_cv_func_nanosleep
+      AC_CHECK_FUNCS(nanosleep)
    fi
 ])
 
