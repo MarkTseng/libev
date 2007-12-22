@@ -598,12 +598,14 @@ overhead for the actual polling but can deliver many events at once.
 By setting a higher I<io collect interval> you allow libev to spend more
 time collecting I/O events, so you can handle more events per iteration,
 at the cost of increasing latency. Timeouts (both C<ev_periodic> and
-C<ev_timer>) will be not affected.
+C<ev_timer>) will be not affected. Setting this to a non-null bvalue will
+introduce an additional C<ev_sleep ()> call into most loop iterations.
 
 Likewise, by setting a higher I<timeout collect interval> you allow libev
 to spend more time collecting timeouts, at the expense of increased
 latency (the watcher callback will be called later). C<ev_io> watchers
-will not be affected.
+will not be affected. Setting this to a non-null value will not introduce
+any overhead in libev.
 
 Many (busy) programs can usually benefit by setting the io collect
 interval to a value near C<0.1> or so, which is often enough for
