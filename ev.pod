@@ -341,20 +341,23 @@ need to use non-blocking I/O or other means to avoid blocking when no data
 =item C<EVBACKEND_KQUEUE>  (value 8, most BSD clones)
 
 Kqueue deserves special mention, as at the time of this writing, it
-was broken on I<all> BSDs (usually it doesn't work with anything but
-sockets and pipes, except on Darwin, where of course it's completely
-useless. On NetBSD, it seems to work for all the FD types I tested, so it
-is used by default there). For this reason it's not being "autodetected"
+was broken on all BSDs except NetBSD (usually it doesn't work reliably
+with anything but sockets and pipes, except on Darwin, where of course
+it's completely useless). For this reason it's not being "autodetected"
 unless you explicitly specify it explicitly in the flags (i.e. using
 C<EVBACKEND_KQUEUE>) or libev was compiled on a known-to-be-good (-enough)
 system like NetBSD.
 
+You still can embed kqueue into a normal poll or select backend and use it
+only for sockets (after having made sure that sockets work with kqueue on
+the target platform). See C<ev_embed> watchers for more info.
+
 It scales in the same way as the epoll backend, but the interface to the
-kernel is more efficient (which says nothing about its actual speed,
-of course). While stopping, setting and starting an I/O watcher does
-never cause an extra syscall as with epoll, it still adds up to two event
-changes per incident, support for C<fork ()> is very bad and it drops fds
-silently in similarly hard-to-detetc cases.
+kernel is more efficient (which says nothing about its actual speed, of
+course). While stopping, setting and starting an I/O watcher does never
+cause an extra syscall as with C<EVBACKEND_EPOLL>, it still adds up to
+two event changes per incident, support for C<fork ()> is very bad and it
+drops fds silently in similarly hard-to-detect cases.
 
 =item C<EVBACKEND_DEVPOLL> (value 16, Solaris 8)
 
@@ -1625,11 +1628,11 @@ It is recommended to give C<ev_check> watchers highest (C<EV_MAXPRI>)
 priority, to ensure that they are being run before any other watchers
 after the poll. Also, C<ev_check> watchers (and C<ev_prepare> watchers,
 too) should not activate ("feed") events into libev. While libev fully
-supports this, they will be called before other C<ev_check> watchers did
-their job. As C<ev_check> watchers are often used to embed other event
-loops those other event loops might be in an unusable state until their
-C<ev_check> watcher ran (always remind yourself to coexist peacefully with
-others).
+supports this, they will be called before other C<ev_check> watchers
+did their job. As C<ev_check> watchers are often used to embed other
+(non-libev) event loops those other event loops might be in an unusable
+state until their C<ev_check> watcher ran (always remind yourself to
+coexist peacefully with others).
 
 =head3 Watcher-Specific Functions and Data Members
 
@@ -1778,7 +1781,7 @@ this.
 This is a rather advanced watcher type that lets you embed one event loop
 into another (currently only C<ev_io> events are supported in the embedded
 loop, other types of watchers might be handled in a delayed or incorrect
-fashion and must not be used). (See portability notes, below).
+fashion and must not be used).
 
 There are primarily two reasons you would want that: work around bugs and
 prioritise I/O.
@@ -1842,22 +1845,6 @@ create it, and if that fails, use the normal loop for everything:
     }
   else
     loop_lo = loop_hi;
-
-=head2 Portability notes
-
-Kqueue is nominally embeddable, but this is broken on all BSDs that I
-tried, in various ways. Usually the embedded event loop will simply never
-receive events, sometimes it will only trigger a few times, sometimes in a
-loop. Epoll is also nominally embeddable, but many Linux kernel versions
-will always eport the epoll fd as ready, even when no events are pending.
-
-While libev allows embedding these backends (they are contained in
-C<ev_embeddable_backends ()>), take extreme care that it will actually
-work.
-
-When in doubt, create a dynamic event loop forced to use sockets (this
-usually works) and possibly another thread and a pipe or so to report to
-your main event loop.
 
 =head3 Watcher-Specific Functions and Data Members
 

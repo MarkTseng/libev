@@ -257,8 +257,8 @@ library in any way.
 Returns the current time as libev would use it. Please note that the
 \&\f(CW\*(C`ev_now\*(C'\fR function is usually faster and also often returns the timestamp
 you actually want to know.
-.IP "void ev_sleep (ev_tstamp interval)" 4
-.IX Item "void ev_sleep (ev_tstamp interval)"
+.IP "ev_sleep (ev_tstamp interval)" 4
+.IX Item "ev_sleep (ev_tstamp interval)"
 Sleep for the given interval: The current thread will be blocked until
 either it is interrupted or the given time interval has passed. Basically
 this is a subsecond-resolution \f(CW\*(C`sleep ()\*(C'\fR.
@@ -486,20 +486,23 @@ need to use non-blocking I/O or other means to avoid blocking when no data
 .el .IP "\f(CWEVBACKEND_KQUEUE\fR  (value 8, most \s-1BSD\s0 clones)" 4
 .IX Item "EVBACKEND_KQUEUE  (value 8, most BSD clones)"
 Kqueue deserves special mention, as at the time of this writing, it
-was broken on \fIall\fR BSDs (usually it doesn't work with anything but
-sockets and pipes, except on Darwin, where of course it's completely
-useless. On NetBSD, it seems to work for all the \s-1FD\s0 types I tested, so it
-is used by default there). For this reason it's not being \*(L"autodetected\*(R"
+was broken on all BSDs except NetBSD (usually it doesn't work reliably
+with anything but sockets and pipes, except on Darwin, where of course
+it's completely useless). For this reason it's not being \*(L"autodetected\*(R"
 unless you explicitly specify it explicitly in the flags (i.e. using
 \&\f(CW\*(C`EVBACKEND_KQUEUE\*(C'\fR) or libev was compiled on a known-to-be-good (\-enough)
 system like NetBSD.
 .Sp
+You still can embed kqueue into a normal poll or select backend and use it
+only for sockets (after having made sure that sockets work with kqueue on
+the target platform). See \f(CW\*(C`ev_embed\*(C'\fR watchers for more info.
+.Sp
 It scales in the same way as the epoll backend, but the interface to the
-kernel is more efficient (which says nothing about its actual speed,
-of course). While stopping, setting and starting an I/O watcher does
-never cause an extra syscall as with epoll, it still adds up to two event
-changes per incident, support for \f(CW\*(C`fork ()\*(C'\fR is very bad and it drops fds
-silently in similarly hard-to-detetc cases.
+kernel is more efficient (which says nothing about its actual speed, of
+course). While stopping, setting and starting an I/O watcher does never
+cause an extra syscall as with \f(CW\*(C`EVBACKEND_EPOLL\*(C'\fR, it still adds up to
+two event changes per incident, support for \f(CW\*(C`fork ()\*(C'\fR is very bad and it
+drops fds silently in similarly hard-to-detect cases.
 .ie n .IP """EVBACKEND_DEVPOLL"" (value 16, Solaris 8)" 4
 .el .IP "\f(CWEVBACKEND_DEVPOLL\fR (value 16, Solaris 8)" 4
 .IX Item "EVBACKEND_DEVPOLL (value 16, Solaris 8)"
@@ -731,11 +734,11 @@ Example: For some weird reason, unregister the above signal handler again.
 \&  ev_ref (loop);
 \&  ev_signal_stop (loop, &exitsig);
 .Ve
-.IP "ev_set_io_collect_interval (ev_tstamp interval)" 4
-.IX Item "ev_set_io_collect_interval (ev_tstamp interval)"
+.IP "ev_set_io_collect_interval (loop, ev_tstamp interval)" 4
+.IX Item "ev_set_io_collect_interval (loop, ev_tstamp interval)"
 .PD 0
-.IP "ev_set_timeout_collect_interval (ev_tstamp interval)" 4
-.IX Item "ev_set_timeout_collect_interval (ev_tstamp interval)"
+.IP "ev_set_timeout_collect_interval (loop, ev_tstamp interval)" 4
+.IX Item "ev_set_timeout_collect_interval (loop, ev_tstamp interval)"
 .PD
 These advanced functions influence the time that libev will spend waiting
 for events. Both are by default \f(CW0\fR, meaning that libev will try to
@@ -754,18 +757,20 @@ overhead for the actual polling but can deliver many events at once.
 By setting a higher \fIio collect interval\fR you allow libev to spend more
 time collecting I/O events, so you can handle more events per iteration,
 at the cost of increasing latency. Timeouts (both \f(CW\*(C`ev_periodic\*(C'\fR and
-\&\f(CW\*(C`ev_timer\*(C'\fR) will be not affected.
+\&\f(CW\*(C`ev_timer\*(C'\fR) will be not affected. Setting this to a non-null bvalue will
+introduce an additional \f(CW\*(C`ev_sleep ()\*(C'\fR call into most loop iterations.
 .Sp
 Likewise, by setting a higher \fItimeout collect interval\fR you allow libev
 to spend more time collecting timeouts, at the expense of increased
 latency (the watcher callback will be called later). \f(CW\*(C`ev_io\*(C'\fR watchers
-will not be affected.
+will not be affected. Setting this to a non-null value will not introduce
+any overhead in libev.
 .Sp
-Many programs can usually benefit by setting the io collect interval to
-a value near \f(CW0.1\fR or so, which is often enough for interactive servers
-(of course not for games), likewise for timeouts. It usually doesn't make
-much sense to set it to a lower value than \f(CW0.01\fR, as this approsaches
-the timing granularity of most systems.
+Many (busy) programs can usually benefit by setting the io collect
+interval to a value near \f(CW0.1\fR or so, which is often enough for
+interactive servers (of course not for games), likewise for timeouts. It
+usually doesn't make much sense to set it to a lower value than \f(CW0.01\fR,
+as this approsaches the timing granularity of most systems.
 .SH "ANATOMY OF A WATCHER"
 .IX Header "ANATOMY OF A WATCHER"
 A watcher is a structure that you create and register to record your
@@ -1784,11 +1789,11 @@ It is recommended to give \f(CW\*(C`ev_check\*(C'\fR watchers highest (\f(CW\*(C
 priority, to ensure that they are being run before any other watchers
 after the poll. Also, \f(CW\*(C`ev_check\*(C'\fR watchers (and \f(CW\*(C`ev_prepare\*(C'\fR watchers,
 too) should not activate (\*(L"feed\*(R") events into libev. While libev fully
-supports this, they will be called before other \f(CW\*(C`ev_check\*(C'\fR watchers did
-their job. As \f(CW\*(C`ev_check\*(C'\fR watchers are often used to embed other event
-loops those other event loops might be in an unusable state until their
-\&\f(CW\*(C`ev_check\*(C'\fR watcher ran (always remind yourself to coexist peacefully with
-others).
+supports this, they will be called before other \f(CW\*(C`ev_check\*(C'\fR watchers
+did their job. As \f(CW\*(C`ev_check\*(C'\fR watchers are often used to embed other
+(non\-libev) event loops those other event loops might be in an unusable
+state until their \f(CW\*(C`ev_check\*(C'\fR watcher ran (always remind yourself to
+coexist peacefully with others).
 .PP
 \fIWatcher-Specific Functions and Data Members\fR
 .IX Subsection "Watcher-Specific Functions and Data Members"
@@ -1978,7 +1983,7 @@ this.
 This is a rather advanced watcher type that lets you embed one event loop
 into another (currently only \f(CW\*(C`ev_io\*(C'\fR events are supported in the embedded
 loop, other types of watchers might be handled in a delayed or incorrect
-fashion and must not be used). (See portability notes, below).
+fashion and must not be used).
 .PP
 There are primarily two reasons you would want that: work around bugs and
 prioritise I/O.
@@ -2048,21 +2053,6 @@ create it, and if that fails, use the normal loop for everything:
 \&  else
 \&    loop_lo = loop_hi;
 .Ve
-.Sh "Portability notes"
-.IX Subsection "Portability notes"
-Kqueue is nominally embeddable, but this is broken on all BSDs that I
-tried, in various ways. Usually the embedded event loop will simply never
-receive events, sometimes it will only trigger a few times, sometimes in a
-loop. Epoll is also nominally embeddable, but many Linux kernel versions
-will always eport the epoll fd as ready, even when no events are pending.
-.PP
-While libev allows embedding these backends (they are contained in
-\&\f(CW\*(C`ev_embeddable_backends ()\*(C'\fR), take extreme care that it will actually
-work.
-.PP
-When in doubt, create a dynamic event loop forced to use sockets (this
-usually works) and possibly another thread and a pipe or so to report to
-your main event loop.
 .PP
 \fIWatcher-Specific Functions and Data Members\fR
 .IX Subsection "Watcher-Specific Functions and Data Members"
