@@ -974,9 +974,18 @@ ev_recommended_backends (void)
 unsigned int
 ev_embeddable_backends (void)
 {
+  int flags = EVBACKEND_EPOLL | EVBACKEND_KQUEUE | EVBACKEND_PORT;
+
   /* epoll embeddability broken on all linux versions up to at least 2.6.23 */
-  return EVBACKEND_KQUEUE
-       | EVBACKEND_PORT;
+  /* please fix it and tell me how to detect the fix */
+  flags &= ~EVBACKEND_EPOLL;
+
+#ifdef __APPLE__
+  /* is there anything thats not broken on darwin? */
+  flags &= ~EVBACKEND_KQUEUE;
+#endif
+
+  return flags;
 }
 
 unsigned int
