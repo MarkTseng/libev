@@ -605,11 +605,11 @@ to spend more time collecting timeouts, at the expense of increased
 latency (the watcher callback will be called later). C<ev_io> watchers
 will not be affected.
 
-Many programs can usually benefit by setting the io collect interval to
-a value near C<0.1> or so, which is often enough for interactive servers
-(of course not for games), likewise for timeouts. It usually doesn't make
-much sense to set it to a lower value than C<0.01>, as this approsaches
-the timing granularity of most systems.
+Many (busy) programs can usually benefit by setting the io collect
+interval to a value near C<0.1> or so, which is often enough for
+interactive servers (of course not for games), likewise for timeouts. It
+usually doesn't make much sense to set it to a lower value than C<0.01>,
+as this approsaches the timing granularity of most systems.
 
 =back
 
