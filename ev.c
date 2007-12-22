@@ -56,6 +56,14 @@ extern "C" {
 #  endif
 # endif
 
+# ifndef EV_USE_NANOSLEEP
+#  if HAVE_NANOSLEEP
+#   define EV_USE_NANOSLEEP 1
+#  else
+#   define EV_USE_NANOSLEEP 0
+#  endif
+# endif
+
 # ifndef EV_USE_SELECT
 #  if HAVE_SELECT && HAVE_SYS_SELECT_H
 #   define EV_USE_SELECT 1
@@ -148,6 +156,10 @@ extern "C" {
 # define EV_USE_REALTIME 0
 #endif
 
+#ifndef EV_USE_NANOSLEEP
+# define EV_USE_NANOSLEEP 0
+#endif
+
 #ifndef EV_USE_SELECT
 # define EV_USE_SELECT 1
 #endif
@@ -207,6 +219,12 @@ extern "C" {
 #if !EV_STAT_ENABLE
 # undef EV_USE_INOTIFY
 # define EV_USE_INOTIFY 0
+#endif
+
+#if !EV_USE_NANOSLEEP
+# ifndef _WIN32
+#  include <sys/select.h>
+# endif
 #endif
 
 #if EV_USE_INOTIFY
@@ -409,6 +427,33 @@ ev_now (EV_P)
   return ev_rt_now;
 }
 #endif
+
+void
+ev_sleep (ev_tstamp delay)
+{
+  if (delay > 0.)
+    {
+#if EV_USE_NANOSLEEP
+      struct timespec ts;
+
+      ts.tv_sec  = (time_t)delay;
+      ts.tv_nsec = (long)((delay - (ev_tstamp)(ts.tv_sec)) * 1e9);
+
+      nanosleep (&ts, 0);
+#elif defined(_WIN32)
+      Sleep (delay * 1e3);
+#else
+      struct timeval tv;
+
+      tv.tv_sec  = (time_t)delay;
+      tv.tv_usec = (long)((delay - (ev_tstamp)(tv.tv_sec)) * 1e6);
+
+      select (0, 0, 0, 0, &tv);
+#endif
+    }
+}
+
+/*****************************************************************************/
 
 int inline_size
 array_nextsize (int elem, int cur, int cnt)
@@ -944,6 +989,18 @@ ev_loop_count (EV_P)
   return loop_count;
 }
 
+void
+ev_set_io_collect_interval (EV_P_ ev_tstamp interval)
+{
+  io_blocktime = interval;
+}
+
+void
+ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval)
+{
+  timeout_blocktime = interval;
+}
+
 static void noinline
 loop_init (EV_P_ unsigned int flags)
 {
@@ -961,6 +1018,9 @@ loop_init (EV_P_ unsigned int flags)
       mn_now    = get_clock ();
       now_floor = mn_now;
       rtmn_diff = ev_rt_now - mn_now;
+
+      io_blocktime      = 0.;
+      timeout_blocktime = 0.;
 
       /* pid check not overridable via env */
 #ifndef _WIN32
@@ -1458,39 +1518,50 @@ ev_loop (EV_P_ int flags)
 
       /* calculate blocking time */
       {
-        ev_tstamp block;
+        ev_tstamp waittime  = 0.;
+        ev_tstamp sleeptime = 0.;
 
-        if (expect_false (flags & EVLOOP_NONBLOCK || idleall || !activecnt))
-          block = 0.; /* do not block at all */
-        else
+        if (expect_true (!(flags & EVLOOP_NONBLOCK || idleall || !activecnt)))
           {
             /* update time to cancel out callback processing overhead */
             time_update (EV_A_ 1e100);
 
-            block = MAX_BLOCKTIME;
+            waittime = MAX_BLOCKTIME;
 
             if (timercnt)
               {
                 ev_tstamp to = ((WT)timers [0])->at - mn_now + backend_fudge;
-                if (block > to) block = to;
+                if (waittime > to) waittime = to;
               }
 
 #if EV_PERIODIC_ENABLE
             if (periodiccnt)
               {
                 ev_tstamp to = ((WT)periodics [0])->at - ev_rt_now + backend_fudge;
-                if (block > to) block = to;
+                if (waittime > to) waittime = to;
               }
 #endif
 
-            if (expect_false (block < 0.)) block = 0.;
+            if (expect_false (waittime < timeout_blocktime))
+              waittime = timeout_blocktime;
+
+            sleeptime = waittime - backend_fudge;
+
+            if (expect_true (sleeptime > io_blocktime))
+              sleeptime = io_blocktime;
+
+            if (sleeptime)
+              {
+                ev_sleep (sleeptime);
+                waittime -= sleeptime;
+              }
           }
 
         ++loop_count;
-        backend_poll (EV_A_ block);
+        backend_poll (EV_A_ waittime);
 
         /* update ev_rt_now, do magic */
-        time_update (EV_A_ block);
+        time_update (EV_A_ waittime + sleeptime);
       }
 
       /* queue pending timers and reschedule them */

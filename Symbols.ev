@@ -37,9 +37,12 @@ ev_prepare_stop
 ev_recommended_backends
 ev_ref
 ev_set_allocator
+ev_set_io_collect_interval
 ev_set_syserr_cb
+ev_set_timeout_collect_interval
 ev_signal_start
 ev_signal_stop
+ev_sleep
 ev_stat_start
 ev_stat_stat
 ev_stat_stop

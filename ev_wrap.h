@@ -4,13 +4,15 @@
 #define now_floor ((loop)->now_floor)
 #define mn_now ((loop)->mn_now)
 #define rtmn_diff ((loop)->rtmn_diff)
+#define io_blocktime ((loop)->io_blocktime)
+#define timeout_blocktime ((loop)->timeout_blocktime)
 #define backend ((loop)->backend)
 #define activecnt ((loop)->activecnt)
 #define loop_count ((loop)->loop_count)
+#define backend_fd ((loop)->backend_fd)
 #define backend_fudge ((loop)->backend_fudge)
 #define backend_modify ((loop)->backend_modify)
 #define backend_poll ((loop)->backend_poll)
-#define backend_fd ((loop)->backend_fd)
 #define curpid ((loop)->curpid)
 #define postfork ((loop)->postfork)
 #define vec_ri ((loop)->vec_ri)
@@ -67,13 +69,15 @@
 #undef now_floor
 #undef mn_now
 #undef rtmn_diff
+#undef io_blocktime
+#undef timeout_blocktime
 #undef backend
 #undef activecnt
 #undef loop_count
+#undef backend_fd
 #undef backend_fudge
 #undef backend_modify
 #undef backend_poll
-#undef backend_fd
 #undef curpid
 #undef postfork
 #undef vec_ri

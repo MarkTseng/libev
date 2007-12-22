@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "EV 1"
-.TH EV 1 "2007-12-21" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH EV 1 "2007-12-22" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -257,6 +257,11 @@ library in any way.
 Returns the current time as libev would use it. Please note that the
 \&\f(CW\*(C`ev_now\*(C'\fR function is usually faster and also often returns the timestamp
 you actually want to know.
+.IP "void ev_sleep (ev_tstamp interval)" 4
+.IX Item "void ev_sleep (ev_tstamp interval)"
+Sleep for the given interval: The current thread will be blocked until
+either it is interrupted or the given time interval has passed. Basically
+this is a subsecond-resolution \f(CW\*(C`sleep ()\*(C'\fR.
 .IP "int ev_version_major ()" 4
 .IX Item "int ev_version_major ()"
 .PD 0
@@ -465,7 +470,7 @@ but it scales phenomenally better. While poll and select usually scale
 like O(total_fds) where n is the total number of fds (or the highest fd),
 epoll scales either O(1) or O(active_fds). The epoll design has a number
 of shortcomings, such as silently dropping events in some hard-to-detect
-cases and rewuiring a syscall per fd change, no fork support and bad
+cases and rewiring a syscall per fd change, no fork support and bad
 support for dup:
 .Sp
 While stopping, setting and starting an I/O watcher in the same iteration
@@ -726,6 +731,41 @@ Example: For some weird reason, unregister the above signal handler again.
 \&  ev_ref (loop);
 \&  ev_signal_stop (loop, &exitsig);
 .Ve
+.IP "ev_set_io_collect_interval (ev_tstamp interval)" 4
+.IX Item "ev_set_io_collect_interval (ev_tstamp interval)"
+.PD 0
+.IP "ev_set_timeout_collect_interval (ev_tstamp interval)" 4
+.IX Item "ev_set_timeout_collect_interval (ev_tstamp interval)"
+.PD
+These advanced functions influence the time that libev will spend waiting
+for events. Both are by default \f(CW0\fR, meaning that libev will try to
+invoke timer/periodic callbacks and I/O callbacks with minimum latency.
+.Sp
+Setting these to a higher value (the \f(CW\*(C`interval\*(C'\fR \fImust\fR be >= \f(CW0\fR)
+allows libev to delay invocation of I/O and timer/periodic callbacks to
+increase efficiency of loop iterations.
+.Sp
+The background is that sometimes your program runs just fast enough to
+handle one (or very few) event(s) per loop iteration. While this makes
+the program responsive, it also wastes a lot of \s-1CPU\s0 time to poll for new
+events, especially with backends like \f(CW\*(C`select ()\*(C'\fR which have a high
+overhead for the actual polling but can deliver many events at once.
+.Sp
+By setting a higher \fIio collect interval\fR you allow libev to spend more
+time collecting I/O events, so you can handle more events per iteration,
+at the cost of increasing latency. Timeouts (both \f(CW\*(C`ev_periodic\*(C'\fR and
+\&\f(CW\*(C`ev_timer\*(C'\fR) will be not affected.
+.Sp
+Likewise, by setting a higher \fItimeout collect interval\fR you allow libev
+to spend more time collecting timeouts, at the expense of increased
+latency (the watcher callback will be called later). \f(CW\*(C`ev_io\*(C'\fR watchers
+will not be affected.
+.Sp
+Many programs can usually benefit by setting the io collect interval to
+a value near \f(CW0.1\fR or so, which is often enough for interactive servers
+(of course not for games), likewise for timeouts. It usually doesn't make
+much sense to set it to a lower value than \f(CW0.01\fR, as this approsaches
+the timing granularity of most systems.
 .SH "ANATOMY OF A WATCHER"
 .IX Header "ANATOMY OF A WATCHER"
 A watcher is a structure that you create and register to record your
@@ -2503,6 +2543,10 @@ runtime if successful). Otherwise no use of the realtime clock option will
 be attempted. This effectively replaces \f(CW\*(C`gettimeofday\*(C'\fR by \f(CW\*(C`clock_get
 (CLOCK_REALTIME, ...)\*(C'\fR and will not normally affect correctness. See the
 note about libraries in the description of \f(CW\*(C`EV_USE_MONOTONIC\*(C'\fR, though.
+.IP "\s-1EV_USE_NANOSLEEP\s0" 4
+.IX Item "EV_USE_NANOSLEEP"
+If defined to be \f(CW1\fR, libev will assume that \f(CW\*(C`nanosleep ()\*(C'\fR is available
+and will use it for delays. Otherwise it will use \f(CW\*(C`select ()\*(C'\fR.
 .IP "\s-1EV_USE_SELECT\s0" 4
 .IX Item "EV_USE_SELECT"
 If undefined or defined to be \f(CW1\fR, libev will compile in support for the

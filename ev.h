@@ -346,6 +346,7 @@ unsigned int ev_recommended_backends (void);
 unsigned int ev_embeddable_backends (void);
 
 ev_tstamp ev_time (void);
+void ev_sleep (ev_tstamp delay); /* sleep for a while */
 
 /* Sets the allocation function to use, works like realloc.
  * It is used to allocate and free memory.
@@ -403,8 +404,8 @@ void ev_default_destroy (void); /* destroy the default loop */
 /* you can actually call it at any time, anywhere :) */
 void ev_default_fork (void);
 
-unsigned int ev_backend (EV_P);
-unsigned int ev_loop_count (EV_P);
+unsigned int ev_backend (EV_P);    /* backend in use by loop */
+unsigned int ev_loop_count (EV_P); /* number of loop iterations */
 #endif
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */
@@ -416,6 +417,9 @@ unsigned int ev_loop_count (EV_P);
 #if EV_PROTOTYPES
 void ev_loop (EV_P_ int flags);
 void ev_unloop (EV_P_ int how); /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
+
+void ev_set_io_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
+void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
 
 /*
  * ref/unref can be used to add or remove a refcount on the mainloop. every watcher
