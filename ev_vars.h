@@ -4,8 +4,8 @@ VARx(ev_tstamp, now_floor) /* last time we refreshed rt_time */
 VARx(ev_tstamp, mn_now)    /* monotonic clock "now" */
 VARx(ev_tstamp, rtmn_diff) /* difference realtime - monotonic time */
 
-VARx(ev_tstamp, io_blocktime);
-VARx(ev_tstamp, timeout_blocktime);
+VARx(ev_tstamp, io_blocktime)
+VARx(ev_tstamp, timeout_blocktime)
 
 VARx(int, backend)
 VARx(int, activecnt) /* total number of active events ("refcount") */
