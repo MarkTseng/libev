@@ -1,6 +1,6 @@
 AC_INIT(ev_epoll.c)
 
-AM_INIT_AUTOMAKE(libev,1.86)
+AM_INIT_AUTOMAKE(libev,2.0)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 

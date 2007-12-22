@@ -106,7 +106,7 @@ perl -ne '
    s/-Wall//g;
    #s/libevent/libev/g;
    #VERSION
-   s/AM_INIT_AUTOMAKE\s*\(.*,(.*)\)/AM_INIT_AUTOMAKE(libevent-$1+libev,1.86)/;
+   s/AM_INIT_AUTOMAKE\s*\(.*,(.*)\)/AM_INIT_AUTOMAKE(libevent-$1+libev,2.0)/;
    s/AC_LIBOBJ\(select\)/: ;/g;
    s/AC_LIBOBJ\(poll\)/: ;/g;
    s/AC_LIBOBJ\(kqueue\)/: ;/g;

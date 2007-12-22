@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign no-dependencies
 
-VERSION_INFO = 1:0
+VERSION_INFO = 2:0
 
 EXTRA_DIST = LICENSE libev.m4 autogen.sh \
 	     ev.h ev_vars.h ev_wrap.h event_compat.h ev++.h event.h \
