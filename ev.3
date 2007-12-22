@@ -453,15 +453,24 @@ environment variable.
 This is your standard \fIselect\fR\|(2) backend. Not \fIcompletely\fR standard, as
 libev tries to roll its own fd_set with no limits on the number of fds,
 but if that fails, expect a fairly low limit on the number of fds when
-using this backend. It doesn't scale too well (O(highest_fd)), but its usually
-the fastest backend for a low number of fds.
+using this backend. It doesn't scale too well (O(highest_fd)), but its
+usually the fastest backend for a low number of (low\-numbered :) fds.
+.Sp
+To get good performance out of this backend you need a high amount of
+parallelity (most of the file descriptors should be busy). If you are
+writing a server, you should \f(CW\*(C`accept ()\*(C'\fR in a loop to accept as many
+connections as possible during one iteration. You might also want to have
+a look at \f(CW\*(C`ev_set_io_collect_interval ()\*(C'\fR to increase the amount of
+readyness notifications you get per iteration.
 .ie n .IP """EVBACKEND_POLL""    (value 2, poll backend, available everywhere except on windows)" 4
 .el .IP "\f(CWEVBACKEND_POLL\fR    (value 2, poll backend, available everywhere except on windows)" 4
 .IX Item "EVBACKEND_POLL    (value 2, poll backend, available everywhere except on windows)"
-And this is your standard \fIpoll\fR\|(2) backend. It's more complicated than
-select, but handles sparse fds better and has no artificial limit on the
-number of fds you can use (except it will slow down considerably with a
-lot of inactive fds). It scales similarly to select, i.e. O(total_fds).
+And this is your standard \fIpoll\fR\|(2) backend. It's more complicated
+than select, but handles sparse fds better and has no artificial
+limit on the number of fds you can use (except it will slow down
+considerably with a lot of inactive fds). It scales similarly to select,
+i.e. O(total_fds). See the entry for \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR, above, for
+performance tips.
 .ie n .IP """EVBACKEND_EPOLL""   (value 4, Linux)" 4
 .el .IP "\f(CWEVBACKEND_EPOLL\fR   (value 4, Linux)" 4
 .IX Item "EVBACKEND_EPOLL   (value 4, Linux)"
@@ -471,7 +480,7 @@ like O(total_fds) where n is the total number of fds (or the highest fd),
 epoll scales either O(1) or O(active_fds). The epoll design has a number
 of shortcomings, such as silently dropping events in some hard-to-detect
 cases and rewiring a syscall per fd change, no fork support and bad
-support for dup:
+support for dup.
 .Sp
 While stopping, setting and starting an I/O watcher in the same iteration
 will result in some caching, there is still a syscall per such incident
@@ -482,6 +491,13 @@ very well if you register events for both fds.
 Please note that epoll sometimes generates spurious notifications, so you
 need to use non-blocking I/O or other means to avoid blocking when no data
 (or space) is available.
+.Sp
+Best performance from this backend is achieved by not unregistering all
+watchers for a file descriptor until it has been closed, if possible, i.e.
+keep at least one watcher active per fd at all times.
+.Sp
+While nominally embeddeble in other event loops, this feature is broken in
+all kernel versions tested so far.
 .ie n .IP """EVBACKEND_KQUEUE""  (value 8, most \s-1BSD\s0 clones)" 4
 .el .IP "\f(CWEVBACKEND_KQUEUE\fR  (value 8, most \s-1BSD\s0 clones)" 4
 .IX Item "EVBACKEND_KQUEUE  (value 8, most BSD clones)"
@@ -503,10 +519,22 @@ course). While stopping, setting and starting an I/O watcher does never
 cause an extra syscall as with \f(CW\*(C`EVBACKEND_EPOLL\*(C'\fR, it still adds up to
 two event changes per incident, support for \f(CW\*(C`fork ()\*(C'\fR is very bad and it
 drops fds silently in similarly hard-to-detect cases.
+.Sp
+This backend usually performs well under most conditions.
+.Sp
+While nominally embeddable in other event loops, this doesn't work
+everywhere, so you might need to test for this. And since it is broken
+almost everywhere, you should only use it when you have a lot of sockets
+(for which it usually works), by embedding it into another event loop
+(e.g. \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR) and using it only for
+sockets.
 .ie n .IP """EVBACKEND_DEVPOLL"" (value 16, Solaris 8)" 4
 .el .IP "\f(CWEVBACKEND_DEVPOLL\fR (value 16, Solaris 8)" 4
 .IX Item "EVBACKEND_DEVPOLL (value 16, Solaris 8)"
-This is not implemented yet (and might never be).
+This is not implemented yet (and might never be, unless you send me an
+implementation). According to reports, \f(CW\*(C`/dev/poll\*(C'\fR only supports sockets
+and is not embeddable, which would limit the usefulness of this backend
+immensely.
 .ie n .IP """EVBACKEND_PORT""    (value 32, Solaris 10)" 4
 .el .IP "\f(CWEVBACKEND_PORT\fR    (value 32, Solaris 10)" 4
 .IX Item "EVBACKEND_PORT    (value 32, Solaris 10)"
@@ -516,12 +544,19 @@ it's really slow, but it still scales very well (O(active_fds)).
 Please note that solaris event ports can deliver a lot of spurious
 notifications, so you need to use non-blocking I/O or other means to avoid
 blocking when no data (or space) is available.
+.Sp
+While this backend scales well, it requires one system call per active
+file descriptor per loop iteration. For small and medium numbers of file
+descriptors a \*(L"slow\*(R" \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR backend
+might perform better.
 .ie n .IP """EVBACKEND_ALL""" 4
 .el .IP "\f(CWEVBACKEND_ALL\fR" 4
 .IX Item "EVBACKEND_ALL"
 Try all backends (even potentially broken ones that wouldn't be tried
 with \f(CW\*(C`EVFLAG_AUTO\*(C'\fR). Since this is a mask, you can do stuff such as
 \&\f(CW\*(C`EVBACKEND_ALL & ~EVBACKEND_KQUEUE\*(C'\fR.
+.Sp
+It is definitely not recommended to use this flag.
 .RE
 .RS 4
 .Sp
@@ -757,7 +792,7 @@ overhead for the actual polling but can deliver many events at once.
 By setting a higher \fIio collect interval\fR you allow libev to spend more
 time collecting I/O events, so you can handle more events per iteration,
 at the cost of increasing latency. Timeouts (both \f(CW\*(C`ev_periodic\*(C'\fR and
-\&\f(CW\*(C`ev_timer\*(C'\fR) will be not affected. Setting this to a non-null bvalue will
+\&\f(CW\*(C`ev_timer\*(C'\fR) will be not affected. Setting this to a non-null value will
 introduce an additional \f(CW\*(C`ev_sleep ()\*(C'\fR call into most loop iterations.
 .Sp
 Likewise, by setting a higher \fItimeout collect interval\fR you allow libev
