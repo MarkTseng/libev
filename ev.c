@@ -2268,7 +2268,7 @@ embed_io_cb (EV_P_ ev_io *io, int revents)
   if (ev_cb (w))
     ev_feed_event (EV_A_ (W)w, EV_EMBED);
   else
-    ev_embed_sweep (loop, w);
+    ev_loop (w->other, EVLOOP_NONBLOCK);
 }
 
 static void
@@ -2276,8 +2276,24 @@ embed_prepare_cb (EV_P_ ev_prepare *prepare, int revents)
 {
   ev_embed *w = (ev_embed *)(((char *)prepare) - offsetof (ev_embed, prepare));
 
-  fd_reify (w->other);
+  {
+    struct ev_loop *loop = w->other;
+
+    while (fdchangecnt)
+      {
+        fd_reify (EV_A);
+        ev_loop (EV_A_ EVLOOP_NONBLOCK);
+      }
+  }
 }
+
+#if 0
+static void
+embed_idle_cb (EV_P_ ev_idle *idle, int revents)
+{
+  ev_idle_stop (EV_A_ idle);
+}
+#endif
 
 void
 ev_embed_start (EV_P_ ev_embed *w)
@@ -2297,6 +2313,8 @@ ev_embed_start (EV_P_ ev_embed *w)
   ev_prepare_init (&w->prepare, embed_prepare_cb);
   ev_set_priority (&w->prepare, EV_MINPRI);
   ev_prepare_start (EV_A_ &w->prepare);
+
+  /*ev_idle_init (&w->idle, e,bed_idle_cb);*/
 
   ev_start (EV_A_ (W)w, 1);
 }
