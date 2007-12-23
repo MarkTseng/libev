@@ -2528,7 +2528,7 @@ increase this value (I<must> be a power of two).
 
 =item EV_INOTIFY_HASHSIZE
 
-C<ev_staz> watchers use a small hash table to distribute workload by
+C<ev_stat> watchers use a small hash table to distribute workload by
 inotify watch id. The default size is C<16> (or C<1> with C<EV_MINIMAL>),
 usually more than enough. If you need to manage thousands of C<ev_stat>
 watchers you might want to increase this value (I<must> be a power of
