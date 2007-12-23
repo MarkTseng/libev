@@ -1034,12 +1034,12 @@ optimisations to libev.
 =head3 The special problem of dup'ed file descriptors
 
 Some backends (e.g. epoll), cannot register events for file descriptors,
-but only events for the underlying file descriptions. That menas when you
+but only events for the underlying file descriptions. That means when you
 have C<dup ()>'ed file descriptors and register events for them, only one
 file descriptor might actually receive events.
 
-There is no workaorund possible except not registering events
-for potentially C<dup ()>'ed file descriptors or to resort to
+There is no workaround possible except not registering events
+for potentially C<dup ()>'ed file descriptors, or to resort to
 C<EVBACKEND_SELECT> or C<EVBACKEND_POLL>.
 
 =head3 The special problem of fork
