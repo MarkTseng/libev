@@ -6,7 +6,7 @@ libev - a high performance full-featured event loop written in C
 
   #include <ev.h>
 
-=head1 EXAMPLE PROGRAM
+=head2 EXAMPLE PROGRAM
 
   #include <ev.h>
 
@@ -67,7 +67,7 @@ watchers>, which are relatively small C structures you initialise with the
 details of the event, and then hand it over to libev by I<starting> the
 watcher.
 
-=head1 FEATURES
+=head2 FEATURES
 
 Libev supports C<select>, C<poll>, the Linux-specific C<epoll>, the
 BSD-specific C<kqueue> and the Solaris-specific event port mechanisms
@@ -84,7 +84,7 @@ It also is quite fast (see this
 L<benchmark|http://libev.schmorp.de/bench.html> comparing it to libevent
 for example).
 
-=head1 CONVENTIONS
+=head2 CONVENTIONS
 
 Libev is very configurable. In this manual the default configuration will
 be described, which supports multiple event loops. For more info about
@@ -93,7 +93,7 @@ this manual. If libev was configured without support for multiple event
 loops, then all functions taking an initial argument of name C<loop>
 (which is always of type C<struct ev_loop *>) will not have this argument.
 
-=head1 TIME REPRESENTATION
+=head2 TIME REPRESENTATION
 
 Libev represents time as a single floating point number, representing the
 (fractional) number of seconds since the (POSIX) epoch (somewhere near
