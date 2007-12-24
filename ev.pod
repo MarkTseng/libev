@@ -1498,6 +1498,23 @@ to fall back to regular polling again even with inotify, but changes are
 usually detected immediately, and if the file exists there will be no
 polling.
 
+=head3 The special problem of stat time resolution
+
+The C<stat ()> syscall only supports full-second resolution portably, and
+even on systems where the resolution is higher, many filesystems still
+only support whole seconds.
+
+That means that, if the time is the only thing that changes, you might
+miss updates: on the first update, C<ev_stat> detects a change and calls
+your callback, which does something. When there is another update within
+the same second, C<ev_stat> will be unable to detect it.
+
+The solution to this is to delay acting on a change for a second (or till
+the next second boundary), using a roughly one-second delay C<ev_timer>
+(C<ev_timer_set (w, 0., 1.01); ev_timer_again (loop, w)>). The C<.01>
+is added to work around small timing inconsistencies of some operating
+systems.
+
 =head3 Watcher-Specific Functions and Data Members
 
 =over 4
@@ -1566,8 +1583,36 @@ Example: Watch C</etc/passwd> for attribute changes.
   ...
   ev_stat passwd;
 
-  ev_stat_init (&passwd, passwd_cb, "/etc/passwd");
+  ev_stat_init (&passwd, passwd_cb, "/etc/passwd", 0.);
   ev_stat_start (loop, &passwd);
+
+Example: Like above, but additionally use a one-second delay so we do not
+miss updates (however, frequent updates will delay processing, too, so
+one might do the work both on C<ev_stat> callback invocation I<and> on
+C<ev_timer> callback invocation).
+
+  static ev_stat passwd;
+  static ev_timer timer;
+
+  static void
+  timer_cb (EV_P_ ev_timer *w, int revents)
+  {
+    ev_timer_stop (EV_A_ w);
+
+    /* now it's one second after the most recent passwd change */
+  }
+
+  static void
+  stat_cb (EV_P_ ev_stat *w, int revents)
+  {
+    /* reset the one-second timer */
+    ev_timer_again (EV_A_ &timer);
+  }
+
+  ...
+  ev_stat_init (&passwd, stat_cb, "/etc/passwd", 0.);
+  ev_stat_start (loop, &passwd);
+  ev_timer_init (&timer, timer_cb, 0., 1.01);
 
 
 =head2 C<ev_idle> - when you've got nothing better to do...
