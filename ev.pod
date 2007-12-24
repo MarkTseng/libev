@@ -985,12 +985,6 @@ fd as you want (as long as you don't confuse yourself). Setting all file
 descriptors to non-blocking mode is also usually a good idea (but not
 required if you know what you are doing).
 
-You have to be careful with dup'ed file descriptors, though. Some backends
-(the linux epoll backend is a notable example) cannot handle dup'ed file
-descriptors correctly if you register interest in two or more fds pointing
-to the same underlying file/socket/etc. description (that is, they share
-the same underlying "file open").
-
 If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only C<EVBACKEND_SELECT> and
 C<EVBACKEND_POLL>).
@@ -1035,8 +1029,8 @@ optimisations to libev.
 
 Some backends (e.g. epoll), cannot register events for file descriptors,
 but only events for the underlying file descriptions. That means when you
-have C<dup ()>'ed file descriptors and register events for them, only one
-file descriptor might actually receive events.
+have C<dup ()>'ed file descriptors or weirder constellations, and register
+events for them, only one file descriptor might actually receive events.
 
 There is no workaround possible except not registering events
 for potentially C<dup ()>'ed file descriptors, or to resort to
