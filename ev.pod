@@ -1498,6 +1498,22 @@ to fall back to regular polling again even with inotify, but changes are
 usually detected immediately, and if the file exists there will be no
 polling.
 
+=head3 Inotify
+
+When C<inotify (7)> support has been compiled into libev (generally only
+available on Linux) and present at runtime, it will be used to speed up
+change detection where possible. The inotify descriptor will be created lazily
+when the first C<ev_stat> watcher is being started.
+
+Inotify presense does not change the semantics of C<ev_stat> watchers
+except that changes might be detected earlier, and in some cases, to avoid
+making regular C<stat> calls. Even in the presense of inotify support
+there are many cases where libev has to resort to regular C<stat> polling.
+
+(There is no support for kqueue, as apparently it cannot be used to
+implement this functionality, due to the requirement of having a file
+descriptor open on the object at all times).
+
 =head3 The special problem of stat time resolution
 
 The C<stat ()> syscall only supports full-second resolution portably, and
@@ -1561,6 +1577,8 @@ The specified interval.
 The filesystem path that is being watched.
 
 =back
+
+=head3 Examples
 
 Example: Watch C</etc/passwd> for attribute changes.
 
