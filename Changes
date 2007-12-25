@@ -1,6 +1,7 @@
 Revision history for libev, a high-performance and full-featured event loop
 
 2.01 Tue Dec 25 08:04:41 CET 2007
+	- separate Changes file.
 	- fix ev_path_set => ev_stat_set typo.
         - remove event_compat.h from the libev tarball.
         - change how include files are found.

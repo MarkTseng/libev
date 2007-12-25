@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "EV 1"
-.TH EV 1 "2007-12-22" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH EV 1 "2007-12-25" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 libev \- a high performance full\-featured event loop written in C
 .SH "SYNOPSIS"
@@ -137,8 +137,8 @@ libev \- a high performance full\-featured event loop written in C
 .Vb 1
 \&  #include <ev.h>
 .Ve
-.SH "EXAMPLE PROGRAM"
-.IX Header "EXAMPLE PROGRAM"
+.Sh "\s-1EXAMPLE\s0 \s-1PROGRAM\s0"
+.IX Subsection "EXAMPLE PROGRAM"
 .Vb 1
 \&  #include <ev.h>
 .Ve
@@ -214,8 +214,8 @@ You register interest in certain events by registering so-called \fIevent
 watchers\fR, which are relatively small C structures you initialise with the
 details of the event, and then hand it over to libev by \fIstarting\fR the
 watcher.
-.SH "FEATURES"
-.IX Header "FEATURES"
+.Sh "\s-1FEATURES\s0"
+.IX Subsection "FEATURES"
 Libev supports \f(CW\*(C`select\*(C'\fR, \f(CW\*(C`poll\*(C'\fR, the Linux-specific \f(CW\*(C`epoll\*(C'\fR, the
 BSD-specific \f(CW\*(C`kqueue\*(C'\fR and the Solaris-specific event port mechanisms
 for file descriptor events (\f(CW\*(C`ev_io\*(C'\fR), the Linux \f(CW\*(C`inotify\*(C'\fR interface
@@ -230,16 +230,16 @@ file watchers (\f(CW\*(C`ev_stat\*(C'\fR) and even limited support for fork even
 It also is quite fast (see this
 benchmark comparing it to libevent
 for example).
-.SH "CONVENTIONS"
-.IX Header "CONVENTIONS"
+.Sh "\s-1CONVENTIONS\s0"
+.IX Subsection "CONVENTIONS"
 Libev is very configurable. In this manual the default configuration will
 be described, which supports multiple event loops. For more info about
 various configuration options please have a look at \fB\s-1EMBED\s0\fR section in
 this manual. If libev was configured without support for multiple event
 loops, then all functions taking an initial argument of name \f(CW\*(C`loop\*(C'\fR
 (which is always of type \f(CW\*(C`struct ev_loop *\*(C'\fR) will not have this argument.
-.SH "TIME REPRESENTATION"
-.IX Header "TIME REPRESENTATION"
+.Sh "\s-1TIME\s0 \s-1REPRESENTATION\s0"
+.IX Subsection "TIME REPRESENTATION"
 Libev represents time as a single floating point number, representing the
 (fractional) number of seconds since the (\s-1POSIX\s0) epoch (somewhere near
 the beginning of 1970, details are complicated, don't ask). This type is
@@ -1140,12 +1140,6 @@ fd as you want (as long as you don't confuse yourself). Setting all file
 descriptors to non-blocking mode is also usually a good idea (but not
 required if you know what you are doing).
 .PP
-You have to be careful with dup'ed file descriptors, though. Some backends
-(the linux epoll backend is a notable example) cannot handle dup'ed file
-descriptors correctly if you register interest in two or more fds pointing
-to the same underlying file/socket/etc. description (that is, they share
-the same underlying \*(L"file open\*(R").
-.PP
 If you must do this, then force the use of a known-to-be-good backend
 (at the time of this writing, this includes only \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR and
 \&\f(CW\*(C`EVBACKEND_POLL\*(C'\fR).
@@ -1191,12 +1185,12 @@ optimisations to libev.
 .IX Subsection "The special problem of dup'ed file descriptors"
 .PP
 Some backends (e.g. epoll), cannot register events for file descriptors,
-but only events for the underlying file descriptions. That menas when you
-have \f(CW\*(C`dup ()\*(C'\fR'ed file descriptors and register events for them, only one
-file descriptor might actually receive events.
+but only events for the underlying file descriptions. That means when you
+have \f(CW\*(C`dup ()\*(C'\fR'ed file descriptors or weirder constellations, and register
+events for them, only one file descriptor might actually receive events.
 .PP
-There is no workaorund possible except not registering events
-for potentially \f(CW\*(C`dup ()\*(C'\fR'ed file descriptors or to resort to
+There is no workaround possible except not registering events
+for potentially \f(CW\*(C`dup ()\*(C'\fR'ed file descriptors, or to resort to
 \&\f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR.
 .PP
 \fIThe special problem of fork\fR
@@ -1662,6 +1656,41 @@ to fall back to regular polling again even with inotify, but changes are
 usually detected immediately, and if the file exists there will be no
 polling.
 .PP
+\fIInotify\fR
+.IX Subsection "Inotify"
+.PP
+When \f(CW\*(C`inotify (7)\*(C'\fR support has been compiled into libev (generally only
+available on Linux) and present at runtime, it will be used to speed up
+change detection where possible. The inotify descriptor will be created lazily
+when the first \f(CW\*(C`ev_stat\*(C'\fR watcher is being started.
+.PP
+Inotify presense does not change the semantics of \f(CW\*(C`ev_stat\*(C'\fR watchers
+except that changes might be detected earlier, and in some cases, to avoid
+making regular \f(CW\*(C`stat\*(C'\fR calls. Even in the presense of inotify support
+there are many cases where libev has to resort to regular \f(CW\*(C`stat\*(C'\fR polling.
+.PP
+(There is no support for kqueue, as apparently it cannot be used to
+implement this functionality, due to the requirement of having a file
+descriptor open on the object at all times).
+.PP
+\fIThe special problem of stat time resolution\fR
+.IX Subsection "The special problem of stat time resolution"
+.PP
+The \f(CW\*(C`stat ()\*(C'\fR syscall only supports full-second resolution portably, and
+even on systems where the resolution is higher, many filesystems still
+only support whole seconds.
+.PP
+That means that, if the time is the only thing that changes, you might
+miss updates: on the first update, \f(CW\*(C`ev_stat\*(C'\fR detects a change and calls
+your callback, which does something. When there is another update within
+the same second, \f(CW\*(C`ev_stat\*(C'\fR will be unable to detect it.
+.PP
+The solution to this is to delay acting on a change for a second (or till
+the next second boundary), using a roughly one-second delay \f(CW\*(C`ev_timer\*(C'\fR
+(\f(CW\*(C`ev_timer_set (w, 0., 1.01); ev_timer_again (loop, w)\*(C'\fR). The \f(CW.01\fR
+is added to work around small timing inconsistencies of some operating
+systems.
+.PP
 \fIWatcher-Specific Functions and Data Members\fR
 .IX Subsection "Watcher-Specific Functions and Data Members"
 .IP "ev_stat_init (ev_stat *, callback, const char *path, ev_tstamp interval)" 4
@@ -1702,6 +1731,9 @@ The specified interval.
 .IX Item "const char *path [read-only]"
 The filesystem path that is being watched.
 .PP
+\fIExamples\fR
+.IX Subsection "Examples"
+.PP
 Example: Watch \f(CW\*(C`/etc/passwd\*(C'\fR for attribute changes.
 .PP
 .Vb 15
@@ -1728,8 +1760,46 @@ Example: Watch \f(CW\*(C`/etc/passwd\*(C'\fR for attribute changes.
 .Ve
 .PP
 .Vb 2
-\&  ev_stat_init (&passwd, passwd_cb, "/etc/passwd");
+\&  ev_stat_init (&passwd, passwd_cb, "/etc/passwd", 0.);
 \&  ev_stat_start (loop, &passwd);
+.Ve
+.PP
+Example: Like above, but additionally use a one-second delay so we do not
+miss updates (however, frequent updates will delay processing, too, so
+one might do the work both on \f(CW\*(C`ev_stat\*(C'\fR callback invocation \fIand\fR on
+\&\f(CW\*(C`ev_timer\*(C'\fR callback invocation).
+.PP
+.Vb 2
+\&  static ev_stat passwd;
+\&  static ev_timer timer;
+.Ve
+.PP
+.Vb 4
+\&  static void
+\&  timer_cb (EV_P_ ev_timer *w, int revents)
+\&  {
+\&    ev_timer_stop (EV_A_ w);
+.Ve
+.PP
+.Vb 2
+\&    /* now it's one second after the most recent passwd change */
+\&  }
+.Ve
+.PP
+.Vb 6
+\&  static void
+\&  stat_cb (EV_P_ ev_stat *w, int revents)
+\&  {
+\&    /* reset the one-second timer */
+\&    ev_timer_again (EV_A_ &timer);
+\&  }
+.Ve
+.PP
+.Vb 4
+\&  ...
+\&  ev_stat_init (&passwd, stat_cb, "/etc/passwd", 0.);
+\&  ev_stat_start (loop, &passwd);
+\&  ev_timer_init (&timer, timer_cb, 0., 1.01);
 .Ve
 .ie n .Sh """ev_idle"" \- when you've got nothing better to do..."
 .el .Sh "\f(CWev_idle\fP \- when you've got nothing better to do..."
@@ -2635,8 +2705,8 @@ be detected at runtime.
 .IP "\s-1EV_H\s0" 4
 .IX Item "EV_H"
 The name of the \fIev.h\fR header file used to include it. The default if
-undefined is \f(CW\*(C`<ev.h>\*(C'\fR in \fIevent.h\fR and \f(CW"ev.h"\fR in \fIev.c\fR. This
-can be used to virtually rename the \fIev.h\fR header file in case of conflicts.
+undefined is \f(CW"ev.h"\fR in \fIevent.h\fR and \fIev.c\fR. This can be used to
+virtually rename the \fIev.h\fR header file in case of conflicts.
 .IP "\s-1EV_CONFIG_H\s0" 4
 .IX Item "EV_CONFIG_H"
 If \f(CW\*(C`EV_STANDALONE\*(C'\fR isn't \f(CW1\fR, this variable can be used to override
@@ -2645,7 +2715,7 @@ If \f(CW\*(C`EV_STANDALONE\*(C'\fR isn't \f(CW1\fR, this variable can be used to
 .IP "\s-1EV_EVENT_H\s0" 4
 .IX Item "EV_EVENT_H"
 Similarly to \f(CW\*(C`EV_H\*(C'\fR, this macro can be used to override \fIevent.c\fR's idea
-of how the \fIevent.h\fR header can be found.
+of how the \fIevent.h\fR header can be found, the dfeault is \f(CW"event.h"\fR.
 .IP "\s-1EV_PROTOTYPES\s0" 4
 .IX Item "EV_PROTOTYPES"
 If defined to be \f(CW0\fR, then \fIev.h\fR will not define any function
@@ -2712,7 +2782,7 @@ than enough. If you need to manage thousands of children you might want to
 increase this value (\fImust\fR be a power of two).
 .IP "\s-1EV_INOTIFY_HASHSIZE\s0" 4
 .IX Item "EV_INOTIFY_HASHSIZE"
-\&\f(CW\*(C`ev_staz\*(C'\fR watchers use a small hash table to distribute workload by
+\&\f(CW\*(C`ev_stat\*(C'\fR watchers use a small hash table to distribute workload by
 inotify watch id. The default size is \f(CW16\fR (or \f(CW1\fR with \f(CW\*(C`EV_MINIMAL\*(C'\fR),
 usually more than enough. If you need to manage thousands of \f(CW\*(C`ev_stat\*(C'\fR
 watchers you might want to increase this value (\fImust\fR be a power of
@@ -2826,37 +2896,42 @@ it is much faster and asymptotically approaches constant time.
 .IX Item "Starting and stopping timer/periodic watchers: O(log skipped_other_timers)"
 This means that, when you have a watcher that triggers in one hour and
 there are 100 watchers that would trigger before that then inserting will
-have to skip those 100 watchers.
-.IP "Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)" 4
-.IX Item "Changing timer/periodic watchers (by autorepeat, again): O(log skipped_other_timers)"
-That means that for changing a timer costs less than removing/adding them
+have to skip roughly seven (\f(CW\*(C`ld 100\*(C'\fR) of these watchers.
+.IP "Changing timer/periodic watchers (by autorepeat or calling again): O(log skipped_other_timers)" 4
+.IX Item "Changing timer/periodic watchers (by autorepeat or calling again): O(log skipped_other_timers)"
+That means that changing a timer costs less than removing/adding them
 as only the relative motion in the event queue has to be paid for.
 .IP "Starting io/check/prepare/idle/signal/child watchers: O(1)" 4
 .IX Item "Starting io/check/prepare/idle/signal/child watchers: O(1)"
 These just add the watcher into an array or at the head of a list.
-=item Stopping check/prepare/idle watchers: O(1)
+.IP "Stopping check/prepare/idle watchers: O(1)" 4
+.IX Item "Stopping check/prepare/idle watchers: O(1)"
+.PD 0
 .IP "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % \s-1EV_PID_HASHSIZE\s0))" 4
 .IX Item "Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))"
+.PD
 These watchers are stored in lists then need to be walked to find the
 correct watcher to remove. The lists are usually short (you don't usually
 have many watchers waiting for the same fd or signal).
-.IP "Finding the next timer per loop iteration: O(1)" 4
-.IX Item "Finding the next timer per loop iteration: O(1)"
-.PD 0
+.IP "Finding the next timer in each loop iteration: O(1)" 4
+.IX Item "Finding the next timer in each loop iteration: O(1)"
+By virtue of using a binary heap, the next timer is always found at the
+beginning of the storage array.
 .IP "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)" 4
 .IX Item "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)"
-.PD
 A change means an I/O watcher gets started or stopped, which requires
-libev to recalculate its status (and possibly tell the kernel).
-.IP "Activating one watcher: O(1)" 4
-.IX Item "Activating one watcher: O(1)"
+libev to recalculate its status (and possibly tell the kernel, depending
+on backend and wether \f(CW\*(C`ev_io_set\*(C'\fR was used).
+.IP "Activating one watcher (putting it into the pending state): O(1)" 4
+.IX Item "Activating one watcher (putting it into the pending state): O(1)"
 .PD 0
 .IP "Priority handling: O(number_of_priorities)" 4
 .IX Item "Priority handling: O(number_of_priorities)"
 .PD
 Priorities are implemented by allocating some space for each
 priority. When doing priority-based operations, libev usually has to
-linearly search all the priorities.
+linearly search all the priorities, but starting/stopping and activating
+watchers becomes O(1) w.r.t. prioritiy handling.
 .RE
 .RS 4
 .SH "AUTHOR"
