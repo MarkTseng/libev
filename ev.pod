@@ -1070,6 +1070,8 @@ The events being watched.
 
 =back
 
+=head3 Examples
+
 Example: Call C<stdin_readable_cb> when STDIN_FILENO has become, well
 readable, but only once. Since it is likely line-buffered, you could
 attempt to read a whole line in the callback.
@@ -1175,6 +1177,8 @@ or C<ev_timer_again> is called and determines the next timeout (if any),
 which is also when any modifications are taken into account.
 
 =back
+
+=head3 Examples
 
 Example: Create a timer that fires after 60 seconds.
 
@@ -1342,6 +1346,8 @@ trigger next.
 
 =back
 
+=head3 Examples
+
 Example: Call a callback every hour, or, more precisely, whenever the
 system clock is divisible by 3600. The callback invocation times have
 potentially a lot of jittering, but good long-term stability.
@@ -1442,6 +1448,8 @@ The process exit/trace status caused by C<rpid> (see your systems
 C<waitpid> and C<sys/wait.h> documentation for details).
 
 =back
+
+=head3 Examples
 
 Example: Try to exit cleanly on SIGINT and SIGTERM.
 
@@ -1660,6 +1668,8 @@ believe me.
 
 =back
 
+=head3 Examples
+
 Example: Dynamically allocate an C<ev_idle> watcher, start it, and in the
 callback, free it. Also, use no error checking, as usual.
 
@@ -1739,6 +1749,8 @@ parameters of any kind. There are C<ev_prepare_set> and C<ev_check_set>
 macros, but using them is utterly, utterly and completely pointless.
 
 =back
+
+=head3 Examples
 
 There are a number of principal ways to embed other event loops or modules
 into libev. Here are some ideas on how to include libadns into libev
@@ -1917,26 +1929,7 @@ portable one.
 So when you want to use this feature you will always have to be prepared
 that you cannot get an embeddable loop. The recommended way to get around
 this is to have a separate variables for your embeddable loop, try to
-create it, and if that fails, use the normal loop for everything:
-
-  struct ev_loop *loop_hi = ev_default_init (0);
-  struct ev_loop *loop_lo = 0;
-  struct ev_embed embed;
-  
-  // see if there is a chance of getting one that works
-  // (remember that a flags value of 0 means autodetection)
-  loop_lo = ev_embeddable_backends () & ev_recommended_backends ()
-    ? ev_loop_new (ev_embeddable_backends () & ev_recommended_backends ())
-    : 0;
-
-  // if we got one, then embed it, otherwise default to loop_hi
-  if (loop_lo)
-    {
-      ev_embed_init (&embed, 0, loop_lo);
-      ev_embed_start (loop_hi, &embed);
-    }
-  else
-    loop_lo = loop_hi;
+create it, and if that fails, use the normal loop for everything.
 
 =head3 Watcher-Specific Functions and Data Members
 
@@ -1963,6 +1956,54 @@ apropriate way for embedded loops.
 The embedded event loop.
 
 =back
+
+=head3 Examples
+
+Example: Try to get an embeddable event loop and embed it into the default
+event loop. If that is not possible, use the default loop. The default
+loop is stored in C<loop_hi>, while the mebeddable loop is stored in
+C<loop_lo> (which is C<loop_hi> in the acse no embeddable loop can be
+used).
+
+  struct ev_loop *loop_hi = ev_default_init (0);
+  struct ev_loop *loop_lo = 0;
+  struct ev_embed embed;
+  
+  // see if there is a chance of getting one that works
+  // (remember that a flags value of 0 means autodetection)
+  loop_lo = ev_embeddable_backends () & ev_recommended_backends ()
+    ? ev_loop_new (ev_embeddable_backends () & ev_recommended_backends ())
+    : 0;
+
+  // if we got one, then embed it, otherwise default to loop_hi
+  if (loop_lo)
+    {
+      ev_embed_init (&embed, 0, loop_lo);
+      ev_embed_start (loop_hi, &embed);
+    }
+  else
+    loop_lo = loop_hi;
+
+Example: Check if kqueue is available but not recommended and create
+a kqueue backend for use with sockets (which usually work with any
+kqueue implementation). Store the kqueue/socket-only event loop in
+C<loop_socket>. (One might optionally use C<EVFLAG_NOENV>, too).
+
+  struct ev_loop *loop = ev_default_init (0);
+  struct ev_loop *loop_socket = 0;
+  struct ev_embed embed;
+  
+  if (ev_supported_backends () & ~ev_recommended_backends () & EVBACKEND_KQUEUE)
+    if ((loop_socket = ev_loop_new (EVBACKEND_KQUEUE))
+      {
+        ev_embed_init (&embed, 0, loop_socket);
+        ev_embed_start (loop, &embed);
+      }
+
+  if (!loop_socket)
+    loop_socket = loop;
+
+  // now use loop_socket for all sockets, and loop for everything else
 
 
 =head2 C<ev_fork> - the audacity to resume the event loop after a fork
