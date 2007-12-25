@@ -1,5 +1,7 @@
 #!/bin/sh
 
+LE=../libevent-1.4.0-beta
+
 if ! [ -e evbuffer.c ]; then
    echo do not run this programm unless you know what you are doing
    exit 1
@@ -12,9 +14,9 @@ rsync -avP libev/. . --exclude CVS
 
 rm -f configure.ac
 
-LE=../libevent-1.4.0-beta
-
 cp $LE/evdns.h .
+
+perl -i -pe 's%^/.libevent-include./%#include "event_compat.h"%' event.h
 
 perl -ne '
    s/\s+char buf\[64\];/\tchar buf[96];/;

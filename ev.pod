@@ -2497,8 +2497,8 @@ be detected at runtime.
 =item EV_H
 
 The name of the F<ev.h> header file used to include it. The default if
-undefined is C<< <ev.h> >> in F<event.h> and C<"ev.h"> in F<ev.c>. This
-can be used to virtually rename the F<ev.h> header file in case of conflicts.
+undefined is C<"ev.h"> in F<event.h> and F<ev.c>. This can be used to
+virtually rename the F<ev.h> header file in case of conflicts.
 
 =item EV_CONFIG_H
 
@@ -2509,7 +2509,7 @@ C<EV_H>, above.
 =item EV_EVENT_H
 
 Similarly to C<EV_H>, this macro can be used to override F<event.c>'s idea
-of how the F<event.h> header can be found.
+of how the F<event.h> header can be found, the dfeault is C<"event.h">.
 
 =item EV_PROTOTYPES
 
