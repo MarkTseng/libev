@@ -602,7 +602,11 @@ fd_reify (EV_P)
       if (events)
         {
           unsigned long argp;
-          anfd->handle = _get_osfhandle (fd);
+          #ifdef EV_FD_TO_WIN32_HANDLE
+            anfd->handle = EV_FD_TO_WIN32_HANDLE (fd);
+          #else
+            anfd->handle = _get_osfhandle (fd);
+          #endif
           assert (("libev only supports socket fds in this configuration", ioctlsocket (anfd->handle, FIONREAD, &argp) == 0));
         }
 #endif

@@ -2493,6 +2493,14 @@ C<_get_osfhandle> on the fd to convert it to an OS handle. Otherwise,
 it is assumed that all these functions actually work on fds, even
 on win32. Should not be defined on non-win32 platforms.
 
+=item EV_FD_TO_WIN32_HANDLE
+
+If C<EV_SELECT_IS_WINSOCKET> is enabled, then libev needs a way to map
+file descriptors to socket handles. When not defining this symbol (the
+default), then libev will call C<_get_osfhandle>, which is usually
+correct. In some cases, programs use their own file descriptor management,
+in which case they can provide this function to map fds to socket handles.
+
 =item EV_USE_POLL
 
 If defined to be C<1>, libev will compile in support for the C<poll>(2)
@@ -2770,6 +2778,73 @@ Priorities are implemented by allocating some space for each
 priority. When doing priority-based operations, libev usually has to
 linearly search all the priorities, but starting/stopping and activating
 watchers becomes O(1) w.r.t. prioritiy handling.
+
+=back
+
+
+=head1 Win32 platform limitations and workarounds
+
+Win32 doesn't support any of the standards (e.g. POSIX) that libev
+requires, and its I/O model is fundamentally incompatible with the POSIX
+model. Libev still offers limited functionality on this platform in
+the form of the C<EVBACKEND_SELECT> backend, and only supports socket
+descriptors. This only applies when using Win32 natively, not when using
+e.g. cygwin.
+
+There is no supported compilation method available on windows except
+embedding it into other applications.
+
+Due to the many, low, and arbitrary limits on the win32 platform and the
+abysmal performance of winsockets, using a large number of sockets is not
+recommended (and not reasonable). If your program needs to use more than
+a hundred or so sockets, then likely it needs to use a totally different
+implementation for windows, as libev offers the POSIX model, which cannot
+be implemented efficiently on windows (microsoft monopoly games).
+
+=over 4
+
+=item The winsocket select function
+
+The winsocket C<select> function doesn't follow POSIX in that it requires
+socket I<handles> and not socket I<file descriptors>. This makes select
+very inefficient, and also requires a mapping from file descriptors
+to socket handles. See the discussion of the C<EV_SELECT_USE_FD_SET>,
+C<EV_SELECT_IS_WINSOCKET> and C<EV_FD_TO_WIN32_HANDLE> preprocessor
+symbols for more info.
+
+The configuration for a "naked" win32 using the microsoft runtime
+libraries and raw winsocket select is:
+
+  #define EV_USE_SELECT 1
+  #define EV_SELECT_IS_WINSOCKET 1   /* forces EV_SELECT_USE_FD_SET, too */
+
+Note that winsockets handling of fd sets is O(n), so you can easily get a
+complexity in the O(n²) range when using win32.
+
+=item Limited number of file descriptors
+
+Windows has numerous arbitrary (and low) limits on things. Early versions
+of winsocket's select only supported waiting for a max. of C<64> handles
+(probably owning to the fact that all windows kernels can only wait for
+C<64> things at the same time internally; microsoft recommends spawning a
+chain of threads and wait for 63 handles and the previous thread in each).
+
+Newer versions support more handles, but you need to define C<FD_SETSIZE>
+to some high number (e.g. C<2048>) before compiling the winsocket select
+call (which might be in libev or elsewhere, for example, perl does its own
+select emulation on windows).
+
+Another limit is the number of file descriptors in the microsoft runtime
+libraries, which by default is C<64> (there must be a hidden I<64> fetish
+or something like this inside microsoft). You can increase this by calling
+C<_setmaxstdio>, which can increase this limit to C<2048> (another
+arbitrary limit), but is broken in many versions of the microsoft runtime
+libraries.
+
+This might get you to about C<512> or C<2048> sockets (depending on
+windows version and/or the phase of the moon). To get more, you need to
+wrap all I/O functions and provide your own fd management, but the cost of
+calling select (O(n²)) will likely make this unworkable.
 
 =back
 
