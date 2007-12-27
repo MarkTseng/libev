@@ -1311,7 +1311,7 @@ timers_reify (EV_P)
     {
       ev_timer *w = (ev_timer *)timers [0];
 
-      /*assert (("inactive timer on timer heap detected", ev_is_active (w)));*/
+      assert (("inactive timer on timer heap detected", ev_is_active (w)));
 
       /* first reschedule or stop timer */
       if (w->repeat)
