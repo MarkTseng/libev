@@ -553,12 +553,16 @@ usually a better approach for this kind of thing.
 Here are the gory details of what C<ev_loop> does:
 
    - Before the first iteration, call any pending watchers.
-   * If there are no active watchers (reference count is zero), return.
-   - Queue all prepare watchers and then call all outstanding watchers.
+   * If EVFLAG_FORKCHECK was used, check for a fork.
+   - If a fork was detected, queue and call all fork watchers.
+   - Queue and call all prepare watchers.
    - If we have been forked, recreate the kernel state.
    - Update the kernel state with all outstanding changes.
    - Update the "event loop time".
-   - Calculate for how long to block.
+   - Calculate for how long to sleep or block, if at all
+     (active idle watchers, EVLOOP_NONBLOCK or not having
+     any active watchers at all will result in not sleeping).
+   - Sleep if the I/O and timer collect interval say so.
    - Block the process, waiting for any events.
    - Queue all outstanding I/O (fd) events.
    - Update the "event loop time" and do time jump handling.
@@ -569,8 +573,9 @@ Here are the gory details of what C<ev_loop> does:
    - Call all queued watchers in reverse order (i.e. check watchers first).
      Signals and child watchers are implemented as I/O watchers, and will
      be handled here by queueing them when their watcher gets executed.
-   - If ev_unloop has been called or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
-     were used, return, otherwise continue with step *.
+   - If ev_unloop has been called, or EVLOOP_ONESHOT or EVLOOP_NONBLOCK
+     were used, or there are no active watchers, return, otherwise
+     continue with step *.
 
 Example: Queue some jobs and then loop until no events are outsanding
 anymore.
