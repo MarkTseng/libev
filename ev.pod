@@ -577,7 +577,7 @@ Here are the gory details of what C<ev_loop> does:
      were used, or there are no active watchers, return, otherwise
      continue with step *.
 
-Example: Queue some jobs and then loop until no events are outsanding
+Example: Queue some jobs and then loop until no events are outstanding
 anymore.
 
    ... queue jobs here, make sure they register event watchers as long
