@@ -607,7 +607,9 @@ example, libev itself uses this for its internal signal pipe: It is not
 visible to the libev user and should not keep C<ev_loop> from exiting if
 no event watchers registered by it are active. It is also an excellent
 way to do this for generic recurring timers or from within third-party
-libraries. Just remember to I<unref after start> and I<ref before stop>.
+libraries. Just remember to I<unref after start> and I<ref before stop>
+(but only if the watcher wasn't active before, or was active before,
+respectively).
 
 Example: Create a signal watcher, but keep it from keeping C<ev_loop>
 running when nothing else is active.
