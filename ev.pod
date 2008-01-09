@@ -405,6 +405,10 @@ file descriptor per loop iteration. For small and medium numbers of file
 descriptors a "slow" C<EVBACKEND_SELECT> or C<EVBACKEND_POLL> backend
 might perform better.
 
+On the positive side, ignoring the spurious readyness notifications, this
+backend actually performed to specification in all tests and is fully
+embeddable, which is a rare feat among the OS-specific backends.
+
 =item C<EVBACKEND_ALL>
 
 Try all backends (even potentially broken ones that wouldn't be tried
@@ -416,9 +420,8 @@ It is definitely not recommended to use this flag.
 =back
 
 If one or more of these are ored into the flags value, then only these
-backends will be tried (in the reverse order as given here). If none are
-specified, most compiled-in backend will be tried, usually in reverse
-order of their flag values :)
+backends will be tried (in the reverse order as listed here). If none are
+specified, all backends in C<ev_recommended_backends ()> will be tried.
 
 The most typical usage is like this:
 
