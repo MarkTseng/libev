@@ -43,7 +43,7 @@
 #ifdef EV_H
 # include EV_H
 #else
-# include <ev.h>
+# include "ev.h"
 #endif
 
 namespace ev {

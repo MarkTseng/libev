@@ -262,6 +262,13 @@ flags. If that is troubling you, check C<ev_backend ()> afterwards).
 If you don't know what event loop to use, use the one returned from this
 function.
 
+The default loop is the only loop that can handle C<ev_signal> and
+C<ev_child> watchers, and to do this, it always registers a handler
+for C<SIGCHLD>. If this is a problem for your app you can either
+create a dynamic loop with C<ev_loop_new> that doesn't do that, or you
+can simply overwrite the C<SIGCHLD> signal handler I<after> calling
+C<ev_default_init>.
+
 The flags argument can be used to specify special behaviour or specific
 backends to use, and is usually specified as C<0> (or C<EVFLAG_AUTO>).
 
@@ -2558,8 +2565,8 @@ be detected at runtime.
 =item EV_H
 
 The name of the F<ev.h> header file used to include it. The default if
-undefined is C<"ev.h"> in F<event.h> and F<ev.c>. This can be used to
-virtually rename the F<ev.h> header file in case of conflicts.
+undefined is C<"ev.h"> in F<event.h>, F<ev.c> and F<ev++.h>. This can be
+used to virtually rename the F<ev.h> header file in case of conflicts.
 
 =item EV_CONFIG_H
 
@@ -2570,7 +2577,7 @@ C<EV_H>, above.
 =item EV_EVENT_H
 
 Similarly to C<EV_H>, this macro can be used to override F<event.c>'s idea
-of how the F<event.h> header can be found, the dfeault is C<"event.h">.
+of how the F<event.h> header can be found, the default is C<"event.h">.
 
 =item EV_PROTOTYPES
 

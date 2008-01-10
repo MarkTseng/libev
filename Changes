@@ -1,5 +1,8 @@
 Revision history for libev, a high-performance and full-featured event loop
 
+	- ev++.h includes "ev.h" by default now, not <ev.h>.
+	- slightly improved documentation.
+
 2.01 Tue Dec 25 08:04:41 CET 2007
 	- separate Changes file.
 	- fix ev_path_set => ev_stat_set typo.
