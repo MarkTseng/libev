@@ -485,24 +485,22 @@ earlier call to C<ev_loop_new>.
 
 =item ev_default_fork ()
 
-This function reinitialises the kernel state for backends that have
-one. Despite the name, you can call it anytime, but it makes most sense
-after forking, in either the parent or child process (or both, but that
-again makes little sense).
+This function sets a flag that causes subsequent C<ev_loop> iterations
+to reinitialise the kernel state for backends that have one. Despite the
+name, you can call it anytime, but it makes most sense after forking, in
+the child process (or both child and parent, but that again makes little
+sense). You I<must> call it in the child before using any of the libev
+functions, and it will only take effect at the next C<ev_loop> iteration.
 
-You I<must> call this function in the child process after forking if and
-only if you want to use the event library in both processes. If you just
-fork+exec, you don't have to call it.
+On the other hand, you only need to call this function in the child
+process if and only if you want to use the event library in the child. If
+you just fork+exec, you don't have to call it at all.
 
 The function itself is quite fast and it's usually not a problem to call
 it just in case after a fork. To make this easy, the function will fit in
 quite nicely into a call to C<pthread_atfork>:
 
     pthread_atfork (0, 0, ev_default_fork);
-
-At the moment, C<EVBACKEND_SELECT> and C<EVBACKEND_POLL> are safe to use
-without calling this function, so if you force one of those backends you
-do not need to care.
 
 =item ev_loop_fork (loop)
 
