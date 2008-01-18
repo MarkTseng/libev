@@ -1168,6 +1168,7 @@ loop_fork (EV_P)
         syserr ("(libev) error creating pipe");
 
       siginit (EV_A);
+      sigcb (EV_A_ &sigev, EV_READ);
     }
 
   postfork = 0;
