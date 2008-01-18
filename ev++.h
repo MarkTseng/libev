@@ -186,6 +186,11 @@ namespace ev {
     {
       return ev_is_pending (static_cast<const ev_watcher *>(this));
     }
+
+    void feed_event (int revents)
+    {
+      ev_feed_event (EV_A_ static_cast<const ev_watcher *>(this), revents);
+    }
   };
 
   inline void delay (tstamp interval)
