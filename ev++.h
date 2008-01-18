@@ -68,6 +68,31 @@ namespace ev {
     ERROR    = EV_ERROR,
   };
 
+  enum
+  {
+    AUTO = EVFLAG_AUTO,
+    NOENV = EVFLAG_NOENV,
+    FORKCHECK = EVFLAG_FORKCHECK,
+    SELECT = EVBACKEND_SELECT,
+    POLL = EVBACKEND_POLL,
+    EPOLL = EVBACKEND_EPOLL,
+    KQUEUE = EVBACKEND_KQUEUE,
+    DEVPOLL = EVBACKEND_DEVPOLL,
+    PORT = EVBACKEND_PORT
+  };
+
+  enum
+  {
+    NONBLOCK = EVLOOP_NONBLOCK,
+    ONESHOT = EVLOOP_ONESHOT
+  };
+
+  enum how_t
+  {
+    ONE = EVUNLOOP_ONE,
+    ALL = EVUNLOOP_ALL
+  };
+
   template<class ev_watcher, class watcher>
   struct base : ev_watcher
   {
