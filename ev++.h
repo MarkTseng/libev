@@ -208,10 +208,9 @@ namespace ev {
                                                                                         \
   private:                                                                              \
                                                                                         \
-    cppstem (const cppstem &o)								\
-    { /* disabled */ }                                        				\
+    cppstem (const cppstem &o);                                                         \
                                                                                         \
-    void operator =(const cppstem &o) { /* disabled */ }                                \
+    cppstem & operator =(const cppstem &o);                                             \
                                                                                         \
   public:
 
