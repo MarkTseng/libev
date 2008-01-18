@@ -188,6 +188,46 @@ namespace ev {
     }
   };
 
+  inline void delay (tstamp interval)
+  {
+    ev_sleep (interval);
+  }
+
+  inline int version_major ()
+  {
+    return ev_version_major ();
+  }
+
+  inline int version_minor ()
+  {
+    return ev_version_minor ();
+  }
+
+  inline unsigned int supported_backends ()
+  {
+    return ev_supported_backends ();
+  }
+
+  inline unsigned int recommended_backends ()
+  {
+    return ev_recommended_backends ();
+  }
+
+  inline unsigned int embeddable_backends ()
+  {
+    return ev_embeddable_backends ();
+  }
+
+  inline void set_allocator (void *(*cb)(void *ptr, long size))
+  {
+    ev_set_allocator (cb);
+  }
+
+  inline void set_syserr_cb (void (*cb)(const char *msg))
+  {
+    ev_set_syserr_cb (cb);
+  }
+
 
   inline ev_tstamp now (EV_P)
   {
