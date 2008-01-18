@@ -93,19 +93,323 @@ namespace ev {
     ALL = EVUNLOOP_ALL
   };
 
+#ifdef EV_AX
+#  undef EV_AX
+#endif
+
+#ifdef EV_AX_
+#  undef EV_AX_
+#endif
+
+#if EV_MULTIPLICITY
+#  define EV_AX  raw_loop
+#  define EV_AX_ raw_loop,
+#else
+#  define EV_AX
+#  define EV_AX_
+#endif
+
+  struct loop_ref
+  {
+
+    loop_ref (EV_P)
+#if EV_MULTIPLICITY
+      : EV_AX (EV_A)
+#endif
+    {
+    }
+
+    bool operator== (const loop_ref &other) const
+    {
+#if EV_MULTIPLICITY
+      return this->EV_AX == other.EV_AX;
+#else
+      return true;
+#endif
+    }
+
+    bool operator!= (const loop_ref &other) const
+    {
+#if EV_MULTIPLICITY
+      return ! (*this == other);
+#else
+      return false;
+#endif
+    }
+
+#if EV_MULTIPLICITY
+    bool operator== (struct ev_loop *other) const
+    {
+      return this->EV_AX == other;
+    }
+
+    bool operator!= (struct ev_loop *other) const
+    {
+      return ! (*this == other);
+    }
+
+    bool operator== (const struct ev_loop *other) const
+    {
+      return this->EV_AX == other;
+    }
+
+    bool operator!= (const struct ev_loop *other) const
+    {
+      return (*this == other);
+    }
+
+    operator struct ev_loop * () const
+    {
+      return EV_AX;
+    }
+
+    operator const struct ev_loop * () const
+    {
+      return EV_AX;
+    }
+
+    bool is_default () const
+    {
+      return EV_AX == ev_default_loop (0);
+    }
+#endif
+
+    void loop (int flags = 0)
+    {
+      ev_loop (EV_AX_ flags);
+    }
+
+    void unloop (how_t how = ONE)
+    {
+      ev_unloop (EV_AX_ how);
+    }
+
+    void post_fork ()
+    {
+#if EV_MULTIPLICITY
+      ev_loop_fork (EV_AX);
+#else
+      ev_default_fork ();
+#endif
+    }
+
+    unsigned int count () const
+    {
+      return ev_loop_count (EV_AX);
+    }
+
+    unsigned int backend () const
+    {
+      return ev_backend (EV_AX);
+    }
+
+    tstamp now () const
+    {
+      return ev_now (EV_AX);
+    }
+
+    void ref ()
+    {
+      ev_ref (EV_AX);
+    }
+
+    void unref ()
+    {
+      ev_unref (EV_AX);
+    }
+
+    void set_io_collect_interval (tstamp interval)
+    {
+      ev_set_io_collect_interval (EV_AX_ interval);
+    }
+
+    void set_timeout_collect_interval (tstamp interval)
+    {
+      ev_set_timeout_collect_interval (EV_AX_ interval);
+    }
+
+    // function callback
+    void once (int fd, int events, tstamp timeout, void (*cb)(int, void *), void* arg = 0)
+    {
+      ev_once (EV_AX_ fd, events, timeout, cb, arg);
+    }
+
+    // method callback
+    template<class K, void (K::*method)(int)>
+    void once (int fd, int events, tstamp timeout, K *object)
+    {
+      once (fd, events, timeout, method_thunk<K, method>, object);
+    }
+
+    template<class K, void (K::*method)(int)>
+    static void method_thunk (int revents, void* arg)
+    {
+      K *obj = static_cast<K *>(arg);
+      (obj->*method) (revents);
+    }
+
+    // const method callback
+    template<class K, void (K::*method)(int) const>
+    void once (int fd, int events, tstamp timeout, const K *object)
+    {
+      once (fd, events, timeout, const_method_thunk<K, method>, object);
+    }
+
+    template<class K, void (K::*method)(int) const>
+    static void const_method_thunk (int revents, void* arg)
+    {
+      K *obj = static_cast<K *>(arg);
+      (obj->*method) (revents);
+    }
+
+    // simple method callback
+    template<class K, void (K::*method)()>
+    void once (int fd, int events, tstamp timeout, K *object)
+    {
+      once (fd, events, timeout, method_noargs_thunk<K, method>, object);
+    }
+
+    template<class K, void (K::*method)()>
+    static void method_noargs_thunk (int revents, void* arg)
+    {
+      K *obj = static_cast<K *>(arg);
+      (obj->*method) ();
+    }
+
+    // simpler function callback
+    template<void (*cb)(int)>
+    void once (int fd, int events, tstamp timeout)
+    {
+      once (fd, events, timeout, simpler_func_thunk<cb>);
+    }
+
+    template<void (*cb)(int)>
+    static void simpler_func_thunk (int revents, void* arg)
+    {
+      (*cb) (revents);
+    }
+
+    // simplest function callback
+    template<void (*cb)()>
+    void once (int fd, int events, tstamp timeout)
+    {
+      once (fd, events, timeout, simplest_func_thunk<cb>);
+    }
+
+    template<void (*cb)()>
+    static void simplest_func_thunk (int revents, void* arg)
+    {
+      (*cb) ();
+    }
+
+    void feed_fd_event (int fd, int revents)
+    {
+      ev_feed_fd_event (EV_AX_ fd, revents);
+    }
+
+    void feed_signal_event (int signum)
+    {
+      ev_feed_signal_event (EV_AX_ signum);
+    }
+
+#if EV_MULTIPLICITY
+    struct ev_loop* EV_AX;
+#endif
+
+  };
+
+#if EV_MULTIPLICITY
+  struct dynamic_loop: loop_ref
+  {
+
+    dynamic_loop (unsigned int flags = AUTO)
+      : loop_ref (ev_loop_new (flags))
+    {
+    }
+
+    ~dynamic_loop ()
+    {
+      ev_loop_destroy (EV_AX);
+      EV_AX = 0;
+    }
+
+  private:
+
+    dynamic_loop (const dynamic_loop &);
+
+    dynamic_loop & operator= (const dynamic_loop &);
+
+  };
+#endif
+
+  struct default_loop: loop_ref
+  {
+
+    default_loop (unsigned int flags = AUTO)
+#if EV_MULTIPLICITY
+      : loop_ref (ev_default_loop (flags))
+    {
+    }
+#else
+    {
+      ev_default_loop (flags);
+    }
+#endif
+
+    ~default_loop ()
+    {
+      ev_default_destroy ();
+#if EV_MULTIPLICITY
+      EV_AX = 0;
+#endif
+    }
+
+  private:
+
+    default_loop (const default_loop &);
+
+    default_loop & operator= (const default_loop &);
+
+  };
+
+  inline loop_ref get_default_loop ()
+  {
+#if EV_MULTIPLICITY
+    return ev_default_loop (0);
+#else
+    return loop_ref ();
+#endif
+  }
+
+#undef EV_AX
+#undef EV_AX_
+
+#undef EV_PX
+#undef EV_PX_
+#if EV_MULTIPLICITY
+#  define EV_PX  loop_ref EV_A
+#  define EV_PX_ loop_ref EV_A_
+#else
+#  define EV_PX
+#  define EV_PX_
+#endif
+
   template<class ev_watcher, class watcher>
   struct base : ev_watcher
   {
     #if EV_MULTIPLICITY
-      EV_P;
+      EV_PX;
 
-      void set (EV_P)
+      void set (EV_PX)
       {
         this->EV_A = EV_A;
       }
     #endif
 
-    base ()
+    base (EV_PX)
+    #if EV_MULTIPLICITY
+      : EV_A (EV_A)
+    #endif
     {
       ev_init (this, 0);
     }
@@ -233,20 +537,14 @@ namespace ev {
     ev_set_syserr_cb (cb);
   }
 
-
-  inline ev_tstamp now (EV_P)
-  {
-    return ev_now (EV_A);
-  }
-
   #if EV_MULTIPLICITY
-    #define EV_CONSTRUCT                                                                \
-      (EV_P = EV_DEFAULT)                                                               \
+    #define EV_CONSTRUCT(cppstem,cstem)	                                                \
+      (EV_PX = get_default_loop ())                                                     \
+        : base<ev_ ## cstem, cppstem> (EV_A)                                            \
       {                                                                                 \
-        set (EV_A);                                                                     \
       }
   #else
-    #define EV_CONSTRUCT                                                                \
+    #define EV_CONSTRUCT(cppstem,cstem)                                                 \
       ()                                                                                \
       {                                                                                 \
       }
@@ -268,7 +566,7 @@ namespace ev {
       ev_ ## cstem ## _stop (EV_A_ static_cast<ev_ ## cstem *>(this));                  \
     }                                                                                   \
                                                                                         \
-    cppstem EV_CONSTRUCT                                                                \
+    cppstem EV_CONSTRUCT(cppstem,cstem)                                                 \
                                                                                         \
     ~cppstem ()                                                                         \
     {                                                                                   \
@@ -446,9 +744,12 @@ namespace ev {
   EV_END_WATCHER (fork, fork)
   #endif
 
+  #undef EV_PX
+  #undef EV_PX_
   #undef EV_CONSTRUCT
   #undef EV_BEGIN_WATCHER
   #undef EV_END_WATCHER
+
 }
 
 #endif
