@@ -48,6 +48,26 @@
 
 namespace ev {
 
+  typedef ev_tstamp tstamp;
+
+  enum {
+    UNDEF    = EV_UNDEF,
+    NONE     = EV_NONE,
+    READ     = EV_READ,
+    WRITE    = EV_WRITE,
+    TIMEOUT  = EV_TIMEOUT,
+    PERIODIC = EV_PERIODIC,
+    SIGNAL   = EV_SIGNAL,
+    CHILD    = EV_CHILD,
+    STAT     = EV_STAT,
+    IDLE     = EV_IDLE,
+    CHECK    = EV_CHECK,
+    PREPARE  = EV_PREPARE,
+    FORK     = EV_FORK,
+    EMBED    = EV_EMBED,
+    ERROR    = EV_ERROR,
+  };
+
   template<class ev_watcher, class watcher>
   struct base : ev_watcher
   {
@@ -143,25 +163,6 @@ namespace ev {
     }
   };
 
-  enum {
-    UNDEF    = EV_UNDEF,
-    NONE     = EV_NONE,
-    READ     = EV_READ,
-    WRITE    = EV_WRITE,
-    TIMEOUT  = EV_TIMEOUT,
-    PERIODIC = EV_PERIODIC,
-    SIGNAL   = EV_SIGNAL,
-    CHILD    = EV_CHILD,
-    STAT     = EV_STAT,
-    IDLE     = EV_IDLE,
-    CHECK    = EV_CHECK,
-    PREPARE  = EV_PREPARE,
-    FORK     = EV_FORK,
-    EMBED    = EV_EMBED,
-    ERROR    = EV_ERROR,
-  };
-
-  typedef ev_tstamp tstamp;
 
   inline ev_tstamp now (EV_P)
   {
