@@ -497,6 +497,11 @@ namespace ev {
     }
   };
 
+  inline tstamp now ()
+  {
+    return ev_time ();
+  }
+
   inline void delay (tstamp interval)
   {
     ev_sleep (interval);
