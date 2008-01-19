@@ -46,16 +46,12 @@
 # include "ev.h"
 #endif
 
-#ifndef EV_CXX_EXCEPTIONS
-#define EV_CXX_EXCEPTIONS 1
+#ifndef EV_USE_STDEXCEPT
+# define EV_USE_STDEXCEPT 1
 #endif
 
-#undef EV_THROW
-#if EV_CXX_EXCEPTIONS
-#  include <stdexcept>
-#  define EV_THROW(exception) throw (exception)
-#else
-#  define EV_THROW(exception)
+#if EV_USE_STDEXCEPT
+# include <stdexcept>
 #endif
 
 namespace ev {
@@ -105,15 +101,18 @@ namespace ev {
     ALL = EVUNLOOP_ALL
   };
 
-#if EV_CXX_EXCEPTIONS
-  struct bad_loop : std::runtime_error
+  struct bad_loop
+#if EV_USE_STDEXCEPT
+  : std::runtime_error
+#endif
   {
+#if EV_USE_STDEXCEPT
     bad_loop ()
-    : std::runtime_error ("loop can't be initialized")
+    : std::runtime_error ("libev event loop cannot be initialized, bad value of LIBEV_FLAGS?")
     {
     }
-  };
 #endif
+  };
 
 #ifdef EV_AX
 #  undef EV_AX
@@ -134,27 +133,27 @@ namespace ev {
   struct loop_ref
   {
 
-    loop_ref (EV_P)
+    loop_ref (EV_P) throw (bad_loop)
 #if EV_MULTIPLICITY
-      EV_THROW (bad_loop) : EV_AX (EV_A)
+    : EV_AX (EV_A)
 #endif
     {
-#if EV_MULTIPLICIY && EV_CXX_EXCEPTIONS
-      if (!EV_A)
+#if EV_MULTIPLICITY
+      if (!EV_AX)
         throw bad_loop ();
 #endif
     }
 
-    bool operator== (const loop_ref &other) const throw ()
+    bool operator == (const loop_ref &other) const throw ()
     {
 #if EV_MULTIPLICITY
-      return this->EV_AX == other.EV_AX;
+      return EV_AX == other.EV_AX;
 #else
       return true;
 #endif
     }
 
-    bool operator!= (const loop_ref &other) const throw ()
+    bool operator != (const loop_ref &other) const throw ()
     {
 #if EV_MULTIPLICITY
       return ! (*this == other);
@@ -371,38 +370,25 @@ namespace ev {
   struct default_loop: loop_ref
   {
 
-    default_loop (unsigned int flags = AUTO) EV_THROW (bad_loop)
+    default_loop (unsigned int flags = AUTO) throw (bad_loop)
 #if EV_MULTIPLICITY
-      : loop_ref (ev_default_loop (flags))
-    {
-    }
-#else
-    {
-    #if EV_CXX_EXCEPTIONS
-      int r =
-    #endif
-          ev_default_loop (flags);
-    #if EV_CXX_EXCEPTIONS
-      if (!r)
-        throw bad_loop ();
-    #endif
-    }
+    : loop_ref (ev_default_loop (flags))
 #endif
+    {
+#ifndef EV_MULTIPLICITY
+    if (!ev_default_loop (flags))
+      throw bad_loop ();
+#endif
+    }
 
     ~default_loop () throw ()
     {
       ev_default_destroy ();
-#if EV_MULTIPLICITY
-      EV_AX = 0;
-#endif
     }
 
   private:
-
     default_loop (const default_loop &);
-
-    default_loop & operator= (const default_loop &);
-
+    default_loop &operator = (const default_loop &);
   };
 
   inline loop_ref get_default_loop () throw ()
