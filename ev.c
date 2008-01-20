@@ -1200,7 +1200,7 @@ ev_loop_destroy (EV_P)
 void
 ev_loop_fork (EV_P)
 {
-  postfork = 1; // must be in line with ev_default_fork
+  postfork = 1; /* must be in line with ev_default_fork */
 }
 
 #endif
@@ -1274,7 +1274,7 @@ ev_default_fork (void)
 #endif
 
   if (backend)
-    postfork = 1; // must be in line with ev_loop_fork
+    postfork = 1; /* must be in line with ev_loop_fork */
 }
 
 /*****************************************************************************/
