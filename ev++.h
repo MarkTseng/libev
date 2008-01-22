@@ -349,7 +349,7 @@ namespace ev {
   struct dynamic_loop: loop_ref
   {
 
-    dynamic_loop (unsigned int flags = AUTO) EV_THROW (bad_loop)
+    dynamic_loop (unsigned int flags = AUTO) throw (bad_loop)
       : loop_ref (ev_loop_new (flags))
     {
     }
@@ -777,8 +777,6 @@ namespace ev {
   #undef EV_END_WATCHER
 
 }
-
-#undef EV_THROW
 
 #endif
 
