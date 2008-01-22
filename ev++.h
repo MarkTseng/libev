@@ -133,16 +133,18 @@ namespace ev {
   struct loop_ref
   {
 
-    loop_ref (EV_P) throw (bad_loop)
+    loop_ref (EV_P)
 #if EV_MULTIPLICITY
-    : EV_AX (EV_A)
-#endif
+      throw (bad_loop) : EV_AX (EV_A)
     {
-#if EV_MULTIPLICITY
       if (!EV_AX)
         throw bad_loop ();
-#endif
     }
+#else
+      throw ()
+    {
+    }
+#endif
 
     bool operator == (const loop_ref &other) const throw ()
     {
