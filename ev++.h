@@ -133,18 +133,12 @@ namespace ev {
   struct loop_ref
   {
 
-    loop_ref (EV_P)
+    loop_ref (EV_P) throw ()
 #if EV_MULTIPLICITY
-      throw (bad_loop) : EV_AX (EV_A)
-    {
-      if (!EV_AX)
-        throw bad_loop ();
-    }
-#else
-      throw ()
-    {
-    }
+    : EV_AX (EV_A)
 #endif
+    {
+    }
 
     bool operator == (const loop_ref &other) const throw ()
     {
@@ -346,12 +340,14 @@ namespace ev {
   };
 
 #if EV_MULTIPLICITY
-  struct dynamic_loop: loop_ref
+  struct dynamic_loop : loop_ref
   {
 
     dynamic_loop (unsigned int flags = AUTO) throw (bad_loop)
-      : loop_ref (ev_loop_new (flags))
+    : loop_ref (ev_loop_new (flags))
     {
+      if (!EV_AX)
+        throw bad_loop ();
     }
 
     ~dynamic_loop () throw ()
@@ -369,7 +365,7 @@ namespace ev {
   };
 #endif
 
-  struct default_loop: loop_ref
+  struct default_loop : loop_ref
   {
 
     default_loop (unsigned int flags = AUTO) throw (bad_loop)
@@ -377,10 +373,14 @@ namespace ev {
     : loop_ref (ev_default_loop (flags))
 #endif
     {
-#if !EV_MULTIPLICITY
-    if (!ev_default_loop (flags))
-      throw bad_loop ();
+      if (
+#if EV_MULTIPLICITY
+          !EV_AX
+#else
+          !ev_default_loop (flags)
 #endif
+      )
+        throw bad_loop ();
     }
 
     ~default_loop () throw ()
