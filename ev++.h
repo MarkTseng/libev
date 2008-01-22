@@ -377,7 +377,7 @@ namespace ev {
     : loop_ref (ev_default_loop (flags))
 #endif
     {
-#ifndef EV_MULTIPLICITY
+#if !EV_MULTIPLICITY
     if (!ev_default_loop (flags))
       throw bad_loop ();
 #endif
