@@ -159,22 +159,22 @@ namespace ev {
     }
 
 #if EV_MULTIPLICITY
-    bool operator== (struct ev_loop *other) const throw ()
+    bool operator == (struct ev_loop *other) const throw ()
     {
       return this->EV_AX == other;
     }
 
-    bool operator!= (struct ev_loop *other) const throw ()
+    bool operator != (struct ev_loop *other) const throw ()
     {
       return ! (*this == other);
     }
 
-    bool operator== (const struct ev_loop *other) const throw ()
+    bool operator == (const struct ev_loop *other) const throw ()
     {
       return this->EV_AX == other;
     }
 
-    bool operator!= (const struct ev_loop *other) const throw ()
+    bool operator != (const struct ev_loop *other) const throw ()
     {
       return (*this == other);
     }
@@ -697,17 +697,17 @@ namespace ev {
   EV_END_WATCHER (sig, signal)
 
   EV_BEGIN_WATCHER (child, child)
-    void set (int pid) throw ()
+    void set (int pid, int trace = 0) throw ()
     {
       int active = is_active ();
       if (active) stop ();
-      ev_child_set (static_cast<ev_child *>(this), pid);
+      ev_child_set (static_cast<ev_child *>(this), pid, trace);
       if (active) start ();
     }
 
-    void start (int pid) throw ()
+    void start (int pid, int trace = 0) throw ()
     {
-      set (pid);
+      set (pid, trace);
       start ();
     }
   EV_END_WATCHER (child, child)

@@ -869,19 +869,27 @@ static WL childs [EV_PID_HASHSIZE];
 
 static ev_signal childev;
 
+#ifndef WIFCONTINUED
+# define WIFCONTINUED(status) 0
+#endif
+
 void inline_speed
 child_reap (EV_P_ ev_signal *sw, int chain, int pid, int status)
 {
   ev_child *w;
+  int traced = WIFSTOPPED (status) || WIFCONTINUED (status);
 
   for (w = (ev_child *)childs [chain & (EV_PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
-    if (w->pid == pid || !w->pid)
-      {
-        ev_set_priority (w, ev_priority (sw)); /* need to do it *now* */
-        w->rpid    = pid;
-        w->rstatus = status;
-        ev_feed_event (EV_A_ (W)w, EV_CHILD);
-      }
+    {
+      if ((w->pid == pid || !w->pid)
+          && (!traced || (w->flags & 1)))
+        {
+          ev_set_priority (w, ev_priority (sw)); /* need to do it *now* */
+          w->rpid    = pid;
+          w->rstatus = status;
+          ev_feed_event (EV_A_ (W)w, EV_CHILD);
+        }
+    }
 }
 
 #ifndef WCONTINUED

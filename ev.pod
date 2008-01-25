@@ -1440,16 +1440,18 @@ some child status changes (most typically when a child of yours dies).
 
 =over 4
 
-=item ev_child_init (ev_child *, callback, int pid)
+=item ev_child_init (ev_child *, callback, int pid, int trace)
 
-=item ev_child_set (ev_child *, int pid)
+=item ev_child_set (ev_child *, int pid, int trace)
 
 Configures the watcher to wait for status changes of process C<pid> (or
 I<any> process if C<pid> is specified as C<0>). The callback can look
 at the C<rstatus> member of the C<ev_child> watcher structure to see
 the status word (use the macros from C<sys/wait.h> and see your systems
 C<waitpid> documentation). The C<rpid> member contains the pid of the
-process causing the status change.
+process causing the status change. C<trace> must be either C<0> (only
+activate the watcher when the process terminates) or C<1> (additionally
+activate the watcher when the process is stopped or continued).
 
 =item int pid [read-only]
 
