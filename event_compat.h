@@ -153,7 +153,7 @@ struct bufferevent *bufferevent_new(int fd,
 int bufferevent_base_set(struct event_base *base, struct bufferevent *bufev);
 int bufferevent_priority_set(struct bufferevent *bufev, int pri);
 void bufferevent_free(struct bufferevent *bufev);
-int bufferevent_write(struct bufferevent *bufev, void *data, size_t size);
+int bufferevent_write(struct bufferevent *bufev, const void *data, size_t size);
 int bufferevent_write_buffer(struct bufferevent *bufev, struct evbuffer *buf);
 size_t bufferevent_read(struct bufferevent *bufev, void *data, size_t size);
 int bufferevent_enable(struct bufferevent *bufev, short event);
@@ -189,37 +189,35 @@ void evbuffer_setcb(struct evbuffer *, void (*)(struct evbuffer *, size_t, size_
 
 void evtag_init(void);
 
-void evtag_marshal(struct evbuffer *evbuf, uint8_t tag, const void *data,
+void evtag_marshal(struct evbuffer *evbuf, uint32_t tag, const void *data,
     uint32_t len);
 
 void encode_int(struct evbuffer *evbuf, uint32_t number);
 
-void evtag_marshal_int(struct evbuffer *evbuf, uint8_t tag, uint32_t integer);
+void evtag_marshal_int(struct evbuffer *evbuf, uint32_t tag, uint32_t integer);
 
-void evtag_marshal_string(struct evbuffer *buf, uint8_t tag,
+void evtag_marshal_string(struct evbuffer *buf, uint32_t tag,
     const char *string);
 
-void evtag_marshal_timeval(struct evbuffer *evbuf, uint8_t tag,
+void evtag_marshal_timeval(struct evbuffer *evbuf, uint32_t tag,
     struct timeval *tv);
 
-void evtag_test(void);
-
-int evtag_unmarshal(struct evbuffer *src, uint8_t *ptag, struct evbuffer *dst);
-int evtag_peek(struct evbuffer *evbuf, uint8_t *ptag);
+int evtag_unmarshal(struct evbuffer *src, uint32_t *ptag, struct evbuffer *dst);
+int evtag_peek(struct evbuffer *evbuf, uint32_t *ptag);
 int evtag_peek_length(struct evbuffer *evbuf, uint32_t *plength);
 int evtag_payload_length(struct evbuffer *evbuf, uint32_t *plength);
 int evtag_consume(struct evbuffer *evbuf);
 
-int evtag_unmarshal_int(struct evbuffer *evbuf, uint8_t need_tag,
+int evtag_unmarshal_int(struct evbuffer *evbuf, uint32_t need_tag,
     uint32_t *pinteger);
 
-int evtag_unmarshal_fixed(struct evbuffer *src, uint8_t need_tag, void *data,
+int evtag_unmarshal_fixed(struct evbuffer *src, uint32_t need_tag, void *data,
     size_t len);
 
-int evtag_unmarshal_string(struct evbuffer *evbuf, uint8_t need_tag,
+int evtag_unmarshal_string(struct evbuffer *evbuf, uint32_t need_tag,
     char **pstring);
 
-int evtag_unmarshal_timeval(struct evbuffer *evbuf, uint8_t need_tag,
+int evtag_unmarshal_timeval(struct evbuffer *evbuf, uint32_t need_tag,
     struct timeval *ptv);
 
 #ifdef __cplusplus
