@@ -1,6 +1,6 @@
 Revision history for libev, a high-performance and full-featured event loop
 
-3.0
+3.0  Mon Jan 28 13:14:47 CET 2008
 	- API/ABI bump to version 3.0.
 	- ev++.h includes "ev.h" by default now, not <ev.h>.
 	- slightly improved documentation.
