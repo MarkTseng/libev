@@ -1697,7 +1697,7 @@ callback, free it. Also, use no error checking, as usual.
   {
     free (w);
     // now do something you wanted to do when the program has
-    // no longer asnything immediate to do.
+    // no longer anything immediate to do.
   }
 
   struct ev_idle *idle_watcher = malloc (sizeof (struct ev_idle));
@@ -2284,19 +2284,17 @@ the constructor.
 
   class myclass
   {
-    ev_io   io;   void io_cb   (ev::io   &w, int revents);
-    ev_idle idle  void idle_cb (ev::idle &w, int revents);
+    ev::io   io;  void io_cb   (ev::io   &w, int revents);
+    ev:idle idle  void idle_cb (ev::idle &w, int revents);
 
-    myclass ();
-  }
+    myclass (int fd)
+    {
+      io  .set <myclass, &myclass::io_cb  > (this);
+      idle.set <myclass, &myclass::idle_cb> (this);
 
-  myclass::myclass (int fd)
-  {
-    io  .set <myclass, &myclass::io_cb  > (this);
-    idle.set <myclass, &myclass::idle_cb> (this);
-
-    io.start (fd, ev::READ);
-  }
+      io.start (fd, ev::READ);
+    }
+  };
 
 
 =head1 MACRO MAGIC
