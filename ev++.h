@@ -132,7 +132,6 @@ namespace ev {
 
   struct loop_ref
   {
-
     loop_ref (EV_P) throw ()
 #if EV_MULTIPLICITY
     : EV_AX (EV_A)
@@ -367,7 +366,6 @@ namespace ev {
 
   struct default_loop : loop_ref
   {
-
     default_loop (unsigned int flags = AUTO) throw (bad_loop)
 #if EV_MULTIPLICITY
     : loop_ref (ev_default_loop (flags))
@@ -775,7 +773,6 @@ namespace ev {
   #undef EV_CONSTRUCT
   #undef EV_BEGIN_WATCHER
   #undef EV_END_WATCHER
-
 }
 
 #endif
