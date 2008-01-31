@@ -2609,6 +2609,15 @@ If defined to be C<1>, libev will compile in support for the Linux inotify
 interface to speed up C<ev_stat> watchers. Its actual availability will
 be detected at runtime.
 
+=item EV_ATOMIC_T
+
+Libev requires an integer type (suitable for storing C<0> or C<1>) whose
+access is atomic with respect to other threads or signal contexts. No such type
+is easily found using, so you cna provide your own type that you know is safe.
+
+In the absense of this define, libev will use C<sig_atomic_t volatile>
+from F<signal.h>, which is usually good enough on most platforms.
+
 =item EV_H
 
 The name of the F<ev.h> header file used to include it. The default if
@@ -2683,6 +2692,11 @@ defined to be C<0>, then they are not.
 =item EV_FORK_ENABLE
 
 If undefined or defined to be C<1>, then fork watchers are supported. If
+defined to be C<0>, then they are not.
+
+=item EV_ASYNC_ENABLE
+
+If undefined or defined to be C<1>, then async watchers are supported. If
 defined to be C<0>, then they are not.
 
 =item EV_MINIMAL
