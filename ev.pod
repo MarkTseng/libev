@@ -776,6 +776,10 @@ The embedded event loop specified in the C<ev_embed> watcher needs attention.
 The event loop has been resumed in the child process after fork (see
 C<ev_fork>).
 
+=item C<EV_ASYNC>
+
+The given async watcher has been asynchronously notified (see C<ev_async>).
+
 =item C<EV_ERROR>
 
 An unspecified error has occured, the watcher has been stopped. This might
@@ -2044,6 +2048,51 @@ handlers will be invoked, too, of course.
 Initialises and configures the fork watcher - it has no parameters of any
 kind. There is a C<ev_fork_set> macro, but using it is utterly pointless,
 believe me.
+
+=back
+
+
+=head2 C<ev_async> - how to wake up another event loop
+
+In general, you cannot use an C<ev_loop> from multiple threads or other
+asynchronous sources such as signal handlers (as opposed to multiple event
+loops - those are of course safe to use in different threads).
+
+Sometimes, however, you need to wake up another event loop you do not
+control, for example because it belongs to another thread. This is what
+C<ev_async> watchers do: as long as the C<ev_async> watcher is active, you
+can signal it by calling C<ev_async_send>, which is thread- and signal
+safe.
+
+This functionality is very similar to C<ev_signal> watchers, as signals,
+too, are asynchronous in nature, and signals, too, will be compressed
+(i.e. the number of callback invocations may be less than the number of
+C<ev_async_sent> calls).
+
+Unlike C<ev_signal> watchers, C<ev_async> works with any event loop, not
+just the default loop.
+
+=head3 Watcher-Specific Functions and Data Members
+
+=over 4
+
+=item ev_async_init (ev_async *, callback)
+
+Initialises and configures the async watcher - it has no parameters of any
+kind. There is a C<ev_asynd_set> macro, but using it is utterly pointless,
+believe me.
+
+=item ev_async_send (loop, ev_async *)
+
+Sends/signals/activates the given C<ev_async> watcher, that is, feeds
+an C<EV_ASYNC> event on the watcher into the event loop. Unlike
+C<ev_feed_event>, this call is safe to do in other threads, signal or
+similar contexts (see the dicusssion of C<EV_ATOMIC_T> in the embedding
+section below on what exactly this means).
+
+This call incurs the overhead of a syscall only once per loop iteration,
+so while the overhead might be noticable, it doesn't apply to repeated
+calls to C<ev_async_send>.
 
 =back
 
