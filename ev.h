@@ -489,7 +489,7 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_check_set(ev)                    /* nop, yes, this is a serious in-joke */
 #define ev_embed_set(ev,other_)             do { (ev)->other = (other_); } while (0)
 #define ev_fork_set(ev)                     /* nop, yes, this is a serious in-joke */
-#define ev_async_set(ev)                    do { (ev)->gotasync = 0; } while (0)
+#define ev_async_set(ev)                    do { (ev)->sent = 0; } while (0)
 
 #define ev_io_init(ev,cb,fd,events)         do { ev_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
 #define ev_timer_init(ev,cb,after,repeat)   do { ev_init ((ev), (cb)); ev_timer_set ((ev),(after),(repeat)); } while (0)
