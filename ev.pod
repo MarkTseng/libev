@@ -2099,7 +2099,7 @@ some fictitiuous SIGUSR1 handler:
 
      // no locking etc.
      queue_put (data);
-     ev_async_send (DEFAULT_LOOP, &mysig);
+     ev_async_send (DEFAULT_ &mysig);
    }
 
    static void
@@ -2140,7 +2140,7 @@ emply a traditional mutex lock, such as in this pthread example:
      queue_put (data);
      pthread_mutex_unlock (&mymutex);
 
-     ev_async_send (DEFAULT_LOOP, &mysig);
+     ev_async_send (DEFAULT_ &mysig);
    }
 
    static void
