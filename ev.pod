@@ -2914,11 +2914,11 @@ have to skip roughly seven (C<ld 100>) of these watchers.
 That means that changing a timer costs less than removing/adding them
 as only the relative motion in the event queue has to be paid for.
 
-=item Starting io/check/prepare/idle/signal/child watchers: O(1)
+=item Starting io/check/prepare/idle/signal/child/fork/async watchers: O(1)
 
 These just add the watcher into an array or at the head of a list.
 
-=item Stopping check/prepare/idle watchers: O(1)
+=item Stopping check/prepare/idle/fork/async watchers: O(1)
 
 =item Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))
 
@@ -2945,6 +2945,16 @@ Priorities are implemented by allocating some space for each
 priority. When doing priority-based operations, libev usually has to
 linearly search all the priorities, but starting/stopping and activating
 watchers becomes O(1) w.r.t. prioritiy handling.
+
+=item Sending an ev_async: O(1)
+
+=item Processing ev_async_send: O(number_of_async_watchers)
+
+=item Processing signals: O(max_signal_number)
+
+Sending involves a syscall I<iff> there were no other C<ev_async_send>
+calls in the current loop iteration. Checking for async and signal events
+involves iterating over all running async watchers or all signal numbers.
 
 =back
 
