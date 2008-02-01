@@ -1222,8 +1222,8 @@ loop_fork (EV_P)
       close (evpipe [1]);
 
       evpipe_init (EV_A);
-      /* now iterate over everything */
-      evcb (EV_A_ &pipeev, EV_READ);
+      /* now iterate over everything, in case we missed something */
+      pipecb (EV_A_ &pipeev, EV_READ);
     }
 
   postfork = 0;
