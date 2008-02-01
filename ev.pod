@@ -2699,7 +2699,8 @@ be detected at runtime.
 Libev requires an integer type (suitable for storing C<0> or C<1>) whose
 access is atomic with respect to other threads or signal contexts. No such
 type is easily found in the C language, so you can provide your own type
-that you know is safe for your purposes.
+that you know is safe for your purposes. It is used both for signal handler "locking"
+as well as for signal and thread safety in C<ev_async> watchers.
 
 In the absense of this define, libev will use C<sig_atomic_t volatile>
 (from F<signal.h>), which is usually good enough on most platforms.
