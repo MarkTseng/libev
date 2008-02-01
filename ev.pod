@@ -2072,6 +2072,91 @@ C<ev_async_sent> calls).
 Unlike C<ev_signal> watchers, C<ev_async> works with any event loop, not
 just the default loop.
 
+=head3 Queueing
+
+C<ev_async> does not support queueing of data in any way. The reason
+is that the author does not know of a simple (or any) algorithm for a
+multiple-writer-single-reader queue that works in all cases and doesn't
+need elaborate support such as pthreads.
+
+That means that if you want to queue data, you have to provide your own
+queue. And here is how you would implement locking:
+
+=over 4
+
+=item queueing from a signal handler context
+
+To implement race-free queueing, you simply add to the queue in the signal
+handler but you block the signal handler in the watcher callback. Here is an example that does that for
+some fictitiuous SIGUSR1 handler:
+
+   static ev_async mysig;
+
+   static void
+   sigusr1_handler (void)
+   {
+     sometype data;
+
+     // no locking etc.
+     queue_put (data);
+     ev_async_send (DEFAULT_LOOP, &mysig);
+   }
+
+   static void
+   mysig_cb (EV_P_ ev_async *w, int revents)
+   {
+     sometype data;
+     sigset_t block, prev;
+
+     sigemptyset (&block);
+     sigaddset (&block, SIGUSR1);
+     sigprocmask (SIG_BLOCK, &block, &prev);
+
+     while (queue_get (&data))
+       process (data);
+
+     if (sigismember (&prev, SIGUSR1)
+       sigprocmask (SIG_UNBLOCK, &block, 0);
+   }
+
+(Note: pthreads in theory requires you to use C<pthread_setmask>
+instead of C<sigprocmask> when you use threads, but libev doesn't do it
+either...).
+
+=item queueing from a thread context
+
+The strategy for threads is different, as you cannot (easily) block
+threads but you can easily preempt them, so to queue safely you need to
+emply a traditional mutex lock, such as in this pthread example:
+
+   static ev_async mysig;
+   static pthread_mutex_t mymutex = PTHREAD_MUTEX_INITIALIZER;
+
+   static void
+   otherthread (void)
+   {
+     // only need to lock the actual queueing operation
+     pthread_mutex_lock (&mymutex);
+     queue_put (data);
+     pthread_mutex_unlock (&mymutex);
+
+     ev_async_send (DEFAULT_LOOP, &mysig);
+   }
+
+   static void
+   mysig_cb (EV_P_ ev_async *w, int revents)
+   {
+     pthread_mutex_lock (&mymutex);
+
+     while (queue_get (&data))
+       process (data);
+
+     pthread_mutex_unlock (&mymutex);
+   }
+
+=back
+
+
 =head3 Watcher-Specific Functions and Data Members
 
 =over 4
