@@ -140,8 +140,8 @@ VARx(int, forkmax)
 VARx(int, forkcnt)
 #endif
 
-#if EV_ASYNC_ENABLE || EV_GENWRAP
 VARx(EV_ATOMIC_T, gotasync)
+#if EV_ASYNC_ENABLE || EV_GENWRAP
 VARx(struct ev_async **, asyncs)
 VARx(int, asyncmax)
 VARx(int, asynccnt)

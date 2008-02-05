@@ -2944,7 +2944,7 @@ on backend and wether C<ev_io_set> was used).
 Priorities are implemented by allocating some space for each
 priority. When doing priority-based operations, libev usually has to
 linearly search all the priorities, but starting/stopping and activating
-watchers becomes O(1) w.r.t. prioritiy handling.
+watchers becomes O(1) w.r.t. priority handling.
 
 =item Sending an ev_async: O(1)
 

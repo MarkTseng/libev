@@ -849,6 +849,7 @@ pipecb (EV_P_ ev_io *iow, int revents)
           ev_feed_signal_event (EV_A_ signum + 1);
     }
 
+#if EV_ASYNC_ENABLE
   if (gotasync)
     {
       int i;
@@ -861,6 +862,7 @@ pipecb (EV_P_ ev_io *iow, int revents)
             ev_feed_event (EV_A_ asyncs [i], EV_ASYNC);
           }
     }
+#endif
 }
 
 /*****************************************************************************/
@@ -1081,13 +1083,19 @@ loop_init (EV_P_ unsigned int flags)
       }
 #endif
 
-      ev_rt_now = ev_time ();
-      mn_now    = get_clock ();
-      now_floor = mn_now;
-      rtmn_diff = ev_rt_now - mn_now;
+      ev_rt_now         = ev_time ();
+      mn_now            = get_clock ();
+      now_floor         = mn_now;
+      rtmn_diff         = ev_rt_now - mn_now;
 
       io_blocktime      = 0.;
       timeout_blocktime = 0.;
+      backend           = 0;
+      backend_fd        = -1;
+      gotasync          = 0;
+#if EV_USE_INOTIFY
+      fs_fd             = -2;
+#endif
 
       /* pid check not overridable via env */
 #ifndef _WIN32
@@ -1102,12 +1110,6 @@ loop_init (EV_P_ unsigned int flags)
 
       if (!(flags & 0x0000ffffUL))
         flags |= ev_recommended_backends ();
-
-      backend = 0;
-      backend_fd = -1;
-#if EV_USE_INOTIFY
-      fs_fd = -2;
-#endif
 
 #if EV_USE_PORT
       if (!backend && (flags & EVBACKEND_PORT  )) backend = port_init   (EV_A_ flags);
@@ -1189,6 +1191,9 @@ loop_destroy (EV_P)
 #endif
   array_free (prepare, EMPTY);
   array_free (check, EMPTY);
+#if EV_ASYNC_ENABLE
+  array_free (async, EMPTY);
+#endif
 
   backend = 0;
 }
