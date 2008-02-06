@@ -2080,7 +2080,8 @@ multiple-writer-single-reader queue that works in all cases and doesn't
 need elaborate support such as pthreads.
 
 That means that if you want to queue data, you have to provide your own
-queue. And here is how you would implement locking:
+queue. But at least I can tell you would implement locking around your
+queue:
 
 =over 4
 
@@ -2127,7 +2128,7 @@ either...).
 
 The strategy for threads is different, as you cannot (easily) block
 threads but you can easily preempt them, so to queue safely you need to
-emply a traditional mutex lock, such as in this pthread example:
+employ a traditional mutex lock, such as in this pthread example:
 
    static ev_async mysig;
    static pthread_mutex_t mymutex = PTHREAD_MUTEX_INITIALIZER;
