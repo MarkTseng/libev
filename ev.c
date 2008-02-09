@@ -812,7 +812,7 @@ evpipe_init (EV_P)
 
       ev_io_set (&pipeev, evpipe [0], EV_READ);
       ev_io_start (EV_A_ &pipeev);
-      ev_unref (EV_A); /* child watcher should not keep loop alive */
+      ev_unref (EV_A); /* watcher should not keep loop alive */
     }
 }
 
@@ -821,12 +821,13 @@ evpipe_write (EV_P_ int sig, int async)
 {
   if (!(gotasync || gotsig))
     {
-      int old_errno = errno;
+      int old_errno = errno; /* save errno becaue write might clobber it */
 
       if (sig)   gotsig   = 1;
       if (async) gotasync = 1;
 
       write (evpipe [1], &old_errno, 1);
+
       errno = old_errno;
     }
 }
