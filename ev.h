@@ -432,6 +432,18 @@ ev_now (void)
 }
 # endif
 
+static int
+ev_is_default_loop (EV_P)
+{
+#if EV_MULTIPLICITY
+  extern struct ev_loop *ev_default_loop_ptr;
+
+  return !!(EV_A == ev_default_loop_ptr);
+#else
+  return 1;
+#endif
+}
+
 void ev_default_destroy (void); /* destroy the default loop */
 /* this needs to be called after fork, to duplicate the default loop */
 /* if you create alternative loops you have to call ev_loop_fork on them */

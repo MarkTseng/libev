@@ -508,6 +508,10 @@ Like C<ev_default_fork>, but acts on an event loop created by
 C<ev_loop_new>. Yes, you have to call this on every allocated event loop
 after fork, and how you do this is entirely your own problem.
 
+=item int ev_is_default_loop (loop)
+
+Returns true when the given loop actually is the default loop, false otherwise.
+
 =item unsigned int ev_loop_count (loop)
 
 Returns the count of loop iterations for the loop, which is identical to
