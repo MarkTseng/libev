@@ -819,15 +819,15 @@ evpipe_init (EV_P)
 void inline_size
 evpipe_write (EV_P_ int sig, int async)
 {
-  if (!(gotasync || gotsig))
+  int sent = gotasync || gotsig;
+
+  if (sig)   gotsig   = 1;
+  if (async) gotasync = 1;
+
+  if (!sent)
     {
       int old_errno = errno; /* save errno becaue write might clobber it */
-
-      if (sig)   gotsig   = 1;
-      if (async) gotasync = 1;
-
       write (evpipe [1], &old_errno, 1);
-
       errno = old_errno;
     }
 }
