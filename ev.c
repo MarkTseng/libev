@@ -817,17 +817,15 @@ evpipe_init (EV_P)
 }
 
 void inline_size
-evpipe_write (EV_P_ int sig, int async)
+evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 {
-  int sent = gotasync || gotsig;
-
-  if (sig)   gotsig   = 1;
-  if (async) gotasync = 1;
-
-  if (!sent)
+  if (!*flag)
     {
       int old_errno = errno; /* save errno becaue write might clobber it */
+
+      *flag = 1;
       write (evpipe [1], &old_errno, 1);
+
       errno = old_errno;
     }
 }
@@ -880,7 +878,7 @@ sighandler (int signum)
 #endif
 
   signals [signum - 1].gotsig = 1;
-  evpipe_write (EV_A_ 1, 0);
+  evpipe_write (EV_A_ &gotsig);
 }
 
 void noinline
@@ -2470,7 +2468,7 @@ void
 ev_async_send (EV_P_ ev_async *w)
 {
   w->sent = 1;
-  evpipe_write (EV_A_ 0, 1);
+  evpipe_write (EV_A_ &gotasync);
 }
 #endif
 
