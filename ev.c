@@ -813,9 +813,6 @@ evpipe_init (EV_P)
       ev_io_set (&pipeev, evpipe [0], EV_READ);
       ev_io_start (EV_A_ &pipeev);
       ev_unref (EV_A); /* watcher should not keep loop alive */
-
-      /* in case we received the signal before we had the chance of installing a handler */
-      ev_feed_event (EV_A_ &pipeev, 0);
     }
 }
 
@@ -1223,7 +1220,11 @@ loop_fork (EV_P)
   if (ev_is_active (&pipeev))
     {
       /* this "locks" the handlers against writing to the pipe */
-      gotsig = gotasync = 1;
+      /* while we modify the fd vars */
+      gotsig = 1;
+#if EV_ASYNC_ENABLE
+      gotasync = 1;
+#endif
 
       ev_ref (EV_A);
       ev_io_stop (EV_A_ &pipeev);
