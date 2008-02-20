@@ -1158,7 +1158,7 @@ exactly 10 second intervals. If, however, your program cannot keep up with
 the timer (because it takes longer than those 10 seconds to do stuff) the
 timer will not fire more than once per event loop iteration.
 
-=item ev_timer_again (loop)
+=item ev_timer_again (loop, ev_timer *)
 
 This will act as if the timer timed out and restart it again if it is
 repeating. The exact semantics are:
@@ -1277,7 +1277,7 @@ C<at> and doesn't repeat. It will not adjust when a time jump occurs,
 that is, if it is to be run at January 1st 2011 then it will run when the
 system time reaches or surpasses this time.
 
-=item * non-repeating interval timer (at = offset, interval > 0, reschedule_cb = 0)
+=item * repeating interval timer (at = offset, interval > 0, reschedule_cb = 0)
 
 In this mode the watcher will always be scheduled to time out at the next
 C<at + N * interval> time (for some integer N, which can also be negative)
@@ -1438,6 +1438,20 @@ The signal the watcher watches out for.
 
 =back
 
+=head3 Examples
+
+Example: Try to exit cleanly on SIGINT and SIGTERM.
+
+  static void
+  sigint_cb (struct ev_loop *loop, struct ev_signal *w, int revents)
+  {
+    ev_unloop (loop, EVUNLOOP_ALL);
+  }
+
+  struct ev_signal signal_watcher;
+  ev_signal_init (&signal_watcher, sigint_cb, SIGINT);
+  ev_signal_start (loop, &sigint_cb);
+
 
 =head2 C<ev_child> - watch out for process status changes
 
@@ -1475,20 +1489,6 @@ The process exit/trace status caused by C<rpid> (see your systems
 C<waitpid> and C<sys/wait.h> documentation for details).
 
 =back
-
-=head3 Examples
-
-Example: Try to exit cleanly on SIGINT and SIGTERM.
-
-  static void
-  sigint_cb (struct ev_loop *loop, struct ev_signal *w, int revents)
-  {
-    ev_unloop (loop, EVUNLOOP_ALL);
-  }
-
-  struct ev_signal signal_watcher;
-  ev_signal_init (&signal_watcher, sigint_cb, SIGINT);
-  ev_signal_start (loop, &sigint_cb);
 
 
 =head2 C<ev_stat> - did the file attributes just change?
@@ -1578,7 +1578,7 @@ The callback will be receive C<EV_STAT> when a change was detected,
 relative to the attributes at the time the watcher was started (or the
 last change was detected).
 
-=item ev_stat_stat (ev_stat *)
+=item ev_stat_stat (loop, ev_stat *)
 
 Updates the stat buffer immediately with new values. If you change the
 watched path in your callback, you could call this fucntion to avoid
