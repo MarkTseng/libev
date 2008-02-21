@@ -821,7 +821,7 @@ evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 {
   if (!*flag)
     {
-      int old_errno = errno; /* save errno becaue write might clobber it */
+      int old_errno = errno; /* save errno because write might clobber it */
 
       *flag = 1;
       write (evpipe [1], &old_errno, 1);
