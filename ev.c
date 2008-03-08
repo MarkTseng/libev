@@ -914,7 +914,7 @@ static ev_signal childev;
 #endif
 
 void inline_speed
-child_reap (EV_P_ ev_signal *sw, int chain, int pid, int status)
+child_reap (EV_P_ int chain, int pid, int status)
 {
   ev_child *w;
   int traced = WIFSTOPPED (status) || WIFCONTINUED (status);
@@ -924,7 +924,7 @@ child_reap (EV_P_ ev_signal *sw, int chain, int pid, int status)
       if ((w->pid == pid || !w->pid)
           && (!traced || (w->flags & 1)))
         {
-          ev_set_priority (w, ev_priority (sw)); /* need to do it *now* */
+          ev_set_priority (w, EV_MAXPRI); /* need to do it *now*, this *must* be the same prio as the signal watcher itself */
           w->rpid    = pid;
           w->rstatus = status;
           ev_feed_event (EV_A_ (W)w, EV_CHILD);
@@ -948,13 +948,13 @@ childcb (EV_P_ ev_signal *sw, int revents)
         || 0 >= (pid = waitpid (-1, &status, WNOHANG | WUNTRACED)))
       return;
 
-  /* make sure we are called again until all childs have been reaped */
+  /* make sure we are called again until all children have been reaped */
   /* we need to do it this way so that the callback gets called before we continue */
   ev_feed_event (EV_A_ (W)sw, EV_SIGNAL);
 
-  child_reap (EV_A_ sw, pid, pid, status);
+  child_reap (EV_A_ pid, pid, status);
   if (EV_PID_HASHSIZE > 1)
-    child_reap (EV_A_ sw, 0, pid, status); /* this might trigger a watcher twice, but feed_event catches that */
+    child_reap (EV_A_ 0, pid, status); /* this might trigger a watcher twice, but feed_event catches that */
 }
 
 #endif

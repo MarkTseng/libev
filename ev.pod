@@ -1456,7 +1456,32 @@ Example: Try to exit cleanly on SIGINT and SIGTERM.
 =head2 C<ev_child> - watch out for process status changes
 
 Child watchers trigger when your process receives a SIGCHLD in response to
-some child status changes (most typically when a child of yours dies).
+some child status changes (most typically when a child of yours dies). It
+is permissible to install a child watcher I<after> the child has been
+forked (which implies it might have already exited), as long as the event
+loop isn't entered (or is continued from a watcher).
+
+Only the default event loop is capable of handling signals, and therefore
+you can only rgeister child watchers in the default event loop.
+
+=head3 Process Interaction
+
+Libev grabs C<SIGCHLD> as soon as the default event loop is
+initialised. This is necessary to guarantee proper behaviour even if
+the first child watcher is started after the child exits. The occurance
+of C<SIGCHLD> is recorded asynchronously, but child reaping is done
+synchronously as part of the event loop processing. Libev always reaps all
+children, even ones not watched.
+
+=head3 Overriding the Built-In Processing
+
+Libev offers no special support for overriding the built-in child
+processing, but if your application collides with libev's default child
+handler, you can override it easily by installing your own handler for
+C<SIGCHLD> after initialising the default loop, and making sure the
+default loop never gets destroyed. You are encouraged, however, to use an
+event-based approach to child reaping and thus use libev's support for
+that, so other libev users can use C<ev_child> watchers freely.
 
 =head3 Watcher-Specific Functions and Data Members
 
@@ -1489,6 +1514,35 @@ The process exit/trace status caused by C<rpid> (see your systems
 C<waitpid> and C<sys/wait.h> documentation for details).
 
 =back
+
+=head3 Examples
+
+Example: C<fork()> a new process and install a child handler to wait for
+its completion.
+
+  ev_child cw;
+
+  static void
+  child_cb (EV_P_ struct ev_child *w, int revents)
+  {
+    ev_child_stop (EV_A_ w);
+    printf ("process %d exited with status %x\n", w->rpid, w->rstatus);
+  }
+
+  pid_t pid = fork ();
+
+  if (pid < 0)
+    // error
+  else if (pid == 0)
+    {
+      // the forked child executes here
+      exit (1);
+    }
+  else
+    {
+      ev_child_init (&cw, child_cb, pid, 0);
+      ev_child_start (EV_DEFAULT_ &cw);
+    }
 
 
 =head2 C<ev_stat> - did the file attributes just change?
