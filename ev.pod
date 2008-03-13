@@ -2511,6 +2511,41 @@ the constructor.
   };
 
 
+=head1 OTHER LANGUAGE BINDINGS
+
+Libev does not offer other language bindings itself, but bindings for a
+numbe rof languages exist in the form of third-party packages. If you know
+any interesting language binding in addition to the ones listed here, drop
+me a note.
+
+=over 4
+
+=item Perl
+
+The EV module implements the full libev API and is actually used to test
+libev. EV is developed together with libev. Apart from the EV core module,
+there are additional modules that implement libev-compatible interfaces
+to C<libadns> (C<EV::ADNS>), C<Net::SNMP> (C<Net::SNMP::EV>) and the
+C<libglib> event core (C<Glib::EV> and C<EV::Glib>).
+
+It can be found and installed via CPAN, its homepage is found at
+L<http://software.schmorp.de/pkg/EV>.
+
+=item Ruby
+
+Tony Arcieri has written a ruby extension that offers access to a subset
+of the libev API and adds filehandle abstractions, asynchronous DNS and
+more on top of it. It can be found via gem servers. Its homepage is at
+L<http://rev.rubyforge.org/>.
+
+=item D
+
+Leandro Lucarella has written a D language binding (F<ev.d>) for libev, to
+be found at L<http://git.llucax.com.ar/?p=software/ev.d.git;a=summary>.
+
+=back
+
+
 =head1 MACRO MAGIC
 
 Libev can be compiled with a variety of options, the most fundamantal

@@ -1,3 +1,6 @@
+ev_async_send
+ev_async_start
+ev_async_stop
 ev_backend
 ev_check_start
 ev_check_stop

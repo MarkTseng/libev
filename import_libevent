@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LE=../libevent-1.4.1-beta
+LE=../libevent-1.4.2-rc
 
 if ! [ -e evbuffer.c ]; then
    echo do not run this programm unless you know what you are doing
@@ -108,7 +108,7 @@ perl -ne '
    s/-Wall//g;
    #s/libevent/libev/g;
    #VERSION
-   s/AM_INIT_AUTOMAKE\s*\(.*,(.*)\)/AM_INIT_AUTOMAKE(libevent-$1+libev,3.0)/;
+   s/AM_INIT_AUTOMAKE\s*\(.*,(.*)\)/AM_INIT_AUTOMAKE(libevent-$1+libev,3.1)/;
    s/AC_LIBOBJ\(select\)/: ;/g;
    s/AC_LIBOBJ\(poll\)/: ;/g;
    s/AC_LIBOBJ\(kqueue\)/: ;/g;
