@@ -1602,6 +1602,17 @@ to fall back to regular polling again even with inotify, but changes are
 usually detected immediately, and if the file exists there will be no
 polling.
 
+=head3 ABI Issues (Largefile Support)
+
+Libev by default (unless the user overrides this) uses the default
+compilation environment, which means that on systems with optionally
+disabled large file support, you get the 32 bit version of the stat
+structure. When using the library from programs that change the ABI to
+use 64 bit file offsets the programs will fail. In that case you have to
+compile libev with the same flags to get binary compatibility. This is
+obviously the case with any flags that change the ABI, but the problem is
+most noticably with ev_stat and largefile support.
+
 =head3 Inotify
 
 When C<inotify (7)> support has been compiled into libev (generally only

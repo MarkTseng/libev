@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "EV 1"
-.TH EV 1 "2008-03-08" "perl v5.10.0" "User Contributed Perl Documentation"
+.TH EV 1 "2008-03-13" "perl v5.10.0" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -2618,6 +2618,32 @@ the constructor.
 \&    }
 \&  };
 .Ve
+.SH "OTHER LANGUAGE BINDINGS"
+.IX Header "OTHER LANGUAGE BINDINGS"
+Libev does not offer other language bindings itself, but bindings for a
+numbe rof languages exist in the form of third-party packages. If you know
+any interesting language binding in addition to the ones listed here, drop
+me a note.
+.IP "Perl" 4
+.IX Item "Perl"
+The \s-1EV\s0 module implements the full libev \s-1API\s0 and is actually used to test
+libev. \s-1EV\s0 is developed together with libev. Apart from the \s-1EV\s0 core module,
+there are additional modules that implement libev-compatible interfaces
+to \f(CW\*(C`libadns\*(C'\fR (\f(CW\*(C`EV::ADNS\*(C'\fR), \f(CW\*(C`Net::SNMP\*(C'\fR (\f(CW\*(C`Net::SNMP::EV\*(C'\fR) and the
+\&\f(CW\*(C`libglib\*(C'\fR event core (\f(CW\*(C`Glib::EV\*(C'\fR and \f(CW\*(C`EV::Glib\*(C'\fR).
+.Sp
+It can be found and installed via \s-1CPAN\s0, its homepage is found at
+<http://software.schmorp.de/pkg/EV>.
+.IP "Ruby" 4
+.IX Item "Ruby"
+Tony Arcieri has written a ruby extension that offers access to a subset
+of the libev \s-1API\s0 and adds filehandle abstractions, asynchronous \s-1DNS\s0 and
+more on top of it. It can be found via gem servers. Its homepage is at
+<http://rev.rubyforge.org/>.
+.IP "D" 4
+.IX Item "D"
+Leandro Lucarella has written a D language binding (\fIev.d\fR) for libev, to
+be found at <http://git.llucax.com.ar/?p=software/ev.d.git;a=summary>.
 .SH "MACRO MAGIC"
 .IX Header "MACRO MAGIC"
 Libev can be compiled with a variety of options, the most fundamantal
@@ -3199,6 +3225,6 @@ Marc Lehmann <libev@schmorp.de>.
 .SH "POD ERRORS"
 .IX Header "POD ERRORS"
 Hey! \fBThe above document had some coding errors, which are explained below:\fR
-.IP "Around line 2916:" 4
-.IX Item "Around line 2916:"
+.IP "Around line 2951:" 4
+.IX Item "Around line 2951:"
 You forgot a '=back' before '=head2'
