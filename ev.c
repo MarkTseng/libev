@@ -453,7 +453,7 @@ ev_sleep (ev_tstamp delay)
 
       nanosleep (&ts, 0);
 #elif defined(_WIN32)
-      Sleep (delay * 1e3);
+      Sleep ((unsigned long)(delay * 1e3));
 #else
       struct timeval tv;
 
