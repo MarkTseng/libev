@@ -867,14 +867,14 @@ pipecb (EV_P_ ev_io *iow, int revents)
 /*****************************************************************************/
 
 static void
-sighandler (int signum)
+ev_sighandler (int signum)
 {
 #if EV_MULTIPLICITY
   struct ev_loop *loop = &default_loop_struct;
 #endif
 
 #if _WIN32
-  signal (signum, sighandler);
+  signal (signum, ev_sighandler);
 #endif
 
   signals [signum - 1].gotsig = 1;
@@ -1932,10 +1932,10 @@ ev_signal_start (EV_P_ ev_signal *w)
   if (!((WL)w)->next)
     {
 #if _WIN32
-      signal (w->signum, sighandler);
+      signal (w->signum, ev_sighandler);
 #else
       struct sigaction sa;
-      sa.sa_handler = sighandler;
+      sa.sa_handler = ev_sighandler;
       sigfillset (&sa.sa_mask);
       sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
       sigaction (w->signum, &sa, 0);
