@@ -2290,6 +2290,20 @@ This call incurs the overhead of a syscall only once per loop iteration,
 so while the overhead might be noticable, it doesn't apply to repeated
 calls to C<ev_async_send>.
 
+=item bool = ev_async_pending (ev_async *)
+
+Returns a non-zero value when C<ev_async_send> has been called on the
+watcher but the event has not yet been processed (or even noted) by the
+event loop.
+
+C<ev_async_send> sets a flag in the watcher and wakes up the loop. When
+the loop iterates next and checks for the watcher to have become active,
+it will reset the flag again. C<ev_async_pending> can be used to very
+quickly check wether invoking the loop might be a good idea.
+
+Not that this does I<not> check wether the watcher itself is pending, only
+wether it has been requested to make this watcher pending.
+
 =back
 
 
