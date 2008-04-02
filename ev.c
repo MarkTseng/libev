@@ -1544,9 +1544,7 @@ static int loop_done;
 void
 ev_loop (EV_P_ int flags)
 {
-  loop_done = flags & (EVLOOP_ONESHOT | EVLOOP_NONBLOCK)
-            ? EVUNLOOP_ONE
-            : EVUNLOOP_CANCEL;
+  loop_done = EVUNLOOP_CANCEL;
 
   call_pending (EV_A); /* in case we recurse, ensure ordering stays nice and clean */
 
@@ -1652,9 +1650,12 @@ ev_loop (EV_P_ int flags)
         queue_events (EV_A_ (W *)checks, checkcnt, EV_CHECK);
 
       call_pending (EV_A);
-
     }
-  while (expect_true (activecnt && !loop_done));
+  while (expect_true (
+    activecnt
+    && !loop_done
+    && !(flags & (EVLOOP_ONESHOT | EVLOOP_NONBLOCK))
+  ));
 
   if (loop_done == EVUNLOOP_ONE)
     loop_done = EVUNLOOP_CANCEL;
