@@ -277,6 +277,10 @@ flags. If that is troubling you, check C<ev_backend ()> afterwards).
 If you don't know what event loop to use, use the one returned from this
 function.
 
+Note that this function is I<not> thread-safe, so if you want to use it
+from multiple threads, you have to lock (note also that this is unlikely,
+as loops cannot bes hared easily between threads anyway).
+
 The default loop is the only loop that can handle C<ev_signal> and
 C<ev_child> watchers, and to do this, it always registers a handler
 for C<SIGCHLD>. If this is a problem for your app you can either
@@ -467,6 +471,10 @@ Similar to C<ev_default_loop>, but always creates a new event loop that is
 always distinct from the default loop. Unlike the default loop, it cannot
 handle signal and child watchers, and attempts to do so will be greeted by
 undefined behaviour (or a failed assertion if assertions are enabled).
+
+Note that this function I<is> thread-safe, and the recommended way to use
+libev with threads is indeed to create one loop per thread, and using the
+default loop in the "main" or "initial" thread.
 
 Example: Try to create a event loop that uses epoll and nothing else.
 
