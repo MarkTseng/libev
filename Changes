@@ -1,6 +1,6 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
-3.2
+3.2  Wed Apr  2 17:11:19 CEST 2008
 	- fix a 64 bit overflow issue in the select backend,
           by using fd_mask instead of int for the mask.
         - rename internal sighandler to avoid clash with very old perls.
