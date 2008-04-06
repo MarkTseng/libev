@@ -270,6 +270,7 @@ extern "C" {
 
 #if EV_USE_EVENTFD
 /* our minimum requirement is glibc 2.7 which has the stub, but not the header */
+# include <stdint.h>
 int eventfd (unsigned int initval, int flags);
 #endif
 
