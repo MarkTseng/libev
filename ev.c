@@ -302,7 +302,7 @@ int eventfd (unsigned int initval, int flags);
 #else
 # define expect(expr,value)         (expr)
 # define noinline
-# if __STDC_VERSION__ < 199901L
+# if __STDC_VERSION__ < 199901L && __GNUC__ < 2
 #  define inline
 # endif
 #endif

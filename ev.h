@@ -100,6 +100,8 @@ struct ev_loop;
 # define EV_P_ EV_P,
 # define EV_A loop
 # define EV_A_ EV_A,
+# define EV_DEFAULT_UC ev_default_loop_uc ()
+# define EV_DEFAULT_UC_ EV_DEFAULT_UC,
 # define EV_DEFAULT ev_default_loop (0)
 # define EV_DEFAULT_ EV_DEFAULT,
 #else
@@ -109,9 +111,18 @@ struct ev_loop;
 # define EV_A_
 # define EV_DEFAULT
 # define EV_DEFAULT_
-
+# define EV_DEFAULT_UC
+# define EV_DEFAULT_UC_
 # undef EV_EMBED_ENABLE
 #endif
+
+#if __STDC_VERSION__ >= 199901L || __GNUC__ >= 3
+# define EV_INLINE static inline
+#else
+# define EV_INLINE static
+#endif
+
+/*****************************************************************************/
 
 /* eventmask, revents, events... */
 #define EV_UNDEF            -1L /* guaranteed to be invalid */
@@ -400,18 +411,29 @@ void ev_set_allocator (void *(*cb)(void *ptr, long size));
 void ev_set_syserr_cb (void (*cb)(const char *msg));
 
 # if EV_MULTIPLICITY
-/* the default loop is the only one that handles signals and child watchers */
-/* you can call this as often as you like */
-static struct ev_loop *
-ev_default_loop (unsigned int flags)
+EV_INLINE struct ev_loop *
+ev_default_loop_uc (void)
 {
   extern struct ev_loop *ev_default_loop_ptr;
-  extern struct ev_loop *ev_default_loop_init (unsigned int flags);
-
-  if (!ev_default_loop_ptr)
-    ev_default_loop_init (flags);
 
   return ev_default_loop_ptr;
+}
+
+/* the default loop is the only one that handles signals and child watchers */
+/* you can call this as often as you like */
+EV_INLINE struct ev_loop *
+ev_default_loop (unsigned int flags)
+{
+  struct ev_loop *loop = ev_default_loop_uc ();
+
+  if (!loop)
+    {
+      extern struct ev_loop *ev_default_loop_init (unsigned int flags);
+
+      loop = ev_default_loop_init (flags);
+    }
+
+  return loop;
 }
 
 /* create and destroy alternative loops that don't handle signals */
@@ -425,7 +447,7 @@ ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after 
 
 int ev_default_loop (unsigned int flags); /* returns true when successful */
 
-static ev_tstamp
+EV_INLINE ev_tstamp
 ev_now (void)
 {
   extern ev_tstamp ev_rt_now;
@@ -434,7 +456,7 @@ ev_now (void)
 }
 # endif
 
-static int
+EV_INLINE int
 ev_is_default_loop (EV_P)
 {
 #if EV_MULTIPLICITY
