@@ -2739,9 +2739,9 @@ For this of course you need the m4 file:
 
 =head2 PREPROCESSOR SYMBOLS/MACROS
 
-Libev can be configured via a variety of preprocessor symbols you have to define
-before including any of its files. The default is not to build for multiplicity
-and only include the select backend.
+Libev can be configured via a variety of preprocessor symbols you have to
+define before including any of its files. The default in the absense of
+autoconf is noted for every option.
 
 =over 4
 
@@ -2776,6 +2776,14 @@ note about libraries in the description of C<EV_USE_MONOTONIC>, though.
 
 If defined to be C<1>, libev will assume that C<nanosleep ()> is available
 and will use it for delays. Otherwise it will use C<select ()>.
+
+=item EV_USE_EVENTFD
+
+If defined to be C<1>, then libev will assume that C<eventfd ()> is
+available and will probe for kernel support at runtime. This will improve
+C<ev_signal> and C<ev_async> performance and reduce resource consumption.
+If undefined, it will be enabled if the headers indicate GNU/Linux + Glibc
+2.7 or newer, otherwise disabled.
 
 =item EV_USE_SELECT
 
@@ -2822,8 +2830,9 @@ takes precedence over select.
 
 If defined to be C<1>, libev will compile in support for the Linux
 C<epoll>(7) backend. Its availability will be detected at runtime,
-otherwise another method will be used as fallback. This is the
-preferred backend for GNU/Linux systems.
+otherwise another method will be used as fallback. This is the preferred
+backend for GNU/Linux systems. If undefined, it will be enabled if the
+headers indicate GNU/Linux + Glibc 2.4 or newer, otherwise disabled.
 
 =item EV_USE_KQUEUE
 
@@ -2852,7 +2861,8 @@ reserved for future expansion, works like the USE symbols above.
 
 If defined to be C<1>, libev will compile in support for the Linux inotify
 interface to speed up C<ev_stat> watchers. Its actual availability will
-be detected at runtime.
+be detected at runtime. If undefined, it will be enabled if the headers
+indicate GNU/Linux + Glibc 2.4 or newer, otherwise disabled.
 
 =item EV_ATOMIC_T
 

@@ -55,6 +55,9 @@ VARx(ev_tstamp, backend_fudge) /* assumed typical timer resolution */
 VAR (backend_modify, void (*backend_modify)(EV_P_ int fd, int oev, int nev))
 VAR (backend_poll  , void (*backend_poll)(EV_P_ ev_tstamp timeout))
 
+#if EV_USE_EVENTFD || EV_GENWRAP
+VARx(int, evfd)
+#endif
 VAR (evpipe, int evpipe [2])
 VARx(ev_io, pipeev)
 
