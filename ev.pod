@@ -258,13 +258,6 @@ An event loop is described by a C<struct ev_loop *>. The library knows two
 types of such loops, the I<default> loop, which supports signals and child
 events, and dynamically created loops which do not.
 
-If you use threads, a common model is to run the default event loop
-in your main thread (or in a separate thread) and for each thread you
-create, you also create another event loop. Libev itself does no locking
-whatsoever, so if you mix calls to the same event loop in different
-threads, make sure you lock (this is usually a bad idea, though, even if
-done correctly, because it's hideous and inefficient).
-
 =over 4
 
 =item struct ev_loop *ev_default_loop (unsigned int flags)
@@ -3067,6 +3060,63 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
 
   #include "ev_cpp.h"
   #include "ev.c"
+
+
+=head1 THREADS AND COROUTINES
+
+=head2 THREADS
+
+Libev itself is completely threadsafe, but it uses no locking. This
+means that you can use as many loops as you want in parallel, as long as
+only one thread ever calls into one libev function with the same loop
+parameter.
+
+Or put differently: calls with different loop parameters can be done in
+parallel from multiple threads, calls with the same loop parameter must be
+done serially (but can be done from different threads, as long as only one
+thread ever is inside a call at any point in time, e.g. by using a mutex
+per loop).
+
+If you want to know which design is best for your problem, then I cannot
+help you but by giving some generic advice:
+
+=over 4
+
+=item * most applications have a main thread: use the default libev loop
+in that thread, or create a seperate thread running only the default loop.
+
+This helps integrating other libraries or software modules that use libev
+themselves and don't care/know about threading.
+
+=item * one loop per thread is usually a good model.
+
+Doing this is almost never wrong, sometimes a better-performance model
+exists, but it is always a good start.
+
+=item * other models exist, such as the leader/follower pattern, where one
+loop is handed through multiple threads in a kind of round-robbin fashion.
+
+Chosing a model is hard - look around, learn, know that usually you cna do
+better than you currently do :-)
+
+=item * often you need to talk to some other thread which blocks in the
+event loop - C<ev_async> watchers can be used to wake them up from other
+threads safely (or from signal contexts...).
+
+=back
+
+=head2 COROUTINES
+
+Libev is much more accomodating to coroutines ("cooperative threads"):
+libev fully supports nesting calls to it's functions from different
+coroutines (e.g. you can call C<ev_loop> on the same loop from two
+different coroutines and switch freely between both coroutines running the
+loop, as long as you don't confuse yourself). The only exception is that
+you must not do this from C<ev_periodic> reschedule callbacks.
+
+Care has been invested into making sure that libev does not keep local
+state inside C<ev_loop>, and other calls do not usually allow coroutine
+switches.
 
 
 =head1 COMPLEXITIES
