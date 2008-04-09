@@ -366,7 +366,7 @@ union ev_any_watcher
 #if EV_EMBED_ENABLE
   struct ev_embed embed;
 #endif
-#if EV_ASYND_ENABLE
+#if EV_ASYNC_ENABLE
   struct ev_async async;
 #endif
 };
