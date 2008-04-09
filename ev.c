@@ -362,7 +362,22 @@ syserr (const char *msg)
     }
 }
 
-static void *(*alloc)(void *ptr, long size);
+static void *
+ev_realloc_emul (void *ptr, long size)
+{
+  /* some systems, notably openbsd and darwin, fail to properly
+   * implement realloc (x, 0) (as required by both ansi c-98 and
+   * the single unix specification, so work around them here.
+   */
+
+  if (size)
+    return realloc (ptr, size);
+
+  free (ptr);
+  return 0;
+}
+
+static void *(*alloc)(void *ptr, long size) = ev_realloc_emul;
 
 void
 ev_set_allocator (void *(*cb)(void *ptr, long size))
@@ -373,7 +388,7 @@ ev_set_allocator (void *(*cb)(void *ptr, long size))
 inline_speed void *
 ev_realloc (void *ptr, long size)
 {
-  ptr = alloc ? alloc (ptr, size) : realloc (ptr, size);
+  ptr = alloc (ptr, size);
 
   if (!ptr && size)
     {

@@ -198,18 +198,21 @@ See the description of C<ev_embed> watchers for more info.
 =item ev_set_allocator (void *(*cb)(void *ptr, long size))
 
 Sets the allocation function to use (the prototype is similar - the
-semantics is identical - to the realloc C function). It is used to
-allocate and free memory (no surprises here). If it returns zero when
-memory needs to be allocated, the library might abort or take some
-potentially destructive action. The default is your system realloc
-function.
+semantics are identical to the C<realloc> C89/SuS/POSIX function). It is
+used to allocate and free memory (no surprises here). If it returns zero
+when memory needs to be allocated (C<size != 0>), the library might abort
+or take some potentially destructive action.
+
+Since some systems (at least OpenBSD and Darwin) fail to implement
+correct C<realloc> semantics, libev will use a wrapper around the system
+C<realloc> and C<free> functions by default.
 
 You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.
 
 Example: Replace the libev allocator with one that waits a bit and then
-retries).
+retries (example requires a standards-compliant C<realloc>).
 
    static void *
    persistent_realloc (void *ptr, size_t size)
