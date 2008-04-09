@@ -2,8 +2,6 @@ Revision history for libev, a high-performance and full-featured event loop.
 
         - event_base_loopexit should return 0 on success
           (W.C.A. Wijngaards).
-        - work around poll() potentially not clearing revents
-          field in ev_poll (Brandon Black).
 	- added linux eventfd support.
         - try to autodetect epoll and inotify support
           by libc header version if not using autoconf.
@@ -11,6 +9,9 @@ Revision history for libev, a high-performance and full-featured event loop.
         - declare functions defined in ev.h as inline if
           C99 or gcc are available.
         - enable inlining with gcc versions 2 and 3.
+        - work around broken poll implementations potentially
+          not clearing revents field in ev_poll (Brandon Black)
+          (no such systems are known at this time).
         - work around a bug in realloc on openbsd and darwin,
           also makes the errornous valgrind complaints
           go away (noted by various people).
