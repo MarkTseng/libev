@@ -2380,6 +2380,9 @@ it a private API).
 will fail and all watchers will have the same priority, even though there
 is an ev_pri field.
 
+=item * In libevent, the last base created gets the signals, in libev, the
+first base created (== the default loop) gets the signals.
+
 =item * Other members are not supported.
 
 =item * The libev emulation is I<not> ABI compatible to libevent, you need
