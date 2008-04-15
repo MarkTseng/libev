@@ -72,6 +72,7 @@ namespace ev {
     CHECK    = EV_CHECK,
     PREPARE  = EV_PREPARE,
     FORK     = EV_FORK,
+    ASYNC    = EV_ASYNC,
     EMBED    = EV_EMBED,
     ERROR    = EV_ERROR,
   };
@@ -563,13 +564,13 @@ namespace ev {
 
   #if EV_MULTIPLICITY
     #define EV_CONSTRUCT(cppstem,cstem)	                                                \
-      (EV_PX = get_default_loop ()) throw ()                                         \
+      (EV_PX = get_default_loop ()) throw ()                                            \
         : base<ev_ ## cstem, cppstem> (EV_A)                                            \
       {                                                                                 \
       }
   #else
     #define EV_CONSTRUCT(cppstem,cstem)                                                 \
-      () throw ()                                                                    \
+      () throw ()                                                                       \
       {                                                                                 \
       }
   #endif
@@ -580,19 +581,19 @@ namespace ev {
                                                                                         \
   struct cppstem : base<ev_ ## cstem, cppstem>                                          \
   {                                                                                     \
-    void start () throw ()                                                           \
+    void start () throw ()                                                              \
     {                                                                                   \
       ev_ ## cstem ## _start (EV_A_ static_cast<ev_ ## cstem *>(this));                 \
     }                                                                                   \
                                                                                         \
-    void stop () throw ()                                                            \
+    void stop () throw ()                                                               \
     {                                                                                   \
       ev_ ## cstem ## _stop (EV_A_ static_cast<ev_ ## cstem *>(this));                  \
     }                                                                                   \
                                                                                         \
     cppstem EV_CONSTRUCT(cppstem,cstem)                                                 \
                                                                                         \
-    ~cppstem () throw ()                                                             \
+    ~cppstem () throw ()                                                                \
     {                                                                                   \
       stop ();                                                                          \
     }                                                                                   \
@@ -603,7 +604,7 @@ namespace ev {
                                                                                         \
     cppstem (const cppstem &o);                                                         \
                                                                                         \
-    cppstem & operator =(const cppstem &o);                                             \
+    cppstem &operator =(const cppstem &o);                                              \
                                                                                         \
   public:
 
@@ -748,10 +749,17 @@ namespace ev {
 
   #if EV_EMBED_ENABLE
   EV_BEGIN_WATCHER (embed, embed)
+    void set (struct ev_loop *embedded_loop) throw ()
+    {
+      int active = is_active ();
+      if (active) stop ();
+      ev_embed_set (static_cast<ev_embed *>(this), embedded_loop);
+      if (active) start ();
+    }
+
     void start (struct ev_loop *embedded_loop) throw ()
     {
-      stop ();
-      ev_embed_set (static_cast<ev_embed *>(this), embedded_loop);
+      set (embedded_loop);
       start ();
     }
 
@@ -766,6 +774,22 @@ namespace ev {
   EV_BEGIN_WATCHER (fork, fork)
     void set () throw () { }
   EV_END_WATCHER (fork, fork)
+  #endif
+
+  #if EV_ASYNC_ENABLE
+  EV_BEGIN_WATCHER (async, async)
+    void set () throw () { }
+
+    void send () throw ()
+    {
+      ev_async_send (EV_A_ static_cast<ev_async *>(this));
+    }
+
+    bool async_pending () throw ()
+    {
+      return ev_async_pending (static_cast<ev_async *>(this));
+    }
+  EV_END_WATCHER (async, async)
   #endif
 
   #undef EV_PX

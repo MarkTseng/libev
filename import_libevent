@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LE=../libevent-1.4.2-rc
+LE=../libevent-1.4.3-stable
 
 if ! [ -e evbuffer.c ]; then
    echo do not run this programm unless you know what you are doing

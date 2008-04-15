@@ -338,7 +338,7 @@ typedef struct ev_async
   EV_ATOMIC_T sent; /* private */
 } ev_async;
 
-# define ev_async_pending(w) (((w)->sent + 0)
+# define ev_async_pending(w) ((w)->sent + 0)
 #endif
 
 /* the presence of this union forces similar struct layout */
