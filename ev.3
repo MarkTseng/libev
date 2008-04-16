@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "EV 1"
-.TH EV 1 "2008-04-02" "perl v5.10.0" "User Contributed Perl Documentation"
+.TH EV 1 "2008-04-11" "perl v5.10.0" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -330,18 +330,21 @@ See the description of \f(CW\*(C`ev_embed\*(C'\fR watchers for more info.
 .IP "ev_set_allocator (void *(*cb)(void *ptr, long size))" 4
 .IX Item "ev_set_allocator (void *(*cb)(void *ptr, long size))"
 Sets the allocation function to use (the prototype is similar \- the
-semantics is identical \- to the realloc C function). It is used to
-allocate and free memory (no surprises here). If it returns zero when
-memory needs to be allocated, the library might abort or take some
-potentially destructive action. The default is your system realloc
-function.
+semantics are identical to the \f(CW\*(C`realloc\*(C'\fR C89/SuS/POSIX function). It is
+used to allocate and free memory (no surprises here). If it returns zero
+when memory needs to be allocated (\f(CW\*(C`size != 0\*(C'\fR), the library might abort
+or take some potentially destructive action.
+.Sp
+Since some systems (at least OpenBSD and Darwin) fail to implement
+correct \f(CW\*(C`realloc\*(C'\fR semantics, libev will use a wrapper around the system
+\&\f(CW\*(C`realloc\*(C'\fR and \f(CW\*(C`free\*(C'\fR functions by default.
 .Sp
 You could override this function in high-availability programs to, say,
 free some memory if it cannot allocate memory, to use a special allocator,
 or even to sleep a while and retry until some memory is available.
 .Sp
 Example: Replace the libev allocator with one that waits a bit and then
-retries).
+retries (example requires a standards-compliant \f(CW\*(C`realloc\*(C'\fR).
 .Sp
 .Vb 6
 \&   static void *
@@ -389,13 +392,6 @@ Example: This is basically the same thing that libev does internally, too.
 An event loop is described by a \f(CW\*(C`struct ev_loop *\*(C'\fR. The library knows two
 types of such loops, the \fIdefault\fR loop, which supports signals and child
 events, and dynamically created loops which do not.
-.PP
-If you use threads, a common model is to run the default event loop
-in your main thread (or in a separate thread) and for each thread you
-create, you also create another event loop. Libev itself does no locking
-whatsoever, so if you mix calls to the same event loop in different
-threads, make sure you lock (this is usually a bad idea, though, even if
-done correctly, because it's hideous and inefficient).
 .IP "struct ev_loop *ev_default_loop (unsigned int flags)" 4
 .IX Item "struct ev_loop *ev_default_loop (unsigned int flags)"
 This will initialise the default event loop if it hasn't been initialised
@@ -488,7 +484,7 @@ but it scales phenomenally better. While poll and select usually scale
 like O(total_fds) where n is the total number of fds (or the highest fd),
 epoll scales either O(1) or O(active_fds). The epoll design has a number
 of shortcomings, such as silently dropping events in some hard-to-detect
-cases and rewiring a syscall per fd change, no fork support and bad
+cases and requiring a syscall per fd change, no fork support and bad
 support for dup.
 .Sp
 While stopping, setting and starting an I/O watcher in the same iteration
@@ -2498,6 +2494,9 @@ Priorities are not currently supported. Initialising priorities
 will fail and all watchers will have the same priority, even though there
 is an ev_pri field.
 .IP "\(bu" 4
+In libevent, the last base created gets the signals, in libev, the
+first base created (== the default loop) gets the signals.
+.IP "\(bu" 4
 Other members are not supported.
 .IP "\(bu" 4
 The libev emulation is \fInot\fR \s-1ABI\s0 compatible to libevent, you need
@@ -2735,6 +2734,16 @@ suitable for use with \f(CW\*(C`EV_A\*(C'\fR.
 .IX Item "EV_DEFAULT, EV_DEFAULT_"
 Similar to the other two macros, this gives you the value of the default
 loop, if multiple loops are supported (\*(L"ev loop default\*(R").
+.ie n .IP """EV_DEFAULT_UC""\fR, \f(CW""EV_DEFAULT_UC_""" 4
+.el .IP "\f(CWEV_DEFAULT_UC\fR, \f(CWEV_DEFAULT_UC_\fR" 4
+.IX Item "EV_DEFAULT_UC, EV_DEFAULT_UC_"
+Usage identical to \f(CW\*(C`EV_DEFAULT\*(C'\fR and \f(CW\*(C`EV_DEFAULT_\*(C'\fR, but requires that the
+default loop has been initialised (\f(CW\*(C`UC\*(C'\fR == unchecked). Their behaviour
+is undefined when the default loop has not been initialised by a previous
+execution of \f(CW\*(C`EV_DEFAULT\*(C'\fR, \f(CW\*(C`EV_DEFAULT_\*(C'\fR or \f(CW\*(C`ev_default_init (...)\*(C'\fR.
+.Sp
+It is often prudent to use \f(CW\*(C`EV_DEFAULT\*(C'\fR when initialising the first
+watcher in a function but use \f(CW\*(C`EV_DEFAULT_UC\*(C'\fR afterwards.
 .PP
 Example: Declare and initialise a check watcher, utilising the above
 macros so it will work regardless of whether multiple loops are supported
@@ -2854,9 +2863,9 @@ For this of course you need the m4 file:
 .Ve
 .Sh "\s-1PREPROCESSOR\s0 \s-1SYMBOLS/MACROS\s0"
 .IX Subsection "PREPROCESSOR SYMBOLS/MACROS"
-Libev can be configured via a variety of preprocessor symbols you have to define
-before including any of its files. The default is not to build for multiplicity
-and only include the select backend.
+Libev can be configured via a variety of preprocessor symbols you have to
+define before including any of its files. The default in the absense of
+autoconf is noted for every option.
 .IP "\s-1EV_STANDALONE\s0" 4
 .IX Item "EV_STANDALONE"
 Must always be \f(CW1\fR if you do not use autoconf configuration, which
@@ -2885,6 +2894,13 @@ note about libraries in the description of \f(CW\*(C`EV_USE_MONOTONIC\*(C'\fR, t
 .IX Item "EV_USE_NANOSLEEP"
 If defined to be \f(CW1\fR, libev will assume that \f(CW\*(C`nanosleep ()\*(C'\fR is available
 and will use it for delays. Otherwise it will use \f(CW\*(C`select ()\*(C'\fR.
+.IP "\s-1EV_USE_EVENTFD\s0" 4
+.IX Item "EV_USE_EVENTFD"
+If defined to be \f(CW1\fR, then libev will assume that \f(CW\*(C`eventfd ()\*(C'\fR is
+available and will probe for kernel support at runtime. This will improve
+\&\f(CW\*(C`ev_signal\*(C'\fR and \f(CW\*(C`ev_async\*(C'\fR performance and reduce resource consumption.
+If undefined, it will be enabled if the headers indicate GNU/Linux + Glibc
+2.7 or newer, otherwise disabled.
 .IP "\s-1EV_USE_SELECT\s0" 4
 .IX Item "EV_USE_SELECT"
 If undefined or defined to be \f(CW1\fR, libev will compile in support for the
@@ -2925,8 +2941,9 @@ takes precedence over select.
 .IX Item "EV_USE_EPOLL"
 If defined to be \f(CW1\fR, libev will compile in support for the Linux
 \&\f(CW\*(C`epoll\*(C'\fR(7) backend. Its availability will be detected at runtime,
-otherwise another method will be used as fallback. This is the
-preferred backend for GNU/Linux systems.
+otherwise another method will be used as fallback. This is the preferred
+backend for GNU/Linux systems. If undefined, it will be enabled if the
+headers indicate GNU/Linux + Glibc 2.4 or newer, otherwise disabled.
 .IP "\s-1EV_USE_KQUEUE\s0" 4
 .IX Item "EV_USE_KQUEUE"
 If defined to be \f(CW1\fR, libev will compile in support for the \s-1BSD\s0 style
@@ -2951,7 +2968,8 @@ reserved for future expansion, works like the \s-1USE\s0 symbols above.
 .IX Item "EV_USE_INOTIFY"
 If defined to be \f(CW1\fR, libev will compile in support for the Linux inotify
 interface to speed up \f(CW\*(C`ev_stat\*(C'\fR watchers. Its actual availability will
-be detected at runtime.
+be detected at runtime. If undefined, it will be enabled if the headers
+indicate GNU/Linux + Glibc 2.4 or newer, otherwise disabled.
 .IP "\s-1EV_ATOMIC_T\s0" 4
 .IX Item "EV_ATOMIC_T"
 Libev requires an integer type (suitable for storing \f(CW0\fR or \f(CW1\fR) whose
@@ -3142,6 +3160,56 @@ And a \fIev_cpp.C\fR implementation file that contains libev proper and is compi
 \&  #include "ev_cpp.h"
 \&  #include "ev.c"
 .Ve
+.SH "THREADS AND COROUTINES"
+.IX Header "THREADS AND COROUTINES"
+.Sh "\s-1THREADS\s0"
+.IX Subsection "THREADS"
+Libev itself is completely threadsafe, but it uses no locking. This
+means that you can use as many loops as you want in parallel, as long as
+only one thread ever calls into one libev function with the same loop
+parameter.
+.PP
+Or put differently: calls with different loop parameters can be done in
+parallel from multiple threads, calls with the same loop parameter must be
+done serially (but can be done from different threads, as long as only one
+thread ever is inside a call at any point in time, e.g. by using a mutex
+per loop).
+.PP
+If you want to know which design is best for your problem, then I cannot
+help you but by giving some generic advice:
+.IP "\(bu" 4
+most applications have a main thread: use the default libev loop
+in that thread, or create a seperate thread running only the default loop.
+.Sp
+This helps integrating other libraries or software modules that use libev
+themselves and don't care/know about threading.
+.IP "\(bu" 4
+one loop per thread is usually a good model.
+.Sp
+Doing this is almost never wrong, sometimes a better-performance model
+exists, but it is always a good start.
+.IP "\(bu" 4
+other models exist, such as the leader/follower pattern, where one
+loop is handed through multiple threads in a kind of round-robbin fashion.
+.Sp
+Chosing a model is hard \- look around, learn, know that usually you cna do
+better than you currently do :\-)
+.IP "\(bu" 4
+often you need to talk to some other thread which blocks in the
+event loop \- \f(CW\*(C`ev_async\*(C'\fR watchers can be used to wake them up from other
+threads safely (or from signal contexts...).
+.Sh "\s-1COROUTINES\s0"
+.IX Subsection "COROUTINES"
+Libev is much more accomodating to coroutines (\*(L"cooperative threads\*(R"):
+libev fully supports nesting calls to it's functions from different
+coroutines (e.g. you can call \f(CW\*(C`ev_loop\*(C'\fR on the same loop from two
+different coroutines and switch freely between both coroutines running the
+loop, as long as you don't confuse yourself). The only exception is that
+you must not do this from \f(CW\*(C`ev_periodic\*(C'\fR reschedule callbacks.
+.PP
+Care has been invested into making sure that libev does not keep local
+state inside \f(CW\*(C`ev_loop\*(C'\fR, and other calls do not usually allow coroutine
+switches.
 .SH "COMPLEXITIES"
 .IX Header "COMPLEXITIES"
 In this section the complexities of (many of) the algorithms used inside
@@ -3271,6 +3339,6 @@ Marc Lehmann <libev@schmorp.de>.
 .SH "POD ERRORS"
 .IX Header "POD ERRORS"
 Hey! \fBThe above document had some coding errors, which are explained below:\fR
-.IP "Around line 2996:" 4
-.IX Item "Around line 2996:"
+.IP "Around line 3015:" 4
+.IX Item "Around line 3015:"
 You forgot a '=back' before '=head2'
