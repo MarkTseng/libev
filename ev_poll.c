@@ -98,22 +98,22 @@ poll_poll (EV_P_ ev_tstamp timeout)
       else if (errno != EINTR)
         syserr ("(libev) poll");
     }
+  else
+    for (p = polls; res; ++p)
+      if (expect_false (p->revents)) /* this expect is debatable */
+        {
+          --res;
 
-  for (p = polls; res; ++p)
-    if (expect_false (p->revents)) /* this expect is debatable */
-      {
-        --res;
-
-        if (expect_false (p->revents & POLLNVAL))
-          fd_kill (EV_A_ p->fd);
-        else
-          fd_event (
-            EV_A_
-            p->fd,
-            (p->revents & (POLLOUT | POLLERR | POLLHUP) ? EV_WRITE : 0)
-            | (p->revents & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
-          );
-      }
+          if (expect_false (p->revents & POLLNVAL))
+            fd_kill (EV_A_ p->fd);
+          else
+            fd_event (
+              EV_A_
+              p->fd,
+              (p->revents & (POLLOUT | POLLERR | POLLHUP) ? EV_WRITE : 0)
+              | (p->revents & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
+            );
+        }
 }
 
 int inline_size

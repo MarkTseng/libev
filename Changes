@@ -1,5 +1,9 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+3.3  Wed Apr 16 20:45:04 CEST 2008
+	- added last minute fix for ev_poll.c by Brandon Black not
+          included in original 3.3 tarball.
+
 3.3  Wed Apr 16 19:04:10 CEST 2008
         - event_base_loopexit should return 0 on success
           (W.C.A. Wijngaards).
