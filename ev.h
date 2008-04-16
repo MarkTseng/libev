@@ -125,23 +125,23 @@ struct ev_loop;
 /*****************************************************************************/
 
 /* eventmask, revents, events... */
-#define EV_UNDEF            -1L /* guaranteed to be invalid */
-#define EV_NONE           0x00L /* no events */
-#define EV_READ           0x01L /* ev_io detected read will not block */
-#define EV_WRITE          0x02L /* ev_io detected write will not block */
-#define EV_IOFDSET        0x80L /* internal use only */
-#define EV_TIMEOUT  0x00000100L /* timer timed out */
-#define EV_PERIODIC 0x00000200L /* periodic timer timed out */
-#define EV_SIGNAL   0x00000400L /* signal was received */
-#define EV_CHILD    0x00000800L /* child/pid had status change */
-#define EV_STAT     0x00001000L /* stat data changed */
-#define EV_IDLE     0x00002000L /* event loop is idling */
-#define EV_PREPARE  0x00004000L /* event loop about to poll */
-#define EV_CHECK    0x00008000L /* event loop finished poll */
-#define EV_EMBED    0x00010000L /* embedded event loop needs sweep */
-#define EV_FORK     0x00020000L /* event loop resumed in child */
-#define EV_ASYNC    0x00040000L /* async intra-loop signal */
-#define EV_ERROR    0x80000000L /* sent when an error occurs */
+#define EV_UNDEF            -1 /* guaranteed to be invalid */
+#define EV_NONE           0x00 /* no events */
+#define EV_READ           0x01 /* ev_io detected read will not block */
+#define EV_WRITE          0x02 /* ev_io detected write will not block */
+#define EV_IOFDSET        0x80 /* internal use only */
+#define EV_TIMEOUT  0x00000100 /* timer timed out */
+#define EV_PERIODIC 0x00000200 /* periodic timer timed out */
+#define EV_SIGNAL   0x00000400 /* signal was received */
+#define EV_CHILD    0x00000800 /* child/pid had status change */
+#define EV_STAT     0x00001000 /* stat data changed */
+#define EV_IDLE     0x00002000 /* event loop is idling */
+#define EV_PREPARE  0x00004000 /* event loop about to poll */
+#define EV_CHECK    0x00008000 /* event loop finished poll */
+#define EV_EMBED    0x00010000 /* embedded event loop needs sweep */
+#define EV_FORK     0x00020000 /* event loop resumed in child */
+#define EV_ASYNC    0x00040000 /* async intra-loop signal */
+#define EV_ERROR    0x80000000 /* sent when an error occurs */
 
 /* can be used to add custom fields to all watchers, while losing binary compatibility */
 #ifndef EV_COMMON
@@ -373,17 +373,17 @@ union ev_any_watcher
 
 /* bits for ev_default_loop and ev_loop_new */
 /* the default */
-#define EVFLAG_AUTO       0x00000000UL /* not quite a mask */
+#define EVFLAG_AUTO       0x00000000U /* not quite a mask */
 /* flag bits */
-#define EVFLAG_NOENV      0x01000000UL /* do NOT consult environment */
-#define EVFLAG_FORKCHECK  0x02000000UL /* check for a fork in each iteration */
+#define EVFLAG_NOENV      0x01000000U /* do NOT consult environment */
+#define EVFLAG_FORKCHECK  0x02000000U /* check for a fork in each iteration */
 /* method bits to be ored together */
-#define EVBACKEND_SELECT  0x00000001UL /* about anywhere */
-#define EVBACKEND_POLL    0x00000002UL /* !win */
-#define EVBACKEND_EPOLL   0x00000004UL /* linux */
-#define EVBACKEND_KQUEUE  0x00000008UL /* bsd */
-#define EVBACKEND_DEVPOLL 0x00000010UL /* solaris 8 */ /* NYI */
-#define EVBACKEND_PORT    0x00000020UL /* solaris 10 */
+#define EVBACKEND_SELECT  0x00000001U /* about anywhere */
+#define EVBACKEND_POLL    0x00000002U /* !win */
+#define EVBACKEND_EPOLL   0x00000004U /* linux */
+#define EVBACKEND_KQUEUE  0x00000008U /* bsd */
+#define EVBACKEND_DEVPOLL 0x00000010U /* solaris 8 */ /* NYI */
+#define EVBACKEND_PORT    0x00000020U /* solaris 10 */
 
 #if EV_PROTOTYPES
 int ev_version_major (void);

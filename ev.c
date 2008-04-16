@@ -1187,7 +1187,7 @@ loop_init (EV_P_ unsigned int flags)
           && getenv ("LIBEV_FLAGS"))
         flags = atoi (getenv ("LIBEV_FLAGS"));
 
-      if (!(flags & 0x0000ffffUL))
+      if (!(flags & 0x0000ffffU))
         flags |= ev_recommended_backends ();
 
 #if EV_USE_PORT
