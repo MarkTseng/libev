@@ -1285,7 +1285,9 @@ loop_destroy (EV_P)
   backend = 0;
 }
 
+#if EV_USE_INOTIFY
 void inline_size infy_fork (EV_P);
+#endif
 
 void inline_size
 loop_fork (EV_P)
