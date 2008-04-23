@@ -1636,9 +1636,9 @@ available on Linux) and present at runtime, it will be used to speed up
 change detection where possible. The inotify descriptor will be created lazily
 when the first C<ev_stat> watcher is being started.
 
-Inotify presense does not change the semantics of C<ev_stat> watchers
+Inotify presence does not change the semantics of C<ev_stat> watchers
 except that changes might be detected earlier, and in some cases, to avoid
-making regular C<stat> calls. Even in the presense of inotify support
+making regular C<stat> calls. Even in the presence of inotify support
 there are many cases where libev has to resort to regular C<stat> polling.
 
 (There is no support for kqueue, as apparently it cannot be used to
