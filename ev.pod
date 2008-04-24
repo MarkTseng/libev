@@ -3262,6 +3262,38 @@ calling select (O(n²)) will likely make this unworkable.
 =back
 
 
+=head1 PORTABILITY REQUIREMENTS
+
+In addition to a working ISO-C implementation, libev relies on a few
+additional extensions:
+
+=over 4
+
+=item C<sig_atomic_t volatile> must be thread-atomic as well
+
+The type C<sig_atomic_t volatile> (or whatever is defined as
+C<EV_ATOMIC_T>) must be atomic w.r.t. accesses from different
+threads. This is not part of the specification for C<sig_atomic_t>, but is
+believed to be sufficiently portable.
+
+=item C<sigprocmask> must work in a threaded environment
+
+Libev uses C<sigprocmask> to temporarily block signals. This is not
+allowed in a threaded program (C<pthread_sigmask> has to be used). Typical
+pthread implementations will either allow C<sigprocmask> in the "main
+thread" or will block signals process-wide, both behaviours would
+be compatible with libev. Interaction between C<sigprocmask> and
+C<pthread_sigmask> could complicate things, however.
+
+The most portable way to handle signals is to block signals in all threads
+except the initial one, and run the default loop in the initial thread as
+well.
+
+=back
+
+If you know of other additional requirements drop me a note.
+
+
 =head1 AUTHOR
 
 Marc Lehmann <libev@schmorp.de>.
