@@ -774,12 +774,12 @@ upheap (WT *heap, int k)
         break;
 
       heap [k] = heap [p];
-      ((W)heap [k])->active = k;
+      ev_active (heap [k]) = k;
       k = p;
     }
 
   heap [k] = w;
-  ((W)heap [k])->active = k;
+  ev_active (heap [k]) = k;
 }
 
 /* away from the root */
@@ -802,13 +802,13 @@ downheap (WT *heap, int N, int k)
         break;
 
       heap [k] = heap [c];
-      ((W)heap [k])->active = k;
+      ev_active (heap [k]) = k;
 
       k = c;
     }
 
   heap [k] = w;
-  ((W)heap [k])->active = k;
+  ev_active (heap [k]) = k;
 }
 
 void inline_size
@@ -1897,7 +1897,7 @@ ev_timer_start (EV_P_ ev_timer *w)
   timers [timercnt] = (WT)w;
   upheap (timers, timercnt);
 
-  /*assert (("internal timer heap corruption", timers [((W)w)->active] == w));*/
+  /*assert (("internal timer heap corruption", timers [ev_active (w)] == w));*/
 }
 
 void noinline
@@ -1907,10 +1907,10 @@ ev_timer_stop (EV_P_ ev_timer *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  assert (("internal timer heap corruption", timers [((W)w)->active] == (WT)w));
-
   {
-    int active = ((W)w)->active;
+    int active = ev_active (w);
+
+    assert (("internal timer heap corruption", timers [active] == (WT)w));
 
     if (expect_true (active < timercnt))
       {
@@ -1934,7 +1934,7 @@ ev_timer_again (EV_P_ ev_timer *w)
       if (w->repeat)
         {
           ev_at (w) = mn_now + w->repeat;
-          adjustheap (timers, timercnt, ((W)w)->active);
+          adjustheap (timers, timercnt, ev_active (w));
         }
       else
         ev_timer_stop (EV_A_ w);
@@ -1969,7 +1969,7 @@ ev_periodic_start (EV_P_ ev_periodic *w)
   periodics [periodiccnt] = (WT)w;
   upheap (periodics, periodiccnt);
 
-  /*assert (("internal periodic heap corruption", periodics [((W)w)->active - 1] == w));*/
+  /*assert (("internal periodic heap corruption", periodics [ev_active (w)] == w));*/
 }
 
 void noinline
@@ -1979,10 +1979,10 @@ ev_periodic_stop (EV_P_ ev_periodic *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  assert (("internal periodic heap corruption", periodics [((W)w)->active] == (WT)w));
-
   {
-    int active = ((W)w)->active;
+    int active = ev_active (w);
+
+    assert (("internal periodic heap corruption", periodics [active] == (WT)w));
 
     if (expect_true (active < periodiccnt))
       {
@@ -2370,10 +2370,10 @@ ev_idle_stop (EV_P_ ev_idle *w)
     return;
 
   {
-    int active = ((W)w)->active;
+    int active = ev_active (w);
 
     idles [ABSPRI (w)][active - 1] = idles [ABSPRI (w)][--idlecnt [ABSPRI (w)]];
-    ((W)idles [ABSPRI (w)][active - 1])->active = active;
+    ev_active (idles [ABSPRI (w)][active - 1]) = active;
 
     ev_stop (EV_A_ (W)w);
     --idleall;
@@ -2400,9 +2400,10 @@ ev_prepare_stop (EV_P_ ev_prepare *w)
     return;
 
   {
-    int active = ((W)w)->active;
+    int active = ev_active (w);
+
     prepares [active - 1] = prepares [--preparecnt];
-    ((W)prepares [active - 1])->active = active;
+    ev_active (prepares [active - 1]) = active;
   }
 
   ev_stop (EV_A_ (W)w);
@@ -2427,9 +2428,10 @@ ev_check_stop (EV_P_ ev_check *w)
     return;
 
   {
-    int active = ((W)w)->active;
+    int active = ev_active (w);
+
     checks [active - 1] = checks [--checkcnt];
-    ((W)checks [active - 1])->active = active;
+    ev_active (checks [active - 1]) = active;
   }
 
   ev_stop (EV_A_ (W)w);
@@ -2535,9 +2537,10 @@ ev_fork_stop (EV_P_ ev_fork *w)
     return;
 
   {
-    int active = ((W)w)->active;
+    int active = ev_active (w);
+
     forks [active - 1] = forks [--forkcnt];
-    ((W)forks [active - 1])->active = active;
+    ev_active (forks [active - 1]) = active;
   }
 
   ev_stop (EV_A_ (W)w);
@@ -2566,9 +2569,10 @@ ev_async_stop (EV_P_ ev_async *w)
     return;
 
   {
-    int active = ((W)w)->active;
+    int active = ev_active (w);
+
     asyncs [active - 1] = asyncs [--asynccnt];
-    ((W)asyncs [active - 1])->active = active;
+    ev_active (asyncs [active - 1]) = active;
   }
 
   ev_stop (EV_A_ (W)w);
