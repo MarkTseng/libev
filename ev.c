@@ -756,6 +756,7 @@ fd_rearm_all (EV_P)
 
 /*****************************************************************************/
 
+/* towards the root */
 void inline_speed
 upheap (WT *heap, int k)
 {
@@ -777,6 +778,7 @@ upheap (WT *heap, int k)
   ((W)heap [k])->active = k + 1;
 }
 
+/* away from the root */
 void inline_speed
 downheap (WT *heap, int N, int k)
 {
