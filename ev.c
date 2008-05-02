@@ -327,6 +327,7 @@ typedef ev_watcher *W;
 typedef ev_watcher_list *WL;
 typedef ev_watcher_time *WT;
 
+#define ev_active(w) ((W)(w))->active
 #define ev_at(w) ((WT)(w))->at
 
 #if EV_USE_MONOTONIC
@@ -1940,7 +1941,7 @@ ev_timer_again (EV_P_ ev_timer *w)
     }
   else if (w->repeat)
     {
-      w->at = w->repeat;
+      ev_at (w) = w->repeat;
       ev_timer_start (EV_A_ w);
     }
 }
