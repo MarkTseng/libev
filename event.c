@@ -286,7 +286,6 @@ int event_pending (struct event *ev, short events, struct timeval *tv)
   short revents = 0;
   dLOOPev;
 
-
   if (ev->ev_events & EV_SIGNAL)
     {
       /* sig */
