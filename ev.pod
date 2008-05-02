@@ -1375,6 +1375,11 @@ when you changed some parameters or the reschedule callback would return
 a different time than the last time it was called (e.g. in a crond like
 program when the crontabs have changed).
 
+=item ev_tstamp ev_periodic_at (ev_periodic *)
+
+When active, returns the absolute time that the watcher is supposed to
+trigger next.
+
 =item ev_tstamp offset [read-write]
 
 When repeating, this contains the offset value, otherwise this is the
@@ -1394,11 +1399,6 @@ called.
 The current reschedule callback, or C<0>, if this functionality is
 switched off. Can be changed any time, but changes only take effect when
 the periodic timer fires or C<ev_periodic_again> is being called.
-
-=item ev_tstamp at [read-only]
-
-When active, contains the absolute time that the watcher is supposed to
-trigger next.
 
 =back
 
