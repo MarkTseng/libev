@@ -1525,7 +1525,7 @@ periodics_reschedule (EV_P)
   int i;
 
   /* adjust periodics after time jump */
-  for (i = 0; i < periodiccnt; ++i)
+  for (i = 1; i <= periodiccnt; ++i)
     {
       ev_periodic *w = (ev_periodic *)periodics [i];
 
