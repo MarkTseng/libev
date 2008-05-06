@@ -522,6 +522,8 @@ ev_sleep (ev_tstamp delay)
 
 /*****************************************************************************/
 
+#define MALLOC_ROUND 4096 // prefer to allocate in chunks of this size, must be 2**n and >> 4 longs
+
 int inline_size
 array_nextsize (int elem, int cur, int cnt)
 {
@@ -531,11 +533,11 @@ array_nextsize (int elem, int cur, int cnt)
     ncur <<= 1;
   while (cnt > ncur);
 
-  /* if size > 4096, round to 4096 - 4 * longs to accomodate malloc overhead */
-  if (elem * ncur > 4096)
+  /* if size is large, round to MALLOC_ROUND - 4 * longs to accomodate malloc overhead */
+  if (elem * ncur > MALLOC_ROUND - sizeof (void *) * 4)
     {
       ncur *= elem;
-      ncur = (ncur + elem + 4095 + sizeof (void *) * 4) & ~4095;
+      ncur = (ncur + elem + (MALLOC_ROUND - 1) + sizeof (void *) * 4) & ~(MALLOC_ROUND - 1);
       ncur = ncur - sizeof (void *) * 4;
       ncur /= elem;
     }
@@ -914,7 +916,7 @@ pipecb (EV_P_ ev_io *iow, int revents)
 #if EV_USE_EVENTFD
   if (evfd >= 0)
     {
-      uint64_t counter = 1;
+      uint64_t counter;
       read (evfd, &counter, sizeof (uint64_t));
     }
   else
