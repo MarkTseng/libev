@@ -522,7 +522,7 @@ ev_sleep (ev_tstamp delay)
 
 /*****************************************************************************/
 
-#define MALLOC_ROUND 4096 // prefer to allocate in chunks of this size, must be 2**n and >> 4 longs
+#define MALLOC_ROUND 4096 /* prefer to allocate in chunks of this size, must be 2**n and >> 4 longs */
 
 int inline_size
 array_nextsize (int elem, int cur, int cnt)
@@ -2118,6 +2118,8 @@ infy_add (EV_P_ ev_stat *w)
       ev_timer_start (EV_A_ &w->timer); /* this is not race-free, so we still need to recheck periodically */
 
       /* monitor some parent directory for speedup hints */
+      /* note that exceeding the hardcoded limit is not a correctness issue, */
+      /* but an efficiency issue only */
       if ((errno == ENOENT || errno == EACCES) && strlen (w->path) < 4096)
         {
           char path [4096];

@@ -4,7 +4,9 @@ Revision history for libev, a high-performance and full-featured event loop.
           for better cache-efficiency and increases memory requirements
           by up to two pointers/loop.
         - fix a potential aliasing issue in ev_timer_again.
-        - add/document ev_periodic_at, retract diretc access to ->at.
+        - add/document ev_periodic_at, retract direct access to ->at.
+        - improve ev_stat docs.
+        - add portability requirements section.
 
 3.31 Wed Apr 16 20:45:04 CEST 2008
 	- added last minute fix for ev_poll.c by Brandon Black.

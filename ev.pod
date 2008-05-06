@@ -1612,11 +1612,12 @@ resource-intensive.
 
 At the time of this writing, only the Linux inotify interface is
 implemented (implementing kqueue support is left as an exercise for the
-reader). Inotify will be used to give hints only and should not change the
-semantics of C<ev_stat> watchers, which means that libev sometimes needs
-to fall back to regular polling again even with inotify, but changes are
-usually detected immediately, and if the file exists there will be no
-polling.
+reader, note, however, that the author sees no way of implementing ev_stat
+semantics with kqueue). Inotify will be used to give hints only and should
+not change the semantics of C<ev_stat> watchers, which means that libev
+sometimes needs to fall back to regular polling again even with inotify,
+but changes are usually detected immediately, and if the file exists there
+will be no polling.
 
 =head3 ABI Issues (Largefile Support)
 
@@ -1651,16 +1652,25 @@ The C<stat ()> syscall only supports full-second resolution portably, and
 even on systems where the resolution is higher, many filesystems still
 only support whole seconds.
 
-That means that, if the time is the only thing that changes, you might
-miss updates: on the first update, C<ev_stat> detects a change and calls
-your callback, which does something. When there is another update within
-the same second, C<ev_stat> will be unable to detect it.
+That means that, if the time is the only thing that changes, you can
+easily miss updates: on the first update, C<ev_stat> detects a change and
+calls your callback, which does something. When there is another update
+within the same second, C<ev_stat> will be unable to detect it as the stat
+data does not change.
 
-The solution to this is to delay acting on a change for a second (or till
-the next second boundary), using a roughly one-second delay C<ev_timer>
-(C<ev_timer_set (w, 0., 1.01); ev_timer_again (loop, w)>). The C<.01>
-is added to work around small timing inconsistencies of some operating
-systems.
+The solution to this is to delay acting on a change for slightly more
+than second (or till slightly after the next full second boundary), using
+a roughly one-second-delay C<ev_timer> (e.g. C<ev_timer_set (w, 0., 1.02);
+ev_timer_again (loop, w)>).
+
+The C<.02> offset is added to work around small timing inconsistencies
+of some operating systems (where the second counter of the current time
+might be be delayed. One such system is the Linux kernel, where a call to
+C<gettimeofday> might return a timestamp with a full second later than
+a subsequent C<time> call - if the equivalent of C<time ()> is used to
+update file times then there will be a small window where the kernel uses
+the previous second to update file times but libev might already execute
+the timer callback).
 
 =head3 Watcher-Specific Functions and Data Members
 
@@ -1676,28 +1686,32 @@ be detected and should normally be specified as C<0> to let libev choose
 a suitable value. The memory pointed to by C<path> must point to the same
 path for as long as the watcher is active.
 
-The callback will be receive C<EV_STAT> when a change was detected,
-relative to the attributes at the time the watcher was started (or the
-last change was detected).
+The callback will receive C<EV_STAT> when a change was detected, relative
+to the attributes at the time the watcher was started (or the last change
+was detected).
 
 =item ev_stat_stat (loop, ev_stat *)
 
 Updates the stat buffer immediately with new values. If you change the
-watched path in your callback, you could call this fucntion to avoid
-detecting this change (while introducing a race condition). Can also be
-useful simply to find out the new values.
+watched path in your callback, you could call this function to avoid
+detecting this change (while introducing a race condition if you are not
+the only one changing the path). Can also be useful simply to find out the
+new values.
 
 =item ev_statdata attr [read-only]
 
-The most-recently detected attributes of the file. Although the type is of
+The most-recently detected attributes of the file. Although the type is
 C<ev_statdata>, this is usually the (or one of the) C<struct stat> types
-suitable for your system. If the C<st_nlink> member is C<0>, then there
-was some error while C<stat>ing the file.
+suitable for your system, but you can only rely on the POSIX-standardised
+members to be present. If the C<st_nlink> member is C<0>, then there was
+some error while C<stat>ing the file.
 
 =item ev_statdata prev [read-only]
 
 The previous attributes of the file. The callback gets invoked whenever
-C<prev> != C<attr>.
+C<prev> != C<attr>, or, more precisely, one or more of these members
+differ: C<st_dev>, C<st_ino>, C<st_mode>, C<st_nlink>, C<st_uid>,
+C<st_gid>, C<st_rdev>, C<st_size>, C<st_atime>, C<st_mtime>, C<st_ctime>.
 
 =item ev_tstamp interval [read-only]
 
@@ -1761,7 +1775,7 @@ C<ev_timer> callback invocation).
   ...
   ev_stat_init (&passwd, stat_cb, "/etc/passwd", 0.);
   ev_stat_start (loop, &passwd);
-  ev_timer_init (&timer, timer_cb, 0., 1.01);
+  ev_timer_init (&timer, timer_cb, 0., 1.02);
 
 
 =head2 C<ev_idle> - when you've got nothing better to do...
@@ -1859,7 +1873,7 @@ It is recommended to give C<ev_check> watchers highest (C<EV_MAXPRI>)
 priority, to ensure that they are being run before any other watchers
 after the poll. Also, C<ev_check> watchers (and C<ev_prepare> watchers,
 too) should not activate ("feed") events into libev. While libev fully
-supports this, they will be called before other C<ev_check> watchers
+supports this, they might get executed before other C<ev_check> watchers
 did their job. As C<ev_check> watchers are often used to embed other
 (non-libev) event loops those other event loops might be in an unusable
 state until their C<ev_check> watcher ran (always remind yourself to
@@ -1884,9 +1898,9 @@ macros, but using them is utterly, utterly and completely pointless.
 There are a number of principal ways to embed other event loops or modules
 into libev. Here are some ideas on how to include libadns into libev
 (there is a Perl module named C<EV::ADNS> that does this, which you could
-use for an actually working example. Another Perl module named C<EV::Glib>
-embeds a Glib main context into libev, and finally, C<Glib::EV> embeds EV
-into the Glib event loop).
+use as a working example. Another Perl module named C<EV::Glib> embeds a
+Glib main context into libev, and finally, C<Glib::EV> embeds EV into the
+Glib event loop).
 
 Method 1: Add IO watchers and a timeout watcher in a prepare handler,
 and in a check watcher, destroy them and call into libadns. What follows
@@ -3204,15 +3218,21 @@ the form of the C<EVBACKEND_SELECT> backend, and only supports socket
 descriptors. This only applies when using Win32 natively, not when using
 e.g. cygwin.
 
+Lifting these limitations would basically require the full
+re-implementation of the I/O system. If you are into these kinds of
+things, then note that glib does exactly that for you in a very portable
+way (note also that glib is the slowest event library known to man).
+
 There is no supported compilation method available on windows except
 embedding it into other applications.
 
-Due to the many, low, and arbitrary limits on the win32 platform and the
-abysmal performance of winsockets, using a large number of sockets is not
-recommended (and not reasonable). If your program needs to use more than
-a hundred or so sockets, then likely it needs to use a totally different
-implementation for windows, as libev offers the POSIX model, which cannot
-be implemented efficiently on windows (microsoft monopoly games).
+Due to the many, low, and arbitrary limits on the win32 platform and
+the abysmal performance of winsockets, using a large number of sockets
+is not recommended (and not reasonable). If your program needs to use
+more than a hundred or so sockets, then likely it needs to use a totally
+different implementation for windows, as libev offers the POSIX readyness
+notification model, which cannot be implemented efficiently on windows
+(microsoft monopoly games).
 
 =over 4
 
@@ -3236,11 +3256,13 @@ complexity in the O(n²) range when using win32.
 
 =item Limited number of file descriptors
 
-Windows has numerous arbitrary (and low) limits on things. Early versions
-of winsocket's select only supported waiting for a max. of C<64> handles
-(probably owning to the fact that all windows kernels can only wait for
-C<64> things at the same time internally; microsoft recommends spawning a
-chain of threads and wait for 63 handles and the previous thread in each).
+Windows has numerous arbitrary (and low) limits on things.
+
+Early versions of winsocket's select only supported waiting for a maximum
+of C<64> handles (probably owning to the fact that all windows kernels
+can only wait for C<64> things at the same time internally; microsoft
+recommends spawning a chain of threads and wait for 63 handles and the
+previous thread in each. Great).
 
 Newer versions support more handles, but you need to define C<FD_SETSIZE>
 to some high number (e.g. C<2048>) before compiling the winsocket select
@@ -3288,6 +3310,21 @@ C<pthread_sigmask> could complicate things, however.
 The most portable way to handle signals is to block signals in all threads
 except the initial one, and run the default loop in the initial thread as
 well.
+
+=item C<long> must be large enough for common memory allocation sizes
+
+To improve portability and simplify using libev, libev uses C<long>
+internally instead of C<size_t> when allocating its data structures. On
+non-POSIX systems (Microsoft...) this might be unexpectedly low, but
+is still at least 31 bits everywhere, which is enough for hundreds of
+millions of watchers.
+
+=item C<double> must hold a time value in seconds with enough accuracy
+
+The type C<double> is used to represent timestamps. It is required to have
+at least 51 bits of mantissa, which is good enough for at least into the
+year 4000. This requirement is fulfilled by implementations implementing
+IEEE 754 (basically all existing ones).
 
 =back
 
