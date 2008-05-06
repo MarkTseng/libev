@@ -1372,7 +1372,6 @@ ev_loop_fork (EV_P)
 {
   postfork = 1; /* must be in line with ev_default_fork */
 }
-
 #endif
 
 #if EV_MULTIPLICITY
@@ -1463,6 +1462,29 @@ call_pending (EV_P)
       }
 }
 
+#if EV_IDLE_ENABLE
+void inline_size
+idle_reify (EV_P)
+{
+  if (expect_false (idleall))
+    {
+      int pri;
+
+      for (pri = NUMPRI; pri--; )
+        {
+          if (pendingcnt [pri])
+            break;
+
+          if (idlecnt [pri])
+            {
+              queue_events (EV_A_ (W *)idles [pri], idlecnt [pri], EV_IDLE);
+              break;
+            }
+        }
+    }
+}
+#endif
+
 void inline_size
 timers_reify (EV_P)
 {
@@ -1543,29 +1565,6 @@ periodics_reschedule (EV_P)
 }
 #endif
 
-#if EV_IDLE_ENABLE
-void inline_size
-idle_reify (EV_P)
-{
-  if (expect_false (idleall))
-    {
-      int pri;
-
-      for (pri = NUMPRI; pri--; )
-        {
-          if (pendingcnt [pri])
-            break;
-
-          if (idlecnt [pri])
-            {
-              queue_events (EV_A_ (W *)idles [pri], idlecnt [pri], EV_IDLE);
-              break;
-            }
-        }
-    }
-}
-#endif
-
 void inline_speed
 time_update (EV_P_ ev_tstamp max_block)
 {
@@ -1601,7 +1600,7 @@ time_update (EV_P_ ev_tstamp max_block)
         {
           rtmn_diff = ev_rt_now - mn_now;
 
-          if (fabs (odiff - rtmn_diff) < MIN_TIMEJUMP)
+          if (expect_true (fabs (odiff - rtmn_diff) < MIN_TIMEJUMP))
             return; /* all is well */
 
           ev_rt_now = ev_time ();
