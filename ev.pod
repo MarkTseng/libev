@@ -2982,8 +2982,9 @@ defined to be C<0>, then they are not.
 =item EV_MINIMAL
 
 If you need to shave off some kilobytes of code at the expense of some
-speed, define this symbol to C<1>. Currently only used for gcc to override
-some inlining decisions, saves roughly 30% codesize of amd64.
+speed, define this symbol to C<1>. Currently this is used to override some
+inlining decisions, saves roughly 30% codesize of amd64. It also selects a
+much smaller 2-heap for timer management over the default 4-heap.
 
 =item EV_PID_HASHSIZE
 
@@ -3178,8 +3179,8 @@ have many watchers waiting for the same fd or signal).
 
 =item Finding the next timer in each loop iteration: O(1)
 
-By virtue of using a binary heap, the next timer is always found at the
-beginning of the storage array.
+By virtue of using a binary or 4-heap, the next timer is always found at a
+fixed position in the storage array.
 
 =item Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)
 

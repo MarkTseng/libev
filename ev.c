@@ -761,6 +761,88 @@ fd_rearm_all (EV_P)
 
 /*****************************************************************************/
 
+/*
+ * at the moment we allow libev the luxury of two heaps,
+ * a small-code-size 2-heap one and a ~1.5kb larger 4-heap
+ * which is more cache-efficient.
+ * the difference is about 5% with 50000+ watchers.
+ */
+#define USE_4HEAP !EV_MINIMAL
+#if USE_4HEAP
+
+#define HEAP0 3 /* index of first element in heap */
+
+/* towards the root */
+void inline_speed
+upheap (WT *heap, int k)
+{
+  WT w = heap [k];
+
+  for (;;)
+    {
+      int p = ((k - HEAP0 - 1) / 4) + HEAP0;
+
+      if (p >= HEAP0 || heap [p]->at <= w->at)
+        break;
+
+      heap [k] = heap [p];
+      ev_active (heap [k]) = k;
+      k = p;
+    }
+
+  heap [k] = w;
+  ev_active (heap [k]) = k;
+}
+
+/* away from the root */
+void inline_speed
+downheap (WT *heap, int N, int k)
+{
+  WT w = heap [k];
+  WT *E = heap + N + HEAP0;
+
+  for (;;)
+    {
+      ev_tstamp minat;
+      WT *minpos;
+      WT *pos = heap + 4 * (k - HEAP0) + HEAP0;
+
+      // find minimum child
+      if (expect_true (pos +3 < E))
+        {
+                                   (minpos = pos + 0), (minat = (*minpos)->at);
+          if (pos [1]->at < minat) (minpos = pos + 1), (minat = (*minpos)->at);
+          if (pos [2]->at < minat) (minpos = pos + 2), (minat = (*minpos)->at);
+          if (pos [3]->at < minat) (minpos = pos + 3), (minat = (*minpos)->at);
+        }
+      else
+        {
+          if (pos >= E)
+            break;
+
+                                                  (minpos = pos + 0), (minat = (*minpos)->at);
+          if (pos + 1 < E && pos [1]->at < minat) (minpos = pos + 1), (minat = (*minpos)->at);
+          if (pos + 2 < E && pos [2]->at < minat) (minpos = pos + 2), (minat = (*minpos)->at);
+          if (pos + 3 < E && pos [3]->at < minat) (minpos = pos + 3), (minat = (*minpos)->at);
+        }
+
+      if (w->at <= minat)
+        break;
+
+      ev_active (*minpos) = k;
+      heap [k] = *minpos;
+
+      k = minpos - heap;
+    }
+
+  heap [k] = w;
+  ev_active (heap [k]) = k;
+}
+
+#else // 4HEAP
+
+#define HEAP0 1
+
 /* towards the root */
 void inline_speed
 upheap (WT *heap, int k)
@@ -797,21 +879,22 @@ downheap (WT *heap, int N, int k)
       if (c > N)
         break;
 
-      c += c < N && heap [c]->at > heap [c + 1]->at
+      c += c + 1 < N && heap [c]->at > heap [c + 1]->at
            ? 1 : 0;
 
       if (w->at <= heap [c]->at)
         break;
 
       heap [k] = heap [c];
-      ev_active (heap [k]) = k;
-
+      ((W)heap [k])->active = k;
+      
       k = c;
     }
 
   heap [k] = w;
   ev_active (heap [k]) = k;
 }
+#endif
 
 void inline_size
 adjustheap (WT *heap, int N, int k)
@@ -1488,9 +1571,9 @@ idle_reify (EV_P)
 void inline_size
 timers_reify (EV_P)
 {
-  while (timercnt && ev_at (timers [1]) <= mn_now)
+  while (timercnt && ev_at (timers [HEAP0]) <= mn_now)
     {
-      ev_timer *w = (ev_timer *)timers [1];
+      ev_timer *w = (ev_timer *)timers [HEAP0];
 
       /*assert (("inactive timer on timer heap detected", ev_is_active (w)));*/
 
@@ -1503,7 +1586,7 @@ timers_reify (EV_P)
           if (ev_at (w) < mn_now)
             ev_at (w) = mn_now;
 
-          downheap (timers, timercnt, 1);
+          downheap (timers, timercnt, HEAP0);
         }
       else
         ev_timer_stop (EV_A_ w); /* nonrepeating: stop timer */
@@ -1516,9 +1599,9 @@ timers_reify (EV_P)
 void inline_size
 periodics_reify (EV_P)
 {
-  while (periodiccnt && ev_at (periodics [1]) <= ev_rt_now)
+  while (periodiccnt && ev_at (periodics [HEAP0]) <= ev_rt_now)
     {
-      ev_periodic *w = (ev_periodic *)periodics [1];
+      ev_periodic *w = (ev_periodic *)periodics [HEAP0];
 
       /*assert (("inactive timer on periodic heap detected", ev_is_active (w)));*/
 
@@ -1534,7 +1617,7 @@ periodics_reify (EV_P)
           ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
           if (ev_at (w) - ev_rt_now <= TIME_EPSILON) ev_at (w) += w->interval;
           assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ev_at (w) > ev_rt_now));
-          downheap (periodics, periodiccnt, 1);
+          downheap (periodics, periodiccnt, HEAP0);
         }
       else
         ev_periodic_stop (EV_A_ w); /* nonrepeating: stop timer */
@@ -1560,8 +1643,8 @@ periodics_reschedule (EV_P)
     }
 
   /* now rebuild the heap */
-  for (i = periodiccnt >> 1; i--; )
-    downheap (periodics, periodiccnt, i);
+  for (i = periodiccnt >> 1; --i; )
+    downheap (periodics, periodiccnt, i + HEAP0);
 }
 #endif
 
@@ -1706,14 +1789,14 @@ ev_loop (EV_P_ int flags)
 
             if (timercnt)
               {
-                ev_tstamp to = ev_at (timers [1]) - mn_now + backend_fudge;
+                ev_tstamp to = ev_at (timers [HEAP0]) - mn_now + backend_fudge;
                 if (waittime > to) waittime = to;
               }
 
 #if EV_PERIODIC_ENABLE
             if (periodiccnt)
               {
-                ev_tstamp to = ev_at (periodics [1]) - ev_rt_now + backend_fudge;
+                ev_tstamp to = ev_at (periodics [HEAP0]) - ev_rt_now + backend_fudge;
                 if (waittime > to) waittime = to;
               }
 #endif
@@ -1893,10 +1976,10 @@ ev_timer_start (EV_P_ ev_timer *w)
 
   assert (("ev_timer_start called with negative timer repeat value", w->repeat >= 0.));
 
-  ev_start (EV_A_ (W)w, ++timercnt);
-  array_needsize (WT, timers, timermax, timercnt + 1, EMPTY2);
-  timers [timercnt] = (WT)w;
-  upheap (timers, timercnt);
+  ev_start (EV_A_ (W)w, ++timercnt + HEAP0 - 1);
+  array_needsize (WT, timers, timermax, timercnt + HEAP0, EMPTY2);
+  timers [ev_active (w)] = (WT)w;
+  upheap (timers, ev_active (w));
 
   /*assert (("internal timer heap corruption", timers [ev_active (w)] == w));*/
 }
@@ -1913,9 +1996,9 @@ ev_timer_stop (EV_P_ ev_timer *w)
 
     assert (("internal timer heap corruption", timers [active] == (WT)w));
 
-    if (expect_true (active < timercnt))
+    if (expect_true (active < timercnt + HEAP0 - 1))
       {
-        timers [active] = timers [timercnt];
+        timers [active] = timers [timercnt + HEAP0 - 1];
         adjustheap (timers, timercnt, active);
       }
 
@@ -1965,10 +2048,10 @@ ev_periodic_start (EV_P_ ev_periodic *w)
   else
     ev_at (w) = w->offset;
 
-  ev_start (EV_A_ (W)w, ++periodiccnt);
-  array_needsize (WT, periodics, periodicmax, periodiccnt + 1, EMPTY2);
-  periodics [periodiccnt] = (WT)w;
-  upheap (periodics, periodiccnt);
+  ev_start (EV_A_ (W)w, ++periodiccnt + HEAP0 - 1);
+  array_needsize (WT, periodics, periodicmax, periodiccnt + HEAP0, EMPTY2);
+  periodics [ev_active (w)] = (WT)w;
+  upheap (periodics, ev_active (w));
 
   /*assert (("internal periodic heap corruption", periodics [ev_active (w)] == w));*/
 }
@@ -1985,9 +2068,9 @@ ev_periodic_stop (EV_P_ ev_periodic *w)
 
     assert (("internal periodic heap corruption", periodics [active] == (WT)w));
 
-    if (expect_true (active < periodiccnt))
+    if (expect_true (active < periodiccnt + HEAP0 - 1))
       {
-        periodics [active] = periodics [periodiccnt];
+        periodics [active] = periodics [periodiccnt + HEAP0 - 1];
         adjustheap (periodics, periodiccnt, active);
       }
 
