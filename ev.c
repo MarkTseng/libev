@@ -770,7 +770,8 @@ fd_rearm_all (EV_P)
 #define USE_4HEAP !EV_MINIMAL
 #if USE_4HEAP
 
-#define HEAP0 3 /* index of first element in heap */
+#define DHEAP 4
+#define HEAP0 (DHEAP - 1) /* index of first element in heap */
 
 /* towards the root */
 void inline_speed
@@ -780,7 +781,7 @@ upheap (WT *heap, int k)
 
   for (;;)
     {
-      int p = ((k - HEAP0 - 1) / 4) + HEAP0;
+      int p = ((k - HEAP0 - 1) / DHEAP) + HEAP0;
 
       if (p >= HEAP0 || heap [p]->at <= w->at)
         break;
@@ -805,10 +806,10 @@ downheap (WT *heap, int N, int k)
     {
       ev_tstamp minat;
       WT *minpos;
-      WT *pos = heap + 4 * (k - HEAP0) + HEAP0;
+      WT *pos = heap + DHEAP * (k - HEAP0) + HEAP0;
 
       // find minimum child
-      if (expect_true (pos +3 < E))
+      if (expect_true (pos + DHEAP - 1 < E))
         {
           /* fast path */
                                    (minpos = pos + 0), (minat = (*minpos)->at);
