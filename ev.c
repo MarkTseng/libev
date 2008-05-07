@@ -810,6 +810,7 @@ downheap (WT *heap, int N, int k)
       // find minimum child
       if (expect_true (pos +3 < E))
         {
+          /* fast path */
                                    (minpos = pos + 0), (minat = (*minpos)->at);
           if (pos [1]->at < minat) (minpos = pos + 1), (minat = (*minpos)->at);
           if (pos [2]->at < minat) (minpos = pos + 2), (minat = (*minpos)->at);
@@ -817,9 +818,9 @@ downheap (WT *heap, int N, int k)
         }
       else
         {
+          /* slow path */
           if (pos >= E)
             break;
-
                                                   (minpos = pos + 0), (minat = (*minpos)->at);
           if (pos + 1 < E && pos [1]->at < minat) (minpos = pos + 1), (minat = (*minpos)->at);
           if (pos + 2 < E && pos [2]->at < minat) (minpos = pos + 2), (minat = (*minpos)->at);
