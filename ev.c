@@ -768,7 +768,6 @@ fd_rearm_all (EV_P)
  * the difference is about 5% with 50000+ watchers.
  */
 #define USE_4HEAP !EV_MINIMAL
-#define USE_4HEAP 1/* they do not work corretcly */
 #if USE_4HEAP
 
 #define DHEAP 4
