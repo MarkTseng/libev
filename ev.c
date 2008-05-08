@@ -778,12 +778,13 @@ void inline_speed
 upheap (WT *heap, int k)
 {
   WT w = heap [k];
+  ev_tstamp w_at = w->at;
 
   for (;;)
     {
       int p = ((k - HEAP0 - 1) / DHEAP) + HEAP0;
 
-      if (p == k || heap [p]->at <= w->at)
+      if (p == k || heap [p]->at <= w_at)
         break;
 
       heap [k] = heap [p];
@@ -811,22 +812,20 @@ downheap (WT *heap, int N, int k)
       // find minimum child
       if (expect_true (pos + DHEAP - 1 < E))
         {
-          /* fast path */
-                                   (minpos = pos + 0), (minat = (*minpos)->at);
+          /* fast path */          (minpos = pos + 0), (minat = (*minpos)->at);
           if (pos [1]->at < minat) (minpos = pos + 1), (minat = (*minpos)->at);
           if (pos [2]->at < minat) (minpos = pos + 2), (minat = (*minpos)->at);
           if (pos [3]->at < minat) (minpos = pos + 3), (minat = (*minpos)->at);
         }
-      else
+      else if (pos < E)
         {
-          /* slow path */
-          if (pos >= E)
-            break;
-                                                  (minpos = pos + 0), (minat = (*minpos)->at);
+          /* slow path */                         (minpos = pos + 0), (minat = (*minpos)->at);
           if (pos + 1 < E && pos [1]->at < minat) (minpos = pos + 1), (minat = (*minpos)->at);
           if (pos + 2 < E && pos [2]->at < minat) (minpos = pos + 2), (minat = (*minpos)->at);
           if (pos + 3 < E && pos [3]->at < minat) (minpos = pos + 3), (minat = (*minpos)->at);
         }
+      else
+        break;
 
       if (w->at <= minat)
         break;
