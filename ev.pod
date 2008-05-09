@@ -3001,6 +3001,28 @@ usually more than enough. If you need to manage thousands of C<ev_stat>
 watchers you might want to increase this value (I<must> be a power of
 two).
 
+=item EV_USE_4HEAP
+
+Heaps are not very cache-efficient. To improve the cache-efficiency of the
+timer and periodics heap, libev uses a 4-heap when this symbol is defined
+to C<1>. The 4-heap uses more complicated (longer) code but has a
+noticable after performance with many (thousands) of watchers.
+
+The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
+(disabled).
+
+=item EV_HEAP_CACHE_AT
+
+Heaps are not very cache-efficient. To improve the cache-efficiency of the
+timer and periodics heap, libev can cache the timestamp (I<at>) within
+the heap structure (selected by defining C<EV_HEAP_CACHE_AT> to C<1>),
+which uses 8-12 bytes more per watcher and a few hundred bytes more code,
+but avoids random read accesses on heap changes. This noticably improves
+performance noticably with with many (hundreds) of watchers.
+
+The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
+(disabled).
+
 =item EV_COMMON
 
 By default, all watchers have a C<void *data> member. By redefining

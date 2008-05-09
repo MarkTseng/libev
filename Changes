@@ -6,6 +6,9 @@ Revision history for libev, a high-performance and full-featured event loop.
         - use 3-based 4-heap for !EV_MINIMAL. this makes better use
           of cpu cache lines and gives better growth behaviour than
           2-based heaps.
+        - cache timestamp within heap for !EV_MINIMAL, to avoid random
+          memory accesses.
+        - document/add EV_USE_4HEAP and EV_HEAP_CACHE_AT.
         - fix a potential aliasing issue in ev_timer_again.
         - add/document ev_periodic_at, retract direct access to ->at.
         - improve ev_stat docs.

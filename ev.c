@@ -237,6 +237,14 @@ extern "C" {
 # endif
 #endif
 
+#ifndef EV_USE_4HEAP
+# define EV_USE_4HEAP !EV_MINIMAL
+#endif
+
+#ifndef EV_HEAP_CACHE_AT
+# define EV_HEAP_CACHE_AT !EV_MINIMAL
+#endif
+
 /* this block fixes any misconfiguration where we know we run into trouble otherwise */
 
 #ifndef CLOCK_MONOTONIC
@@ -432,11 +440,10 @@ typedef struct
 #endif
 
 /* Heap Entry */
-#define EV_HEAP_CACHE_AT 0
 #if EV_HEAP_CACHE_AT
   typedef struct {
-    WT w;
     ev_tstamp at;
+    WT w;
   } ANHE;
 
   #define ANHE_w(he)      (he).w     /* access watcher, read-write */
@@ -793,7 +800,6 @@ fd_rearm_all (EV_P)
  * which is more cache-efficient.
  * the difference is about 5% with 50000+ watchers.
  */
-#define EV_USE_4HEAP !EV_MINIMAL
 #if EV_USE_4HEAP
 
 #define DHEAP 4
@@ -888,7 +894,7 @@ upheap (ANHE *heap, int k)
       k = p;
     }
 
-  heap [k] = w;
+  heap [k] = he;
   ev_active (ANHE_w (heap [k])) = k;
 }
 
@@ -908,7 +914,7 @@ downheap (ANHE *heap, int N, int k)
       c += c + 1 < N && ANHE_at (heap [c]) > ANHE_at (heap [c + 1])
            ? 1 : 0;
 
-      if (w->at <= ANHE_at (heap [c]))
+      if (ANHE_at (he) <= ANHE_at (heap [c]))
         break;
 
       heap [k] = heap [c];
@@ -1606,11 +1612,11 @@ timers_reify (EV_P)
       /* first reschedule or stop timer */
       if (w->repeat)
         {
-          assert (("negative ev_timer repeat value found while processing timers", w->repeat > 0.));
-
           ev_at (w) += w->repeat;
           if (ev_at (w) < mn_now)
             ev_at (w) = mn_now;
+
+          assert (("negative ev_timer repeat value found while processing timers", w->repeat > 0.));
 
           ANHE_at_set (timers [HEAP0]);
           downheap (timers, timercnt, HEAP0);
@@ -1636,7 +1642,9 @@ periodics_reify (EV_P)
       if (w->reschedule_cb)
         {
           ev_at (w) = w->reschedule_cb (w, ev_rt_now + TIME_EPSILON);
+
           assert (("ev_periodic reschedule callback returned time in the past", ev_at (w) > ev_rt_now));
+
           ANHE_at_set (periodics [HEAP0]);
           downheap (periodics, periodiccnt, HEAP0);
         }
@@ -1644,7 +1652,9 @@ periodics_reify (EV_P)
         {
           ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
           if (ev_at (w) - ev_rt_now <= TIME_EPSILON) ev_at (w) += w->interval;
+
           assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ev_at (w) > ev_rt_now));
+
           ANHE_at_set (periodics [HEAP0]);
           downheap (periodics, periodiccnt, HEAP0);
         }
@@ -1673,9 +1683,10 @@ periodics_reschedule (EV_P)
       ANHE_at_set (periodics [i]);
     }
 
-  /* now rebuild the heap, this for the 2-heap, inefficient for the 4-heap, but correct */
-  for (i = periodiccnt >> 1; --i; )
-    downheap (periodics, periodiccnt, i + HEAP0);
+  /* we don't use floyds algorithm, uphead is simpler and is more cache-efficient */
+  /* also, this is easy and corretc for both 2-heaps and 4-heaps */
+  for (i = 0; i < periodiccnt; ++i)
+    upheap (periodics, i + HEAP0);
 }
 #endif
 
@@ -2088,6 +2099,7 @@ ev_periodic_start (EV_P_ ev_periodic *w)
   ev_start (EV_A_ (W)w, ++periodiccnt + HEAP0 - 1);
   array_needsize (ANHE, periodics, periodicmax, ev_active (w) + 1, EMPTY2);
   ANHE_w (periodics [ev_active (w)]) = (WT)w;
+  ANHE_at_set (periodics [ev_active (w)]);
   upheap (periodics, ev_active (w));
 
   /*assert (("internal periodic heap corruption", ANHE_w (periodics [ev_active (w)]) == (WT)w));*/
