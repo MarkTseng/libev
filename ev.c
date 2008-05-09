@@ -432,15 +432,16 @@ typedef struct
 #endif
 
 /* Heap Entry */
+#define EV_HEAP_CACHE_AT 0
 #if EV_HEAP_CACHE_AT
   typedef struct {
     WT w;
     ev_tstamp at;
   } ANHE;
 
-  #define ANHE_w(he)      (he)        /* access watcher, read-write */
-  #define ANHE_at(he)     (he)->at    /* acces cahced at, read-only */
-  #define ANHE_at_set(he) (he)->at = (he)->w->at /* update at from watcher */
+  #define ANHE_w(he)      (he).w     /* access watcher, read-write */
+  #define ANHE_at(he)     (he).at    /* access cached at, read-only */
+  #define ANHE_at_set(he) (he).at = (he).w->at /* update at from watcher */
 #else
   typedef WT ANHE;
 
@@ -1611,6 +1612,7 @@ timers_reify (EV_P)
           if (ev_at (w) < mn_now)
             ev_at (w) = mn_now;
 
+          ANHE_at_set (timers [HEAP0]);
           downheap (timers, timercnt, HEAP0);
         }
       else
@@ -1635,13 +1637,15 @@ periodics_reify (EV_P)
         {
           ev_at (w) = w->reschedule_cb (w, ev_rt_now + TIME_EPSILON);
           assert (("ev_periodic reschedule callback returned time in the past", ev_at (w) > ev_rt_now));
-          downheap (periodics, periodiccnt, 1);
+          ANHE_at_set (periodics [HEAP0]);
+          downheap (periodics, periodiccnt, HEAP0);
         }
       else if (w->interval)
         {
           ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
           if (ev_at (w) - ev_rt_now <= TIME_EPSILON) ev_at (w) += w->interval;
           assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ev_at (w) > ev_rt_now));
+          ANHE_at_set (periodics [HEAP0]);
           downheap (periodics, periodiccnt, HEAP0);
         }
       else
@@ -1665,6 +1669,8 @@ periodics_reschedule (EV_P)
         ev_at (w) = w->reschedule_cb (w, ev_rt_now);
       else if (w->interval)
         ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
+
+      ANHE_at_set (periodics [i]);
     }
 
   /* now rebuild the heap, this for the 2-heap, inefficient for the 4-heap, but correct */
@@ -1987,7 +1993,7 @@ ev_io_stop (EV_P_ ev_io *w)
   if (expect_false (!ev_is_active (w)))
     return;
 
-  assert (("ev_io_start called with illegal fd (must stay constant after start!)", w->fd >= 0 && w->fd < anfdmax));
+  assert (("ev_io_stop called with illegal fd (must stay constant after start!)", w->fd >= 0 && w->fd < anfdmax));
 
   wlist_del (&anfds[w->fd].head, (WL)w);
   ev_stop (EV_A_ (W)w);
@@ -2011,7 +2017,7 @@ ev_timer_start (EV_P_ ev_timer *w)
   ANHE_at_set (timers [ev_active (w)]);
   upheap (timers, ev_active (w));
 
-  /*assert (("internal timer heap corruption", timers [ev_active (w)] == w));*/
+  /*assert (("internal timer heap corruption", timers [ev_active (w)] == (WT)w));*/
 }
 
 void noinline
