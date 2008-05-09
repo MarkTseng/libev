@@ -424,10 +424,29 @@ typedef struct
 } ANPENDING;
 
 #if EV_USE_INOTIFY
+/* hash table entry per inotify-id */
 typedef struct
 {
   WL head;
 } ANFS;
+#endif
+
+/* Heap Entry */
+#if EV_HEAP_CACHE_AT
+  typedef struct {
+    WT w;
+    ev_tstamp at;
+  } ANHE;
+
+  #define ANHE_w(he)      (he)        /* access watcher, read-write */
+  #define ANHE_at(he)     (he)->at    /* acces cahced at, read-only */
+  #define ANHE_at_set(he) (he)->at = (he)->w->at /* update at from watcher */
+#else
+  typedef WT ANHE;
+
+  #define ANHE_w(he)      (he)
+  #define ANHE_at(he)     (he)->at
+  #define ANHE_at_set(he)
 #endif
 
 #if EV_MULTIPLICITY
@@ -762,82 +781,87 @@ fd_rearm_all (EV_P)
 /*****************************************************************************/
 
 /*
+ * the heap functions want a real array index. array index 0 uis guaranteed to not
+ * be in-use at any time. the first heap entry is at array [HEAP0]. DHEAP gives
+ * the branching factor of the d-tree.
+ */
+
+/*
  * at the moment we allow libev the luxury of two heaps,
  * a small-code-size 2-heap one and a ~1.5kb larger 4-heap
  * which is more cache-efficient.
  * the difference is about 5% with 50000+ watchers.
  */
-#define USE_4HEAP !EV_MINIMAL
-#if USE_4HEAP
+#define EV_USE_4HEAP !EV_MINIMAL
+#if EV_USE_4HEAP
 
 #define DHEAP 4
 #define HEAP0 (DHEAP - 1) /* index of first element in heap */
 
 /* towards the root */
 void inline_speed
-upheap (WT *heap, int k)
+upheap (ANHE *heap, int k)
 {
-  WT w = heap [k];
-  ev_tstamp w_at = w->at;
+  ANHE he = heap [k];
 
   for (;;)
     {
       int p = ((k - HEAP0 - 1) / DHEAP) + HEAP0;
 
-      if (p == k || heap [p]->at <= w_at)
+      if (p == k || ANHE_at (heap [p]) <= ANHE_at (he))
         break;
 
       heap [k] = heap [p];
-      ev_active (heap [k]) = k;
+      ev_active (ANHE_w (heap [k])) = k;
       k = p;
     }
 
-  heap [k] = w;
-  ev_active (heap [k]) = k;
+  ev_active (ANHE_w (he)) = k;
+  heap [k] = he;
 }
 
 /* away from the root */
 void inline_speed
-downheap (WT *heap, int N, int k)
+downheap (ANHE *heap, int N, int k)
 {
-  WT w = heap [k];
-  WT *E = heap + N + HEAP0;
+  ANHE he = heap [k];
+  ANHE *E = heap + N + HEAP0;
 
   for (;;)
     {
       ev_tstamp minat;
-      WT *minpos;
-      WT *pos = heap + DHEAP * (k - HEAP0) + HEAP0;
+      ANHE *minpos;
+      ANHE *pos = heap + DHEAP * (k - HEAP0) + HEAP0;
 
       // find minimum child
       if (expect_true (pos + DHEAP - 1 < E))
         {
-          /* fast path */          (minpos = pos + 0), (minat = (*minpos)->at);
-          if (pos [1]->at < minat) (minpos = pos + 1), (minat = (*minpos)->at);
-          if (pos [2]->at < minat) (minpos = pos + 2), (minat = (*minpos)->at);
-          if (pos [3]->at < minat) (minpos = pos + 3), (minat = (*minpos)->at);
+          /* fast path */                (minpos = pos + 0), (minat = ANHE_at (*minpos));
+          if (ANHE_at (pos [1]) < minat) (minpos = pos + 1), (minat = ANHE_at (*minpos));
+          if (ANHE_at (pos [2]) < minat) (minpos = pos + 2), (minat = ANHE_at (*minpos));
+          if (ANHE_at (pos [3]) < minat) (minpos = pos + 3), (minat = ANHE_at (*minpos));
         }
       else if (pos < E)
         {
-          /* slow path */                         (minpos = pos + 0), (minat = (*minpos)->at);
-          if (pos + 1 < E && pos [1]->at < minat) (minpos = pos + 1), (minat = (*minpos)->at);
-          if (pos + 2 < E && pos [2]->at < minat) (minpos = pos + 2), (minat = (*minpos)->at);
-          if (pos + 3 < E && pos [3]->at < minat) (minpos = pos + 3), (minat = (*minpos)->at);
+          /* slow path */                               (minpos = pos + 0), (minat = ANHE_at (*minpos));
+          if (pos + 1 < E && ANHE_at (pos [1]) < minat) (minpos = pos + 1), (minat = ANHE_at (*minpos));
+          if (pos + 2 < E && ANHE_at (pos [2]) < minat) (minpos = pos + 2), (minat = ANHE_at (*minpos));
+          if (pos + 3 < E && ANHE_at (pos [3]) < minat) (minpos = pos + 3), (minat = ANHE_at (*minpos));
         }
       else
         break;
 
-      if (w->at <= minat)
+      if (ANHE_at (he) <= minat)
         break;
 
-      ev_active (*minpos) = k;
+      ev_active (ANHE_w (*minpos)) = k;
       heap [k] = *minpos;
 
       k = minpos - heap;
     }
 
-  heap [k] = w;
-  ev_active (heap [k]) = k;
+  ev_active (ANHE_w (he)) = k;
+  heap [k] = he;
 }
 
 #else // 4HEAP
@@ -846,32 +870,32 @@ downheap (WT *heap, int N, int k)
 
 /* towards the root */
 void inline_speed
-upheap (WT *heap, int k)
+upheap (ANHE *heap, int k)
 {
-  WT w = heap [k];
+  ANHE he = heap [k];
 
   for (;;)
     {
       int p = k >> 1;
 
       /* maybe we could use a dummy element at heap [0]? */
-      if (!p || heap [p]->at <= w->at)
+      if (!p || ANHE_at (heap [p]) <= ANHE_at (he))
         break;
 
       heap [k] = heap [p];
-      ev_active (heap [k]) = k;
+      ev_active (ANHE_w (heap [k])) = k;
       k = p;
     }
 
   heap [k] = w;
-  ev_active (heap [k]) = k;
+  ev_active (ANHE_w (heap [k])) = k;
 }
 
 /* away from the root */
 void inline_speed
-downheap (WT *heap, int N, int k)
+downheap (ANHE *heap, int N, int k)
 {
-  WT w = heap [k];
+  ANHE he = heap [k];
 
   for (;;)
     {
@@ -880,25 +904,25 @@ downheap (WT *heap, int N, int k)
       if (c > N)
         break;
 
-      c += c + 1 < N && heap [c]->at > heap [c + 1]->at
+      c += c + 1 < N && ANHE_at (heap [c]) > ANHE_at (heap [c + 1])
            ? 1 : 0;
 
-      if (w->at <= heap [c]->at)
+      if (w->at <= ANHE_at (heap [c]))
         break;
 
       heap [k] = heap [c];
-      ((W)heap [k])->active = k;
+      ev_active (ANHE_w (heap [k])) = k;
       
       k = c;
     }
 
-  heap [k] = w;
-  ev_active (heap [k]) = k;
+  heap [k] = he;
+  ev_active (ANHE_w (he)) = k;
 }
 #endif
 
 void inline_size
-adjustheap (WT *heap, int N, int k)
+adjustheap (ANHE *heap, int N, int k)
 {
   upheap (heap, k);
   downheap (heap, N, k);
@@ -1572,9 +1596,9 @@ idle_reify (EV_P)
 void inline_size
 timers_reify (EV_P)
 {
-  while (timercnt && ev_at (timers [HEAP0]) <= mn_now)
+  while (timercnt && ANHE_at (timers [HEAP0]) <= mn_now)
     {
-      ev_timer *w = (ev_timer *)timers [HEAP0];
+      ev_timer *w = (ev_timer *)ANHE_w (timers [HEAP0]);
 
       /*assert (("inactive timer on timer heap detected", ev_is_active (w)));*/
 
@@ -1600,9 +1624,9 @@ timers_reify (EV_P)
 void inline_size
 periodics_reify (EV_P)
 {
-  while (periodiccnt && ev_at (periodics [HEAP0]) <= ev_rt_now)
+  while (periodiccnt && ANHE_at (periodics [HEAP0]) <= ev_rt_now)
     {
-      ev_periodic *w = (ev_periodic *)periodics [HEAP0];
+      ev_periodic *w = (ev_periodic *)ANHE_w (periodics [HEAP0]);
 
       /*assert (("inactive timer on periodic heap detected", ev_is_active (w)));*/
 
@@ -1633,9 +1657,9 @@ periodics_reschedule (EV_P)
   int i;
 
   /* adjust periodics after time jump */
-  for (i = 1; i <= periodiccnt; ++i)
+  for (i = HEAP0; i < periodiccnt + HEAP0; ++i)
     {
-      ev_periodic *w = (ev_periodic *)periodics [i];
+      ev_periodic *w = (ev_periodic *)ANHE_w (periodics [i]);
 
       if (w->reschedule_cb)
         ev_at (w) = w->reschedule_cb (w, ev_rt_now);
@@ -1643,7 +1667,7 @@ periodics_reschedule (EV_P)
         ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
     }
 
-  /* now rebuild the heap */
+  /* now rebuild the heap, this for the 2-heap, inefficient for the 4-heap, but correct */
   for (i = periodiccnt >> 1; --i; )
     downheap (periodics, periodiccnt, i + HEAP0);
 }
@@ -1709,8 +1733,12 @@ time_update (EV_P_ ev_tstamp max_block)
           periodics_reschedule (EV_A);
 #endif
           /* adjust timers. this is easy, as the offset is the same for all of them */
-          for (i = 1; i <= timercnt; ++i)
-            ev_at (timers [i]) += ev_rt_now - mn_now;
+          for (i = 0; i < timercnt; ++i)
+            {
+              ANHE *he = timers + i + HEAP0;
+              ANHE_w (*he)->at += ev_rt_now - mn_now;
+              ANHE_at_set (*he);
+            }
         }
 
       mn_now = ev_rt_now;
@@ -1790,14 +1818,14 @@ ev_loop (EV_P_ int flags)
 
             if (timercnt)
               {
-                ev_tstamp to = ev_at (timers [HEAP0]) - mn_now + backend_fudge;
+                ev_tstamp to = ANHE_at (timers [HEAP0]) - mn_now + backend_fudge;
                 if (waittime > to) waittime = to;
               }
 
 #if EV_PERIODIC_ENABLE
             if (periodiccnt)
               {
-                ev_tstamp to = ev_at (periodics [HEAP0]) - ev_rt_now + backend_fudge;
+                ev_tstamp to = ANHE_at (periodics [HEAP0]) - ev_rt_now + backend_fudge;
                 if (waittime > to) waittime = to;
               }
 #endif
@@ -1978,8 +2006,9 @@ ev_timer_start (EV_P_ ev_timer *w)
   assert (("ev_timer_start called with negative timer repeat value", w->repeat >= 0.));
 
   ev_start (EV_A_ (W)w, ++timercnt + HEAP0 - 1);
-  array_needsize (WT, timers, timermax, timercnt + HEAP0, EMPTY2);
-  timers [ev_active (w)] = (WT)w;
+  array_needsize (ANHE, timers, timermax, ev_active (w) + 1, EMPTY2);
+  ANHE_w (timers [ev_active (w)]) = (WT)w;
+  ANHE_at_set (timers [ev_active (w)]);
   upheap (timers, ev_active (w));
 
   /*assert (("internal timer heap corruption", timers [ev_active (w)] == w));*/
@@ -1995,7 +2024,7 @@ ev_timer_stop (EV_P_ ev_timer *w)
   {
     int active = ev_active (w);
 
-    assert (("internal timer heap corruption", timers [active] == (WT)w));
+    assert (("internal timer heap corruption", ANHE_w (timers [active]) == (WT)w));
 
     if (expect_true (active < timercnt + HEAP0 - 1))
       {
@@ -2019,6 +2048,7 @@ ev_timer_again (EV_P_ ev_timer *w)
       if (w->repeat)
         {
           ev_at (w) = mn_now + w->repeat;
+          ANHE_at_set (timers [ev_active (w)]);
           adjustheap (timers, timercnt, ev_active (w));
         }
       else
@@ -2050,11 +2080,11 @@ ev_periodic_start (EV_P_ ev_periodic *w)
     ev_at (w) = w->offset;
 
   ev_start (EV_A_ (W)w, ++periodiccnt + HEAP0 - 1);
-  array_needsize (WT, periodics, periodicmax, periodiccnt + HEAP0, EMPTY2);
-  periodics [ev_active (w)] = (WT)w;
+  array_needsize (ANHE, periodics, periodicmax, ev_active (w) + 1, EMPTY2);
+  ANHE_w (periodics [ev_active (w)]) = (WT)w;
   upheap (periodics, ev_active (w));
 
-  /*assert (("internal periodic heap corruption", periodics [ev_active (w)] == w));*/
+  /*assert (("internal periodic heap corruption", ANHE_w (periodics [ev_active (w)]) == (WT)w));*/
 }
 
 void noinline
@@ -2067,7 +2097,7 @@ ev_periodic_stop (EV_P_ ev_periodic *w)
   {
     int active = ev_active (w);
 
-    assert (("internal periodic heap corruption", periodics [active] == (WT)w));
+    assert (("internal periodic heap corruption", ANHE_w (periodics [active]) == (WT)w));
 
     if (expect_true (active < periodiccnt + HEAP0 - 1))
       {
