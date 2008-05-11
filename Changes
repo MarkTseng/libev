@@ -13,6 +13,7 @@ Revision history for libev, a high-performance and full-featured event loop.
         - add/document ev_periodic_at, retract direct access to ->at.
         - improve ev_stat docs.
         - add portability requirements section.
+	- fix manpage headers etc.
 
 3.31 Wed Apr 16 20:45:04 CEST 2008
 	- added last minute fix for ev_poll.c by Brandon Black.

@@ -131,8 +131,8 @@
 .rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
-.IX Title "EV 1"
-.TH EV 1 "2008-04-11" "perl v5.10.0" "User Contributed Perl Documentation"
+.IX Title "LIBEV 3"
+.TH LIBEV 3 "2008-05-09" "libev-1.1" "libev - high perfromance full featured event loop"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1513,6 +1513,10 @@ Simply stops and restarts the periodic watcher again. This is only useful
 when you changed some parameters or the reschedule callback would return
 a different time than the last time it was called (e.g. in a crond like
 program when the crontabs have changed).
+.IP "ev_tstamp ev_periodic_at (ev_periodic *)" 4
+.IX Item "ev_tstamp ev_periodic_at (ev_periodic *)"
+When active, returns the absolute time that the watcher is supposed to
+trigger next.
 .IP "ev_tstamp offset [read\-write]" 4
 .IX Item "ev_tstamp offset [read-write]"
 When repeating, this contains the offset value, otherwise this is the
@@ -1530,10 +1534,6 @@ called.
 The current reschedule callback, or \f(CW0\fR, if this functionality is
 switched off. Can be changed any time, but changes only take effect when
 the periodic timer fires or \f(CW\*(C`ev_periodic_again\*(C'\fR is being called.
-.IP "ev_tstamp at [read\-only]" 4
-.IX Item "ev_tstamp at [read-only]"
-When active, contains the absolute time that the watcher is supposed to
-trigger next.
 .PP
 \fIExamples\fR
 .IX Subsection "Examples"
@@ -1749,11 +1749,12 @@ resource-intensive.
 .PP
 At the time of this writing, only the Linux inotify interface is
 implemented (implementing kqueue support is left as an exercise for the
-reader). Inotify will be used to give hints only and should not change the
-semantics of \f(CW\*(C`ev_stat\*(C'\fR watchers, which means that libev sometimes needs
-to fall back to regular polling again even with inotify, but changes are
-usually detected immediately, and if the file exists there will be no
-polling.
+reader, note, however, that the author sees no way of implementing ev_stat
+semantics with kqueue). Inotify will be used to give hints only and should
+not change the semantics of \f(CW\*(C`ev_stat\*(C'\fR watchers, which means that libev
+sometimes needs to fall back to regular polling again even with inotify,
+but changes are usually detected immediately, and if the file exists there
+will be no polling.
 .PP
 \fI\s-1ABI\s0 Issues (Largefile Support)\fR
 .IX Subsection "ABI Issues (Largefile Support)"
@@ -1775,9 +1776,9 @@ available on Linux) and present at runtime, it will be used to speed up
 change detection where possible. The inotify descriptor will be created lazily
 when the first \f(CW\*(C`ev_stat\*(C'\fR watcher is being started.
 .PP
-Inotify presense does not change the semantics of \f(CW\*(C`ev_stat\*(C'\fR watchers
+Inotify presence does not change the semantics of \f(CW\*(C`ev_stat\*(C'\fR watchers
 except that changes might be detected earlier, and in some cases, to avoid
-making regular \f(CW\*(C`stat\*(C'\fR calls. Even in the presense of inotify support
+making regular \f(CW\*(C`stat\*(C'\fR calls. Even in the presence of inotify support
 there are many cases where libev has to resort to regular \f(CW\*(C`stat\*(C'\fR polling.
 .PP
 (There is no support for kqueue, as apparently it cannot be used to
@@ -1791,16 +1792,25 @@ The \f(CW\*(C`stat ()\*(C'\fR syscall only supports full-second resolution porta
 even on systems where the resolution is higher, many filesystems still
 only support whole seconds.
 .PP
-That means that, if the time is the only thing that changes, you might
-miss updates: on the first update, \f(CW\*(C`ev_stat\*(C'\fR detects a change and calls
-your callback, which does something. When there is another update within
-the same second, \f(CW\*(C`ev_stat\*(C'\fR will be unable to detect it.
+That means that, if the time is the only thing that changes, you can
+easily miss updates: on the first update, \f(CW\*(C`ev_stat\*(C'\fR detects a change and
+calls your callback, which does something. When there is another update
+within the same second, \f(CW\*(C`ev_stat\*(C'\fR will be unable to detect it as the stat
+data does not change.
 .PP
-The solution to this is to delay acting on a change for a second (or till
-the next second boundary), using a roughly one-second delay \f(CW\*(C`ev_timer\*(C'\fR
-(\f(CW\*(C`ev_timer_set (w, 0., 1.01); ev_timer_again (loop, w)\*(C'\fR). The \f(CW.01\fR
-is added to work around small timing inconsistencies of some operating
-systems.
+The solution to this is to delay acting on a change for slightly more
+than second (or till slightly after the next full second boundary), using
+a roughly one-second-delay \f(CW\*(C`ev_timer\*(C'\fR (e.g. \f(CW\*(C`ev_timer_set (w, 0., 1.02);
+ev_timer_again (loop, w)\*(C'\fR).
+.PP
+The \f(CW.02\fR offset is added to work around small timing inconsistencies
+of some operating systems (where the second counter of the current time
+might be be delayed. One such system is the Linux kernel, where a call to
+\&\f(CW\*(C`gettimeofday\*(C'\fR might return a timestamp with a full second later than
+a subsequent \f(CW\*(C`time\*(C'\fR call \- if the equivalent of \f(CW\*(C`time ()\*(C'\fR is used to
+update file times then there will be a small window where the kernel uses
+the previous second to update file times but libev might already execute
+the timer callback).
 .PP
 \fIWatcher-Specific Functions and Data Members\fR
 .IX Subsection "Watcher-Specific Functions and Data Members"
@@ -1816,25 +1826,29 @@ be detected and should normally be specified as \f(CW0\fR to let libev choose
 a suitable value. The memory pointed to by \f(CW\*(C`path\*(C'\fR must point to the same
 path for as long as the watcher is active.
 .Sp
-The callback will be receive \f(CW\*(C`EV_STAT\*(C'\fR when a change was detected,
-relative to the attributes at the time the watcher was started (or the
-last change was detected).
+The callback will receive \f(CW\*(C`EV_STAT\*(C'\fR when a change was detected, relative
+to the attributes at the time the watcher was started (or the last change
+was detected).
 .IP "ev_stat_stat (loop, ev_stat *)" 4
 .IX Item "ev_stat_stat (loop, ev_stat *)"
 Updates the stat buffer immediately with new values. If you change the
-watched path in your callback, you could call this fucntion to avoid
-detecting this change (while introducing a race condition). Can also be
-useful simply to find out the new values.
+watched path in your callback, you could call this function to avoid
+detecting this change (while introducing a race condition if you are not
+the only one changing the path). Can also be useful simply to find out the
+new values.
 .IP "ev_statdata attr [read\-only]" 4
 .IX Item "ev_statdata attr [read-only]"
-The most-recently detected attributes of the file. Although the type is of
+The most-recently detected attributes of the file. Although the type is
 \&\f(CW\*(C`ev_statdata\*(C'\fR, this is usually the (or one of the) \f(CW\*(C`struct stat\*(C'\fR types
-suitable for your system. If the \f(CW\*(C`st_nlink\*(C'\fR member is \f(CW0\fR, then there
-was some error while \f(CW\*(C`stat\*(C'\fRing the file.
+suitable for your system, but you can only rely on the POSIX-standardised
+members to be present. If the \f(CW\*(C`st_nlink\*(C'\fR member is \f(CW0\fR, then there was
+some error while \f(CW\*(C`stat\*(C'\fRing the file.
 .IP "ev_statdata prev [read\-only]" 4
 .IX Item "ev_statdata prev [read-only]"
 The previous attributes of the file. The callback gets invoked whenever
-\&\f(CW\*(C`prev\*(C'\fR != \f(CW\*(C`attr\*(C'\fR.
+\&\f(CW\*(C`prev\*(C'\fR != \f(CW\*(C`attr\*(C'\fR, or, more precisely, one or more of these members
+differ: \f(CW\*(C`st_dev\*(C'\fR, \f(CW\*(C`st_ino\*(C'\fR, \f(CW\*(C`st_mode\*(C'\fR, \f(CW\*(C`st_nlink\*(C'\fR, \f(CW\*(C`st_uid\*(C'\fR,
+\&\f(CW\*(C`st_gid\*(C'\fR, \f(CW\*(C`st_rdev\*(C'\fR, \f(CW\*(C`st_size\*(C'\fR, \f(CW\*(C`st_atime\*(C'\fR, \f(CW\*(C`st_mtime\*(C'\fR, \f(CW\*(C`st_ctime\*(C'\fR.
 .IP "ev_tstamp interval [read\-only]" 4
 .IX Item "ev_tstamp interval [read-only]"
 The specified interval.
@@ -1898,7 +1912,7 @@ one might do the work both on \f(CW\*(C`ev_stat\*(C'\fR callback invocation \fIa
 \&  ...
 \&  ev_stat_init (&passwd, stat_cb, "/etc/passwd", 0.);
 \&  ev_stat_start (loop, &passwd);
-\&  ev_timer_init (&timer, timer_cb, 0., 1.01);
+\&  ev_timer_init (&timer, timer_cb, 0., 1.02);
 .Ve
 .ie n .Sh """ev_idle"" \- when you've got nothing better to do..."
 .el .Sh "\f(CWev_idle\fP \- when you've got nothing better to do..."
@@ -1994,7 +2008,7 @@ It is recommended to give \f(CW\*(C`ev_check\*(C'\fR watchers highest (\f(CW\*(C
 priority, to ensure that they are being run before any other watchers
 after the poll. Also, \f(CW\*(C`ev_check\*(C'\fR watchers (and \f(CW\*(C`ev_prepare\*(C'\fR watchers,
 too) should not activate (\*(L"feed\*(R") events into libev. While libev fully
-supports this, they will be called before other \f(CW\*(C`ev_check\*(C'\fR watchers
+supports this, they might get executed before other \f(CW\*(C`ev_check\*(C'\fR watchers
 did their job. As \f(CW\*(C`ev_check\*(C'\fR watchers are often used to embed other
 (non-libev) event loops those other event loops might be in an unusable
 state until their \f(CW\*(C`ev_check\*(C'\fR watcher ran (always remind yourself to
@@ -2018,9 +2032,9 @@ macros, but using them is utterly, utterly and completely pointless.
 There are a number of principal ways to embed other event loops or modules
 into libev. Here are some ideas on how to include libadns into libev
 (there is a Perl module named \f(CW\*(C`EV::ADNS\*(C'\fR that does this, which you could
-use for an actually working example. Another Perl module named \f(CW\*(C`EV::Glib\*(C'\fR
-embeds a Glib main context into libev, and finally, \f(CW\*(C`Glib::EV\*(C'\fR embeds \s-1EV\s0
-into the Glib event loop).
+use as a working example. Another Perl module named \f(CW\*(C`EV::Glib\*(C'\fR embeds a
+Glib main context into libev, and finally, \f(CW\*(C`Glib::EV\*(C'\fR embeds \s-1EV\s0 into the
+Glib event loop).
 .PP
 Method 1: Add \s-1IO\s0 watchers and a timeout watcher in a prepare handler,
 and in a check watcher, destroy them and call into libadns. What follows
@@ -3054,8 +3068,9 @@ defined to be \f(CW0\fR, then they are not.
 .IP "\s-1EV_MINIMAL\s0" 4
 .IX Item "EV_MINIMAL"
 If you need to shave off some kilobytes of code at the expense of some
-speed, define this symbol to \f(CW1\fR. Currently only used for gcc to override
-some inlining decisions, saves roughly 30% codesize of amd64.
+speed, define this symbol to \f(CW1\fR. Currently this is used to override some
+inlining decisions, saves roughly 30% codesize of amd64. It also selects a
+much smaller 2\-heap for timer management over the default 4\-heap.
 .IP "\s-1EV_PID_HASHSIZE\s0" 4
 .IX Item "EV_PID_HASHSIZE"
 \&\f(CW\*(C`ev_child\*(C'\fR watchers use a small hash table to distribute workload by
@@ -3069,6 +3084,26 @@ inotify watch id. The default size is \f(CW16\fR (or \f(CW1\fR with \f(CW\*(C`EV
 usually more than enough. If you need to manage thousands of \f(CW\*(C`ev_stat\*(C'\fR
 watchers you might want to increase this value (\fImust\fR be a power of
 two).
+.IP "\s-1EV_USE_4HEAP\s0" 4
+.IX Item "EV_USE_4HEAP"
+Heaps are not very cache-efficient. To improve the cache-efficiency of the
+timer and periodics heap, libev uses a 4\-heap when this symbol is defined
+to \f(CW1\fR. The 4\-heap uses more complicated (longer) code but has a
+noticable after performance with many (thousands) of watchers.
+.Sp
+The default is \f(CW1\fR unless \f(CW\*(C`EV_MINIMAL\*(C'\fR is set in which case it is \f(CW0\fR
+(disabled).
+.IP "\s-1EV_HEAP_CACHE_AT\s0" 4
+.IX Item "EV_HEAP_CACHE_AT"
+Heaps are not very cache-efficient. To improve the cache-efficiency of the
+timer and periodics heap, libev can cache the timestamp (\fIat\fR) within
+the heap structure (selected by defining \f(CW\*(C`EV_HEAP_CACHE_AT\*(C'\fR to \f(CW1\fR),
+which uses 8\-12 bytes more per watcher and a few hundred bytes more code,
+but avoids random read accesses on heap changes. This noticably improves
+performance noticably with with many (hundreds) of watchers.
+.Sp
+The default is \f(CW1\fR unless \f(CW\*(C`EV_MINIMAL\*(C'\fR is set in which case it is \f(CW0\fR
+(disabled).
 .IP "\s-1EV_COMMON\s0" 4
 .IX Item "EV_COMMON"
 By default, all watchers have a \f(CW\*(C`void *data\*(C'\fR member. By redefining
@@ -3244,8 +3279,8 @@ correct watcher to remove. The lists are usually short (you don't usually
 have many watchers waiting for the same fd or signal).
 .IP "Finding the next timer in each loop iteration: O(1)" 4
 .IX Item "Finding the next timer in each loop iteration: O(1)"
-By virtue of using a binary heap, the next timer is always found at the
-beginning of the storage array.
+By virtue of using a binary or 4\-heap, the next timer is always found at a
+fixed position in the storage array.
 .IP "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)" 4
 .IX Item "Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)"
 A change means an I/O watcher gets started or stopped, which requires
@@ -3281,15 +3316,21 @@ the form of the \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR backend, and only supports so
 descriptors. This only applies when using Win32 natively, not when using
 e.g. cygwin.
 .PP
+Lifting these limitations would basically require the full
+re-implementation of the I/O system. If you are into these kinds of
+things, then note that glib does exactly that for you in a very portable
+way (note also that glib is the slowest event library known to man).
+.PP
 There is no supported compilation method available on windows except
 embedding it into other applications.
 .PP
-Due to the many, low, and arbitrary limits on the win32 platform and the
-abysmal performance of winsockets, using a large number of sockets is not
-recommended (and not reasonable). If your program needs to use more than
-a hundred or so sockets, then likely it needs to use a totally different
-implementation for windows, as libev offers the \s-1POSIX\s0 model, which cannot
-be implemented efficiently on windows (microsoft monopoly games).
+Due to the many, low, and arbitrary limits on the win32 platform and
+the abysmal performance of winsockets, using a large number of sockets
+is not recommended (and not reasonable). If your program needs to use
+more than a hundred or so sockets, then likely it needs to use a totally
+different implementation for windows, as libev offers the \s-1POSIX\s0 readyness
+notification model, which cannot be implemented efficiently on windows
+(microsoft monopoly games).
 .IP "The winsocket select function" 4
 .IX Item "The winsocket select function"
 The winsocket \f(CW\*(C`select\*(C'\fR function doesn't follow \s-1POSIX\s0 in that it requires
@@ -3311,11 +3352,13 @@ Note that winsockets handling of fd sets is O(n), so you can easily get a
 complexity in the O(nA\*^X) range when using win32.
 .IP "Limited number of file descriptors" 4
 .IX Item "Limited number of file descriptors"
-Windows has numerous arbitrary (and low) limits on things. Early versions
-of winsocket's select only supported waiting for a max. of \f(CW64\fR handles
-(probably owning to the fact that all windows kernels can only wait for
-\&\f(CW64\fR things at the same time internally; microsoft recommends spawning a
-chain of threads and wait for 63 handles and the previous thread in each).
+Windows has numerous arbitrary (and low) limits on things.
+.Sp
+Early versions of winsocket's select only supported waiting for a maximum
+of \f(CW64\fR handles (probably owning to the fact that all windows kernels
+can only wait for \f(CW64\fR things at the same time internally; microsoft
+recommends spawning a chain of threads and wait for 63 handles and the
+previous thread in each. Great).
 .Sp
 Newer versions support more handles, but you need to define \f(CW\*(C`FD_SETSIZE\*(C'\fR
 to some high number (e.g. \f(CW2048\fR) before compiling the winsocket select
@@ -3333,12 +3376,53 @@ This might get you to about \f(CW512\fR or \f(CW2048\fR sockets (depending on
 windows version and/or the phase of the moon). To get more, you need to
 wrap all I/O functions and provide your own fd management, but the cost of
 calling select (O(nA\*^X)) will likely make this unworkable.
+.SH "PORTABILITY REQUIREMENTS"
+.IX Header "PORTABILITY REQUIREMENTS"
+In addition to a working ISO-C implementation, libev relies on a few
+additional extensions:
+.ie n .IP """sig_atomic_t volatile"" must be thread-atomic as well" 4
+.el .IP "\f(CWsig_atomic_t volatile\fR must be thread-atomic as well" 4
+.IX Item "sig_atomic_t volatile must be thread-atomic as well"
+The type \f(CW\*(C`sig_atomic_t volatile\*(C'\fR (or whatever is defined as
+\&\f(CW\*(C`EV_ATOMIC_T\*(C'\fR) must be atomic w.r.t. accesses from different
+threads. This is not part of the specification for \f(CW\*(C`sig_atomic_t\*(C'\fR, but is
+believed to be sufficiently portable.
+.ie n .IP """sigprocmask"" must work in a threaded environment" 4
+.el .IP "\f(CWsigprocmask\fR must work in a threaded environment" 4
+.IX Item "sigprocmask must work in a threaded environment"
+Libev uses \f(CW\*(C`sigprocmask\*(C'\fR to temporarily block signals. This is not
+allowed in a threaded program (\f(CW\*(C`pthread_sigmask\*(C'\fR has to be used). Typical
+pthread implementations will either allow \f(CW\*(C`sigprocmask\*(C'\fR in the \*(L"main
+thread\*(R" or will block signals process-wide, both behaviours would
+be compatible with libev. Interaction between \f(CW\*(C`sigprocmask\*(C'\fR and
+\&\f(CW\*(C`pthread_sigmask\*(C'\fR could complicate things, however.
+.Sp
+The most portable way to handle signals is to block signals in all threads
+except the initial one, and run the default loop in the initial thread as
+well.
+.ie n .IP """long"" must be large enough for common memory allocation sizes" 4
+.el .IP "\f(CWlong\fR must be large enough for common memory allocation sizes" 4
+.IX Item "long must be large enough for common memory allocation sizes"
+To improve portability and simplify using libev, libev uses \f(CW\*(C`long\*(C'\fR
+internally instead of \f(CW\*(C`size_t\*(C'\fR when allocating its data structures. On
+non-POSIX systems (Microsoft...) this might be unexpectedly low, but
+is still at least 31 bits everywhere, which is enough for hundreds of
+millions of watchers.
+.ie n .IP """double"" must hold a time value in seconds with enough accuracy" 4
+.el .IP "\f(CWdouble\fR must hold a time value in seconds with enough accuracy" 4
+.IX Item "double must hold a time value in seconds with enough accuracy"
+The type \f(CW\*(C`double\*(C'\fR is used to represent timestamps. It is required to
+have at least 51 bits of mantissa (and 9 bits of exponent), which is good
+enough for at least into the year 4000. This requirement is fulfilled by
+implementations implementing \s-1IEEE\s0 754 (basically all existing ones).
+.PP
+If you know of other additional requirements drop me a note.
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 Marc Lehmann <libev@schmorp.de>.
 .SH "POD ERRORS"
 .IX Header "POD ERRORS"
 Hey! \fBThe above document had some coding errors, which are explained below:\fR
-.IP "Around line 3015:" 4
-.IX Item "Around line 3015:"
+.IP "Around line 3052:" 4
+.IX Item "Around line 3052:"
 You forgot a '=back' before '=head2'
