@@ -19,3 +19,4 @@ event_pending
 event_priority_init
 event_priority_set
 event_set
+event_set_log_callback
