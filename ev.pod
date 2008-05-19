@@ -338,7 +338,7 @@ parallelity (most of the file descriptors should be busy). If you are
 writing a server, you should C<accept ()> in a loop to accept as many
 connections as possible during one iteration. You might also want to have
 a look at C<ev_set_io_collect_interval ()> to increase the amount of
-readyness notifications you get per iteration.
+readiness notifications you get per iteration.
 
 =item C<EVBACKEND_POLL>    (value 2, poll backend, available everywhere except on windows)
 
@@ -427,7 +427,7 @@ file descriptor per loop iteration. For small and medium numbers of file
 descriptors a "slow" C<EVBACKEND_SELECT> or C<EVBACKEND_POLL> backend
 might perform better.
 
-On the positive side, ignoring the spurious readyness notifications, this
+On the positive side, ignoring the spurious readiness notifications, this
 backend actually performed to specification in all tests and is fully
 embeddable, which is a rare feat among the OS-specific backends.
 
@@ -1034,7 +1034,7 @@ If you must do this, then force the use of a known-to-be-good backend
 C<EVBACKEND_POLL>).
 
 Another thing you have to watch out for is that it is quite easy to
-receive "spurious" readyness notifications, that is your callback might
+receive "spurious" readiness notifications, that is your callback might
 be called with C<EV_READ> but a subsequent C<read>(2) will actually block
 because there is no data. Not only are some backends known to create a
 lot of those (for example solaris ports), it is very easy to get into
@@ -1659,7 +1659,7 @@ within the same second, C<ev_stat> will be unable to detect it as the stat
 data does not change.
 
 The solution to this is to delay acting on a change for slightly more
-than second (or till slightly after the next full second boundary), using
+than a second (or till slightly after the next full second boundary), using
 a roughly one-second-delay C<ev_timer> (e.g. C<ev_timer_set (w, 0., 1.02);
 ev_timer_again (loop, w)>).
 
@@ -3005,8 +3005,8 @@ two).
 
 Heaps are not very cache-efficient. To improve the cache-efficiency of the
 timer and periodics heap, libev uses a 4-heap when this symbol is defined
-to C<1>. The 4-heap uses more complicated (longer) code but has a
-noticable after performance with many (thousands) of watchers.
+to C<1>. The 4-heap uses more complicated (longer) code but has
+noticably faster performance with many (thousands) of watchers.
 
 The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
 (disabled).
@@ -3017,8 +3017,8 @@ Heaps are not very cache-efficient. To improve the cache-efficiency of the
 timer and periodics heap, libev can cache the timestamp (I<at>) within
 the heap structure (selected by defining C<EV_HEAP_CACHE_AT> to C<1>),
 which uses 8-12 bytes more per watcher and a few hundred bytes more code,
-but avoids random read accesses on heap changes. This noticably improves
-performance noticably with with many (hundreds) of watchers.
+but avoids random read accesses on heap changes. This improves performance
+noticably with with many (hundreds) of watchers.
 
 The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
 (disabled).
@@ -3253,7 +3253,7 @@ Due to the many, low, and arbitrary limits on the win32 platform and
 the abysmal performance of winsockets, using a large number of sockets
 is not recommended (and not reasonable). If your program needs to use
 more than a hundred or so sockets, then likely it needs to use a totally
-different implementation for windows, as libev offers the POSIX readyness
+different implementation for windows, as libev offers the POSIX readiness
 notification model, which cannot be implemented efficiently on windows
 (microsoft monopoly games).
 
