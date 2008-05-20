@@ -3,6 +3,7 @@ Revision history for libev, a high-performance and full-featured event loop.
 3.4
 	- work around an (undocumented) bug in winsocket select: if you
           provide only empty fd sets then select returns WSAEINVAL. how sucky.
+        - improve timer scheduling stability and reduce use of time_epsilon.
         - use 1-based 2-heap for EV_MINIMAL, simplifies code, reduces
           codesize and makes for better cache-efficiency.
         - use 3-based 4-heap for !EV_MINIMAL. this makes better use

@@ -1603,7 +1603,7 @@ idle_reify (EV_P)
 void inline_size
 timers_reify (EV_P)
 {
-  while (timercnt && ANHE_at (timers [HEAP0]) <= mn_now)
+  while (timercnt && ANHE_at (timers [HEAP0]) < mn_now)
     {
       ev_timer *w = (ev_timer *)ANHE_w (timers [HEAP0]);
 
@@ -1632,7 +1632,7 @@ timers_reify (EV_P)
 void inline_size
 periodics_reify (EV_P)
 {
-  while (periodiccnt && ANHE_at (periodics [HEAP0]) <= ev_rt_now)
+  while (periodiccnt && ANHE_at (periodics [HEAP0]) < ev_rt_now)
     {
       ev_periodic *w = (ev_periodic *)ANHE_w (periodics [HEAP0]);
 
@@ -1641,9 +1641,9 @@ periodics_reify (EV_P)
       /* first reschedule or stop timer */
       if (w->reschedule_cb)
         {
-          ev_at (w) = w->reschedule_cb (w, ev_rt_now + TIME_EPSILON);
+          ev_at (w) = w->reschedule_cb (w, ev_rt_now);
 
-          assert (("ev_periodic reschedule callback returned time in the past", ev_at (w) > ev_rt_now));
+          assert (("ev_periodic reschedule callback returned time in the past", ev_at (w) >= ev_rt_now));
 
           ANHE_at_set (periodics [HEAP0]);
           downheap (periodics, periodiccnt, HEAP0);
@@ -1653,7 +1653,7 @@ periodics_reify (EV_P)
           ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
           if (ev_at (w) - ev_rt_now <= TIME_EPSILON) ev_at (w) += w->interval;
 
-          assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ev_at (w) > ev_rt_now));
+          assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ev_at (w) >= ev_rt_now));
 
           ANHE_at_set (periodics [HEAP0]);
           downheap (periodics, periodiccnt, HEAP0);

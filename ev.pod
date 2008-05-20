@@ -1153,8 +1153,8 @@ Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.
 
 The timers are based on real time, that is, if you register an event that
-times out after an hour and you reset your system clock to last years
-time, it will still time out after (roughly) and hour. "Roughly" because
+times out after an hour and you reset your system clock to january last
+year, it will still time out after (roughly) and hour. "Roughly" because
 detecting time jumps is hard, and some inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).
 
@@ -1166,7 +1166,7 @@ on the current time, use something like this to adjust for this:
 
    ev_timer_set (&timer, after + ev_now () - ev_time (), 0.);
 
-The callback is guarenteed to be invoked only when its timeout has passed,
+The callback is guarenteed to be invoked only after its timeout has passed,
 but if multiple timers become ready during the same loop iteration then
 order of execution is undefined.
 
@@ -1178,16 +1178,17 @@ order of execution is undefined.
 
 =item ev_timer_set (ev_timer *, ev_tstamp after, ev_tstamp repeat)
 
-Configure the timer to trigger after C<after> seconds. If C<repeat> is
-C<0.>, then it will automatically be stopped. If it is positive, then the
-timer will automatically be configured to trigger again C<repeat> seconds
-later, again, and again, until stopped manually.
+Configure the timer to trigger after C<after> seconds. If C<repeat>
+is C<0.>, then it will automatically be stopped once the timeout is
+reached. If it is positive, then the timer will automatically be
+configured to trigger again C<repeat> seconds later, again, and again,
+until stopped manually.
 
-The timer itself will do a best-effort at avoiding drift, that is, if you
-configure a timer to trigger every 10 seconds, then it will trigger at
-exactly 10 second intervals. If, however, your program cannot keep up with
-the timer (because it takes longer than those 10 seconds to do stuff) the
-timer will not fire more than once per event loop iteration.
+The timer itself will do a best-effort at avoiding drift, that is, if
+you configure a timer to trigger every 10 seconds, then it will normally
+trigger at exactly 10 second intervals. If, however, your program cannot
+keep up with the timer (because it takes longer than those 10 seconds to
+do stuff) the timer will not fire more than once per event loop iteration.
 
 =item ev_timer_again (loop, ev_timer *)
 
@@ -1274,18 +1275,19 @@ Periodic watchers are also timers of a kind, but they are very versatile
 
 Unlike C<ev_timer>'s, they are not based on real time (or relative time)
 but on wallclock time (absolute time). You can tell a periodic watcher
-to trigger "at" some specific point in time. For example, if you tell a
+to trigger after some specific point in time. For example, if you tell a
 periodic watcher to trigger in 10 seconds (by specifiying e.g. C<ev_now ()
-+ 10.>) and then reset your system clock to the last year, then it will
-take a year to trigger the event (unlike an C<ev_timer>, which would trigger
-roughly 10 seconds later).
++ 10.>, that is, an absolute time not a delay) and then reset your system
+clock to january of the previous year, then it will take more than year
+to trigger the event (unlike an C<ev_timer>, which would still trigger
+roughly 10 seconds later as it uses a relative timeout).
 
-They can also be used to implement vastly more complex timers, such as
-triggering an event on each midnight, local time or other, complicated,
-rules.
+C<ev_periodic>s can also be used to implement vastly more complex timers,
+such as triggering an event on each "midnight, local time", or other
+complicated, rules.
 
 As with timers, the callback is guarenteed to be invoked only when the
-time (C<at>) has been passed, but if multiple periodic timers become ready
+time (C<at>) has passed, but if multiple periodic timers become ready
 during the same loop iteration then order of execution is undefined.
 
 =head3 Watcher-Specific Functions and Data Members
@@ -1303,10 +1305,10 @@ operation, and we will explain them from simplest to complex:
 
 =item * absolute timer (at = time, interval = reschedule_cb = 0)
 
-In this configuration the watcher triggers an event at the wallclock time
-C<at> and doesn't repeat. It will not adjust when a time jump occurs,
-that is, if it is to be run at January 1st 2011 then it will run when the
-system time reaches or surpasses this time.
+In this configuration the watcher triggers an event after the wallclock
+time C<at> has passed and doesn't repeat. It will not adjust when a time
+jump occurs, that is, if it is to be run at January 1st 2011 then it will
+run when the system time reaches or surpasses this time.
 
 =item * repeating interval timer (at = offset, interval > 0, reschedule_cb = 0)
 
@@ -1315,7 +1317,8 @@ C<at + N * interval> time (for some integer N, which can also be negative)
 and then repeat, regardless of any time jumps.
 
 This can be used to create timers that do not drift with respect to system
-time:
+time, for example, here is a C<ev_periodic> that triggers each hour, on
+the hour:
 
    ev_periodic_set (&periodic, 0., 3600., 0);
 
@@ -1330,7 +1333,7 @@ time where C<time = at (mod interval)>, regardless of any time jumps.
 
 For numerical stability it is preferable that the C<at> value is near
 C<ev_now ()> (the current time), but there is no range requirement for
-this value.
+this value, and in fact is often specified as zero.
 
 =item * manual reschedule mode (at and interval ignored, reschedule_cb = callback)
 
@@ -1340,12 +1343,14 @@ reschedule callback will be called with the watcher as first, and the
 current time as second argument.
 
 NOTE: I<This callback MUST NOT stop or destroy any periodic watcher,
-ever, or make any event loop modifications>. If you need to stop it,
-return C<now + 1e30> (or so, fudge fudge) and stop it afterwards (e.g. by
-starting an C<ev_prepare> watcher, which is legal).
+ever, or make ANY event loop modifications whatsoever>.
 
-Its prototype is C<ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
-ev_tstamp now)>, e.g.:
+If you need to stop it, return C<now + 1e30> (or so, fudge fudge) and stop
+it afterwards (e.g. by starting an C<ev_prepare> watcher, which is the
+only event loop modification you are allowed to do).
+
+The callback prototype is C<ev_tstamp (*reschedule_cb)(struct ev_periodic
+*w, ev_tstamp now)>, e.g.:
 
    static ev_tstamp my_rescheduler (struct ev_periodic *w, ev_tstamp now)
    {
@@ -1357,11 +1362,11 @@ It must return the next time to trigger, based on the passed time value
 will usually be called just before the callback will be triggered, but
 might be called at other times, too.
 
-NOTE: I<< This callback must always return a time that is later than the
-passed C<now> value >>. Not even C<now> itself will do, it I<must> be larger.
+NOTE: I<< This callback must always return a time that is higher than or
+equal to the passed C<now> value >>.
 
 This can be used to create very complex timers, such as a timer that
-triggers on each midnight, local time. To do this, you would calculate the
+triggers on "next midnight, local time". To do this, you would calculate the
 next midnight after C<now> and return the timestamp value for this. How
 you do this is, again, up to you (but it is not trivial, which is the main
 reason I omitted it as an example).
