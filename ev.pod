@@ -3354,6 +3354,32 @@ implementations implementing IEEE 754 (basically all existing ones).
 If you know of other additional requirements drop me a note.
 
 
+=head1 VALGRIND
+
+Valgrind has a special section here because it is a popular tool that is
+highly useful, but valgrind reports are very hard to interpret.
+
+If you think you found a bug (memory leak, uninitialised data access etc.)
+in libev, then check twice: If valgrind reports something like:
+
+   ==2274==    definitely lost: 0 bytes in 0 blocks.
+   ==2274==      possibly lost: 0 bytes in 0 blocks.
+   ==2274==    still reachable: 256 bytes in 1 blocks.
+
+then there is no memory leak. Similarly, under some circumstances,
+valgrind might report kernel bugs as if it were a bug in libev, or it
+might be confused (it is a very good tool, but only a tool).
+
+If you are unsure about something, feel free to contact the mailing list
+with the full valgrind report and an explanation on why you think this is
+a bug in libev. However, don't be annoyed when you get a brisk "this is
+no bug" answer and take the chance of learning how to interpret valgrind
+properly.
+
+If you need, for some reason, empty reports from valgrind for your project
+I suggest using suppression lists.
+
+
 =head1 AUTHOR
 
 Marc Lehmann <libev@schmorp.de>.
