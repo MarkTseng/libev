@@ -166,6 +166,15 @@ struct ev_loop;
  * private: you can look at them, but not change them, and they might not mean anything to you.
  * ro: can be read anytime, but only changed when the watcher isn't active
  * rw: can be read and modified anytime, even when the watcher is active
+ *
+ * some internal details that might be helpful for debugging:
+ *
+ * active is either 0, which means the watcher is not active,
+ *           or the array index of the watcher (periodics, timers)
+ *           or the array index + 1 (most other watchers)
+ *           or simply 1 for watchers that aren't in some array.
+ * pending is either 0, in which case the watcher isn't,
+ *            or the array index + 1 in the pendings array.
  */
 
 /* shared by all watchers */
