@@ -1651,9 +1651,18 @@ periodics_reify (EV_P)
       else if (w->interval)
         {
           ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
-          if (ev_at (w) - ev_rt_now <= TIME_EPSILON) ev_at (w) += w->interval;
+          /* if next trigger time is not sufficiently in the future, put it there */
+          /* this might happen because of floating point inexactness */
+          if (ev_at (w) - ev_rt_now < TIME_EPSILON)
+            {
+              ev_at (w) += w->interval;
 
-          assert (("ev_periodic timeout in the past detected while processing timers, negative interval?", ev_at (w) >= ev_rt_now));
+              /* if interval is unreasonably low we might still have a time in the past */
+              /* so correct this. this will make the periodic very inexact, but the user */
+              /* has effectively asked to get triggered more often than possible */
+              if (ev_at (w) < ev_rt_now)
+                ev_at (w) = ev_rt_now;
+            }
 
           ANHE_at_set (periodics [HEAP0]);
           downheap (periodics, periodiccnt, HEAP0);

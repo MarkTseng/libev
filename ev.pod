@@ -1335,6 +1335,11 @@ For numerical stability it is preferable that the C<at> value is near
 C<ev_now ()> (the current time), but there is no range requirement for
 this value, and in fact is often specified as zero.
 
+Note also that there is an upper limit to how often a timer can fire (cpu
+speed for example), so if C<interval> is very small then timing stability
+will of course detoriate. Libev itself tries to be exact to be about one
+millisecond (if the OS supports it and the machine is fast enough).
+
 =item * manual reschedule mode (at and interval ignored, reschedule_cb = callback)
 
 In this mode the values for C<interval> and C<at> are both being
