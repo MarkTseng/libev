@@ -804,6 +804,7 @@ fd_rearm_all (EV_P)
 
 #define DHEAP 4
 #define HEAP0 (DHEAP - 1) /* index of first element in heap */
+#define HPARENT(k) ((((k) - HEAP0 - 1) / DHEAP) + HEAP0)
 
 /* towards the root */
 void inline_speed
@@ -813,7 +814,7 @@ upheap (ANHE *heap, int k)
 
   for (;;)
     {
-      int p = ((k - HEAP0 - 1) / DHEAP) + HEAP0;
+      int p = HPARENT (k);
 
       if (p == k || ANHE_at (heap [p]) <= ANHE_at (he))
         break;
@@ -823,8 +824,8 @@ upheap (ANHE *heap, int k)
       k = p;
     }
 
-  ev_active (ANHE_w (he)) = k;
   heap [k] = he;
+  ev_active (ANHE_w (he)) = k;
 }
 
 /* away from the root */
@@ -861,19 +862,20 @@ downheap (ANHE *heap, int N, int k)
       if (ANHE_at (he) <= minat)
         break;
 
-      ev_active (ANHE_w (*minpos)) = k;
       heap [k] = *minpos;
+      ev_active (ANHE_w (*minpos)) = k;
 
       k = minpos - heap;
     }
 
-  ev_active (ANHE_w (he)) = k;
   heap [k] = he;
+  ev_active (ANHE_w (he)) = k;
 }
 
 #else // 4HEAP
 
 #define HEAP0 1
+#define HPARENT(k) ((k) >> 1)
 
 /* towards the root */
 void inline_speed
@@ -883,7 +885,7 @@ upheap (ANHE *heap, int k)
 
   for (;;)
     {
-      int p = k >> 1;
+      int p = HPARENT (k);
 
       /* maybe we could use a dummy element at heap [0]? */
       if (!p || ANHE_at (heap [p]) <= ANHE_at (he))
@@ -931,8 +933,10 @@ downheap (ANHE *heap, int N, int k)
 void inline_size
 adjustheap (ANHE *heap, int N, int k)
 {
-  upheap (heap, k);
-  downheap (heap, N, k);
+  if (k > HEAP0 && ANHE_at (heap [HPARENT (k)]) >= ANHE_at (heap [k]))
+    upheap (heap, k);
+  else
+    downheap (heap, N, k);
 }
 
 /*****************************************************************************/
