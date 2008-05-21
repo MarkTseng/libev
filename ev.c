@@ -237,6 +237,12 @@ extern "C" {
 # endif
 #endif
 
+#if 0 /* debugging */
+# define EV_VERIFY 1
+# define EV_USE_4HEAP 1
+# define EV_HEAP_CACHE_AT 1
+#endif
+
 #ifndef EV_USE_4HEAP
 # define EV_USE_4HEAP !EV_MINIMAL
 #endif
@@ -290,12 +296,12 @@ int eventfd (unsigned int initval, int flags);
 
 /**/
 
-/* undefined or zero: no verification done or available */
-/* 1 or higher: ev_loop_verify function available */
-/* 2 or higher: ev_loop_verify is called frequently */
-#define EV_VERIFY 1
-
-#if EV_VERIFY > 1
+/* EV_VERIFY: enable internal consistency checks
+ * undefined or zero: no verification done or available
+ * 1 or higher: ev_loop_verify function available
+ * 2 or higher: ev_loop_verify is called frequently
+ */
+#if EV_VERIFY >= 1
 # define EV_FREQUENT_CHECK ev_loop_verify (EV_A)
 #else
 # define EV_FREQUENT_CHECK do { } while (0)
