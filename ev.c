@@ -843,10 +843,10 @@ downheap (ANHE *heap, int N, int k)
       // find minimum child
       if (expect_true (pos + DHEAP - 1 < E))
         {
-          /* fast path */                (minpos = pos + 0), (minat = ANHE_at (*minpos));
-          if (ANHE_at (pos [1]) < minat) (minpos = pos + 1), (minat = ANHE_at (*minpos));
-          if (ANHE_at (pos [2]) < minat) (minpos = pos + 2), (minat = ANHE_at (*minpos));
-          if (ANHE_at (pos [3]) < minat) (minpos = pos + 3), (minat = ANHE_at (*minpos));
+          /* fast path */                               (minpos = pos + 0), (minat = ANHE_at (*minpos));
+          if (               ANHE_at (pos [1]) < minat) (minpos = pos + 1), (minat = ANHE_at (*minpos));
+          if (               ANHE_at (pos [2]) < minat) (minpos = pos + 2), (minat = ANHE_at (*minpos));
+          if (               ANHE_at (pos [3]) < minat) (minpos = pos + 3), (minat = ANHE_at (*minpos));
         }
       else if (pos < E)
         {
