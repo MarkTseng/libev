@@ -54,12 +54,6 @@
 #if EV_SELECT_IS_WINSOCKET
 # undef EV_SELECT_USE_FD_SET
 # define EV_SELECT_USE_FD_SET 1
-# undef EINTR
-# define EINTR WSAEINTR
-# undef EBADF
-# define EBADF WSAENOTSOCK
-# undef ENOMEM
-# define ENOMEM (errno + 1)
 #endif
 
 #if !EV_SELECT_USE_FD_SET
