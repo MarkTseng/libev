@@ -119,6 +119,27 @@ it, you should treat it as some floatingpoint value. Unlike the name
 component C<stamp> might indicate, it is also used for time differences
 throughout libev.
 
+=head1 ERROR HANDLING
+
+Libev knows three classes of errors: operating system errors, usage errors
+and internal errors (bugs).
+
+When libev catches an operating system error it cannot handle (for example
+a syscall indicating a condition libev cannot fix), it calls the callback
+set via C<ev_set_syserr_cb>, which is supposed to fix the problem or
+abort. The default is to print a diagnostic message and to call C<abort
+()>.
+
+When libev detects a usage error such as a negative timer interval, then
+it will print a diagnostic message and abort (via the C<assert> mechanism,
+so C<NDEBUG> will disable this checking): these are programming errors in
+the libev caller and need to be fixed there.
+
+Libev also has a few internal error-checking C<assert>ions, and also has
+extensive consistency checking code. These do not trigger under normal
+circumstances, as they indicate either a bug in libev or worse.
+
+
 =head1 GLOBAL FUNCTIONS
 
 These functions can be called anytime, even before initialising the
@@ -3295,12 +3316,12 @@ notification model, which cannot be implemented efficiently on windows
 
 =item The winsocket select function
 
-The winsocket C<select> function doesn't follow POSIX in that it requires
-socket I<handles> and not socket I<file descriptors>. This makes select
-very inefficient, and also requires a mapping from file descriptors
-to socket handles. See the discussion of the C<EV_SELECT_USE_FD_SET>,
-C<EV_SELECT_IS_WINSOCKET> and C<EV_FD_TO_WIN32_HANDLE> preprocessor
-symbols for more info.
+The winsocket C<select> function doesn't follow POSIX in that it
+requires socket I<handles> and not socket I<file descriptors> (it is
+also extremely buggy). This makes select very inefficient, and also
+requires a mapping from file descriptors to socket handles. See the
+discussion of the C<EV_SELECT_USE_FD_SET>, C<EV_SELECT_IS_WINSOCKET> and
+C<EV_FD_TO_WIN32_HANDLE> preprocessor symbols for more info.
 
 The configuration for a "naked" win32 using the microsoft runtime
 libraries and raw winsocket select is:
@@ -3386,6 +3407,32 @@ implementations implementing IEEE 754 (basically all existing ones).
 =back
 
 If you know of other additional requirements drop me a note.
+
+
+=head1 COMPILER WARNINGS
+
+Depending on your compiler and compiler settings, you might get no or a
+lot of warnings when compiling libev code. Some people are apparently
+scared by this.
+
+However, these are unavoidable for many reasons. For one, each compiler
+has different warnings, and each user has different tastes regarding
+warning options. "Warn-free" code therefore cannot be a goal except when
+targetting a specific compiler and compiler-version.
+
+Another reason is that some compiler warnings require elaborate
+workarounds, or other changes to the code that make it less clear and less
+maintainable.
+
+And of course, some compiler warnings are just plain stupid, or simply
+wrong (because they don't actually warn about the cindition their message
+seems to warn about).
+
+While libev is written to generate as few warnings as possible,
+"warn-free" code is not a goal, and it is recommended not to build libev
+with any compiler warnings enabled unless you are prepared to cope with
+them (e.g. by ignoring them). Remember that warnings are just that:
+warnings, not errors, or proof of bugs.
 
 
 =head1 VALGRIND
