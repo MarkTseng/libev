@@ -1570,6 +1570,7 @@ ev_loop_verify (EV_P)
     {
       assert (pendingmax [i] >= pendingcnt [i]);
 #if EV_IDLE_ENABLE
+      assert (idleall >= 0);
       assert (idlemax [i] >= idlecnt [i]);
       array_verify (EV_A_ (W *)idles [i], idlecnt [i]);
 #endif
