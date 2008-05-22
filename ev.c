@@ -939,26 +939,12 @@ void inline_size
 reheap (ANHE *heap, int N)
 {
   int i;
+
   /* we don't use floyds algorithm, upheap is simpler and is more cache-efficient */
   /* also, this is easy to implement and correct for both 2-heaps and 4-heaps */
   for (i = 0; i < N; ++i)
     upheap (heap, i + HEAP0);
 }
-
-#if EV_VERIFY
-static void
-checkheap (ANHE *heap, int N)
-{
-  int i;
-
-  for (i = HEAP0; i < N + HEAP0; ++i)
-    {
-      assert (("active index mismatch in heap", ev_active (ANHE_w (heap [i])) == i));
-      assert (("heap condition violated", i == HEAP0 || ANHE_at (heap [HPARENT (i)]) <= ANHE_at (heap [i])));
-      assert (("heap at cache mismatch", ANHE_at (heap [i]) == ev_at (ANHE_w (heap [i]))));
-    }
-}
-#endif
 
 /*****************************************************************************/
 
@@ -1515,11 +1501,38 @@ ev_loop_fork (EV_P)
 }
 
 #if EV_VERIFY
-static void
-array_check (W **ws, int cnt)
+void noinline
+verify_watcher (EV_P_ W w)
+{
+  assert (("watcher has invalid priority", ABSPRI (w) >= 0 && ABSPRI (w) < NUMPRI));
+
+  if (w->pending)
+    assert (("pending watcher not on pending queue", pendings [ABSPRI (w)][w->pending - 1].w == w));
+}
+
+static void noinline
+verify_heap (EV_P_ ANHE *heap, int N)
+{
+  int i;
+
+  for (i = HEAP0; i < N + HEAP0; ++i)
+    {
+      assert (("active index mismatch in heap", ev_active (ANHE_w (heap [i])) == i));
+      assert (("heap condition violated", i == HEAP0 || ANHE_at (heap [HPARENT (i)]) <= ANHE_at (heap [i])));
+      assert (("heap at cache mismatch", ANHE_at (heap [i]) == ev_at (ANHE_w (heap [i]))));
+
+      verify_watcher (EV_A_ (W)ANHE_w (heap [i]));
+    }
+}
+
+static void noinline
+array_verify (EV_P_ W *ws, int cnt)
 {
   while (cnt--)
-    assert (("active index mismatch", ev_active (ws [cnt]) == cnt + 1));
+    {
+      assert (("active index mismatch", ev_active (ws [cnt]) == cnt + 1));
+      verify_watcher (EV_A_ ws [cnt]);
+    }
 }
 #endif
 
@@ -1528,24 +1541,60 @@ ev_loop_verify (EV_P)
 {
 #if EV_VERIFY
   int i;
+  WL w;
 
-  checkheap (timers, timercnt);
+  assert (activecnt >= -1);
+
+  assert (fdchangemax >= fdchangecnt);
+  for (i = 0; i < fdchangecnt; ++i)
+    assert (("negative fd in fdchanges", fdchanges [i] >= 0));
+
+  assert (anfdmax >= 0);
+  for (i = 0; i < anfdmax; ++i)
+    for (w = anfds [i].head; w; w = w->next)
+      {
+        verify_watcher (EV_A_ (W)w);
+        assert (("inactive fd watcher on anfd list", ev_active (w) == 1));
+        assert (("fd mismatch between watcher and anfd", ((ev_io *)w)->fd == i));
+      }
+
+  assert (timermax >= timercnt);
+  verify_heap (EV_A_ timers, timercnt);
+
 #if EV_PERIODIC_ENABLE
-  checkheap (periodics, periodiccnt);
+  assert (periodicmax >= periodiccnt);
+  verify_heap (EV_A_ periodics, periodiccnt);
 #endif
 
-#if EV_IDLE_ENABLE
   for (i = NUMPRI; i--; )
-    array_check ((W **)idles [i], idlecnt [i]);
+    {
+      assert (pendingmax [i] >= pendingcnt [i]);
+#if EV_IDLE_ENABLE
+      assert (idlemax [i] >= idlecnt [i]);
+      array_verify (EV_A_ (W *)idles [i], idlecnt [i]);
 #endif
+    }
+
 #if EV_FORK_ENABLE
-  array_check ((W **)forks, forkcnt);
+  assert (forkmax >= forkcnt);
+  array_verify (EV_A_ (W *)forks, forkcnt);
 #endif
+
 #if EV_ASYNC_ENABLE
-  array_check ((W **)asyncs, asynccnt);
+  assert (asyncmax >= asynccnt);
+  array_verify (EV_A_ (W *)asyncs, asynccnt);
 #endif
-  array_check ((W **)prepares, preparecnt);
-  array_check ((W **)checks, checkcnt);
+
+  assert (preparemax >= preparecnt);
+  array_verify (EV_A_ (W *)prepares, preparecnt);
+
+  assert (checkmax >= checkcnt);
+  array_verify (EV_A_ (W *)checks, checkcnt);
+
+# if 0
+  for (w = (ev_child *)childs [chain & (EV_PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
+  for (signum = signalmax; signum--; ) if (signals [signum].gotsig)
+# endif
 #endif
 }
 
