@@ -128,7 +128,7 @@ extern "C" {
 #   define EV_USE_EVENTFD 0
 #  endif
 # endif
-   
+ 
 #endif
 
 #include <math.h>
@@ -238,9 +238,13 @@ extern "C" {
 #endif
 
 #if 0 /* debugging */
-# define EV_VERIFY 1
+# define EV_VERIFY 3
 # define EV_USE_4HEAP 1
 # define EV_HEAP_CACHE_AT 1
+#endif
+
+#ifndef EV_VERIFY
+# define EV_VERIFY !EV_MINIMAL
 #endif
 
 #ifndef EV_USE_4HEAP
@@ -296,12 +300,7 @@ int eventfd (unsigned int initval, int flags);
 
 /**/
 
-/* EV_VERIFY: enable internal consistency checks
- * undefined or zero: no verification done or available
- * 1 or higher: ev_loop_verify function available
- * 2 or higher: ev_loop_verify is called frequently
- */
-#if EV_VERIFY >= 1
+#if EV_VERIFY >= 3
 # define EV_FREQUENT_CHECK ev_loop_verify (EV_A)
 #else
 # define EV_FREQUENT_CHECK do { } while (0)
@@ -1486,6 +1485,7 @@ loop_fork (EV_P)
 }
 
 #if EV_MULTIPLICITY
+
 struct ev_loop *
 ev_loop_new (unsigned int flags)
 {
@@ -1521,10 +1521,12 @@ array_check (W **ws, int cnt)
   while (cnt--)
     assert (("active index mismatch", ev_active (ws [cnt]) == cnt + 1));
 }
+#endif
 
-static void
+void
 ev_loop_verify (EV_P)
 {
+#if EV_VERIFY
   int i;
 
   checkheap (timers, timercnt);
@@ -1539,15 +1541,15 @@ ev_loop_verify (EV_P)
 #if EV_FORK_ENABLE
   array_check ((W **)forks, forkcnt);
 #endif
-  array_check ((W **)prepares, preparecnt);
-  array_check ((W **)checks, checkcnt);
 #if EV_ASYNC_ENABLE
   array_check ((W **)asyncs, asynccnt);
 #endif
+  array_check ((W **)prepares, preparecnt);
+  array_check ((W **)checks, checkcnt);
+#endif
 }
-#endif
 
-#endif
+#endif /* multiplicity */
 
 #if EV_MULTIPLICITY
 struct ev_loop *
@@ -1622,8 +1624,6 @@ call_pending (EV_P)
 {
   int pri;
 
-  EV_FREQUENT_CHECK;
-
   for (pri = NUMPRI; pri--; )
     while (pendingcnt [pri])
       {
@@ -1635,10 +1635,9 @@ call_pending (EV_P)
 
             p->w->pending = 0;
             EV_CB_INVOKE (p->w, p->events);
+            EV_FREQUENT_CHECK;
           }
       }
-
-  EV_FREQUENT_CHECK;
 }
 
 #if EV_IDLE_ENABLE
@@ -1700,6 +1699,7 @@ void inline_size
 periodics_reify (EV_P)
 {
   EV_FREQUENT_CHECK;
+
   while (periodiccnt && ANHE_at (periodics [HEAP0]) < ev_rt_now)
     {
       ev_periodic *w = (ev_periodic *)ANHE_w (periodics [HEAP0]);
@@ -1715,7 +1715,6 @@ periodics_reify (EV_P)
 
           ANHE_at_cache (periodics [HEAP0]);
           downheap (periodics, periodiccnt, HEAP0);
-          EV_FREQUENT_CHECK;
         }
       else if (w->interval)
         {
@@ -1861,6 +1860,10 @@ ev_loop (EV_P_ int flags)
 
   do
     {
+#if EV_VERIFY >= 2
+      ev_loop_verify (EV_A);
+#endif
+
 #ifndef _WIN32
       if (expect_false (curpid)) /* penalise the forking check even more */
         if (expect_false (getpid () != curpid))

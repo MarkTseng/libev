@@ -691,6 +691,17 @@ interactive servers (of course not for games), likewise for timeouts. It
 usually doesn't make much sense to set it to a lower value than C<0.01>,
 as this approsaches the timing granularity of most systems.
 
+=item ev_loop_verify (loop)
+
+This function only does something when C<EV_VERIFY> support has been
+compiled in. It tries to go through all internal structures and checks
+them for validity. If anything is found to be inconsistent, it will print
+an error message to standard error and call C<abort ()>.
+
+This can be used to catch bugs inside libev itself: under normal
+circumstances, this function will never abort as of course libev keeps its
+data structures consistent.
+
 =back
 
 
@@ -3032,6 +3043,19 @@ noticably with with many (hundreds) of watchers.
 
 The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
 (disabled).
+
+=item EV_VERIFY
+
+Controls how much internal verification (see C<ev_loop_verify ()>) will
+be done: If set to C<0>, no internal verification code will be compiled
+in. If set to C<1>, then verification code will be compiled in, but not
+called. If set to C<2>, then the internal verification code will be
+called once per loop, which can slow down libev. If set to C<3>, then the
+verification code will be called very frequently, which will slow down
+libev considerably.
+
+The default is C<1>, unless C<EV_MINIMAL> is set, in which case it will be
+C<0.>
 
 =item EV_COMMON
 

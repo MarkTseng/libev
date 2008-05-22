@@ -419,7 +419,7 @@ void ev_set_allocator (void *(*cb)(void *ptr, long size));
  */
 void ev_set_syserr_cb (void (*cb)(const char *msg));
 
-# if EV_MULTIPLICITY
+#if EV_MULTIPLICITY
 EV_INLINE struct ev_loop *
 ev_default_loop_uc (void)
 {
@@ -449,10 +449,11 @@ ev_default_loop (unsigned int flags)
 struct ev_loop *ev_loop_new (unsigned int flags);
 void ev_loop_destroy (EV_P);
 void ev_loop_fork (EV_P);
+void ev_loop_verify (EV_P);
 
 ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after each poll */
 
-# else
+#else
 
 int ev_default_loop (unsigned int flags); /* returns true when successful */
 
@@ -463,7 +464,7 @@ ev_now (void)
 
   return ev_rt_now;
 }
-# endif
+#endif /* multiplicity */
 
 EV_INLINE int
 ev_is_default_loop (EV_P)
@@ -486,7 +487,7 @@ void ev_default_fork (void);
 
 unsigned int ev_backend (EV_P);    /* backend in use by loop */
 unsigned int ev_loop_count (EV_P); /* number of loop iterations */
-#endif
+#endif /* prototypes */
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */
 #define EVLOOP_ONESHOT	2 /* block *once* only */
