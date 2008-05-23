@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "LIBEV 3"
-.TH LIBEV 3 "2008-05-11" "libev-3.33" "libev - high perfromance full featured event loop"
+.TH LIBEV 3 "2008-05-22" "libev-3.41" "libev - high perfromance full featured event loop"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -254,6 +254,25 @@ to the \f(CW\*(C`double\*(C'\fR type in C, and when you need to do any calculati
 it, you should treat it as some floatingpoint value. Unlike the name
 component \f(CW\*(C`stamp\*(C'\fR might indicate, it is also used for time differences
 throughout libev.
+.SH "ERROR HANDLING"
+.IX Header "ERROR HANDLING"
+Libev knows three classes of errors: operating system errors, usage errors
+and internal errors (bugs).
+.PP
+When libev catches an operating system error it cannot handle (for example
+a syscall indicating a condition libev cannot fix), it calls the callback
+set via \f(CW\*(C`ev_set_syserr_cb\*(C'\fR, which is supposed to fix the problem or
+abort. The default is to print a diagnostic message and to call \f(CW\*(C`abort
+()\*(C'\fR.
+.PP
+When libev detects a usage error such as a negative timer interval, then
+it will print a diagnostic message and abort (via the \f(CW\*(C`assert\*(C'\fR mechanism,
+so \f(CW\*(C`NDEBUG\*(C'\fR will disable this checking): these are programming errors in
+the libev caller and need to be fixed there.
+.PP
+Libev also has a few internal error-checking \f(CW\*(C`assert\*(C'\fRions, and also has
+extensive consistency checking code. These do not trigger under normal
+circumstances, as they indicate either a bug in libev or worse.
 .SH "GLOBAL FUNCTIONS"
 .IX Header "GLOBAL FUNCTIONS"
 These functions can be called anytime, even before initialising the
@@ -466,7 +485,7 @@ parallelity (most of the file descriptors should be busy). If you are
 writing a server, you should \f(CW\*(C`accept ()\*(C'\fR in a loop to accept as many
 connections as possible during one iteration. You might also want to have
 a look at \f(CW\*(C`ev_set_io_collect_interval ()\*(C'\fR to increase the amount of
-readyness notifications you get per iteration.
+readiness notifications you get per iteration.
 .ie n .IP """EVBACKEND_POLL""    (value 2, poll backend, available everywhere except on windows)" 4
 .el .IP "\f(CWEVBACKEND_POLL\fR    (value 2, poll backend, available everywhere except on windows)" 4
 .IX Item "EVBACKEND_POLL    (value 2, poll backend, available everywhere except on windows)"
@@ -555,7 +574,7 @@ file descriptor per loop iteration. For small and medium numbers of file
 descriptors a \*(L"slow\*(R" \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR backend
 might perform better.
 .Sp
-On the positive side, ignoring the spurious readyness notifications, this
+On the positive side, ignoring the spurious readiness notifications, this
 backend actually performed to specification in all tests and is fully
 embeddable, which is a rare feat among the OS-specific backends.
 .ie n .IP """EVBACKEND_ALL""" 4
@@ -828,6 +847,16 @@ interval to a value near \f(CW0.1\fR or so, which is often enough for
 interactive servers (of course not for games), likewise for timeouts. It
 usually doesn't make much sense to set it to a lower value than \f(CW0.01\fR,
 as this approsaches the timing granularity of most systems.
+.IP "ev_loop_verify (loop)" 4
+.IX Item "ev_loop_verify (loop)"
+This function only does something when \f(CW\*(C`EV_VERIFY\*(C'\fR support has been
+compiled in. It tries to go through all internal structures and checks
+them for validity. If anything is found to be inconsistent, it will print
+an error message to standard error and call \f(CW\*(C`abort ()\*(C'\fR.
+.Sp
+This can be used to catch bugs inside libev itself: under normal
+circumstances, this function will never abort as of course libev keeps its
+data structures consistent.
 .SH "ANATOMY OF A WATCHER"
 .IX Header "ANATOMY OF A WATCHER"
 A watcher is a structure that you create and register to record your
@@ -1165,7 +1194,7 @@ If you must do this, then force the use of a known-to-be-good backend
 \&\f(CW\*(C`EVBACKEND_POLL\*(C'\fR).
 .PP
 Another thing you have to watch out for is that it is quite easy to
-receive \*(L"spurious\*(R" readyness notifications, that is your callback might
+receive \*(L"spurious\*(R" readiness notifications, that is your callback might
 be called with \f(CW\*(C`EV_READ\*(C'\fR but a subsequent \f(CW\*(C`read\*(C'\fR(2) will actually block
 because there is no data. Not only are some backends known to create a
 lot of those (for example solaris ports), it is very easy to get into
@@ -1285,8 +1314,8 @@ Timer watchers are simple relative timers that generate an event after a
 given time, and optionally repeating in regular intervals after that.
 .PP
 The timers are based on real time, that is, if you register an event that
-times out after an hour and you reset your system clock to last years
-time, it will still time out after (roughly) and hour. \*(L"Roughly\*(R" because
+times out after an hour and you reset your system clock to january last
+year, it will still time out after (roughly) and hour. \*(L"Roughly\*(R" because
 detecting time jumps is hard, and some inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).
 .PP
@@ -1300,7 +1329,7 @@ on the current time, use something like this to adjust for this:
 \&   ev_timer_set (&timer, after + ev_now () \- ev_time (), 0.);
 .Ve
 .PP
-The callback is guarenteed to be invoked only when its timeout has passed,
+The callback is guarenteed to be invoked only after its timeout has passed,
 but if multiple timers become ready during the same loop iteration then
 order of execution is undefined.
 .PP
@@ -1312,16 +1341,17 @@ order of execution is undefined.
 .IP "ev_timer_set (ev_timer *, ev_tstamp after, ev_tstamp repeat)" 4
 .IX Item "ev_timer_set (ev_timer *, ev_tstamp after, ev_tstamp repeat)"
 .PD
-Configure the timer to trigger after \f(CW\*(C`after\*(C'\fR seconds. If \f(CW\*(C`repeat\*(C'\fR is
-\&\f(CW0.\fR, then it will automatically be stopped. If it is positive, then the
-timer will automatically be configured to trigger again \f(CW\*(C`repeat\*(C'\fR seconds
-later, again, and again, until stopped manually.
+Configure the timer to trigger after \f(CW\*(C`after\*(C'\fR seconds. If \f(CW\*(C`repeat\*(C'\fR
+is \f(CW0.\fR, then it will automatically be stopped once the timeout is
+reached. If it is positive, then the timer will automatically be
+configured to trigger again \f(CW\*(C`repeat\*(C'\fR seconds later, again, and again,
+until stopped manually.
 .Sp
-The timer itself will do a best-effort at avoiding drift, that is, if you
-configure a timer to trigger every 10 seconds, then it will trigger at
-exactly 10 second intervals. If, however, your program cannot keep up with
-the timer (because it takes longer than those 10 seconds to do stuff) the
-timer will not fire more than once per event loop iteration.
+The timer itself will do a best-effort at avoiding drift, that is, if
+you configure a timer to trigger every 10 seconds, then it will normally
+trigger at exactly 10 second intervals. If, however, your program cannot
+keep up with the timer (because it takes longer than those 10 seconds to
+do stuff) the timer will not fire more than once per event loop iteration.
 .IP "ev_timer_again (loop, ev_timer *)" 4
 .IX Item "ev_timer_again (loop, ev_timer *)"
 This will act as if the timer timed out and restart it again if it is
@@ -1410,18 +1440,19 @@ Periodic watchers are also timers of a kind, but they are very versatile
 .PP
 Unlike \f(CW\*(C`ev_timer\*(C'\fR's, they are not based on real time (or relative time)
 but on wallclock time (absolute time). You can tell a periodic watcher
-to trigger \*(L"at\*(R" some specific point in time. For example, if you tell a
+to trigger after some specific point in time. For example, if you tell a
 periodic watcher to trigger in 10 seconds (by specifiying e.g. \f(CW\*(C`ev_now ()
-+ 10.\*(C'\fR) and then reset your system clock to the last year, then it will
-take a year to trigger the event (unlike an \f(CW\*(C`ev_timer\*(C'\fR, which would trigger
-roughly 10 seconds later).
++ 10.\*(C'\fR, that is, an absolute time not a delay) and then reset your system
+clock to january of the previous year, then it will take more than year
+to trigger the event (unlike an \f(CW\*(C`ev_timer\*(C'\fR, which would still trigger
+roughly 10 seconds later as it uses a relative timeout).
 .PP
-They can also be used to implement vastly more complex timers, such as
-triggering an event on each midnight, local time or other, complicated,
-rules.
+\&\f(CW\*(C`ev_periodic\*(C'\fRs can also be used to implement vastly more complex timers,
+such as triggering an event on each \*(L"midnight, local time\*(R", or other
+complicated, rules.
 .PP
 As with timers, the callback is guarenteed to be invoked only when the
-time (\f(CW\*(C`at\*(C'\fR) has been passed, but if multiple periodic timers become ready
+time (\f(CW\*(C`at\*(C'\fR) has passed, but if multiple periodic timers become ready
 during the same loop iteration then order of execution is undefined.
 .PP
 \fIWatcher-Specific Functions and Data Members\fR
@@ -1438,10 +1469,10 @@ operation, and we will explain them from simplest to complex:
 .IP "\(bu" 4
 absolute timer (at = time, interval = reschedule_cb = 0)
 .Sp
-In this configuration the watcher triggers an event at the wallclock time
-\&\f(CW\*(C`at\*(C'\fR and doesn't repeat. It will not adjust when a time jump occurs,
-that is, if it is to be run at January 1st 2011 then it will run when the
-system time reaches or surpasses this time.
+In this configuration the watcher triggers an event after the wallclock
+time \f(CW\*(C`at\*(C'\fR has passed and doesn't repeat. It will not adjust when a time
+jump occurs, that is, if it is to be run at January 1st 2011 then it will
+run when the system time reaches or surpasses this time.
 .IP "\(bu" 4
 repeating interval timer (at = offset, interval > 0, reschedule_cb = 0)
 .Sp
@@ -1450,7 +1481,8 @@ In this mode the watcher will always be scheduled to time out at the next
 and then repeat, regardless of any time jumps.
 .Sp
 This can be used to create timers that do not drift with respect to system
-time:
+time, for example, here is a \f(CW\*(C`ev_periodic\*(C'\fR that triggers each hour, on
+the hour:
 .Sp
 .Vb 1
 \&   ev_periodic_set (&periodic, 0., 3600., 0);
@@ -1467,7 +1499,12 @@ time where \f(CW\*(C`time = at (mod interval)\*(C'\fR, regardless of any time ju
 .Sp
 For numerical stability it is preferable that the \f(CW\*(C`at\*(C'\fR value is near
 \&\f(CW\*(C`ev_now ()\*(C'\fR (the current time), but there is no range requirement for
-this value.
+this value, and in fact is often specified as zero.
+.Sp
+Note also that there is an upper limit to how often a timer can fire (cpu
+speed for example), so if \f(CW\*(C`interval\*(C'\fR is very small then timing stability
+will of course detoriate. Libev itself tries to be exact to be about one
+millisecond (if the \s-1OS\s0 supports it and the machine is fast enough).
 .IP "\(bu" 4
 manual reschedule mode (at and interval ignored, reschedule_cb = callback)
 .Sp
@@ -1477,12 +1514,14 @@ reschedule callback will be called with the watcher as first, and the
 current time as second argument.
 .Sp
 \&\s-1NOTE:\s0 \fIThis callback \s-1MUST\s0 \s-1NOT\s0 stop or destroy any periodic watcher,
-ever, or make any event loop modifications\fR. If you need to stop it,
-return \f(CW\*(C`now + 1e30\*(C'\fR (or so, fudge fudge) and stop it afterwards (e.g. by
-starting an \f(CW\*(C`ev_prepare\*(C'\fR watcher, which is legal).
+ever, or make \s-1ANY\s0 event loop modifications whatsoever\fR.
 .Sp
-Its prototype is \f(CW\*(C`ev_tstamp (*reschedule_cb)(struct ev_periodic *w,
-ev_tstamp now)\*(C'\fR, e.g.:
+If you need to stop it, return \f(CW\*(C`now + 1e30\*(C'\fR (or so, fudge fudge) and stop
+it afterwards (e.g. by starting an \f(CW\*(C`ev_prepare\*(C'\fR watcher, which is the
+only event loop modification you are allowed to do).
+.Sp
+The callback prototype is \f(CW\*(C`ev_tstamp (*reschedule_cb)(struct ev_periodic
+*w, ev_tstamp now)\*(C'\fR, e.g.:
 .Sp
 .Vb 4
 \&   static ev_tstamp my_rescheduler (struct ev_periodic *w, ev_tstamp now)
@@ -1496,11 +1535,11 @@ It must return the next time to trigger, based on the passed time value
 will usually be called just before the callback will be triggered, but
 might be called at other times, too.
 .Sp
-\&\s-1NOTE:\s0 \fIThis callback must always return a time that is later than the
-passed \f(CI\*(C`now\*(C'\fI value\fR. Not even \f(CW\*(C`now\*(C'\fR itself will do, it \fImust\fR be larger.
+\&\s-1NOTE:\s0 \fIThis callback must always return a time that is higher than or
+equal to the passed \f(CI\*(C`now\*(C'\fI value\fR.
 .Sp
 This can be used to create very complex timers, such as a timer that
-triggers on each midnight, local time. To do this, you would calculate the
+triggers on \*(L"next midnight, local time\*(R". To do this, you would calculate the
 next midnight after \f(CW\*(C`now\*(C'\fR and return the timestamp value for this. How
 you do this is, again, up to you (but it is not trivial, which is the main
 reason I omitted it as an example).
@@ -1799,7 +1838,7 @@ within the same second, \f(CW\*(C`ev_stat\*(C'\fR will be unable to detect it as
 data does not change.
 .PP
 The solution to this is to delay acting on a change for slightly more
-than second (or till slightly after the next full second boundary), using
+than a second (or till slightly after the next full second boundary), using
 a roughly one-second-delay \f(CW\*(C`ev_timer\*(C'\fR (e.g. \f(CW\*(C`ev_timer_set (w, 0., 1.02);
 ev_timer_again (loop, w)\*(C'\fR).
 .PP
@@ -3088,8 +3127,8 @@ two).
 .IX Item "EV_USE_4HEAP"
 Heaps are not very cache-efficient. To improve the cache-efficiency of the
 timer and periodics heap, libev uses a 4\-heap when this symbol is defined
-to \f(CW1\fR. The 4\-heap uses more complicated (longer) code but has a
-noticable after performance with many (thousands) of watchers.
+to \f(CW1\fR. The 4\-heap uses more complicated (longer) code but has
+noticably faster performance with many (thousands) of watchers.
 .Sp
 The default is \f(CW1\fR unless \f(CW\*(C`EV_MINIMAL\*(C'\fR is set in which case it is \f(CW0\fR
 (disabled).
@@ -3099,11 +3138,23 @@ Heaps are not very cache-efficient. To improve the cache-efficiency of the
 timer and periodics heap, libev can cache the timestamp (\fIat\fR) within
 the heap structure (selected by defining \f(CW\*(C`EV_HEAP_CACHE_AT\*(C'\fR to \f(CW1\fR),
 which uses 8\-12 bytes more per watcher and a few hundred bytes more code,
-but avoids random read accesses on heap changes. This noticably improves
-performance noticably with with many (hundreds) of watchers.
+but avoids random read accesses on heap changes. This improves performance
+noticably with with many (hundreds) of watchers.
 .Sp
 The default is \f(CW1\fR unless \f(CW\*(C`EV_MINIMAL\*(C'\fR is set in which case it is \f(CW0\fR
 (disabled).
+.IP "\s-1EV_VERIFY\s0" 4
+.IX Item "EV_VERIFY"
+Controls how much internal verification (see \f(CW\*(C`ev_loop_verify ()\*(C'\fR) will
+be done: If set to \f(CW0\fR, no internal verification code will be compiled
+in. If set to \f(CW1\fR, then verification code will be compiled in, but not
+called. If set to \f(CW2\fR, then the internal verification code will be
+called once per loop, which can slow down libev. If set to \f(CW3\fR, then the
+verification code will be called very frequently, which will slow down
+libev considerably.
+.Sp
+The default is \f(CW1\fR, unless \f(CW\*(C`EV_MINIMAL\*(C'\fR is set, in which case it will be
+\&\f(CW0.\fR
 .IP "\s-1EV_COMMON\s0" 4
 .IX Item "EV_COMMON"
 By default, all watchers have a \f(CW\*(C`void *data\*(C'\fR member. By redefining
@@ -3328,17 +3379,17 @@ Due to the many, low, and arbitrary limits on the win32 platform and
 the abysmal performance of winsockets, using a large number of sockets
 is not recommended (and not reasonable). If your program needs to use
 more than a hundred or so sockets, then likely it needs to use a totally
-different implementation for windows, as libev offers the \s-1POSIX\s0 readyness
+different implementation for windows, as libev offers the \s-1POSIX\s0 readiness
 notification model, which cannot be implemented efficiently on windows
 (microsoft monopoly games).
 .IP "The winsocket select function" 4
 .IX Item "The winsocket select function"
-The winsocket \f(CW\*(C`select\*(C'\fR function doesn't follow \s-1POSIX\s0 in that it requires
-socket \fIhandles\fR and not socket \fIfile descriptors\fR. This makes select
-very inefficient, and also requires a mapping from file descriptors
-to socket handles. See the discussion of the \f(CW\*(C`EV_SELECT_USE_FD_SET\*(C'\fR,
-\&\f(CW\*(C`EV_SELECT_IS_WINSOCKET\*(C'\fR and \f(CW\*(C`EV_FD_TO_WIN32_HANDLE\*(C'\fR preprocessor
-symbols for more info.
+The winsocket \f(CW\*(C`select\*(C'\fR function doesn't follow \s-1POSIX\s0 in that it
+requires socket \fIhandles\fR and not socket \fIfile descriptors\fR (it is
+also extremely buggy). This makes select very inefficient, and also
+requires a mapping from file descriptors to socket handles. See the
+discussion of the \f(CW\*(C`EV_SELECT_USE_FD_SET\*(C'\fR, \f(CW\*(C`EV_SELECT_IS_WINSOCKET\*(C'\fR and
+\&\f(CW\*(C`EV_FD_TO_WIN32_HANDLE\*(C'\fR preprocessor symbols for more info.
 .Sp
 The configuration for a \*(L"naked\*(R" win32 using the microsoft runtime
 libraries and raw winsocket select is:
@@ -3417,12 +3468,62 @@ enough for at least into the year 4000. This requirement is fulfilled by
 implementations implementing \s-1IEEE\s0 754 (basically all existing ones).
 .PP
 If you know of other additional requirements drop me a note.
+.SH "COMPILER WARNINGS"
+.IX Header "COMPILER WARNINGS"
+Depending on your compiler and compiler settings, you might get no or a
+lot of warnings when compiling libev code. Some people are apparently
+scared by this.
+.PP
+However, these are unavoidable for many reasons. For one, each compiler
+has different warnings, and each user has different tastes regarding
+warning options. \*(L"Warn-free\*(R" code therefore cannot be a goal except when
+targetting a specific compiler and compiler-version.
+.PP
+Another reason is that some compiler warnings require elaborate
+workarounds, or other changes to the code that make it less clear and less
+maintainable.
+.PP
+And of course, some compiler warnings are just plain stupid, or simply
+wrong (because they don't actually warn about the cindition their message
+seems to warn about).
+.PP
+While libev is written to generate as few warnings as possible,
+\&\*(L"warn-free\*(R" code is not a goal, and it is recommended not to build libev
+with any compiler warnings enabled unless you are prepared to cope with
+them (e.g. by ignoring them). Remember that warnings are just that:
+warnings, not errors, or proof of bugs.
+.SH "VALGRIND"
+.IX Header "VALGRIND"
+Valgrind has a special section here because it is a popular tool that is
+highly useful, but valgrind reports are very hard to interpret.
+.PP
+If you think you found a bug (memory leak, uninitialised data access etc.)
+in libev, then check twice: If valgrind reports something like:
+.PP
+.Vb 3
+\&   ==2274==    definitely lost: 0 bytes in 0 blocks.
+\&   ==2274==      possibly lost: 0 bytes in 0 blocks.
+\&   ==2274==    still reachable: 256 bytes in 1 blocks.
+.Ve
+.PP
+then there is no memory leak. Similarly, under some circumstances,
+valgrind might report kernel bugs as if it were a bug in libev, or it
+might be confused (it is a very good tool, but only a tool).
+.PP
+If you are unsure about something, feel free to contact the mailing list
+with the full valgrind report and an explanation on why you think this is
+a bug in libev. However, don't be annoyed when you get a brisk \*(L"this is
+no bug\*(R" answer and take the chance of learning how to interpret valgrind
+properly.
+.PP
+If you need, for some reason, empty reports from valgrind for your project
+I suggest using suppression lists.
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 Marc Lehmann <libev@schmorp.de>.
 .SH "POD ERRORS"
 .IX Header "POD ERRORS"
 Hey! \fBThe above document had some coding errors, which are explained below:\fR
-.IP "Around line 3052:" 4
-.IX Item "Around line 3052:"
+.IP "Around line 3107:" 4
+.IX Item "Around line 3107:"
 You forgot a '=back' before '=head2'

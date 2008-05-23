@@ -30,6 +30,7 @@ ev_loop_count
 ev_loop_destroy
 ev_loop_fork
 ev_loop_new
+ev_loop_verify
 ev_now
 ev_once
 ev_periodic_again
@@ -58,3 +59,4 @@ ev_unloop
 ev_unref
 ev_version_major
 ev_version_minor
+verify_watcher
