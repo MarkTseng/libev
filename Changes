@@ -1,10 +1,12 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 	- pass in the write fd set as except fd set under windows. windows
-          is so uncontrollably lame that it requires this.
+          is so uncontrollably lame that it requires this. this means that
+          switching off oobinline is not supported (but tcp/ip doesn't
+          have oob, so that would be stupid anyways.
 
 3.41 Fri May 23 18:42:54 CEST 2008
-	- work around an (undocumented) bug in winsocket select: if you
+	- work around an obscure bug in winsocket select: if you
           provide only empty fd sets then select returns WSAEINVAL. how sucky.
         - improve timer scheduling stability and reduce use of time_epsilon.
         - use 1-based 2-heap for EV_MINIMAL, simplifies code, reduces

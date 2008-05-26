@@ -72,6 +72,9 @@ VARx(void *, vec_ri)
 VARx(void *, vec_ro)
 VARx(void *, vec_wi)
 VARx(void *, vec_wo)
+#if defined(_WIN32) || EV_GENWRAP
+VARx(void *, vec_eo)
+#endif
 VARx(int, vec_max)
 #endif
 
