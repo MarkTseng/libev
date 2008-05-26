@@ -134,7 +134,16 @@ select_poll (EV_P_ ev_tstamp timeout)
   tv.tv_sec  = (long)timeout;
   tv.tv_usec = (long)((timeout - (ev_tstamp)tv.tv_sec) * 1e6);
 
+#ifdef _WIN32
+  /* pass in the write set as except set.
+   * the idea behind this is to work around a windows bug that causes
+   * errors to be reported as an exception and not by setting
+   * the writable bit. this is so uncontrollably lame.
+   */
+  res = select (vec_max * NFDBITS, (fd_set *)vec_ro, (fd_set *)vec_wo, (fd_set *)vec_wo, &tv);
+#else
   res = select (vec_max * NFDBITS, (fd_set *)vec_ro, (fd_set *)vec_wo, 0, &tv);
+#endif
 
   if (expect_false (res < 0))
     {

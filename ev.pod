@@ -3304,6 +3304,13 @@ way (note also that glib is the slowest event library known to man).
 There is no supported compilation method available on windows except
 embedding it into other applications.
 
+Not a libev limitation but worth mentioning: windows apparently doesn't
+accept large writes: instead of resulting in a partial write, windows will
+either accept everything or return C<ENOBUFS> if the buffer is too large,
+so make sure you only write small amounts into your sockets (less than a
+megabyte seems safe, but thsi apparently depends on the amount of memory
+available).
+
 Due to the many, low, and arbitrary limits on the win32 platform and
 the abysmal performance of winsockets, using a large number of sockets
 is not recommended (and not reasonable). If your program needs to use
