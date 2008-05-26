@@ -225,6 +225,7 @@ select_poll (EV_P_ ev_tstamp timeout)
         fd_mask word_r = ((fd_mask *)vec_ro) [word];
         fd_mask word_w = ((fd_mask *)vec_wo) [word];
         #ifdef _WIN32
+        word_r |= ((fd_mask *)vec_eo) [word];
         word_w |= ((fd_mask *)vec_eo) [word];
         #endif
 
