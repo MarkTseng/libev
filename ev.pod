@@ -3287,7 +3287,7 @@ involves iterating over all running async watchers or all signal numbers.
 =back
 
 
-=head1 Win32 platform limitations and workarounds
+=head1 WIN32 PLATFORM LIMITATIONS AND WORKAROUNDS
 
 Win32 doesn't support any of the standards (e.g. POSIX) that libev
 requires, and its I/O model is fundamentally incompatible with the POSIX
