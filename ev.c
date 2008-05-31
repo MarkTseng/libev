@@ -166,7 +166,11 @@ extern "C" {
 /* this block tries to deduce configuration from header-defined symbols and defaults */
 
 #ifndef EV_USE_MONOTONIC
-# define EV_USE_MONOTONIC 0
+# if defined (_POSIX_MONOTONIC_CLOCK) && _POSIX_MONOTONIC_CLOCK >= 0
+#  define EV_USE_MONOTONIC 1
+# else
+#  define EV_USE_MONOTONIC 0
+# endif
 #endif
 
 #ifndef EV_USE_REALTIME
@@ -174,7 +178,11 @@ extern "C" {
 #endif
 
 #ifndef EV_USE_NANOSLEEP
-# define EV_USE_NANOSLEEP 0
+# if _POSIX_C_SOURCE >= 199309L
+#  define EV_USE_NANOSLEEP 1
+# else
+#  define EV_USE_NANOSLEEP 0
+# endif
 #endif
 
 #ifndef EV_USE_SELECT

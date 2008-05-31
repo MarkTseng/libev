@@ -4,6 +4,8 @@ Revision history for libev, a high-performance and full-featured event loop.
           is so uncontrollably lame that it requires this. this means that
           switching off oobinline is not supported (but tcp/ip doesn't
           have oob, so that would be stupid anyways.
+        - use posix module symbol to auto-detect monotonic clock presence
+          and some other default values.
 
 3.41 Fri May 23 18:42:54 CEST 2008
 	- work around an obscure bug in winsocket select: if you
