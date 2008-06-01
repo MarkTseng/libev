@@ -3376,6 +3376,15 @@ additional extensions:
 
 =over 4
 
+=item C<void (*)(ev_watcher_type *, int revents)> must have compatible
+calling conventions regardless of C<ev_watcher_type *>.
+
+Libev assumes not only that all watcher pointers have the same internal
+structure (guaranteed by POSIX but not by ISO C for example), but it also
+assumes that the same (machine) code can be used to call any watcher
+callback: The watcher callbacks have different type signatures, but libev
+calls them using an C<ev_watcher *> internally.
+
 =item C<sig_atomic_t volatile> must be thread-atomic as well
 
 The type C<sig_atomic_t volatile> (or whatever is defined as
