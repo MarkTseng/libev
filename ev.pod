@@ -2628,8 +2628,17 @@ there are additional modules that implement libev-compatible interfaces
 to C<libadns> (C<EV::ADNS>), C<Net::SNMP> (C<Net::SNMP::EV>) and the
 C<libglib> event core (C<Glib::EV> and C<EV::Glib>).
 
-It can be found and installed via CPAN, its homepage is found at
+It can be found and installed via CPAN, its homepage is at
 L<http://software.schmorp.de/pkg/EV>.
+
+=item Python
+
+Python bindings can be found at L<http://code.google.com/p/pyev/>. It
+seems to be quite complete and well-documented. Note, however, that the
+patch they require for libev is outright dangerous as it breaks the ABI
+for everybody else, and therefore, should never be applied in an installed
+libev (if python requires an incompatible ABI then it needs to embed
+libev).
 
 =item Ruby
 
