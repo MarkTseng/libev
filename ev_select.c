@@ -54,6 +54,8 @@
 #if EV_SELECT_IS_WINSOCKET
 # undef EV_SELECT_USE_FD_SET
 # define EV_SELECT_USE_FD_SET 1
+# undef NFDBITS
+# define NFDBITS 0
 #endif
 
 #if !EV_SELECT_USE_FD_SET

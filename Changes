@@ -1,5 +1,7 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+	- define NFSBITS to 0 when EV_SELECT_IS_WINSOCKET to make it compile
+          (reported any analysed by Chris Hulbert).
 	- pass in the write fd set as except fd set under windows. windows
           is so uncontrollably lame that it requires this. this means that
           switching off oobinline is not supported (but tcp/ip doesn't
