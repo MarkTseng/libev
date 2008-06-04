@@ -2,6 +2,11 @@ Revision history for libev, a high-performance and full-featured event loop.
 
 	- define NFSBITS to 0 when EV_SELECT_IS_WINSOCKET to make it compile
           (reported any analysed by Chris Hulbert).
+        - fix a bug in ev_ebadf (this function is only used to catch
+          programming errors in the libev user). reported by Matt Tolton.
+        - fix a bug in fd_intern on win32 (could lead to compile errors
+          under some circumstances, but would work correctly if it compiles).
+          reported by Matt Tolton.
 	- pass in the write fd set as except fd set under windows. windows
           is so uncontrollably lame that it requires this. this means that
           switching off oobinline is not supported (but tcp/ip doesn't

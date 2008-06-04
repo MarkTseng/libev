@@ -709,13 +709,13 @@ fd_reify (EV_P)
 #if EV_SELECT_IS_WINSOCKET
       if (events)
         {
-          unsigned long argp;
+          unsigned long arg;
           #ifdef EV_FD_TO_WIN32_HANDLE
             anfd->handle = EV_FD_TO_WIN32_HANDLE (fd);
           #else
             anfd->handle = _get_osfhandle (fd);
           #endif
-          assert (("libev only supports socket fds in this configuration", ioctlsocket (anfd->handle, FIONREAD, &argp) == 0));
+          assert (("libev only supports socket fds in this configuration", ioctlsocket (anfd->handle, FIONREAD, &arg) == 0));
         }
 #endif
 
@@ -778,7 +778,7 @@ fd_ebadf (EV_P)
 
   for (fd = 0; fd < anfdmax; ++fd)
     if (anfds [fd].events)
-      if (!fd_valid (fd) == -1 && errno == EBADF)
+      if (!fd_valid (fd) && errno == EBADF)
         fd_kill (EV_A_ fd);
 }
 
@@ -985,7 +985,7 @@ void inline_speed
 fd_intern (int fd)
 {
 #ifdef _WIN32
-  int arg = 1;
+  unsigned long arg = 1;
   ioctlsocket (_get_osfhandle (fd), FIONBIO, &arg);
 #else
   fcntl (fd, F_SETFD, FD_CLOEXEC);
