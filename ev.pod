@@ -3328,6 +3328,22 @@ different implementation for windows, as libev offers the POSIX readiness
 notification model, which cannot be implemented efficiently on windows
 (Microsoft monopoly games).
 
+A typical way to use libev under windows is to embed it (see the embedding
+section for details) and use the following F<evwrap.h> header file instead
+of F<ev.h>:
+
+   #define EV_STANDALONE              /* keeps ev from requiring config.h */
+   #define EV_SELECT_IS_WINSOCKET 1   /* configure libev for windows select */
+   #define EV_STAT_ENABLE 0           /* no stat() availble */
+
+   #include "ev.h"
+
+And compile the following F<evwrap.c> file into your project (make sure
+you do I<not> compile the F<ev.c> or any other embedded soruce files!):
+
+   #include "evwrap.h"
+   #include "ev.c"
+
 =over 4
 
 =item The winsocket select function
@@ -3335,7 +3351,8 @@ notification model, which cannot be implemented efficiently on windows
 The winsocket C<select> function doesn't follow POSIX in that it
 requires socket I<handles> and not socket I<file descriptors> (it is
 also extremely buggy). This makes select very inefficient, and also
-requires a mapping from file descriptors to socket handles. See the
+requires a mapping from file descriptors to socket handles (the Microsoft
+C runtime provides the function C<_open_osfhandle> for this). See the
 discussion of the C<EV_SELECT_USE_FD_SET>, C<EV_SELECT_IS_WINSOCKET> and
 C<EV_FD_TO_WIN32_HANDLE> preprocessor symbols for more info.
 

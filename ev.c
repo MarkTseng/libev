@@ -2571,6 +2571,12 @@ infy_fork (EV_P)
 
 #endif
 
+#ifdef _WIN32
+# define EV_LSTAT(p,b) _stati64 (p, b)
+#else
+# define EV_LSTAT(p,b) lstat (p, b)
+#endif
+
 void
 ev_stat_stat (EV_P_ ev_stat *w)
 {

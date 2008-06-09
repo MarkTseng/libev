@@ -79,15 +79,24 @@ select_modify (EV_P_ int fd, int oev, int nev)
     int handle = fd;
     #endif
 
-    if (nev & EV_READ)
-      FD_SET (handle, (fd_set *)vec_ri);
-    else
-      FD_CLR (handle, (fd_set *)vec_ri);
+    /* FD_SET is broken on windows (it adds the fd to a set twice or more,
+     * which eventually leads to overflows). Need to call it only on changes.
+     */
+    #if EV_SELECT_IS_WINSOCKET
+    if ((oev ^ nev) & EV_READ)
+    #endif
+      if (nev & EV_READ)
+        FD_SET (handle, (fd_set *)vec_ri);
+      else
+        FD_CLR (handle, (fd_set *)vec_ri);
 
-    if (nev & EV_WRITE)
-      FD_SET (handle, (fd_set *)vec_wi);
-    else
-      FD_CLR (handle, (fd_set *)vec_wi);
+    #if EV_SELECT_IS_WINSOCKET
+    if ((oev ^ nev) & EV_WRITE)
+    #endif
+      if (nev & EV_WRITE)
+        FD_SET (handle, (fd_set *)vec_wi);
+      else
+        FD_CLR (handle, (fd_set *)vec_wi);
 
 #else
 
