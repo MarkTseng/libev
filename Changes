@@ -1,5 +1,6 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+3.42 Tue Jun 17 12:12:07 CEST 2008
 	- work around yet another windows bug: FD_SET actually adds fd's
           multiple times to the fd_*SET*, despite official MSN docs claiming
           otherwise. Reported and well-analysed by Matt Tolton.
