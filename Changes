@@ -2,8 +2,8 @@ Revision history for libev, a high-performance and full-featured event loop.
 
 	- work around yet another windows bug: FD_SET actually adds fd's
           multiple times to the fd_*SET*, despite official MSN docs claiming
-          otherwise. Reported and wel-analysed by Matt Tolton.
-	- define NFSBITS to 0 when EV_SELECT_IS_WINSOCKET to make it compile
+          otherwise. Reported and well-analysed by Matt Tolton.
+	- define NFDBITS to 0 when EV_SELECT_IS_WINSOCKET to make it compile
           (reported any analysed by Chris Hulbert).
         - fix a bug in ev_ebadf (this function is only used to catch
           programming errors in the libev user). reported by Matt Tolton.
