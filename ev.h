@@ -93,7 +93,6 @@ typedef double ev_tstamp;
 # ifdef _WIN32
 #  include <time.h>
 #  include <sys/types.h>
-#  include <stdio.h>
 # endif
 # include <sys/stat.h>
 #endif
