@@ -156,6 +156,7 @@ extern "C" {
 # include <sys/wait.h>
 # include <unistd.h>
 #else
+# include <io.h>
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 # ifndef EV_SELECT_IS_WINSOCKET
