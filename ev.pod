@@ -1664,13 +1664,19 @@ will be no polling.
 =head3 ABI Issues (Largefile Support)
 
 Libev by default (unless the user overrides this) uses the default
-compilation environment, which means that on systems with optionally
-disabled large file support, you get the 32 bit version of the stat
+compilation environment, which means that on systems with large file
+support disabled by default, you get the 32 bit version of the stat
 structure. When using the library from programs that change the ABI to
 use 64 bit file offsets the programs will fail. In that case you have to
 compile libev with the same flags to get binary compatibility. This is
 obviously the case with any flags that change the ABI, but the problem is
-most noticeably with ev_stat and large file support.
+most noticeably disabled with ev_stat and large file support.
+
+The solution for this is to lobby your distribution maker to make large
+file interfaces available by default (as e.g. FreeBSD does) and not
+optional. Libev cannot simply switch on large file support because it has
+to exchange stat structures with application programs compiled using the
+default compilation environment.
 
 =head3 Inotify
 
