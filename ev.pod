@@ -3190,8 +3190,9 @@ done serially (but can be done from different threads, as long as only one
 thread ever is inside a call at any point in time, e.g. by using a mutex
 per loop).
 
-If you want to know which design is best for your problem, then I cannot
-help you but by giving some generic advice:
+If you want to know which design (one loop, locking, or multiple loops
+without or something else still) is best for your problem, then I cannot
+help you. I can give some generic advice however:
 
 =over 4
 

@@ -1,5 +1,8 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+3.43
+	- include more include files on windows to get struct _stati64
+          (reported by Chris Hulbert).
 	- add missing #include <io.h> in ev.c on windows (reported by
           Matt Tolton).
 
