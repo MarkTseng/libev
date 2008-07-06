@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "LIBEV 3"
-.TH LIBEV 3 "2008-06-19" "libev-3.43" "libev - high performance full featured event loop"
+.TH LIBEV 3 "2008-07-05" "libev-3.43" "libev - high performance full featured event loop"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -3275,8 +3275,9 @@ done serially (but can be done from different threads, as long as only one
 thread ever is inside a call at any point in time, e.g. by using a mutex
 per loop).
 .PP
-If you want to know which design is best for your problem, then I cannot
-help you but by giving some generic advice:
+If you want to know which design (one loop, locking, or multiple loops
+without or something else still) is best for your problem, then I cannot
+help you. I can give some generic advice however:
 .IP "\(bu" 4
 most applications have a main thread: use the default libev loop
 in that thread, or create a separate thread running only the default loop.
