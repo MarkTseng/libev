@@ -606,21 +606,22 @@ Here are the gory details of what C<ev_loop> does:
 
    - Before the first iteration, call any pending watchers.
    * If EVFLAG_FORKCHECK was used, check for a fork.
-   - If a fork was detected, queue and call all fork watchers.
+   - If a fork was detected (by any means), queue and call all fork watchers.
    - Queue and call all prepare watchers.
-   - If we have been forked, recreate the kernel state.
+   - If we have been forked, detach and recreate the kernel state
+     as to not disturb the other process.
    - Update the kernel state with all outstanding changes.
-   - Update the "event loop time".
+   - Update the "event loop time" (ev_now ()).
    - Calculate for how long to sleep or block, if at all
      (active idle watchers, EVLOOP_NONBLOCK or not having
      any active watchers at all will result in not sleeping).
    - Sleep if the I/O and timer collect interval say so.
    - Block the process, waiting for any events.
    - Queue all outstanding I/O (fd) events.
-   - Update the "event loop time" and do time jump handling.
+   - Update the "event loop time" (ev_now ()), and do time jump adjustments.
    - Queue all outstanding timers.
    - Queue all outstanding periodics.
-   - If no events are pending now, queue all idle watchers.
+   - Unless any events are pending now, queue all idle watchers.
    - Queue all check watchers.
    - Call all queued watchers in reverse order (i.e. check watchers first).
      Signals and child watchers are implemented as I/O watchers, and will
@@ -635,7 +636,7 @@ anymore.
    ... queue jobs here, make sure they register event watchers as long
    ... as they still have work to do (even an idle watcher will do..)
    ev_loop (my_loop, 0);
-   ... jobs done. yeah!
+   ... jobs done or somebody called unloop. yeah!
 
 =item ev_unloop (loop, how)
 
@@ -681,12 +682,14 @@ Example: For some weird reason, unregister the above signal handler again.
 =item ev_set_timeout_collect_interval (loop, ev_tstamp interval)
 
 These advanced functions influence the time that libev will spend waiting
-for events. Both are by default C<0>, meaning that libev will try to
-invoke timer/periodic callbacks and I/O callbacks with minimum latency.
+for events. Both time intervals are by default C<0>, meaning that libev
+will try to invoke timer/periodic callbacks and I/O callbacks with minimum
+latency.
 
 Setting these to a higher value (the C<interval> I<must> be >= C<0>)
-allows libev to delay invocation of I/O and timer/periodic callbacks to
-increase efficiency of loop iterations.
+allows libev to delay invocation of I/O and timer/periodic callbacks
+to increase efficiency of loop iterations (or to increase power-saving
+opportunities).
 
 The background is that sometimes your program runs just fast enough to
 handle one (or very few) event(s) per loop iteration. While this makes
@@ -711,6 +714,13 @@ interval to a value near C<0.1> or so, which is often enough for
 interactive servers (of course not for games), likewise for timeouts. It
 usually doesn't make much sense to set it to a lower value than C<0.01>,
 as this approaches the timing granularity of most systems.
+
+Setting the I<timeout collect interval> can improve the opportunity for
+saving power, as the program will "bundle" timer callback invocations that
+are "near" in time together, by delaying some, thus reducing the number of
+times the process sleeps and wakes up again. Another useful technique to
+reduce iterations/wake-ups is to use C<ev_periodic> watchers and make sure
+they fire on, say, one-second boundaries only.
 
 =item ev_loop_verify (loop)
 
