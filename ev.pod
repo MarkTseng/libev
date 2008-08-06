@@ -2666,7 +2666,7 @@ L<http://rev.rubyforge.org/>.
 =item D
 
 Leandro Lucarella has written a D language binding (F<ev.d>) for libev, to
-be found at L<http://git.llucax.com.ar/?p=software/ev.d.git;a=summary>.
+be found at L<http://proj.llucax.com.ar/wiki/evd>.
 
 =back
 
