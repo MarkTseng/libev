@@ -1572,6 +1572,13 @@ default loop never gets destroyed. You are encouraged, however, to use an
 event-based approach to child reaping and thus use libev's support for
 that, so other libev users can use C<ev_child> watchers freely.
 
+=head3 Stopping the Child Watcher
+
+Currently, the child watcher never gets stopped, even when the
+child terminates, so normally one needs to stop the watcher in the
+callback. Future versions of libev might stop the watcher automatically
+when a child exit is detected.
+
 =head3 Watcher-Specific Functions and Data Members
 
 =over 4
