@@ -1136,10 +1136,9 @@ C<EVBACKEND_POLL>.
 =head3 The special problem of SIGPIPE
 
 While not really specific to libev, it is easy to forget about SIGPIPE:
-when reading from a pipe whose other end has been closed, your program
-gets send a SIGPIPE, which, by default, aborts your program. For most
-programs this is sensible behaviour, for daemons, this is usually
-undesirable.
+when writing to a pipe whose other end has been closed, your program gets
+send a SIGPIPE, which, by default, aborts your program. For most programs
+this is sensible behaviour, for daemons, this is usually undesirable.
 
 So when you encounter spurious, unexplained daemon exits, make sure you
 ignore SIGPIPE (and maybe make sure you log the exit status of your daemon
