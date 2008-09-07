@@ -59,4 +59,3 @@ ev_unloop
 ev_unref
 ev_version_major
 ev_version_minor
-verify_watcher

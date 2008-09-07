@@ -1,5 +1,8 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+WISH? monotonic clocks times/GetTickCount for coarse corrections?
+	- verify_watcher was not marked static.
+
 3.43 Sun Jul  6 05:34:41 CEST 2008
 	- include more include files on windows to get struct _stati64
           (reported by Chris Hulbert, but doesn't quite fix his issue).

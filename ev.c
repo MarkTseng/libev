@@ -1513,7 +1513,7 @@ ev_loop_fork (EV_P)
 }
 
 #if EV_VERIFY
-void noinline
+static void noinline
 verify_watcher (EV_P_ W w)
 {
   assert (("watcher has invalid priority", ABSPRI (w) >= 0 && ABSPRI (w) < NUMPRI));
