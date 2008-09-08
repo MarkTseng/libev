@@ -32,6 +32,7 @@ ev_loop_fork
 ev_loop_new
 ev_loop_verify
 ev_now
+ev_now_update
 ev_once
 ev_periodic_again
 ev_periodic_start

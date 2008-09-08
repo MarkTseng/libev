@@ -1911,6 +1911,12 @@ ev_unref (EV_P)
   --activecnt;
 }
 
+void
+ev_now_update (EV_P)
+{
+  time_update (EV_A_ 1e100);
+}
+
 static int loop_done;
 
 void

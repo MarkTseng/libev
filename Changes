@@ -1,6 +1,8 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 WISH? monotonic clocks times/GetTickCount for coarse corrections?
+3.44
+	- new function: ev_now_update (loop).
 	- verify_watcher was not marked static.
 
 3.43 Sun Jul  6 05:34:41 CEST 2008
