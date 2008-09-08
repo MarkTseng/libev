@@ -1199,17 +1199,24 @@ year, it will still time out after (roughly) and hour. "Roughly" because
 detecting time jumps is hard, and some inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).
 
-The relative timeouts are calculated relative to the C<ev_now ()>
-time. This is usually the right thing as this timestamp refers to the time
-of the event triggering whatever timeout you are modifying/starting. If
-you suspect event processing to be delayed and you I<need> to base the timeout
-on the current time, use something like this to adjust for this:
-
-   ev_timer_set (&timer, after + ev_now () - ev_time (), 0.);
-
 The callback is guaranteed to be invoked only after its timeout has passed,
 but if multiple timers become ready during the same loop iteration then
 order of execution is undefined.
+
+=head3 The special problem of time updates
+
+Requesting the current time is a costly operation (it usually takes at
+least two syscalls): EV therefore updates it's idea of the current time
+only before and after C<ev_loop> polls for new events, which causes the
+difference between C<ev_now ()> and C<ev_time ()>.
+
+The relative timeouts are calculated relative to the C<ev_now ()>
+time. This is usually the right thing as this timestamp refers to the time
+of the event triggering whatever timeout you are modifying/starting. If
+you suspect event processing to be delayed and you I<need> to base the
+timeout on the current time, use something like this to adjust for this:
+
+   ev_timer_set (&timer, after + ev_now () - ev_time (), 0.);
 
 =head3 Watcher-Specific Functions and Data Members
 
