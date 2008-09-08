@@ -575,6 +575,18 @@ change as long as callbacks are being processed, and this is also the base
 time used for relative timers. You can treat it as the timestamp of the
 event occurring (or more correctly, libev finding out about it).
 
+=item ev_now_update (loop)
+
+Establishes the current time by querying the kernel, updating the time
+returned by C<ev_now ()> in the progress. This is a costly operation and
+is usually done automatically within C<ev_loop ()>.
+
+This function is rarely useful, but when some event callback runs for a
+very long time without entering the event loop, updating libev's idea of
+the current time is a good idea.
+
+See also "The special problem of time updates" in the C<ev_timer> section.
+
 =item ev_loop (loop, int flags)
 
 Finally, this is it, the event handler. This function usually is called
@@ -1205,10 +1217,11 @@ order of execution is undefined.
 
 =head3 The special problem of time updates
 
-Requesting the current time is a costly operation (it usually takes at
-least two syscalls): EV therefore updates it's idea of the current time
-only before and after C<ev_loop> polls for new events, which causes the
-difference between C<ev_now ()> and C<ev_time ()>.
+Establishing the current time is a costly operation (it usually takes at
+least two system calls): EV therefore updates its idea of the current
+time only before and after C<ev_loop> polls for new events, which causes
+a growing difference between C<ev_now ()> and C<ev_time ()> when handling
+lots of events.
 
 The relative timeouts are calculated relative to the C<ev_now ()>
 time. This is usually the right thing as this timestamp refers to the time
@@ -1217,6 +1230,10 @@ you suspect event processing to be delayed and you I<need> to base the
 timeout on the current time, use something like this to adjust for this:
 
    ev_timer_set (&timer, after + ev_now () - ev_time (), 0.);
+
+If the event loop is suspended for a long time, one can also force an
+update of the time returned by C<ev_now ()> by calling C<ev_now_update
+()>.
 
 =head3 Watcher-Specific Functions and Data Members
 
