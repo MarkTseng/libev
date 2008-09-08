@@ -2984,7 +2984,7 @@ once_cb (EV_P_ struct ev_once *once, int revents)
   void (*cb)(int revents, void *arg) = once->cb;
   void *arg = once->arg;
 
-  ev_io_stop (EV_A_ &once->io);
+  ev_io_stop    (EV_A_ &once->io);
   ev_timer_stop (EV_A_ &once->to);
   ev_free (once);
 
