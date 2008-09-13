@@ -1008,7 +1008,11 @@ data:
      int otherfd;
      void *somedata;
      struct whatever *mostinteresting;
-   }
+   };
+
+   ...
+   struct my_io w;
+   ev_io_init (&w.io, my_cb, fd, EV_READ);
 
 And since your callback will be called with a pointer to the watcher, you
 can cast it back to your own type:
@@ -1022,8 +1026,8 @@ can cast it back to your own type:
 More interesting and less C-conformant ways of casting your callback type
 instead have been omitted.
 
-Another common scenario is having some data structure with multiple
-watchers:
+Another common scenario is to use some data structure with multiple
+embedded watchers:
 
    struct my_biggy
    {
@@ -1032,8 +1036,10 @@ watchers:
      ev_timer t2;
    }
 
-In this case getting the pointer to C<my_biggy> is a bit more complicated,
-you need to use C<offsetof>:
+In this case getting the pointer to C<my_biggy> is a bit more
+complicated: Either you store the address of your C<my_biggy> struct
+in the C<data> member of the watcher, or you need to use some pointer
+arithmetic using C<offsetof> inside your watchers:
 
    #include <stddef.h>
 

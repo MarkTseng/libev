@@ -4,6 +4,7 @@ WISH? monotonic clocks times/GetTickCount for coarse corrections?
 3.44
 	- new function: ev_now_update (loop).
 	- verify_watcher was not marked static.
+        - improve the "associating..." manpage section.
 
 3.43 Sun Jul  6 05:34:41 CEST 2008
 	- include more include files on windows to get struct _stati64
