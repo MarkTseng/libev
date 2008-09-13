@@ -361,6 +361,10 @@ connections as possible during one iteration. You might also want to have
 a look at C<ev_set_io_collect_interval ()> to increase the amount of
 readiness notifications you get per iteration.
 
+This backend maps C<EV_READ> to the C<readfds> set and C<EV_WRITE> to the
+C<writefds> set (and to work around Microsoft Windows bugs, also onto the
+C<exceptfds> set on that platform).
+
 =item C<EVBACKEND_POLL>    (value 2, poll backend, available everywhere except on windows)
 
 And this is your standard poll(2) backend. It's more complicated
@@ -369,6 +373,9 @@ limit on the number of fds you can use (except it will slow down
 considerably with a lot of inactive fds). It scales similarly to select,
 i.e. O(total_fds). See the entry for C<EVBACKEND_SELECT>, above, for
 performance tips.
+
+This backend maps C<EV_READ> to C<POLLIN | POLLERR | POLLHUP>, and
+C<EV_WRITE> to C<POLLOUT | POLLERR | POLLHUP>.
 
 =item C<EVBACKEND_EPOLL>   (value 4, Linux)
 
@@ -396,6 +403,9 @@ keep at least one watcher active per fd at all times.
 
 While nominally embeddable in other event loops, this feature is broken in
 all kernel versions tested so far.
+
+This backend maps C<EV_READ> and C<EV_WRITE> in the same way as
+C<EVBACKEND_POLL>.
 
 =item C<EVBACKEND_KQUEUE>  (value 8, most BSD clones)
 
@@ -427,6 +437,10 @@ almost everywhere, you should only use it when you have a lot of sockets
 (e.g. C<EVBACKEND_SELECT> or C<EVBACKEND_POLL>) and using it only for
 sockets.
 
+This backend maps C<EV_READ> into an C<EVFILT_READ> kevent with
+C<NOTE_EOF>, and C<EV_WRITE> into an C<EVFILT_WRITE> kevent with
+C<NOTE_EOF>.
+
 =item C<EVBACKEND_DEVPOLL> (value 16, Solaris 8)
 
 This is not implemented yet (and might never be, unless you send me an
@@ -451,6 +465,9 @@ might perform better.
 On the positive side, ignoring the spurious readiness notifications, this
 backend actually performed to specification in all tests and is fully
 embeddable, which is a rare feat among the OS-specific backends.
+
+This backend maps C<EV_READ> and C<EV_WRITE> in the same way as
+C<EVBACKEND_POLL>.
 
 =item C<EVBACKEND_ALL>
 
