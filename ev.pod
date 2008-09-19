@@ -3242,16 +3242,22 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
 
 =head2 THREADS
 
-Libev itself is completely thread-safe, but it uses no locking. This
-means that you can use as many loops as you want in parallel, as long as
-only one thread ever calls into one libev function with the same loop
-parameter.
+Libev itself is thread-safe (unless the opposite is specifically
+documented for a function), but it uses no locking itself. This means that
+you can use as many loops as you want in parallel, as long as only one
+thread ever calls into one libev function with the same loop parameter:
+libev guarentees that different event loops share no data structures that
+need locking.
 
-Or put differently: calls with different loop parameters can be done in
-parallel from multiple threads, calls with the same loop parameter must be
-done serially (but can be done from different threads, as long as only one
-thread ever is inside a call at any point in time, e.g. by using a mutex
-per loop).
+Or to put it differently: calls with different loop parameters can be done
+concurrently from multiple threads, calls with the same loop parameter
+must be done serially (but can be done from different threads, as long as
+only one thread ever is inside a call at any point in time, e.g. by using
+a mutex per loop).
+
+Specifically to support threads (and signal handlers), libev implements
+so-called C<ev_async> watchers, which allow some limited form of
+concurrency on the same event loop.
 
 If you want to know which design (one loop, locking, or multiple loops
 without or something else still) is best for your problem, then I cannot
@@ -3279,6 +3285,9 @@ better than you currently do :-)
 =item * often you need to talk to some other thread which blocks in the
 event loop - C<ev_async> watchers can be used to wake them up from other
 threads safely (or from signal contexts...).
+
+=item * some watcher types are only supported in the default loop - use
+C<ev_async> watchers to tell your other loops about any such events.
 
 =back
 
