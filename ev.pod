@@ -3283,11 +3283,15 @@ Choosing a model is hard - look around, learn, know that usually you can do
 better than you currently do :-)
 
 =item * often you need to talk to some other thread which blocks in the
-event loop - C<ev_async> watchers can be used to wake them up from other
-threads safely (or from signal contexts...).
+event loop.
 
-=item * some watcher types are only supported in the default loop - use
-C<ev_async> watchers to tell your other loops about any such events.
+C<ev_async> watchers can be used to wake them up from other threads safely
+(or from signal contexts...).
+
+An example use would be to communicate signals or other events that only
+work in the default loop by registering the signal watcher with the
+default loop and triggering an C<ev_async> watcher from the default loop
+watcher callback into the event loop interested in the signal.
 
 =back
 
