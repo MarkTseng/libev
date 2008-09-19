@@ -3300,9 +3300,8 @@ different coroutines and switch freely between both coroutines running the
 loop, as long as you don't confuse yourself). The only exception is that
 you must not do this from C<ev_periodic> reschedule callbacks.
 
-Care has been invested into making sure that libev does not keep local
-state inside C<ev_loop>, and other calls do not usually allow coroutine
-switches.
+Care has been taken to ensure that libev does not keep local state inside
+C<ev_loop>, and other calls do not usually allow coroutine switches.
 
 
 =head1 COMPLEXITIES
