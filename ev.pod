@@ -3243,6 +3243,8 @@ their default definitions. One possible use for overriding these is to
 avoid the C<struct ev_loop *> as first argument in all cases, or to use
 method calls instead of plain function calls in C++.
 
+=back
+
 =head2 EXPORTED API SYMBOLS
 
 If you need to re-export the API (e.g. via a DLL) and you need a list of
