@@ -2235,7 +2235,7 @@ but you will also have to stop and restart any C<ev_embed> watchers
 yourself - but you can use a fork watcher to handle this automatically,
 and future versions of libev might do just that.
 
-Unfortunately, not all backends are embeddable, only the ones returned by
+Unfortunately, not all backends are embeddable: only the ones returned by
 C<ev_embeddable_backends> are, which, unfortunately, does not include any
 portable one.
 
@@ -2370,7 +2370,7 @@ multiple-writer-single-reader queue that works in all cases and doesn't
 need elaborate support such as pthreads.
 
 That means that if you want to queue data, you have to provide your own
-queue. But at least I can tell you would implement locking around your
+queue. But at least I can tell you how to implement locking around your
 queue:
 
 =over 4
@@ -2456,13 +2456,13 @@ employ a traditional mutex lock, such as in this pthread example:
 
 Initialises and configures the async watcher - it has no parameters of any
 kind. There is a C<ev_asynd_set> macro, but using it is utterly pointless,
-believe me.
+trust me.
 
 =item ev_async_send (loop, ev_async *)
 
 Sends/signals/activates the given C<ev_async> watcher, that is, feeds
 an C<EV_ASYNC> event on the watcher into the event loop. Unlike
-C<ev_feed_event>, this call is safe to do in other threads, signal or
+C<ev_feed_event>, this call is safe to do from other threads, signal or
 similar contexts (see the discussion of C<EV_ATOMIC_T> in the embedding
 section below on what exactly this means).
 
@@ -2678,7 +2678,7 @@ The prototype of the C<function> must be C<void (*)(ev::TYPE &w, int)>.
 
 See the method-C<set> above for more details.
 
-Example:
+Example: Use a plain function as callback.
 
    static void io_cb (ev::io &w, int revents) { }
    iow.set <io_cb> ();
@@ -2726,8 +2726,8 @@ the constructor.
 
    class myclass
    {
-     ev::io   io;  void io_cb   (ev::io   &w, int revents);
-     ev:idle idle  void idle_cb (ev::idle &w, int revents);
+     ev::io   io  ; void io_cb   (ev::io   &w, int revents);
+     ev::idle idle; void idle_cb (ev::idle &w, int revents);
 
      myclass (int fd)
      {
@@ -2753,8 +2753,9 @@ me a note.
 The EV module implements the full libev API and is actually used to test
 libev. EV is developed together with libev. Apart from the EV core module,
 there are additional modules that implement libev-compatible interfaces
-to C<libadns> (C<EV::ADNS>), C<Net::SNMP> (C<Net::SNMP::EV>) and the
-C<libglib> event core (C<Glib::EV> and C<EV::Glib>).
+to C<libadns> (C<EV::ADNS>, but C<AnyEvent::DNS> is preferred nowadays),
+C<Net::SNMP> (C<Net::SNMP::EV>) and the C<libglib> event core (C<Glib::EV>
+and C<EV::Glib>).
 
 It can be found and installed via CPAN, its homepage is at
 L<http://software.schmorp.de/pkg/EV>.
@@ -2943,7 +2944,7 @@ For this of course you need the m4 file:
 
 Libev can be configured via a variety of preprocessor symbols you have to
 define before including any of its files. The default in the absence of
-autoconf is noted for every option.
+autoconf is documented for every option.
 
 =over 4
 
@@ -3123,8 +3124,8 @@ all the priorities, so having many of them (hundreds) uses a lot of space
 and time, so using the defaults of five priorities (-2 .. +2) is usually
 fine.
 
-If your embedding application does not need any priorities, defining these both to
-C<0> will save some memory and CPU.
+If your embedding application does not need any priorities, defining these
+both to C<0> will save some memory and CPU.
 
 =item EV_PERIODIC_ENABLE
 
@@ -3141,7 +3142,8 @@ code.
 =item EV_EMBED_ENABLE
 
 If undefined or defined to be C<1>, then embed watchers are supported. If
-defined to be C<0>, then they are not.
+defined to be C<0>, then they are not. Embed watchers rely on most other
+watcher types, which therefore must not be disabled.
 
 =item EV_STAT_ENABLE
 
@@ -3183,9 +3185,9 @@ two).
 =item EV_USE_4HEAP
 
 Heaps are not very cache-efficient. To improve the cache-efficiency of the
-timer and periodics heap, libev uses a 4-heap when this symbol is defined
-to C<1>. The 4-heap uses more complicated (longer) code but has
-noticeably faster performance with many (thousands) of watchers.
+timer and periodics heaps, libev uses a 4-heap when this symbol is defined
+to C<1>. The 4-heap uses more complicated (longer) code but has noticeably
+faster performance with many (thousands) of watchers.
 
 The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
 (disabled).
@@ -3193,11 +3195,11 @@ The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
 =item EV_HEAP_CACHE_AT
 
 Heaps are not very cache-efficient. To improve the cache-efficiency of the
-timer and periodics heap, libev can cache the timestamp (I<at>) within
+timer and periodics heaps, libev can cache the timestamp (I<at>) within
 the heap structure (selected by defining C<EV_HEAP_CACHE_AT> to C<1>),
 which uses 8-12 bytes more per watcher and a few hundred bytes more code,
 but avoids random read accesses on heap changes. This improves performance
-noticeably with with many (hundreds) of watchers.
+noticeably with many (hundreds) of watchers.
 
 The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
 (disabled).
@@ -3213,7 +3215,7 @@ verification code will be called very frequently, which will slow down
 libev considerably.
 
 The default is C<1>, unless C<EV_MINIMAL> is set, in which case it will be
-C<0.>
+C<0>.
 
 =item EV_COMMON
 
@@ -3305,7 +3307,7 @@ Libev itself is thread-safe (unless the opposite is specifically
 documented for a function), but it uses no locking itself. This means that
 you can use as many loops as you want in parallel, as long as only one
 thread ever calls into one libev function with the same loop parameter:
-libev guarentees that different event loops share no data structures that
+libev guarantees that different event loops share no data structures that
 need locking.
 
 Or to put it differently: calls with different loop parameters can be done
@@ -3422,7 +3424,7 @@ on backend and whether C<ev_io_set> was used).
 Priorities are implemented by allocating some space for each
 priority. When doing priority-based operations, libev usually has to
 linearly search all the priorities, but starting/stopping and activating
-watchers becomes O(1) w.r.t. priority handling.
+watchers becomes O(1) with respect to priority handling.
 
 =item Sending an ev_async: O(1)
 
@@ -3458,7 +3460,7 @@ Not a libev limitation but worth mentioning: windows apparently doesn't
 accept large writes: instead of resulting in a partial write, windows will
 either accept everything or return C<ENOBUFS> if the buffer is too large,
 so make sure you only write small amounts into your sockets (less than a
-megabyte seems safe, but thsi apparently depends on the amount of memory
+megabyte seems safe, but this apparently depends on the amount of memory
 available).
 
 Due to the many, low, and arbitrary limits on the win32 platform and
@@ -3479,7 +3481,7 @@ of F<ev.h>:
    #include "ev.h"
 
 And compile the following F<evwrap.c> file into your project (make sure
-you do I<not> compile the F<ev.c> or any other embedded soruce files!):
+you do I<not> compile the F<ev.c> or any other embedded source files!):
 
    #include "evwrap.h"
    #include "ev.c"
@@ -3554,7 +3556,7 @@ calls them using an C<ev_watcher *> internally.
 =item C<sig_atomic_t volatile> must be thread-atomic as well
 
 The type C<sig_atomic_t volatile> (or whatever is defined as
-C<EV_ATOMIC_T>) must be atomic w.r.t. accesses from different
+C<EV_ATOMIC_T>) must be atomic with respect to accesses from different
 threads. This is not part of the specification for C<sig_atomic_t>, but is
 believed to be sufficiently portable.
 
