@@ -216,7 +216,7 @@ recommended ones.
 
 See the description of C<ev_embed> watchers for more info.
 
-=item ev_set_allocator (void *(*cb)(void *ptr, long size))
+=item ev_set_allocator (void *(*cb)(void *ptr, long size)) [NOT REENTRANT]
 
 Sets the allocation function to use (the prototype is similar - the
 semantics are identical to the C<realloc> C89/SuS/POSIX function). It is
@@ -252,7 +252,7 @@ retries (example requires a standards-compliant C<realloc>).
    ...
    ev_set_allocator (persistent_realloc);
 
-=item ev_set_syserr_cb (void (*cb)(const char *msg));
+=item ev_set_syserr_cb (void (*cb)(const char *msg)); [NOT REENTRANT]
 
 Set the callback function to call on a retryable system call error (such
 as failed select, poll, epoll_wait). The message is a printable string
@@ -3305,12 +3305,13 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
 
 =head2 THREADS
 
-Libev itself is thread-safe (unless the opposite is specifically
-documented for a function), but it uses no locking itself. This means that
-you can use as many loops as you want in parallel, as long as only one
-thread ever calls into one libev function with the same loop parameter:
-libev guarantees that different event loops share no data structures that
-need locking.
+All libev functions are reentrant and thread-safe unless explicitly
+documented otherwise, but it uses no locking itself. This means that you
+can use as many loops as you want in parallel, as long as there are no
+concurrent calls into any libev function with the same loop parameter
+(C<ev_default_*> calls have an implicit default loop parameter, of
+course): libev guarantees that different event loops share no data
+structures that need any locking.
 
 Or to put it differently: calls with different loop parameters can be done
 concurrently from multiple threads, calls with the same loop parameter
@@ -3320,11 +3321,12 @@ a mutex per loop).
 
 Specifically to support threads (and signal handlers), libev implements
 so-called C<ev_async> watchers, which allow some limited form of
-concurrency on the same event loop.
+concurrency on the same event loop, namely waking it up "from the
+outside".
 
 If you want to know which design (one loop, locking, or multiple loops
 without or something else still) is best for your problem, then I cannot
-help you. I can give some generic advice however:
+help you, but here is some generic advice:
 
 =over 4
 
