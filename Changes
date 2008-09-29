@@ -1,8 +1,8 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
-WISH? monotonic clocks times/GetTickCount for coarse corrections?
-TODO: use automatic fork for ev_embed.
-3.44
+3.44 Mon Sep 29 05:18:39 CEST 2008
+	- embed watchers now automatically invoke ev_loop_fork on the
+          embedded loop when the parent loop forks.
 	- new function: ev_now_update (loop).
 	- verify_watcher was not marked static.
         - improve the "associating..." manpage section.

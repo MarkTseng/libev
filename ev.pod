@@ -2244,6 +2244,14 @@ that you cannot get an embeddable loop. The recommended way to get around
 this is to have a separate variables for your embeddable loop, try to
 create it, and if that fails, use the normal loop for everything.
 
+=head3 C<ev_embed> and fork
+
+While the C<ev_embed> watcher is running, forks in the embedding loop will
+automatically be applied to the embedded loop as well, so no special
+fork handling is required in that case. When the watcher is not running,
+however, it is still the task of the libev user to call C<ev_loop_fork ()>
+as applicable.
+
 =head3 Watcher-Specific Functions and Data Members
 
 =over 4

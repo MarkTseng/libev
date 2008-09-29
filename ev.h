@@ -337,7 +337,7 @@ typedef struct ev_embed
   ev_timer timer;        /* unused */
   ev_periodic periodic;  /* unused */
   ev_idle idle;          /* unused */
-  ev_fork fork;          /* unused */
+  ev_fork fork;          /* private */
 } ev_embed;
 #endif
 
