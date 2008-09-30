@@ -3308,10 +3308,11 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
    #include "ev_cpp.h"
    #include "ev.c"
 
+=head1 INTERACTION WITH OTHER PROGRAMS OR LIBRARIES
 
-=head1 THREADS AND COROUTINES
+=head2 THREADS AND COROUTINES
 
-=head2 THREADS
+=head3 THREADS
 
 All libev functions are reentrant and thread-safe unless explicitly
 documented otherwise, but it uses no locking itself. This means that you
@@ -3368,7 +3369,7 @@ watcher callback into the event loop interested in the signal.
 
 =back
 
-=head2 COROUTINES
+=head3 COROUTINES
 
 Libev is much more accommodating to coroutines ("cooperative threads"):
 libev fully supports nesting calls to it's functions from different
@@ -3379,6 +3380,68 @@ you must not do this from C<ev_periodic> reschedule callbacks.
 
 Care has been taken to ensure that libev does not keep local state inside
 C<ev_loop>, and other calls do not usually allow coroutine switches.
+
+=head2 COMPILER WARNINGS
+
+Depending on your compiler and compiler settings, you might get no or a
+lot of warnings when compiling libev code. Some people are apparently
+scared by this.
+
+However, these are unavoidable for many reasons. For one, each compiler
+has different warnings, and each user has different tastes regarding
+warning options. "Warn-free" code therefore cannot be a goal except when
+targeting a specific compiler and compiler-version.
+
+Another reason is that some compiler warnings require elaborate
+workarounds, or other changes to the code that make it less clear and less
+maintainable.
+
+And of course, some compiler warnings are just plain stupid, or simply
+wrong (because they don't actually warn about the condition their message
+seems to warn about). For example, certain older gcc versions had some
+warnings that resulted an extreme number of false positives. These have
+been fixed, but some people still insist on making code warn-free with
+such buggy versions.
+
+While libev is written to generate as few warnings as possible,
+"warn-free" code is not a goal, and it is recommended not to build libev
+with any compiler warnings enabled unless you are prepared to cope with
+them (e.g. by ignoring them). Remember that warnings are just that:
+warnings, not errors, or proof of bugs.
+
+
+=head1 VALGRIND
+
+Valgrind has a special section here because it is a popular tool that is
+highly useful. Unfortunately, valgrind reports are very hard to interpret.
+
+If you think you found a bug (memory leak, uninitialised data access etc.)
+in libev, then check twice: If valgrind reports something like:
+
+   ==2274==    definitely lost: 0 bytes in 0 blocks.
+   ==2274==      possibly lost: 0 bytes in 0 blocks.
+   ==2274==    still reachable: 256 bytes in 1 blocks.
+
+Then there is no memory leak, just as memory accounted to global variables
+is not a memleak - the memory is still being refernced, and didn't leak.
+
+Similarly, under some circumstances, valgrind might report kernel bugs
+as if it were a bug in libev (e.g. in realloc or in the poll backend,
+although an acceptable workaround has been found here), or it might be
+confused.
+
+Keep in mind that valgrind is a very good tool, but only a tool. Don't
+make it into some kind of religion.
+
+If you are unsure about something, feel free to contact the mailing list
+with the full valgrind report and an explanation on why you think this
+is a bug in libev (best check the archives, too :). However, don't be
+annoyed when you get a brisk "this is no bug" answer and take the chance
+of learning how to interpret valgrind properly.
+
+If you need, for some reason, empty reports from valgrind for your project
+I suggest using suppression lists.
+
 
 
 =head1 COMPLEXITIES
@@ -3451,7 +3514,9 @@ involves iterating over all running async watchers or all signal numbers.
 =back
 
 
-=head1 WIN32 PLATFORM LIMITATIONS AND WORKAROUNDS
+=head1 PORTABILITY
+
+=head2 WIN32 PLATFORM LIMITATIONS AND WORKAROUNDS
 
 Win32 doesn't support any of the standards (e.g. POSIX) that libev
 requires, and its I/O model is fundamentally incompatible with the POSIX
@@ -3548,11 +3613,10 @@ calling select (O(n²)) will likely make this unworkable.
 
 =back
 
+=head2 PORTABILITY REQUIREMENTS
 
-=head1 PORTABILITY REQUIREMENTS
-
-In addition to a working ISO-C implementation, libev relies on a few
-additional extensions:
+In addition to a working ISO-C implementation and of course the
+backend-specific APIs, libev relies on a few additional extensions:
 
 =over 4
 
@@ -3587,11 +3651,11 @@ well.
 
 =item C<long> must be large enough for common memory allocation sizes
 
-To improve portability and simplify using libev, libev uses C<long>
-internally instead of C<size_t> when allocating its data structures. On
-non-POSIX systems (Microsoft...) this might be unexpectedly low, but
-is still at least 31 bits everywhere, which is enough for hundreds of
-millions of watchers.
+To improve portability and simplify its API, libev uses C<long> internally
+instead of C<size_t> when allocating its data structures. On non-POSIX
+systems (Microsoft...) this might be unexpectedly low, but is still at
+least 31 bits everywhere, which is enough for hundreds of millions of
+watchers.
 
 =item C<double> must hold a time value in seconds with enough accuracy
 
@@ -3603,58 +3667,6 @@ implementations implementing IEEE 754 (basically all existing ones).
 =back
 
 If you know of other additional requirements drop me a note.
-
-
-=head1 COMPILER WARNINGS
-
-Depending on your compiler and compiler settings, you might get no or a
-lot of warnings when compiling libev code. Some people are apparently
-scared by this.
-
-However, these are unavoidable for many reasons. For one, each compiler
-has different warnings, and each user has different tastes regarding
-warning options. "Warn-free" code therefore cannot be a goal except when
-targeting a specific compiler and compiler-version.
-
-Another reason is that some compiler warnings require elaborate
-workarounds, or other changes to the code that make it less clear and less
-maintainable.
-
-And of course, some compiler warnings are just plain stupid, or simply
-wrong (because they don't actually warn about the condition their message
-seems to warn about).
-
-While libev is written to generate as few warnings as possible,
-"warn-free" code is not a goal, and it is recommended not to build libev
-with any compiler warnings enabled unless you are prepared to cope with
-them (e.g. by ignoring them). Remember that warnings are just that:
-warnings, not errors, or proof of bugs.
-
-
-=head1 VALGRIND
-
-Valgrind has a special section here because it is a popular tool that is
-highly useful, but valgrind reports are very hard to interpret.
-
-If you think you found a bug (memory leak, uninitialised data access etc.)
-in libev, then check twice: If valgrind reports something like:
-
-   ==2274==    definitely lost: 0 bytes in 0 blocks.
-   ==2274==      possibly lost: 0 bytes in 0 blocks.
-   ==2274==    still reachable: 256 bytes in 1 blocks.
-
-Then there is no memory leak. Similarly, under some circumstances,
-valgrind might report kernel bugs as if it were a bug in libev, or it
-might be confused (it is a very good tool, but only a tool).
-
-If you are unsure about something, feel free to contact the mailing list
-with the full valgrind report and an explanation on why you think this is
-a bug in libev. However, don't be annoyed when you get a brisk "this is
-no bug" answer and take the chance of learning how to interpret valgrind
-properly.
-
-If you need, for some reason, empty reports from valgrind for your project
-I suggest using suppression lists.
 
 
 =head1 AUTHOR
