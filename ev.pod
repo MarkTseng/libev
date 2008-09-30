@@ -2386,8 +2386,8 @@ queue:
 =item queueing from a signal handler context
 
 To implement race-free queueing, you simply add to the queue in the signal
-handler but you block the signal handler in the watcher callback. Here is an example that does that for
-some fictitious SIGUSR1 handler:
+handler but you block the signal handler in the watcher callback. Here is
+an example that does that for some fictitious SIGUSR1 handler:
 
    static ev_async mysig;
 
@@ -3315,11 +3315,11 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
 =head3 THREADS
 
 All libev functions are reentrant and thread-safe unless explicitly
-documented otherwise, but it uses no locking itself. This means that you
-can use as many loops as you want in parallel, as long as there are no
-concurrent calls into any libev function with the same loop parameter
-(C<ev_default_*> calls have an implicit default loop parameter, of
-course): libev guarantees that different event loops share no data
+documented otherwise, but libev implements no locking itself. This means
+that you can use as many loops as you want in parallel, as long as there
+are no concurrent calls into any libev function with the same loop
+parameter (C<ev_default_*> calls have an implicit default loop parameter,
+of course): libev guarantees that different event loops share no data
 structures that need any locking.
 
 Or to put it differently: calls with different loop parameters can be done
@@ -3371,15 +3371,16 @@ watcher callback into the event loop interested in the signal.
 
 =head3 COROUTINES
 
-Libev is much more accommodating to coroutines ("cooperative threads"):
-libev fully supports nesting calls to it's functions from different
+Libev is very accommodating to coroutines ("cooperative threads"):
+libev fully supports nesting calls to its functions from different
 coroutines (e.g. you can call C<ev_loop> on the same loop from two
-different coroutines and switch freely between both coroutines running the
+different coroutines, and switch freely between both coroutines running the
 loop, as long as you don't confuse yourself). The only exception is that
 you must not do this from C<ev_periodic> reschedule callbacks.
 
 Care has been taken to ensure that libev does not keep local state inside
-C<ev_loop>, and other calls do not usually allow coroutine switches.
+C<ev_loop>, and other calls do not usually allow for coroutine switches as
+they do not clal any callbacks.
 
 =head2 COMPILER WARNINGS
 
@@ -3441,77 +3442,6 @@ of learning how to interpret valgrind properly.
 
 If you need, for some reason, empty reports from valgrind for your project
 I suggest using suppression lists.
-
-
-
-=head1 COMPLEXITIES
-
-In this section the complexities of (many of) the algorithms used inside
-libev will be explained. For complexity discussions about backends see the
-documentation for C<ev_default_init>.
-
-All of the following are about amortised time: If an array needs to be
-extended, libev needs to realloc and move the whole array, but this
-happens asymptotically never with higher number of elements, so O(1) might
-mean it might do a lengthy realloc operation in rare cases, but on average
-it is much faster and asymptotically approaches constant time.
-
-=over 4
-
-=item Starting and stopping timer/periodic watchers: O(log skipped_other_timers)
-
-This means that, when you have a watcher that triggers in one hour and
-there are 100 watchers that would trigger before that then inserting will
-have to skip roughly seven (C<ld 100>) of these watchers.
-
-=item Changing timer/periodic watchers (by autorepeat or calling again): O(log skipped_other_timers)
-
-That means that changing a timer costs less than removing/adding them
-as only the relative motion in the event queue has to be paid for.
-
-=item Starting io/check/prepare/idle/signal/child/fork/async watchers: O(1)
-
-These just add the watcher into an array or at the head of a list.
-
-=item Stopping check/prepare/idle/fork/async watchers: O(1)
-
-=item Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))
-
-These watchers are stored in lists then need to be walked to find the
-correct watcher to remove. The lists are usually short (you don't usually
-have many watchers waiting for the same fd or signal).
-
-=item Finding the next timer in each loop iteration: O(1)
-
-By virtue of using a binary or 4-heap, the next timer is always found at a
-fixed position in the storage array.
-
-=item Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)
-
-A change means an I/O watcher gets started or stopped, which requires
-libev to recalculate its status (and possibly tell the kernel, depending
-on backend and whether C<ev_io_set> was used).
-
-=item Activating one watcher (putting it into the pending state): O(1)
-
-=item Priority handling: O(number_of_priorities)
-
-Priorities are implemented by allocating some space for each
-priority. When doing priority-based operations, libev usually has to
-linearly search all the priorities, but starting/stopping and activating
-watchers becomes O(1) with respect to priority handling.
-
-=item Sending an ev_async: O(1)
-
-=item Processing ev_async_send: O(number_of_async_watchers)
-
-=item Processing signals: O(max_signal_number)
-
-Sending involves a system call I<iff> there were no other C<ev_async_send>
-calls in the current loop iteration. Checking for async and signal events
-involves iterating over all running async watchers or all signal numbers.
-
-=back
 
 
 =head1 PORTABILITY NOTES
@@ -3667,6 +3597,77 @@ implementations implementing IEEE 754 (basically all existing ones).
 =back
 
 If you know of other additional requirements drop me a note.
+
+
+=head1 ALGORITHMIC COMPLEXITIES
+
+In this section the complexities of (many of) the algorithms used inside
+libev will be documented. For complexity discussions about backends see
+the documentation for C<ev_default_init>.
+
+All of the following are about amortised time: If an array needs to be
+extended, libev needs to realloc and move the whole array, but this
+happens asymptotically rarer with higher number of elements, so O(1) might
+mean that libev does a lengthy realloc operation in rare cases, but on
+average it is much faster and asymptotically approaches constant time.
+
+=over 4
+
+=item Starting and stopping timer/periodic watchers: O(log skipped_other_timers)
+
+This means that, when you have a watcher that triggers in one hour and
+there are 100 watchers that would trigger before that, then inserting will
+have to skip roughly seven (C<ld 100>) of these watchers.
+
+=item Changing timer/periodic watchers (by autorepeat or calling again): O(log skipped_other_timers)
+
+That means that changing a timer costs less than removing/adding them,
+as only the relative motion in the event queue has to be paid for.
+
+=item Starting io/check/prepare/idle/signal/child/fork/async watchers: O(1)
+
+These just add the watcher into an array or at the head of a list.
+
+=item Stopping check/prepare/idle/fork/async watchers: O(1)
+
+=item Stopping an io/signal/child watcher: O(number_of_watchers_for_this_(fd/signal/pid % EV_PID_HASHSIZE))
+
+These watchers are stored in lists, so they need to be walked to find the
+correct watcher to remove. The lists are usually short (you don't usually
+have many watchers waiting for the same fd or signal: one is typical, two
+is rare).
+
+=item Finding the next timer in each loop iteration: O(1)
+
+By virtue of using a binary or 4-heap, the next timer is always found at a
+fixed position in the storage array.
+
+=item Each change on a file descriptor per loop iteration: O(number_of_watchers_for_this_fd)
+
+A change means an I/O watcher gets started or stopped, which requires
+libev to recalculate its status (and possibly tell the kernel, depending
+on backend and whether C<ev_io_set> was used).
+
+=item Activating one watcher (putting it into the pending state): O(1)
+
+=item Priority handling: O(number_of_priorities)
+
+Priorities are implemented by allocating some space for each
+priority. When doing priority-based operations, libev usually has to
+linearly search all the priorities, but starting/stopping and activating
+watchers becomes O(1) with respect to priority handling.
+
+=item Sending an ev_async: O(1)
+
+=item Processing ev_async_send: O(number_of_async_watchers)
+
+=item Processing signals: O(max_signal_number)
+
+Sending involves a system call I<iff> there were no other C<ev_async_send>
+calls in the current loop iteration. Checking for async and signal events
+involves iterating over all running async watchers or all signal numbers.
+
+=back
 
 
 =head1 AUTHOR
