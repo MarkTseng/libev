@@ -1627,7 +1627,7 @@ The signal the watcher watches out for.
 
 =head3 Examples
 
-Example: Try to exit cleanly on SIGINT and SIGTERM.
+Example: Try to exit cleanly on SIGINT.
 
    static void
    sigint_cb (struct ev_loop *loop, struct ev_signal *w, int revents)
@@ -1637,7 +1637,7 @@ Example: Try to exit cleanly on SIGINT and SIGTERM.
 
    struct ev_signal signal_watcher;
    ev_signal_init (&signal_watcher, sigint_cb, SIGINT);
-   ev_signal_start (loop, &sigint_cb);
+   ev_signal_start (loop, &signal_watcher);
 
 
 =head2 C<ev_child> - watch out for process status changes
