@@ -2504,14 +2504,14 @@ There are some other functions of possible interest. Described. Here. Now.
 =item ev_once (loop, int fd, int events, ev_tstamp timeout, callback)
 
 This function combines a simple timer and an I/O watcher, calls your
-callback on whichever event happens first and automatically stop both
+callback on whichever event happens first and automatically stops both
 watchers. This is useful if you want to wait for a single event on an fd
 or timeout without having to allocate/configure/start/stop/free one or
 more watchers yourself.
 
-If C<fd> is less than 0, then no I/O watcher will be started and events
-is being ignored. Otherwise, an C<ev_io> watcher for the given C<fd> and
-C<events> set will be created and started.
+If C<fd> is less than 0, then no I/O watcher will be started and the
+C<events> argument is being ignored. Otherwise, an C<ev_io> watcher for
+the given C<fd> and C<events> set will be created and started.
 
 If C<timeout> is less than 0, then no timeout watcher will be
 started. Otherwise an C<ev_timer> watcher with after = C<timeout> (and
