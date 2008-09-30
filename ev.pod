@@ -3410,7 +3410,7 @@ them (e.g. by ignoring them). Remember that warnings are just that:
 warnings, not errors, or proof of bugs.
 
 
-=head1 VALGRIND
+=head2 VALGRIND
 
 Valgrind has a special section here because it is a popular tool that is
 highly useful. Unfortunately, valgrind reports are very hard to interpret.
@@ -3514,7 +3514,7 @@ involves iterating over all running async watchers or all signal numbers.
 =back
 
 
-=head1 PORTABILITY
+=head1 PORTABILITY NOTES
 
 =head2 WIN32 PLATFORM LIMITATIONS AND WORKAROUNDS
 
