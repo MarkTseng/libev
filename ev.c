@@ -3014,13 +3014,17 @@ once_cb (EV_P_ struct ev_once *once, int revents)
 static void
 once_cb_io (EV_P_ ev_io *w, int revents)
 {
-  once_cb (EV_A_ (struct ev_once *)(((char *)w) - offsetof (struct ev_once, io)), revents);
+  struct ev_once *once = (struct ev_once *)(((char *)w) - offsetof (struct ev_once, io));
+
+  once_cb (EV_A_ once, revents | ev_clear_pending (EV_A_ &once->to));
 }
 
 static void
 once_cb_to (EV_P_ ev_timer *w, int revents)
 {
-  once_cb (EV_A_ (struct ev_once *)(((char *)w) - offsetof (struct ev_once, to)), revents);
+  struct ev_once *once = (struct ev_once *)(((char *)w) - offsetof (struct ev_once, to));
+
+  once_cb (EV_A_ once, revents | ev_clear_pending (EV_A_ &once->io));
 }
 
 void

@@ -2515,20 +2515,23 @@ the given C<fd> and C<events> set will be created and started.
 
 If C<timeout> is less than 0, then no timeout watcher will be
 started. Otherwise an C<ev_timer> watcher with after = C<timeout> (and
-repeat = 0) will be started. While C<0> is a valid timeout, it is of
-dubious value.
+repeat = 0) will be started. C<0> is a valid timeout.
 
 The callback has the type C<void (*cb)(int revents, void *arg)> and gets
 passed an C<revents> set like normal event callbacks (a combination of
 C<EV_ERROR>, C<EV_READ>, C<EV_WRITE> or C<EV_TIMEOUT>) and the C<arg>
-value passed to C<ev_once>:
+value passed to C<ev_once>. Note that it is possible to receive I<both>
+a timeout and an io event at the same time - you probably should give io
+events precedence.
+
+Example: wait up to ten seconds for data to appear on STDIN_FILENO.
 
    static void stdin_ready (int revents, void *arg)
    {
-     if (revents & EV_TIMEOUT)
-       /* doh, nothing entered */;
-     else if (revents & EV_READ)
+     if (revents & EV_READ)
        /* stdin might have data for us, joy! */;
+     else if (revents & EV_TIMEOUT)
+       /* doh, nothing entered */;
    }
 
    ev_once (STDIN_FILENO, EV_READ, 10., stdin_ready, 0);
