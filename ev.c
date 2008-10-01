@@ -289,6 +289,11 @@ extern "C" {
 
 #if EV_USE_INOTIFY
 # include <sys/inotify.h>
+/* some very old inotify.h headers don't have IN_DONT_FOLLOW */
+# ifndef IN_DONT_FOLLOW
+#  undef EV_USE_INOTIFY
+#  define EV_USE_INOTIFY 0
+# endif
 #endif
 
 #if EV_SELECT_IS_WINSOCKET
