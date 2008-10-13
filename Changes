@@ -2,6 +2,11 @@ Revision history for libev, a high-performance and full-featured event loop.
 
 
 WISH? monotonic clocks times/GetTickCount for coarse corrections?
+	- disable inotify usage on linux <2.6.25, as it is broken
+          (reported by Yoann Vandoorselaere).
+        - ev_stat errornously would try to add inotify watchers
+          even when inotify isn't available (this should only
+          have a performance impact).
 	- ev_once now passes both timeout and io to the callback if both
           occur concurrently, instead of giving timeouts precedence.
 	- disable EV_USE_INOTIFY when sys/inotify.h is too old.
