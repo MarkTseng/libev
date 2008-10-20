@@ -971,12 +971,14 @@ whole section.
 
 =item C<ev_TYPE_stop> (loop *, ev_TYPE *watcher)
 
-Stops the given watcher again (if active) and clears the pending
-status. It is possible that stopped watchers are pending (for example,
-non-repeating timers are being stopped when they become pending), but
-C<ev_TYPE_stop> ensures that the watcher is neither active nor pending. If
-you want to free or reuse the memory used by the watcher it is therefore a
-good idea to always call its C<ev_TYPE_stop> function.
+Stops the given watcher if active, and clears the pending status (whether
+the watcher was active or not).
+
+It is possible that stopped watchers are pending - for example,
+non-repeating timers are being stopped when they become pending - but
+calling C<ev_TYPE_stop> ensures that the watcher is neither active nor
+pending. If you want to free or reuse the memory used by the watcher it is
+therefore a good idea to always call its C<ev_TYPE_stop> function.
 
 =item bool ev_is_active (ev_TYPE *watcher)
 
