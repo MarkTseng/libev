@@ -687,6 +687,8 @@ C<EVUNLOOP_ALL>, which will make all nested C<ev_loop> calls return.
 
 This "unloop state" will be cleared when entering C<ev_loop> again.
 
+It is safe to call C<ev_unloop> from otuside any C<ev_loop> calls.
+
 =item ev_ref (loop)
 
 =item ev_unref (loop)
