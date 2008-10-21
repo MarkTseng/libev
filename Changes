@@ -1,8 +1,6 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
-
-WISH? monotonic clocks times/GetTickCount for coarse corrections?
-TODO: document 2.6.24-- breakage of inotify
+3.45 Tue Oct 21 21:59:26 CEST 2008
 	- disable inotify usage on linux <2.6.25, as it is broken
           (reported by Yoann Vandoorselaere).
         - ev_stat errornously would try to add inotify watchers

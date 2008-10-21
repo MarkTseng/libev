@@ -1798,10 +1798,11 @@ default compilation environment.
 
 =head3 Inotify and Kqueue
 
-When C<inotify (7)> support has been compiled into libev (generally only
-available with Linux) and present at runtime, it will be used to speed up
-change detection where possible. The inotify descriptor will be created lazily
-when the first C<ev_stat> watcher is being started.
+When C<inotify (7)> support has been compiled into libev (generally
+only available with Linux 2.6.25 or above due to bugs in earlier
+implementations) and present at runtime, it will be used to speed up
+change detection where possible. The inotify descriptor will be created
+lazily when the first C<ev_stat> watcher is being started.
 
 Inotify presence does not change the semantics of C<ev_stat> watchers
 except that changes might be detected earlier, and in some cases, to avoid
