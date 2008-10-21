@@ -896,8 +896,12 @@ The given async watcher has been asynchronously notified (see C<ev_async>).
 An unspecified error has occurred, the watcher has been stopped. This might
 happen because the watcher could not be properly started because libev
 ran out of memory, a file descriptor was found to be closed or any other
-problem. You best act on it by reporting the problem and somehow coping
-with the watcher being stopped.
+problem. Libev considers these application bugs.
+
+You best act on it by reporting the problem and somehow coping with the
+watcher being stopped. Note that well-written programs should not receive
+an error ever, so when your watcher receives it, this usually indicates a
+bug in your program.
 
 Libev will usually signal a few "dummy" events together with an error, for
 example it might indicate that a fd is readable or writable, and if your
