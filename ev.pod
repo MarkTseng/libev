@@ -19,7 +19,7 @@ libev - a high performance full-featured event loop written in C
    // all watcher callbacks have a similar signature
    // this callback is called when data is readable on stdin
    static void
-   stdin_cb (EV_P_ struct ev_io *w, int revents)
+   stdin_cb (EV_P_ ev_io *w, int revents)
    {
      puts ("stdin ready");
      // for one-shot events, one must manually stop the watcher
@@ -32,7 +32,7 @@ libev - a high performance full-featured event loop written in C
 
    // another callback, this time for a time-out
    static void
-   timeout_cb (EV_P_ struct ev_timer *w, int revents)
+   timeout_cb (EV_P_ ev_timer *w, int revents)
    {
      puts ("timeout");
      // this causes the innermost ev_loop to stop iterating
@@ -43,7 +43,7 @@ libev - a high performance full-featured event loop written in C
    main (void)
    {
      // use the default event loop unless you have special needs
-     struct ev_loop *loop = ev_default_loop (0);
+     ev_loop *loop = ev_default_loop (0);
 
      // initialise an io watcher, then start it
      // this one will watch for stdin to become readable
@@ -105,7 +105,7 @@ configuration will be described, which supports multiple event loops. For
 more info about various configuration options please have a look at
 B<EMBED> section in this manual. If libev was configured without support
 for multiple event loops, then all functions taking an initial argument of
-name C<loop> (which is always of type C<struct ev_loop *>) will not have
+name C<loop> (which is always of type C<ev_loop *>) will not have
 this argument.
 
 =head2 TIME REPRESENTATION
@@ -278,7 +278,7 @@ Example: This is basically the same thing that libev does internally, too.
 
 =head1 FUNCTIONS CONTROLLING THE EVENT LOOP
 
-An event loop is described by a C<struct ev_loop *>. The library knows two
+An event loop is described by a C<ev_loop *>. The library knows two
 types of such loops, the I<default> loop, which supports signals and child
 events, and dynamically created loops which do not.
 
@@ -712,7 +712,7 @@ respectively).
 Example: Create a signal watcher, but keep it from keeping C<ev_loop>
 running when nothing else is active.
 
-   struct ev_signal exitsig;
+   ev_signal exitsig;
    ev_signal_init (&exitsig, sig_cb, SIGINT);
    ev_signal_start (loop, &exitsig);
    evf_unref (loop);
@@ -788,14 +788,14 @@ A watcher is a structure that you create and register to record your
 interest in some event. For instance, if you want to wait for STDIN to
 become readable, you would create an C<ev_io> watcher for that:
 
-   static void my_cb (struct ev_loop *loop, struct ev_io *w, int revents)
+   static void my_cb (struct ev_loop *loop, ev_io *w, int revents)
    {
      ev_io_stop (w);
      ev_unloop (loop, EVUNLOOP_ALL);
    }
 
    struct ev_loop *loop = ev_default_loop (0);
-   struct ev_io stdin_watcher;
+   ev_io stdin_watcher;
    ev_init (&stdin_watcher, my_cb);
    ev_io_set (&stdin_watcher, STDIN_FILENO, EV_READ);
    ev_io_start (loop, &stdin_watcher);
@@ -931,7 +931,7 @@ which rolls both calls into one.
 You can reinitialise a watcher at any time as long as it has been stopped
 (or never started) and there are no pending events outstanding.
 
-The callback is always of type C<void (*)(ev_loop *loop, ev_TYPE *watcher,
+The callback is always of type C<void (*)(struct ev_loop *loop, ev_TYPE *watcher,
 int revents)>.
 
 Example: Initialise an C<ev_io> watcher in two steps.
@@ -1066,7 +1066,7 @@ data:
 
    struct my_io
    {
-     struct ev_io io;
+     ev_io io;
      int otherfd;
      void *somedata;
      struct whatever *mostinteresting;
@@ -1079,7 +1079,7 @@ data:
 And since your callback will be called with a pointer to the watcher, you
 can cast it back to your own type:
 
-   static void my_cb (struct ev_loop *loop, struct ev_io *w_, int revents)
+   static void my_cb (struct ev_loop *loop, ev_io *w_, int revents)
    {
      struct my_io *w = (struct my_io *)w_;
      ...
@@ -1107,14 +1107,14 @@ programmers):
    #include <stddef.h>
 
    static void
-   t1_cb (EV_P_ struct ev_timer *w, int revents)
+   t1_cb (EV_P_ ev_timer *w, int revents)
    {
      struct my_biggy big = (struct my_biggy *
        (((char *)w) - offsetof (struct my_biggy, t1));
    }
 
    static void
-   t2_cb (EV_P_ struct ev_timer *w, int revents)
+   t2_cb (EV_P_ ev_timer *w, int revents)
    {
      struct my_biggy big = (struct my_biggy *
        (((char *)w) - offsetof (struct my_biggy, t2));
@@ -1259,7 +1259,7 @@ readable, but only once. Since it is likely line-buffered, you could
 attempt to read a whole line in the callback.
 
    static void
-   stdin_readable_cb (struct ev_loop *loop, struct ev_io *w, int revents)
+   stdin_readable_cb (struct ev_loop *loop, ev_io *w, int revents)
    {
       ev_io_stop (loop, w);
      .. read from stdin here (or from w->fd) and handle any I/O errors
@@ -1267,7 +1267,7 @@ attempt to read a whole line in the callback.
 
    ...
    struct ev_loop *loop = ev_default_init (0);
-   struct ev_io stdin_readable;
+   ev_io stdin_readable;
    ev_io_init (&stdin_readable, stdin_readable_cb, STDIN_FILENO, EV_READ);
    ev_io_start (loop, &stdin_readable);
    ev_loop (loop, 0);
@@ -1287,6 +1287,134 @@ monotonic clock option helps a lot here).
 The callback is guaranteed to be invoked only I<after> its timeout has
 passed, but if multiple timers become ready during the same loop iteration
 then order of execution is undefined.
+
+=head3 Be smart about timeouts
+
+Many real-world problems invole some kind of time-out, usually for error
+recovery. A typical example is an HTTP request - if the other side hangs,
+you want to raise some error after a while.
+
+Here are some ways on how to handle this problem, from simple and
+inefficient to very efficient.
+
+In the following examples a 60 second activity timeout is assumed - a
+timeout that gets reset to 60 seconds each time some data ("a lifesign")
+was received.
+
+=over 4
+
+=item 1. Use a timer and stop, reinitialise, start it on activity.
+
+This is the most obvious, but not the most simple way: In the beginning,
+start the watcher:
+
+   ev_timer_init (timer, callback, 60., 0.);
+   ev_timer_start (loop, timer);
+
+Then, each time there is some activity, C<ev_timer_stop> the timer,
+initialise it again, and start it:
+
+   ev_timer_stop (loop, timer);
+   ev_timer_set (timer, 60., 0.);
+   ev_timer_start (loop, timer);
+
+This is relatively simple to implement, but means that each time there
+is some activity, libev will first have to remove the timer from it's
+internal data strcuture and then add it again.
+
+=item 2. Use a timer and re-start it with C<ev_timer_again> inactivity.
+
+This is the easiest way, and involves using C<ev_timer_again> instead of
+C<ev_timer_start>.
+
+For this, configure an C<ev_timer> with a C<repeat> value of C<60> and
+then call C<ev_timer_again> at start and each time you successfully read
+or write some data. If you go into an idle state where you do not expect
+data to travel on the socket, you can C<ev_timer_stop> the timer, and
+C<ev_timer_again> will automatically restart it if need be.
+
+That means you can ignore the C<after> value and C<ev_timer_start>
+altogether and only ever use the C<repeat> value and C<ev_timer_again>.
+
+At start:
+
+   ev_timer_init (timer, callback, 0., 60.);
+   ev_timer_again (loop, timer);
+
+Each time you receive some data:
+
+   ev_timer_again (loop, timer);
+
+It is even possible to change the time-out on the fly:
+
+   timer->repeat = 30.;
+   ev_timer_again (loop, timer);
+
+This is slightly more efficient then stopping/starting the timer each time
+you want to modify its timeout value, as libev does not have to completely
+remove and re-insert the timer from/into it's internal data structure.
+
+=item 3. Let the timer time out, but then re-arm it as required.
+
+This method is more tricky, but usually most efficient: Most timeouts are
+relatively long compared to the loop iteration time - in our example,
+within 60 seconds, there are usually many I/O events with associated
+activity resets.
+
+In this case, it would be more efficient to leave the C<ev_timer> alone,
+but remember the time of last activity, and check for a real timeout only
+within the callback:
+
+   ev_tstamp last_activity; // time of last activity
+
+   static void
+   callback (EV_P_ ev_timer *w, int revents)
+   {
+     ev_tstamp now = ev_now (EV_A);
+     ev_tstamp timeout = last_activity + 60.;
+
+     // if last_activity is older than now - timeout, we did time out
+     if (timeout < now)
+       {
+         // timeout occured, take action
+       }
+     else
+       {
+         // callback was invoked, but there was some activity, re-arm
+         // to fire in last_activity + 60.
+         w->again = timeout - now;
+         ev_timer_again (EV_A_ w);
+       }
+   }
+
+To summarise the callback: first calculate the real time-out (defined as
+"60 seconds after the last activity"), then check if that time has been
+reached, which means there was a real timeout. Otherwise the callback was
+invoked too early (timeout is in the future), so re-schedule the timer to
+fire at that future time.
+
+Note how C<ev_timer_again> is used, taking advantage of the
+C<ev_timer_again> optimisation when the timer is already running.
+
+This scheme causes more callback invocations (about one every 60 seconds),
+but virtually no calls to libev to change the timeout.
+
+To start the timer, simply intiialise the watcher and C<last_activity>,
+then call the callback:
+
+   ev_timer_init (timer, callback);
+   last_activity = ev_now (loop);
+   callback (loop, timer, EV_TIMEOUT);
+
+And when there is some activity, simply remember the time in
+C<last_activity>:
+
+   last_actiivty = ev_now (loop);
+
+This technique is slightly more complex, but in most cases where the
+time-out is unlikely to be triggered, much more efficient.
+
+=back
 
 =head3 The special problem of time updates
 
@@ -1340,36 +1468,8 @@ If the timer is started but non-repeating, stop it (as if it timed out).
 If the timer is repeating, either start it if necessary (with the
 C<repeat> value), or reset the running timer to the C<repeat> value.
 
-This sounds a bit complicated, but here is a useful and typical
-example: Imagine you have a TCP connection and you want a so-called idle
-timeout, that is, you want to be called when there have been, say, 60
-seconds of inactivity on the socket. The easiest way to do this is to
-configure an C<ev_timer> with a C<repeat> value of C<60> and then call
-C<ev_timer_again> each time you successfully read or write some data. If
-you go into an idle state where you do not expect data to travel on the
-socket, you can C<ev_timer_stop> the timer, and C<ev_timer_again> will
-automatically restart it if need be.
-
-That means you can ignore the C<after> value and C<ev_timer_start>
-altogether and only ever use the C<repeat> value and C<ev_timer_again>:
-
-   ev_timer_init (timer, callback, 0., 5.);
-   ev_timer_again (loop, timer);
-   ...
-   timer->again = 17.;
-   ev_timer_again (loop, timer);
-   ...
-   timer->again = 10.;
-   ev_timer_again (loop, timer);
-
-This is more slightly efficient then stopping/starting the timer each time
-you want to modify its timeout value.
-
-Note, however, that it is often even more efficient to remember the
-time of the last activity and let the timer time-out naturally. In the
-callback, you then check whether the time-out is real, or, if there was
-some activity, you reschedule the watcher to time-out in "last_activity +
-timeout - ev_now ()" seconds.
+This sounds a bit complicated, see "Be smart about timeouts", above, for a
+usage example.
 
 =item ev_tstamp repeat [read-write]
 
@@ -1384,12 +1484,12 @@ which is also when any modifications are taken into account.
 Example: Create a timer that fires after 60 seconds.
 
    static void
-   one_minute_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
+   one_minute_cb (struct ev_loop *loop, ev_timer *w, int revents)
    {
      .. one minute over, w is actually stopped right here
    }
 
-   struct ev_timer mytimer;
+   ev_timer mytimer;
    ev_timer_init (&mytimer, one_minute_cb, 60., 0.);
    ev_timer_start (loop, &mytimer);
 
@@ -1397,12 +1497,12 @@ Example: Create a timeout timer that times out after 10 seconds of
 inactivity.
 
    static void
-   timeout_cb (struct ev_loop *loop, struct ev_timer *w, int revents)
+   timeout_cb (struct ev_loop *loop, ev_timer *w, int revents)
    {
      .. ten seconds without any activity
    }
 
-   struct ev_timer mytimer;
+   ev_timer mytimer;
    ev_timer_init (&mytimer, timeout_cb, 0., 10.); /* note, only repeat used */
    ev_timer_again (&mytimer); /* start timer */
    ev_loop (loop, 0);
@@ -1498,10 +1598,11 @@ If you need to stop it, return C<now + 1e30> (or so, fudge fudge) and stop
 it afterwards (e.g. by starting an C<ev_prepare> watcher, which is the
 only event loop modification you are allowed to do).
 
-The callback prototype is C<ev_tstamp (*reschedule_cb)(struct ev_periodic
+The callback prototype is C<ev_tstamp (*reschedule_cb)(ev_periodic
 *w, ev_tstamp now)>, e.g.:
 
-   static ev_tstamp my_rescheduler (struct ev_periodic *w, ev_tstamp now)
+   static ev_tstamp
+   my_rescheduler (ev_periodic *w, ev_tstamp now)
    {
      return now + 60.;
    }
@@ -1548,7 +1649,7 @@ The current interval value. Can be modified any time, but changes only
 take effect when the periodic timer fires or C<ev_periodic_again> is being
 called.
 
-=item ev_tstamp (*reschedule_cb)(struct ev_periodic *w, ev_tstamp now) [read-write]
+=item ev_tstamp (*reschedule_cb)(ev_periodic *w, ev_tstamp now) [read-write]
 
 The current reschedule callback, or C<0>, if this functionality is
 switched off. Can be changed any time, but changes only take effect when
@@ -1563,12 +1664,12 @@ system time is divisible by 3600. The callback invocation times have
 potentially a lot of jitter, but good long-term stability.
 
    static void
-   clock_cb (struct ev_loop *loop, struct ev_io *w, int revents)
+   clock_cb (struct ev_loop *loop, ev_io *w, int revents)
    {
      ... its now a full hour (UTC, or TAI or whatever your clock follows)
    }
 
-   struct ev_periodic hourly_tick;
+   ev_periodic hourly_tick;
    ev_periodic_init (&hourly_tick, clock_cb, 0., 3600., 0);
    ev_periodic_start (loop, &hourly_tick);
 
@@ -1577,7 +1678,7 @@ Example: The same as above, but use a reschedule callback to do it:
    #include <math.h>
 
    static ev_tstamp
-   my_scheduler_cb (struct ev_periodic *w, ev_tstamp now)
+   my_scheduler_cb (ev_periodic *w, ev_tstamp now)
    {
      return now + (3600. - fmod (now, 3600.));
    }
@@ -1586,7 +1687,7 @@ Example: The same as above, but use a reschedule callback to do it:
 
 Example: Call a callback every hour, starting now:
 
-   struct ev_periodic hourly_tick;
+   ev_periodic hourly_tick;
    ev_periodic_init (&hourly_tick, clock_cb,
                      fmod (ev_now (loop), 3600.), 3600., 0);
    ev_periodic_start (loop, &hourly_tick);
@@ -1638,12 +1739,12 @@ The signal the watcher watches out for.
 Example: Try to exit cleanly on SIGINT.
 
    static void
-   sigint_cb (struct ev_loop *loop, struct ev_signal *w, int revents)
+   sigint_cb (struct ev_loop *loop, ev_signal *w, int revents)
    {
      ev_unloop (loop, EVUNLOOP_ALL);
    }
 
-   struct ev_signal signal_watcher;
+   ev_signal signal_watcher;
    ev_signal_init (&signal_watcher, sigint_cb, SIGINT);
    ev_signal_start (loop, &signal_watcher);
 
@@ -1728,7 +1829,7 @@ its completion.
    ev_child cw;
 
    static void
-   child_cb (EV_P_ struct ev_child *w, int revents)
+   child_cb (EV_P_ ev_child *w, int revents)
    {
      ev_child_stop (EV_A_ w);
      printf ("process %d exited with status %x\n", w->rpid, w->rstatus);
@@ -1990,14 +2091,14 @@ Example: Dynamically allocate an C<ev_idle> watcher, start it, and in the
 callback, free it. Also, use no error checking, as usual.
 
    static void
-   idle_cb (struct ev_loop *loop, struct ev_idle *w, int revents)
+   idle_cb (struct ev_loop *loop, ev_idle *w, int revents)
    {
      free (w);
      // now do something you wanted to do when the program has
      // no longer anything immediate to do.
    }
 
-   struct ev_idle *idle_watcher = malloc (sizeof (struct ev_idle));
+   ev_idle *idle_watcher = malloc (sizeof (ev_idle));
    ev_idle_init (idle_watcher, idle_cb);
    ev_idle_start (loop, idle_cb);
 
@@ -2088,13 +2189,13 @@ the callbacks for the IO/timeout watchers might not have been called yet.
    static ev_timer tw;
 
    static void
-   io_cb (ev_loop *loop, ev_io *w, int revents)
+   io_cb (struct ev_loop *loop, ev_io *w, int revents)
    {
    }
 
    // create io watchers for each fd and a timer before blocking
    static void
-   adns_prepare_cb (ev_loop *loop, ev_prepare *w, int revents)
+   adns_prepare_cb (struct ev_loop *loop, ev_prepare *w, int revents)
    {
      int timeout = 3600000;
      struct pollfd fds [nfd];
@@ -2119,7 +2220,7 @@ the callbacks for the IO/timeout watchers might not have been called yet.
 
    // stop all watchers after blocking
    static void
-   adns_check_cb (ev_loop *loop, ev_check *w, int revents)
+   adns_check_cb (struct ev_loop *loop, ev_check *w, int revents)
    {
      ev_timer_stop (loop, &tw);
 
@@ -2297,7 +2398,7 @@ used).
 
    struct ev_loop *loop_hi = ev_default_init (0);
    struct ev_loop *loop_lo = 0;
-   struct ev_embed embed;
+   ev_embed embed;
    
    // see if there is a chance of getting one that works
    // (remember that a flags value of 0 means autodetection)
@@ -2321,7 +2422,7 @@ C<loop_socket>. (One might optionally use C<EVFLAG_NOENV>, too).
 
    struct ev_loop *loop = ev_default_init (0);
    struct ev_loop *loop_socket = 0;
-   struct ev_embed embed;
+   ev_embed embed;
    
    if (ev_supported_backends () & ~ev_recommended_backends () & EVBACKEND_KQUEUE)
      if ((loop_socket = ev_loop_new (EVBACKEND_KQUEUE))
@@ -2545,18 +2646,18 @@ Example: wait up to ten seconds for data to appear on STDIN_FILENO.
 
    ev_once (STDIN_FILENO, EV_READ, 10., stdin_ready, 0);
 
-=item ev_feed_event (ev_loop *, watcher *, int revents)
+=item ev_feed_event (struct ev_loop *, watcher *, int revents)
 
 Feeds the given event set into the event loop, as if the specified event
 had happened for the specified watcher (which must be a pointer to an
 initialised but not necessarily started event watcher).
 
-=item ev_feed_fd_event (ev_loop *, int fd, int revents)
+=item ev_feed_fd_event (struct ev_loop *, int fd, int revents)
 
 Feed an event on the given fd, as if a file descriptor backend detected
 the given events it.
 
-=item ev_feed_signal_event (ev_loop *loop, int signum)
+=item ev_feed_signal_event (struct ev_loop *loop, int signum)
 
 Feed an event as if the given signal occurred (C<loop> must be the default
 loop!).
