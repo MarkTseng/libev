@@ -1290,20 +1290,20 @@ then order of execution is undefined.
 
 =head3 Be smart about timeouts
 
-Many real-world problems invole some kind of time-out, usually for error
+Many real-world problems involve some kind of timeout, usually for error
 recovery. A typical example is an HTTP request - if the other side hangs,
 you want to raise some error after a while.
 
-Here are some ways on how to handle this problem, from simple and
-inefficient to very efficient.
+What follows are some ways to handle this problem, from obvious and
+inefficient to smart and efficient.
 
-In the following examples a 60 second activity timeout is assumed - a
-timeout that gets reset to 60 seconds each time some data ("a lifesign")
-was received.
+In the following, a 60 second activity timeout is assumed - a timeout that
+gets reset to 60 seconds each time there is activity (e.g. each time some
+data or other life sign was received).
 
 =over 4
 
-=item 1. Use a timer and stop, reinitialise, start it on activity.
+=item 1. Use a timer and stop, reinitialise and start it on activity.
 
 This is the most obvious, but not the most simple way: In the beginning,
 start the watcher:
@@ -1311,55 +1311,61 @@ start the watcher:
    ev_timer_init (timer, callback, 60., 0.);
    ev_timer_start (loop, timer);
 
-Then, each time there is some activity, C<ev_timer_stop> the timer,
-initialise it again, and start it:
+Then, each time there is some activity, C<ev_timer_stop> it, initialise it
+and start it again:
 
    ev_timer_stop (loop, timer);
    ev_timer_set (timer, 60., 0.);
    ev_timer_start (loop, timer);
 
-This is relatively simple to implement, but means that each time there
-is some activity, libev will first have to remove the timer from it's
-internal data strcuture and then add it again.
+This is relatively simple to implement, but means that each time there is
+some activity, libev will first have to remove the timer from its internal
+data structure and then add it again. Libev tries to be fast, but it's
+still not a constant-time operation.
 
 =item 2. Use a timer and re-start it with C<ev_timer_again> inactivity.
 
 This is the easiest way, and involves using C<ev_timer_again> instead of
 C<ev_timer_start>.
 
-For this, configure an C<ev_timer> with a C<repeat> value of C<60> and
-then call C<ev_timer_again> at start and each time you successfully read
-or write some data. If you go into an idle state where you do not expect
-data to travel on the socket, you can C<ev_timer_stop> the timer, and
-C<ev_timer_again> will automatically restart it if need be.
+To implement this, configure an C<ev_timer> with a C<repeat> value
+of C<60> and then call C<ev_timer_again> at start and each time you
+successfully read or write some data. If you go into an idle state where
+you do not expect data to travel on the socket, you can C<ev_timer_stop>
+the timer, and C<ev_timer_again> will automatically restart it if need be.
 
-That means you can ignore the C<after> value and C<ev_timer_start>
-altogether and only ever use the C<repeat> value and C<ev_timer_again>.
+That means you can ignore both the C<ev_timer_start> function and the
+C<after> argument to C<ev_timer_set>, and only ever use the C<repeat>
+member and C<ev_timer_again>.
 
 At start:
 
-   ev_timer_init (timer, callback, 0., 60.);
+   ev_timer_init (timer, callback);
+   timer->repeat = 60.;
    ev_timer_again (loop, timer);
 
-Each time you receive some data:
+Each time there is some activity:
 
    ev_timer_again (loop, timer);
 
-It is even possible to change the time-out on the fly:
+It is even possible to change the time-out on the fly, regardless of
+whether the watcher is active or not:
 
    timer->repeat = 30.;
    ev_timer_again (loop, timer);
 
 This is slightly more efficient then stopping/starting the timer each time
 you want to modify its timeout value, as libev does not have to completely
-remove and re-insert the timer from/into it's internal data structure.
+remove and re-insert the timer from/into its internal data structure.
+
+It is, however, even simpler than the "obvious" way to do it.
 
 =item 3. Let the timer time out, but then re-arm it as required.
 
 This method is more tricky, but usually most efficient: Most timeouts are
-relatively long compared to the loop iteration time - in our example,
-within 60 seconds, there are usually many I/O events with associated
-activity resets.
+relatively long compared to the intervals between other activity - in
+our example, within 60 seconds, there are usually many I/O events with
+associated activity resets.
 
 In this case, it would be more efficient to leave the C<ev_timer> alone,
 but remember the time of last activity, and check for a real timeout only
@@ -1370,10 +1376,10 @@ within the callback:
    static void
    callback (EV_P_ ev_timer *w, int revents)
    {
-     ev_tstamp now = ev_now (EV_A);
+     ev_tstamp now     = ev_now (EV_A);
      ev_tstamp timeout = last_activity + 60.;
 
-     // if last_activity is older than now - timeout, we did time out
+     // if last_activity + 60. is older than now, we did time out
      if (timeout < now)
        {
          // timeout occured, take action
@@ -1381,40 +1387,80 @@ within the callback:
      else
        {
          // callback was invoked, but there was some activity, re-arm
-         // to fire in last_activity + 60.
+         // the watcher to fire in last_activity + 60, which is
+         // guaranteed to be in the future, so "again" is positive:
          w->again = timeout - now;
          ev_timer_again (EV_A_ w);
        }
    }
 
-To summarise the callback: first calculate the real time-out (defined as
-"60 seconds after the last activity"), then check if that time has been
-reached, which means there was a real timeout. Otherwise the callback was
-invoked too early (timeout is in the future), so re-schedule the timer to
-fire at that future time.
+To summarise the callback: first calculate the real timeout (defined
+as "60 seconds after the last activity"), then check if that time has
+been reached, which means something I<did>, in fact, time out. Otherwise
+the callback was invoked too early (C<timeout> is in the future), so
+re-schedule the timer to fire at that future time, to see if maybe we have
+a timeout then.
 
 Note how C<ev_timer_again> is used, taking advantage of the
 C<ev_timer_again> optimisation when the timer is already running.
 
-This scheme causes more callback invocations (about one every 60 seconds),
-but virtually no calls to libev to change the timeout.
+This scheme causes more callback invocations (about one every 60 seconds
+minus half the average time between activity), but virtually no calls to
+libev to change the timeout.
 
-To start the timer, simply intiialise the watcher and C<last_activity>,
-then call the callback:
+To start the timer, simply initialise the watcher and set C<last_activity>
+to the current time (meaning we just have some activity :), then call the
+callback, which will "do the right thing" and start the timer:
 
    ev_timer_init (timer, callback);
    last_activity = ev_now (loop);
    callback (loop, timer, EV_TIMEOUT);
 
-And when there is some activity, simply remember the time in
-C<last_activity>:
+And when there is some activity, simply store the current time in
+C<last_activity>, no libev calls at all:
 
    last_actiivty = ev_now (loop);
 
 This technique is slightly more complex, but in most cases where the
 time-out is unlikely to be triggered, much more efficient.
 
+Changing the timeout is trivial as well (if it isn't hard-coded in the
+callback :) - just change the timeout and invoke the callback, which will
+fix things for you.
+
+=item 4. Whee, use a double-linked list for your timeouts.
+
+If there is not one request, but many thousands, all employing some kind
+of timeout with the same timeout value, then one can do even better:
+
+When starting the timeout, calculate the timeout value and put the timeout
+at the I<end> of the list.
+
+Then use an C<ev_timer> to fire when the timeout at the I<beginning> of
+the list is expected to fire (for example, using the technique #3).
+
+When there is some activity, remove the timer from the list, recalculate
+the timeout, append it to the end of the list again, and make sure to
+update the C<ev_timer> if it was taken from the beginning of the list.
+
+This way, one can manage an unlimited number of timeouts in O(1) time for
+starting, stopping and updating the timers, at the expense of a major
+complication, and having to use a constant timeout. The constant timeout
+ensures that the list stays sorted.
+
 =back
+
+So what method is the best?
+
+The method #2 is a simple no-brain-required solution that is adequate in
+most situations. Method #3 requires a bit more thinking, but handles many
+cases better, and isn't very complicated either. In most case, choosing
+either one is fine.
+
+Method #1 is almost always a bad idea, and buys you nothing. Method #4 is
+rather complicated, but extremely efficient, something that really pays
+off after the first or so million of active timers, i.e. it's usually
+overkill :)
 
 =head3 The special problem of time updates
 
