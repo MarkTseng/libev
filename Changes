@@ -9,8 +9,8 @@ WISH? monotonic clocks times/GetTickCount for coarse corrections?
           init functions.
         - expand time-out strategies into a "Be smart about timeouts" section.
         - drop the "struct" from all ev_watcher declarations in the
-          documentation (yeah, it was a mistake to have a function called
-          ev_loop).
+          documentation and did other clarifications (yeah, it was a mistake
+          to have a struct AND a function called ev_loop).
 
 3.45 Tue Oct 21 21:59:26 CEST 2008
 	- disable inotify usage on linux <2.6.25, as it is broken

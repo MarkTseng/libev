@@ -12,7 +12,7 @@ libev - a high performance full-featured event loop written in C
    #include <ev.h>
 
    // every watcher type has its own typedef'd struct
-   // with the name ev_<type>
+   // with the name ev_TYPE
    ev_io stdin_watcher;
    ev_timer timeout_watcher;
 
@@ -278,9 +278,13 @@ Example: This is basically the same thing that libev does internally, too.
 
 =head1 FUNCTIONS CONTROLLING THE EVENT LOOP
 
-An event loop is described by a C<ev_loop *>. The library knows two
-types of such loops, the I<default> loop, which supports signals and child
-events, and dynamically created loops which do not.
+An event loop is described by a C<struct ev_loop *> (the C<struct>
+is I<not> optional in this case, as there is also an C<ev_loop>
+I<function>).
+
+The library knows two types of such loops, the I<default> loop, which
+supports signals and child events, and dynamically created loops which do
+not.
 
 =over 4
 
@@ -770,7 +774,7 @@ they fire on, say, one-second boundaries only.
 =item ev_loop_verify (loop)
 
 This function only does something when C<EV_VERIFY> support has been
-compiled in. which is the default for non-minimal builds. It tries to go
+compiled in, which is the default for non-minimal builds. It tries to go
 through all internal structures and checks them for validity. If anything
 is found to be inconsistent, it will print an error message to standard
 error and call C<abort ()>.
@@ -784,6 +788,10 @@ data structures consistent.
 
 =head1 ANATOMY OF A WATCHER
 
+In the following description, uppercase C<TYPE> in names stands for the
+watcher type, e.g. C<ev_TYPE_start> can mean C<ev_timer_start> for timer
+watchers and C<ev_io_start> for I/O watchers.
+
 A watcher is a structure that you create and register to record your
 interest in some event. For instance, if you want to wait for STDIN to
 become readable, you would create an C<ev_io> watcher for that:
@@ -795,15 +803,21 @@ become readable, you would create an C<ev_io> watcher for that:
    }
 
    struct ev_loop *loop = ev_default_loop (0);
+
    ev_io stdin_watcher;
+
    ev_init (&stdin_watcher, my_cb);
    ev_io_set (&stdin_watcher, STDIN_FILENO, EV_READ);
    ev_io_start (loop, &stdin_watcher);
+
    ev_loop (loop, 0);
 
 As you can see, you are responsible for allocating the memory for your
-watcher structures (and it is usually a bad idea to do this on the stack,
-although this can sometimes be quite valid).
+watcher structures (and it is I<usually> a bad idea to do this on the
+stack).
+
+Each watcher has an associated watcher structure (called C<struct ev_TYPE>
+or simply C<ev_TYPE>, as typedefs are provided for all watcher structs).
 
 Each watcher structure must be initialised by a call to C<ev_init
 (watcher *, callback)>, which expects a callback to be provided. This
@@ -811,19 +825,19 @@ callback gets invoked each time the event occurs (or, in the case of I/O
 watchers, each time the event loop detects that the file descriptor given
 is readable and/or writable).
 
-Each watcher type has its own C<< ev_<type>_set (watcher *, ...) >> macro
-with arguments specific to this watcher type. There is also a macro
-to combine initialisation and setting in one call: C<< ev_<type>_init
-(watcher *, callback, ...) >>.
+Each watcher type further has its own C<< ev_TYPE_set (watcher *, ...) >>
+macro to configure it, with arguments specific to the watcher type. There
+is also a macro to combine initialisation and setting in one call: C<<
+ev_TYPE_init (watcher *, callback, ...) >>.
 
 To make the watcher actually watch out for events, you have to start it
-with a watcher-specific start function (C<< ev_<type>_start (loop, watcher
+with a watcher-specific start function (C<< ev_TYPE_start (loop, watcher
 *) >>), and you can stop watching for events at any time by calling the
-corresponding stop function (C<< ev_<type>_stop (loop, watcher *) >>.
+corresponding stop function (C<< ev_TYPE_stop (loop, watcher *) >>.
 
 As long as your watcher is active (has been started but not stopped) you
 must not touch the values stored in it. Most specifically you must never
-reinitialise it or call its C<set> macro.
+reinitialise it or call its C<ev_TYPE_set> macro.
 
 Each and every callback receives the event loop pointer as first, the
 registered watcher structure as second, and a bitset of received events as
@@ -913,9 +927,6 @@ thing, so beware.
 =back
 
 =head2 GENERIC WATCHER FUNCTIONS
-
-In the following description, C<TYPE> stands for the watcher type,
-e.g. C<timer> for C<ev_timer> watchers and C<io> for C<ev_io> watchers.
 
 =over 4
 
@@ -1428,10 +1439,11 @@ Changing the timeout is trivial as well (if it isn't hard-coded in the
 callback :) - just change the timeout and invoke the callback, which will
 fix things for you.
 
-=item 4. Whee, use a double-linked list for your timeouts.
+=item 4. Wee, just use a double-linked list for your timeouts.
 
-If there is not one request, but many thousands, all employing some kind
-of timeout with the same timeout value, then one can do even better:
+If there is not one request, but many thousands (millions...), all
+employing some kind of timeout with the same timeout value, then one can
+do even better:
 
 When starting the timeout, calculate the timeout value and put the timeout
 at the I<end> of the list.
@@ -1450,16 +1462,16 @@ ensures that the list stays sorted.
 
 =back
 
-So what method is the best?
+So which method the best?
 
-The method #2 is a simple no-brain-required solution that is adequate in
-most situations. Method #3 requires a bit more thinking, but handles many
-cases better, and isn't very complicated either. In most case, choosing
-either one is fine.
+Method #2 is a simple no-brain-required solution that is adequate in most
+situations. Method #3 requires a bit more thinking, but handles many cases
+better, and isn't very complicated either. In most case, choosing either
+one is fine, with #3 being better in typical situations.
 
 Method #1 is almost always a bad idea, and buys you nothing. Method #4 is
 rather complicated, but extremely efficient, something that really pays
-off after the first or so million of active timers, i.e. it's usually
+off after the first million or so of active timers, i.e. it's usually
 overkill :)
 
 =head3 The special problem of time updates
