@@ -451,6 +451,8 @@ typedef struct
   WL head;
   unsigned char events;
   unsigned char reify;
+  unsigned char emask; /* the epoll backend stores the actual kernel mask in here */
+  unsigned char unused; /* currently unused padding */
 #if EV_SELECT_IS_WINSOCKET
   SOCKET handle;
 #endif
@@ -613,6 +615,9 @@ array_realloc (int elem, void *base, int *cur, int cnt)
   return ev_realloc (base, elem * *cur);
 }
 
+#define array_init_zero(base,count)	\
+  memset ((void *)(base), 0, sizeof (*(base)) * (count))
+
 #define array_needsize(type,base,cur,cnt,init)			\
   if (expect_false ((cnt) > (cur)))				\
     {								\
@@ -664,19 +669,6 @@ queue_events (EV_P_ W *events, int eventcnt, int type)
 }
 
 /*****************************************************************************/
-
-void inline_size
-anfds_init (ANFD *base, int count)
-{
-  while (count--)
-    {
-      base->head   = 0;
-      base->events = EV_NONE;
-      base->reify  = 0;
-
-      ++base;
-    }
-}
 
 void inline_speed
 fd_event (EV_P_ int fd, int revents)
@@ -976,18 +968,6 @@ static ANSIG *signals;
 static int signalmax;
 
 static EV_ATOMIC_T gotsig;
-
-void inline_size
-signals_init (ANSIG *base, int count)
-{
-  while (count--)
-    {
-      base->head   = 0;
-      base->gotsig = 0;
-
-      ++base;
-    }
-}
 
 /*****************************************************************************/
 
@@ -2141,11 +2121,12 @@ ev_io_start (EV_P_ ev_io *w)
     return;
 
   assert (("ev_io_start called with negative fd", fd >= 0));
+  assert (("ev_io start called with illegal event mask", !(w->events & ~(EV_IOFDSET | EV_READ | EV_WRITE))));
 
   EV_FREQUENT_CHECK;
 
   ev_start (EV_A_ (W)w, 1);
-  array_needsize (ANFD, anfds, anfdmax, fd + 1, anfds_init);
+  array_needsize (ANFD, anfds, anfdmax, fd + 1, array_init_zero);
   wlist_add (&anfds[fd].head, (WL)w);
 
   fd_change (EV_A_ fd, w->events & EV_IOFDSET | 1);
@@ -2347,7 +2328,7 @@ ev_signal_start (EV_P_ ev_signal *w)
     sigprocmask (SIG_SETMASK, &full, &prev);
 #endif
 
-    array_needsize (ANSIG, signals, signalmax, w->signum, signals_init);
+    array_needsize (ANSIG, signals, signalmax, w->signum, array_init_zero);
 
 #ifndef _WIN32
     sigprocmask (SIG_SETMASK, &prev, 0);

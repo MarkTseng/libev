@@ -1,6 +1,13 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 WISH? monotonic clocks times/GetTickCount for coarse corrections?
+
+	- further optimise away the EPOLL_CTL_ADD/MOD combo in the epoll
+          backend by assuming the kernel event mask hasn't changed if
+          ADD fails with EEXIST.
+        - use memset to initialise most arrays now and do away with the
+          init functions.
+
 3.45 Tue Oct 21 21:59:26 CEST 2008
 	- disable inotify usage on linux <2.6.25, as it is broken
           (reported by Yoann Vandoorselaere).

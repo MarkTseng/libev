@@ -57,19 +57,33 @@
 
 #include <sys/epoll.h>
 
+void inline_size
+unsigned_char_init (unsigned char *base, int count)
+{
+  /* memset might be overkill */
+  while (count--)
+    *base++ = 0;
+}
+
 static void
 epoll_modify (EV_P_ int fd, int oev, int nev)
 {
   struct epoll_event ev;
+  unsigned char oldmask;
 
   /*
    * we handle EPOLL_CTL_DEL by ignoring it here
    * on the assumption that the fd is gone anyways
    * if that is wrong, we have to handle the spurious
    * event in epoll_poll.
+   * the fd is later added, we try to ADD it, and, if that
+   * fails, we assume it still has the same eventmask.
    */
   if (!nev)
     return;
+
+  oldmask = anfds [fd].emask;
+  anfds [fd].emask = nev;
 
   ev.data.u64 = fd; /* use u64 to fully initialise the struct, for nicer strace etc. */
   ev.events   = (nev & EV_READ  ? EPOLLIN  : 0)
@@ -80,7 +94,7 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
 
   if (expect_true (errno == ENOENT))
     {
-      /* on ENOENT the fd went away, so try to do the right thing */
+      /* if ENOENT then the fd went away, so try to do the right thing */
       if (!nev)
         return;
 
@@ -89,8 +103,9 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
     }
   else if (expect_true (errno == EEXIST))
     {
-      /* on EEXIST we ignored a previous DEL */
-      if (!epoll_ctl (backend_fd, EPOLL_CTL_MOD, fd, &ev))
+      /* EEXIST means we ignored a previous DEL, but the fd is still active */
+      /* if the kernel mask is the same as the new mask, we assume it hasn't changed */
+      if (oldmask == nev || !epoll_ctl (backend_fd, EPOLL_CTL_MOD, fd, &ev))
         return;
     }
 
@@ -122,7 +137,10 @@ epoll_poll (EV_P_ ev_tstamp timeout)
 
       if (expect_false (got & ~want))
         {
+          anfds [fd].emask = want;
+
           /* we received an event but are not interested in it, try mod or del */
+          /* I don't think we ever need MOD, but let's handle it anyways */
           ev->events = (want & EV_READ  ? EPOLLIN  : 0)
                      | (want & EV_WRITE ? EPOLLOUT : 0);
 
