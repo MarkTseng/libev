@@ -1640,6 +1640,8 @@ ev_default_destroy (void)
   struct ev_loop *loop = ev_default_loop_ptr;
 #endif
 
+  ev_default_loop_ptr = 0;
+
 #ifndef _WIN32
   ev_ref (EV_A); /* child watcher */
   ev_signal_stop (EV_A_ &childev);
