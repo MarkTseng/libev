@@ -2960,6 +2960,11 @@ L<http://rev.rubyforge.org/>.
 Leandro Lucarella has written a D language binding (F<ev.d>) for libev, to
 be found at L<http://proj.llucax.com.ar/wiki/evd>.
 
+=item Ocaml
+
+Erkki Seppala has written Ocaml bindings for libev, to be found at
+L<http://modeemi.cs.tut.fi/~flux/software/ocaml-ev/>.
+
 =back
 
 
