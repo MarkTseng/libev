@@ -1045,7 +1045,7 @@ always C<0>, which is supposed to not be too high and not be too low :).
 
 Setting a priority outside the range of C<EV_MINPRI> to C<EV_MAXPRI> is
 fine, as long as you do not mind that the priority value you query might
-or might not have been adjusted to be within valid range.
+or might not have been clamped to the valid range.
 
 =item ev_invoke (loop, ev_TYPE *watcher, int revents)
 
