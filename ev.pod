@@ -533,9 +533,9 @@ calling this function, or cope with the fact afterwards (which is usually
 the easiest thing, you can just ignore the watchers and/or C<free ()> them
 for example).
 
-Note that certain global state, such as signal state, will not be freed by
-this function, and related watchers (such as signal and child watchers)
-would need to be stopped manually.
+Note that certain global state, such as signal state (and installed signal
+handlers), will not be freed by this function, and related watchers (such
+as signal and child watchers) would need to be stopped manually.
 
 In general it is not advisable to call this function except in the
 rare occasion where you really need to free e.g. the signal handling
