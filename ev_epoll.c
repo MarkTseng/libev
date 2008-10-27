@@ -85,7 +85,8 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
   oldmask = anfds [fd].emask;
   anfds [fd].emask = nev;
 
-  ev.data.u64 = fd; /* use u64 to fully initialise the struct, for nicer strace etc. */
+  /* store the generation counter in the upper 32 bits */
+  ev.data.u64 = fd | ((uint64_t)++anfds [fd].egen << 32);
   ev.events   = (nev & EV_READ  ? EPOLLIN  : 0)
               | (nev & EV_WRITE ? EPOLLOUT : 0);
 
@@ -96,7 +97,7 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
     {
       /* if ENOENT then the fd went away, so try to do the right thing */
       if (!nev)
-        return;
+        goto dec_egen;
 
       if (!epoll_ctl (backend_fd, EPOLL_CTL_ADD, fd, &ev))
         return;
@@ -105,11 +106,18 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
     {
       /* EEXIST means we ignored a previous DEL, but the fd is still active */
       /* if the kernel mask is the same as the new mask, we assume it hasn't changed */
-      if (oldmask == nev || !epoll_ctl (backend_fd, EPOLL_CTL_MOD, fd, &ev))
+      if (oldmask == nev)
+        goto dec_egen;
+
+      if (!epoll_ctl (backend_fd, EPOLL_CTL_MOD, fd, &ev))
         return;
     }
 
   fd_kill (EV_A_ fd);
+
+dec_egen:
+  /* we didn't successfully call epoll_ctl, so decrement the generation counter again */
+  --anfds [fd].egen;
 }
 
 static void
@@ -130,10 +138,14 @@ epoll_poll (EV_P_ ev_tstamp timeout)
     {
       struct epoll_event *ev = epoll_events + i;
 
-      int fd   = ev->data.u64;
+      int fd   = (uint32_t)ev->data.u64; /* mask out the lower 32 bits */
       int got  = (ev->events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
                | (ev->events & (EPOLLIN  | EPOLLERR | EPOLLHUP) ? EV_READ  : 0);
       int want = anfds [fd].events;
+
+      if (anfds [fd].egen != (unsigned char)(ev->data.u64 >> 32))
+        /*fprintf (stderr, "spurious notification fd %d, %d vs %d\n", fd, (int)(ev->data.u64 >> 32), anfds [fd].egen);*/
+        continue;
 
       if (expect_false (got & ~want))
         {

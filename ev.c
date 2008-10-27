@@ -452,7 +452,7 @@ typedef struct
   unsigned char events;
   unsigned char reify;
   unsigned char emask; /* the epoll backend stores the actual kernel mask in here */
-  unsigned char unused; /* currently unused padding */
+  unsigned char egen;  /* generation counter to counter epoll bugs */
 #if EV_SELECT_IS_WINSOCKET
   SOCKET handle;
 #endif
