@@ -6,7 +6,8 @@ WISH? monotonic clocks times/GetTickCount for coarse corrections?
           backend by assuming the kernel event mask hasn't changed if
           ADD fails with EEXIST.
         - work around spurious event notification bugs in epoll by using
-          an 8-bit generation counter.
+          an 8-bit generation counter. recreate kernel state if we receive
+          spurious notifications or unwanted events.
         - use memset to initialise most arrays now and do away with the
           init functions.
         - expand time-out strategies into a "Be smart about timeouts" section.

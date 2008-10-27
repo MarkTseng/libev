@@ -808,6 +808,7 @@ fd_rearm_all (EV_P)
     if (anfds [fd].events)
       {
         anfds [fd].events = 0;
+        anfds [fd].emask  = 0;
         fd_change (EV_A_ fd, EV_IOFDSET | 1);
       }
 }

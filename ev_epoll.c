@@ -52,18 +52,12 @@
  *
  * lots of "weird code" and complication handling in this file is due
  * to these design problems with epoll, as we try very hard to avoid
- * epoll_ctl syscalls for common usage patterns.
+ * epoll_ctl syscalls for common usage patterns and handle the breakage
+ * ensuing from receiving events for closed and otherwise long gone
+ * file descriptors.
  */
 
 #include <sys/epoll.h>
-
-void inline_size
-unsigned_char_init (unsigned char *base, int count)
-{
-  /* memset might be overkill */
-  while (count--)
-    *base++ = 0;
-}
 
 static void
 epoll_modify (EV_P_ int fd, int oev, int nev)
@@ -138,14 +132,18 @@ epoll_poll (EV_P_ ev_tstamp timeout)
     {
       struct epoll_event *ev = epoll_events + i;
 
-      int fd   = (uint32_t)ev->data.u64; /* mask out the lower 32 bits */
+      int fd = (uint32_t)ev->data.u64; /* mask out the lower 32 bits */
+      int want = anfds [fd].events;
       int got  = (ev->events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0)
                | (ev->events & (EPOLLIN  | EPOLLERR | EPOLLHUP) ? EV_READ  : 0);
-      int want = anfds [fd].events;
 
-      if (anfds [fd].egen != (unsigned char)(ev->data.u64 >> 32))
-        /*fprintf (stderr, "spurious notification fd %d, %d vs %d\n", fd, (int)(ev->data.u64 >> 32), anfds [fd].egen);*/
-        continue;
+      /* check for spurious notification */
+      if (expect_false (anfds [fd].egen != (unsigned char)(ev->data.u64 >> 32)))
+        {
+          /* recreate kernel state */
+          postfork = 1;
+          continue;
+        }
 
       if (expect_false (got & ~want))
         {
@@ -156,7 +154,11 @@ epoll_poll (EV_P_ ev_tstamp timeout)
           ev->events = (want & EV_READ  ? EPOLLIN  : 0)
                      | (want & EV_WRITE ? EPOLLOUT : 0);
 
-          epoll_ctl (backend_fd, want ? EPOLL_CTL_MOD : EPOLL_CTL_DEL, fd, ev);
+          if (epoll_ctl (backend_fd, want ? EPOLL_CTL_MOD : EPOLL_CTL_DEL, fd, ev))
+            {
+              postfork = 1; /* an error occured, recreate kernel state */
+              continue;
+            }
         }
 
       fd_event (EV_A_ fd, got);
@@ -185,7 +187,7 @@ epoll_init (EV_P_ int flags)
   backend_modify = epoll_modify;
   backend_poll   = epoll_poll;
 
-  epoll_eventmax = 64; /* intiial number of events receivable per poll */
+  epoll_eventmax = 64; /* initial number of events receivable per poll */
   epoll_events = (struct epoll_event *)ev_malloc (sizeof (struct epoll_event) * epoll_eventmax);
 
   return EVBACKEND_EPOLL;
