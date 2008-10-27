@@ -386,17 +386,20 @@ C<EV_WRITE> to C<POLLOUT | POLLERR | POLLHUP>.
 For few fds, this backend is a bit little slower than poll and select,
 but it scales phenomenally better. While poll and select usually scale
 like O(total_fds) where n is the total number of fds (or the highest fd),
-epoll scales either O(1) or O(active_fds). The epoll design has a number
-of shortcomings, such as silently dropping events in some hard-to-detect
-cases and requiring a system call per fd change, no fork support and bad
-support for dup.
+epoll scales either O(1) or O(active_fds).
+
+The epoll syscalls are the most misdesigned of the more advanced
+event mechanisms: probelsm include silently dropping events in some
+hard-to-detect cases, requiring a system call per fd change, no fork
+support, problems with dup and so on.
 
 Epoll is also notoriously buggy - embedding epoll fds should work, but
 of course doesn't, and epoll just loves to report events for totally
-I<different> file descriptors (even already closed ones) than registered
-in the set (especially on SMP systems). Libev tries to counter these
-spurious notifications by employing an additional generation counter and
-comparing that against the events to filter out spurious ones.
+I<different> file descriptors (even already closed ones, so one cannot
+even remove them from the set) than registered in the set (especially
+on SMP systems). Libev tries to counter these spurious notifications by
+employing an additional generation counter and comparing that against the
+events to filter out spurious ones.
 
 While stopping, setting and starting an I/O watcher in the same iteration
 will result in some caching, there is still a system call per such incident
