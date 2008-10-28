@@ -388,10 +388,13 @@ but it scales phenomenally better. While poll and select usually scale
 like O(total_fds) where n is the total number of fds (or the highest fd),
 epoll scales either O(1) or O(active_fds).
 
-The epoll syscalls are the most misdesigned of the more advanced
-event mechanisms: probelsm include silently dropping events in some
-hard-to-detect cases, requiring a system call per fd change, no fork
-support, problems with dup and so on.
+The epoll syscalls are the most misdesigned of the more advanced event
+mechanisms: problems include silently dropping fds, requiring a system
+call per change per fd (and unnecessary guessing of parameters), problems
+with dup and so on. The biggest issue is fork races, however - if a
+program forks then I<both> parent and child process have to recreate the
+epoll set, which can take considerable time (one syscall per fd) and is of
+course hard to detect.
 
 Epoll is also notoriously buggy - embedding epoll fds should work, but
 of course doesn't, and epoll just loves to report events for totally
@@ -411,7 +414,9 @@ Best performance from this backend is achieved by not unregistering all
 watchers for a file descriptor until it has been closed, if possible,
 i.e. keep at least one watcher active per fd at all times. Stopping and
 starting a watcher (without re-setting it) also usually doesn't cause
-extra overhead.
+extra overhead. A fork can both result in spurious notifications as well
+as in libev having to destroy and recreate the epoll object, which can
+take considerable time and thus should be avoided.
 
 While nominally embeddable in other event loops, this feature is broken in
 all kernel versions tested so far.
@@ -436,8 +441,9 @@ It scales in the same way as the epoll backend, but the interface to the
 kernel is more efficient (which says nothing about its actual speed, of
 course). While stopping, setting and starting an I/O watcher does never
 cause an extra system call as with C<EVBACKEND_EPOLL>, it still adds up to
-two event changes per incident. Support for C<fork ()> is very bad and it
-drops fds silently in similarly hard-to-detect cases.
+two event changes per incident. Support for C<fork ()> is very bad (but
+sane, unlike epoll) and it drops fds silently in similarly hard-to-detect
+cases
 
 This backend usually performs well under most conditions.
 
@@ -476,7 +482,7 @@ might perform better.
 On the positive side, with the exception of the spurious readiness
 notifications, this backend actually performed fully to specification
 in all tests and is fully embeddable, which is a rare feat among the
-OS-specific backends.
+OS-specific backends (I vastly prefer correctness over speed hacks).
 
 This backend maps C<EV_READ> and C<EV_WRITE> in the same way as
 C<EVBACKEND_POLL>.
