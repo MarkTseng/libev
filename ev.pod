@@ -1924,8 +1924,9 @@ its completion.
 =head2 C<ev_stat> - did the file attributes just change?
 
 This watches a file system path for attribute changes. That is, it calls
-C<stat> regularly (or when the OS says it changed) and sees if it changed
-compared to the last time, invoking the callback if it did.
+C<stat> on that path in regular intervals (or when the OS says it changed)
+and sees if it changed compared to the last time, invoking the callback if
+it did.
 
 The path does not need to exist: changing from "path exists" to "path does
 not exist" is a status change like any other. The condition "path does
@@ -1933,17 +1934,18 @@ not exist" is signified by the C<st_nlink> field being zero (which is
 otherwise always forced to be at least one) and all the other fields of
 the stat buffer having unspecified contents.
 
-The path I<should> be absolute and I<must not> end in a slash. If it is
-relative and your working directory changes, the behaviour is undefined.
+The path I<must not> end in a slash or contain special components such as
+C<.> or C<..>. The path I<should> be absolute: If it is relative and
+your working directory changes, then the behaviour is undefined.
 
-Since there is no standard kernel interface to do this, the portable
-implementation simply calls C<stat (2)> regularly on the path to see if
-it changed somehow. You can specify a recommended polling interval for
-this case. If you specify a polling interval of C<0> (highly recommended!)
-then a I<suitable, unspecified default> value will be used (which
-you can expect to be around five seconds, although this might change
-dynamically). Libev will also impose a minimum interval which is currently
-around C<0.1>, but thats usually overkill.
+Since there is no portable change notification interface available, the
+portable implementation simply calls C<stat(2)> regularly on the path
+to see if it changed somehow. You can specify a recommended polling
+interval for this case. If you specify a polling interval of C<0> (highly
+recommended!) then a I<suitable, unspecified default> value will be used
+(which you can expect to be around five seconds, although this might
+change dynamically). Libev will also impose a minimum interval which is
+currently around C<0.1>, but thats usually overkill.
 
 This watcher type is not meant for massive numbers of stat watchers,
 as even with OS-supported change notifications, this can be
@@ -1963,7 +1965,7 @@ structure. When using the library from programs that change the ABI to
 use 64 bit file offsets the programs will fail. In that case you have to
 compile libev with the same flags to get binary compatibility. This is
 obviously the case with any flags that change the ABI, but the problem is
-most noticeably disabled with ev_stat and large file support.
+most noticeably displayed with ev_stat and large file support.
 
 The solution for this is to lobby your distribution maker to make large
 file interfaces available by default (as e.g. FreeBSD does) and not
@@ -1992,9 +1994,9 @@ etc. is difficult.
 
 =head3 The special problem of stat time resolution
 
-The C<stat ()> system call only supports full-second resolution portably, and
-even on systems where the resolution is higher, most file systems still
-only support whole seconds.
+The C<stat ()> system call only supports full-second resolution portably,
+and even on systems where the resolution is higher, most file systems
+still only support whole seconds.
 
 That means that, if the time is the only thing that changes, you can
 easily miss updates: on the first update, C<ev_stat> detects a change and
