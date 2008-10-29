@@ -80,7 +80,7 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
   anfds [fd].emask = nev;
 
   /* store the generation counter in the upper 32 bits */
-  ev.data.u64 = fd | ((uint64_t)(uint32_t)++anfds [fd].egen << 32);
+  ev.data.u64 = (uint64_t)(uint32_t)fd | ((uint64_t)(uint32_t)++anfds [fd].egen << 32);
   ev.events   = (nev & EV_READ  ? EPOLLIN  : 0)
               | (nev & EV_WRITE ? EPOLLOUT : 0);
 
