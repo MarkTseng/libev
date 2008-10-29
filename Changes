@@ -17,7 +17,8 @@ WISH? monotonic clocks times/GetTickCount for coarse corrections?
           to have a struct AND a function called ev_loop).
 	- fix a bug where ev_default would not initialise the default
           loop again after it was destroyed with ev_default_destroy.
-        - rename syserr to ev_syserr to avoid name clashes when embedding.
+        - rename syserr to ev_syserr to avoid name clashes when embedding,
+          do similar changes for event.c.
 
 3.45 Tue Oct 21 21:59:26 CEST 2008
 	- disable inotify usage on linux <2.6.25, as it is broken
