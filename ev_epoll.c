@@ -138,7 +138,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
                | (ev->events & (EPOLLIN  | EPOLLERR | EPOLLHUP) ? EV_READ  : 0);
 
       /* check for spurious notification */
-      if (expect_false (anfds [fd].egen != (unsigned char)(ev->data.u64 >> 32)))
+      if (expect_false (anfds [fd].egen != (uint32_t)(ev->data.u64 >> 32)))
         {
           /* recreate kernel state */
           postfork = 1;
