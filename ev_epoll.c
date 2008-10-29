@@ -80,7 +80,7 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
   anfds [fd].emask = nev;
 
   /* store the generation counter in the upper 32 bits */
-  ev.data.u64 = fd | ((uint64_t)++anfds [fd].egen << 32);
+  ev.data.u64 = fd | ((uint64_t)(uint32_t)++anfds [fd].egen << 32);
   ev.events   = (nev & EV_READ  ? EPOLLIN  : 0)
               | (nev & EV_WRITE ? EPOLLOUT : 0);
 
@@ -138,7 +138,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
                | (ev->events & (EPOLLIN  | EPOLLERR | EPOLLHUP) ? EV_READ  : 0);
 
       /* check for spurious notification */
-      if (expect_false (anfds [fd].egen != (uint32_t)(ev->data.u64 >> 32)))
+      if (expect_false ((uint32_t)anfds [fd].egen != (uint32_t)(ev->data.u64 >> 32)))
         {
           /* recreate kernel state */
           postfork = 1;
