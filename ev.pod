@@ -300,7 +300,7 @@ function.
 
 Note that this function is I<not> thread-safe, so if you want to use it
 from multiple threads, you have to lock (note also that this is unlikely,
-as loops cannot bes hared easily between threads anyway).
+as loops cannot be shared easily between threads anyway).
 
 The default loop is the only loop that can handle C<ev_signal> and
 C<ev_child> watchers, and to do this, it always registers a handler
@@ -649,7 +649,7 @@ the loop.
 A flags value of C<EVLOOP_ONESHOT> will look for new events (waiting if
 necessary) and will handle those and any already outstanding ones. It
 will block your process until at least one new event arrives (which could
-be an event internal to libev itself, so there is no guarentee that a
+be an event internal to libev itself, so there is no guarantee that a
 user-registered callback will be called), and will return after one
 iteration of the loop.
 
@@ -1945,7 +1945,7 @@ interval for this case. If you specify a polling interval of C<0> (highly
 recommended!) then a I<suitable, unspecified default> value will be used
 (which you can expect to be around five seconds, although this might
 change dynamically). Libev will also impose a minimum interval which is
-currently around C<0.1>, but thats usually overkill.
+currently around C<0.1>, but that's usually overkill.
 
 This watcher type is not meant for massive numbers of stat watchers,
 as even with OS-supported change notifications, this can be
@@ -2645,7 +2645,7 @@ employ a traditional mutex lock, such as in this pthread example:
 =item ev_async_init (ev_async *, callback)
 
 Initialises and configures the async watcher - it has no parameters of any
-kind. There is a C<ev_asynd_set> macro, but using it is utterly pointless,
+kind. There is a C<ev_async_set> macro, but using it is utterly pointless,
 trust me.
 
 =item ev_async_send (loop, ev_async *)
@@ -3088,7 +3088,7 @@ where you can put other configuration options):
    #include "ev.h"
 
 Both header files and implementation files can be compiled with a C++
-compiler (at least, thats a stated goal, and breakage will be treated
+compiler (at least, that's a stated goal, and breakage will be treated
 as a bug).
 
 You need the following files in your source tree, or in a directory
@@ -3570,7 +3570,7 @@ you must not do this from C<ev_periodic> reschedule callbacks.
 
 Care has been taken to ensure that libev does not keep local state inside
 C<ev_loop>, and other calls do not usually allow for coroutine switches as
-they do not clal any callbacks.
+they do not call any callbacks.
 
 =head2 COMPILER WARNINGS
 
@@ -3614,7 +3614,7 @@ in libev, then check twice: If valgrind reports something like:
    ==2274==    still reachable: 256 bytes in 1 blocks.
 
 Then there is no memory leak, just as memory accounted to global variables
-is not a memleak - the memory is still being refernced, and didn't leak.
+is not a memleak - the memory is still being referenced, and didn't leak.
 
 Similarly, under some circumstances, valgrind might report kernel bugs
 as if it were a bug in libev (e.g. in realloc or in the poll backend,
