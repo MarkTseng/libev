@@ -3862,5 +3862,5 @@ involves iterating over all running async watchers or all signal numbers.
 
 =head1 AUTHOR
 
-Marc Lehmann <libev@schmorp.de>.
+Marc Lehmann <libev@schmorp.de>, with repeated corrections by Mikael Magnusson.
 
