@@ -6,7 +6,7 @@ WISH? monotonic clocks times/GetTickCount for coarse corrections?
           backend by assuming the kernel event mask hasn't changed if
           ADD fails with EEXIST.
         - work around spurious event notification bugs in epoll by using
-          an 8-bit generation counter. recreate kernel state if we receive
+          a 32-bit generation counter. recreate kernel state if we receive
           spurious notifications or unwanted events.
         - use memset to initialise most arrays now and do away with the
           init functions.
@@ -16,6 +16,7 @@ WISH? monotonic clocks times/GetTickCount for coarse corrections?
           to have a struct AND a function called ev_loop).
 	- fix a bug where ev_default would not initialise the default
           loop again after it was destroyed with ev_default_destroy.
+        - rename syserr to ev_syserr to avoid name clashes when embedding.
 
 3.45 Tue Oct 21 21:59:26 CEST 2008
 	- disable inotify usage on linux <2.6.25, as it is broken

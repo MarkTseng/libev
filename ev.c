@@ -390,7 +390,7 @@ ev_set_syserr_cb (void (*cb)(const char *msg))
 }
 
 static void noinline
-syserr (const char *msg)
+ev_syserr (const char *msg)
 {
   if (!msg)
     msg = "(libev) system error";
@@ -452,7 +452,10 @@ typedef struct
   unsigned char events;
   unsigned char reify;
   unsigned char emask; /* the epoll backend stores the actual kernel mask in here */
-  unsigned char egen;  /* generation counter to counter epoll bugs */
+  unsigned char unused;
+#if EV_USE_EPOLL
+  unsigned int egen;  /* generation counter to counter epoll bugs */
+#endif
 #if EV_SELECT_IS_WINSOCKET
   SOCKET handle;
 #endif
@@ -1000,7 +1003,7 @@ evpipe_init (EV_P)
 #endif
         {
           while (pipe (evpipe))
-            syserr ("(libev) error creating signal/async pipe");
+            ev_syserr ("(libev) error creating signal/async pipe");
 
           fd_intern (evpipe [0]);
           fd_intern (evpipe [1]);
@@ -1658,8 +1661,7 @@ ev_default_fork (void)
   struct ev_loop *loop = ev_default_loop_ptr;
 #endif
 
-  if (backend)
-    postfork = 1; /* must be in line with ev_loop_fork */
+  ev_loop_fork (EV_A);
 }
 
 /*****************************************************************************/

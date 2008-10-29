@@ -123,7 +123,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
   if (expect_false (eventcnt < 0))
     {
       if (errno != EINTR)
-        syserr ("(libev) epoll_wait");
+        ev_syserr ("(libev) epoll_wait");
 
       return;
     }
@@ -205,7 +205,7 @@ epoll_fork (EV_P)
   close (backend_fd);
 
   while ((backend_fd = epoll_create (256)) < 0)
-    syserr ("(libev) epoll_create");
+    ev_syserr ("(libev) epoll_create");
 
   fcntl (backend_fd, F_SETFD, FD_CLOEXEC);
 
