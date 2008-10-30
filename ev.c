@@ -1661,7 +1661,7 @@ ev_default_fork (void)
   struct ev_loop *loop = ev_default_loop_ptr;
 #endif
 
-  ev_loop_fork (EV_A);
+  postfork = 1; /* must be in line with ev_loop_fork */
 }
 
 /*****************************************************************************/
