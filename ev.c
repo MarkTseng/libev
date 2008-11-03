@@ -289,7 +289,6 @@ extern "C" {
 
 #if EV_USE_INOTIFY
 # include <sys/utsname.h>
-# include <sys/statfs.h>
 # include <sys/inotify.h>
 /* some very old inotify.h headers don't have IN_DONT_FOLLOW */
 # ifndef IN_DONT_FOLLOW
@@ -2459,7 +2458,6 @@ infy_add (EV_P_ ev_stat *w)
         }
     }
   else
-    todo, on nfs etc., we need to poll every 60s or so
     ev_timer_stop (EV_A_ &w->timer); /* we can watch this in a race-free way */
 
   if (w->wd >= 0)
