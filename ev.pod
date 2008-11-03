@@ -2000,6 +2000,24 @@ implement this functionality, due to the requirement of having a file
 descriptor open on the object at all times, and detecting renames, unlinks
 etc. is difficult.
 
+=head3 C<stat ()> is a synchronous operation
+
+Libev doesn't normally do any kind of I/O itself, and so is not blocking
+the process. The exception are C<ev_stat> watchers - those call C<stat
+()>, which is a synchronous operation.
+
+For local paths, this usually doesn't matter: unless the system is very
+busy or the intervals between stat's are large, a stat call will be fast,
+as the path data is suually in memory already (except when starting the
+watcher).
+
+For networked file systems, calling C<stat ()> can block an indefinite
+time due to network issues, and even under good conditions, a stat call
+often takes multiple milliseconds.
+
+Therefore, it is best to avoid using C<ev_stat> watchers on networked
+paths, although this is fully supported by libev.
+
 =head3 The special problem of stat time resolution
 
 The C<stat ()> system call only supports full-second resolution portably,
