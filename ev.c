@@ -289,6 +289,7 @@ extern "C" {
 
 #if EV_USE_INOTIFY
 # include <sys/utsname.h>
+# include <sys/statfs.h>
 # include <sys/inotify.h>
 /* some very old inotify.h headers don't have IN_DONT_FOLLOW */
 # ifndef IN_DONT_FOLLOW
@@ -2416,8 +2417,9 @@ ev_child_stop (EV_P_ ev_child *w)
 #  define lstat(a,b) _stati64 (a,b)
 # endif
 
-#define DEF_STAT_INTERVAL 5.0074891
-#define MIN_STAT_INTERVAL 0.1074891
+#define DEF_STAT_INTERVAL  5.0074891
+#define NFS_STAT_INTERVAL 30.1074891 /* for filesystems potentially failing inotify */
+#define MIN_STAT_INTERVAL  0.1074891
 
 static void noinline stat_timer_cb (EV_P_ ev_timer *w_, int revents);
 
@@ -2431,7 +2433,8 @@ infy_add (EV_P_ ev_stat *w)
 
   if (w->wd < 0)
     {
-      ev_timer_start (EV_A_ &w->timer); /* this is not race-free, so we still need to recheck periodically */
+      w->timer.repeat = w->interval ? w->interval : DEF_STAT_INTERVAL;
+      ev_timer_again (EV_A_ &w->timer); /* this is not race-free, so we still need to recheck periodically */
 
       /* monitor some parent directory for speedup hints */
       /* note that exceeding the hardcoded path limit is not a correctness issue, */
@@ -2458,10 +2461,26 @@ infy_add (EV_P_ ev_stat *w)
         }
     }
   else
-    ev_timer_stop (EV_A_ &w->timer); /* we can watch this in a race-free way */
+    {
+      wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
 
-  if (w->wd >= 0)
-    wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
+      /* now local changes will be tracked by inotify, but remote changes won't */
+      /* unless the filesystem it known to be local, we therefore still poll */
+      /* also do poll on <2.6.25, but with normal frequency */
+      struct statfs sfs;
+
+      if (fs_2625 && !statfs (w->path, &sfs))
+        if (sfs.f_type == 0x1373 /* devfs */
+            || sfs.f_type == 0xEF53 /* ext2/3 */
+            || sfs.f_type == 0x3153464a /* jfs */
+            || sfs.f_type == 0x52654973 /* reiser3 */
+            || sfs.f_type == 0x01021994 /* tempfs */
+            || sfs.f_type == 0x58465342 /* xfs */)
+          return;
+
+      w->timer.repeat = w->interval ? w->interval : fs_2625 ? NFS_STAT_INTERVAL : DEF_STAT_INTERVAL;
+      ev_timer_again (EV_A_ &w->timer);
+    }
 }
 
 static void noinline
@@ -2524,31 +2543,37 @@ infy_cb (EV_P_ ev_io *w, int revents)
 }
 
 void inline_size
+check_2625 (EV_P)
+{
+  /* kernels < 2.6.25 are borked
+   * http://www.ussg.indiana.edu/hypermail/linux/kernel/0711.3/1208.html
+   */
+  struct utsname buf;
+  int major, minor, micro;
+
+  if (uname (&buf))
+    return;
+
+  if (sscanf (buf.release, "%d.%d.%d", &major, &minor, &micro) != 3)
+    return;
+
+  if (major < 2
+      || (major == 2 && minor < 6)
+      || (major == 2 && minor == 6 && micro < 25))
+    return;
+
+  fs_2625 = 1;
+}
+
+void inline_size
 infy_init (EV_P)
 {
   if (fs_fd != -2)
     return;
 
-  /* kernels < 2.6.25 are borked
-   * http://www.ussg.indiana.edu/hypermail/linux/kernel/0711.3/1208.html
-   */
-  {
-    struct utsname buf;
-    int major, minor, micro;
+  fs_fd = -1;
 
-    fs_fd = -1;
-
-    if (uname (&buf))
-      return;
-
-    if (sscanf (buf.release, "%d.%d.%d", &major, &minor, &micro) != 3)
-      return;
-
-    if (major < 2
-        || (major == 2 && minor < 6)
-        || (major == 2 && minor == 6 && micro < 25))
-      return;
-  }
+  check_2625 (EV_A);
 
   fs_fd = inotify_init ();
 
@@ -2586,7 +2611,7 @@ infy_fork (EV_P)
           if (fs_fd >= 0)
             infy_add (EV_A_ w); /* re-add, no matter what */
           else
-            ev_timer_start (EV_A_ &w->timer);
+            ev_timer_again (EV_A_ &w->timer);
         }
     }
 }
@@ -2651,16 +2676,12 @@ ev_stat_start (EV_P_ ev_stat *w)
   if (expect_false (ev_is_active (w)))
     return;
 
-  /* since we use memcmp, we need to clear any padding data etc. */
-  memset (&w->prev, 0, sizeof (ev_statdata));
-  memset (&w->attr, 0, sizeof (ev_statdata));
-
   ev_stat_stat (EV_A_ w);
 
-  if (w->interval < MIN_STAT_INTERVAL)
-    w->interval = w->interval ? MIN_STAT_INTERVAL : DEF_STAT_INTERVAL;
+  if (w->interval < MIN_STAT_INTERVAL && w->interval)
+    w->interval = MIN_STAT_INTERVAL;
 
-  ev_timer_init (&w->timer, stat_timer_cb, w->interval, w->interval);
+  ev_timer_init (&w->timer, stat_timer_cb, 0., w->interval ? w->interval : DEF_STAT_INTERVAL);
   ev_set_priority (&w->timer, ev_priority (w));
 
 #if EV_USE_INOTIFY
@@ -2670,7 +2691,7 @@ ev_stat_start (EV_P_ ev_stat *w)
     infy_add (EV_A_ w);
   else
 #endif
-    ev_timer_start (EV_A_ &w->timer);
+    ev_timer_again (EV_A_ &w->timer);
 
   ev_start (EV_A_ (W)w, 1);
 

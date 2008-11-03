@@ -2,7 +2,10 @@ Revision history for libev, a high-performance and full-featured event loop.
 
 WISH? monotonic clocks times/GetTickCount for coarse corrections?
 
-TODO: "ev_stat on nfs"
+	- ev_stat watchers will now use inotify as a mere hint on
+          kernels <2.6.25, or if the filesystem is not in the
+          "known to be good" list.
+
 3.48 Thu Oct 30 09:02:37 CET 2008
 	- further optimise away the EPOLL_CTL_ADD/MOD combo in the epoll
           backend by assuming the kernel event mask hasn't changed if
