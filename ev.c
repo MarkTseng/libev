@@ -289,6 +289,7 @@ extern "C" {
 
 #if EV_USE_INOTIFY
 # include <sys/utsname.h>
+# include <sys/statfs.h>
 # include <sys/inotify.h>
 /* some very old inotify.h headers don't have IN_DONT_FOLLOW */
 # ifndef IN_DONT_FOLLOW
@@ -2434,7 +2435,7 @@ infy_add (EV_P_ ev_stat *w)
       ev_timer_start (EV_A_ &w->timer); /* this is not race-free, so we still need to recheck periodically */
 
       /* monitor some parent directory for speedup hints */
-      /* note that exceeding the hardcoded limit is not a correctness issue, */
+      /* note that exceeding the hardcoded path limit is not a correctness issue, */
       /* but an efficiency issue only */
       if ((errno == ENOENT || errno == EACCES) && strlen (w->path) < 4096)
         {
@@ -2458,6 +2459,7 @@ infy_add (EV_P_ ev_stat *w)
         }
     }
   else
+    todo, on nfs etc., we need to poll every 60s or so
     ev_timer_stop (EV_A_ &w->timer); /* we can watch this in a race-free way */
 
   if (w->wd >= 0)
