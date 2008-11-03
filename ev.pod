@@ -1934,10 +1934,11 @@ and sees if it changed compared to the last time, invoking the callback if
 it did.
 
 The path does not need to exist: changing from "path exists" to "path does
-not exist" is a status change like any other. The condition "path does
-not exist" is signified by the C<st_nlink> field being zero (which is
-otherwise always forced to be at least one) and all the other fields of
-the stat buffer having unspecified contents.
+not exist" is a status change like any other. The condition "path does not
+exist" (or more correctly "path cannot be stat'ed") is signified by the
+C<st_nlink> field being zero (which is otherwise always forced to be at
+least one) and all the other fields of the stat buffer having unspecified
+contents.
 
 The path I<must not> end in a slash or contain special components such as
 C<.> or C<..>. The path I<should> be absolute: If it is relative and
@@ -1957,9 +1958,9 @@ as even with OS-supported change notifications, this can be
 resource-intensive.
 
 At the time of this writing, the only OS-specific interface implemented
-is the Linux inotify interface (implementing kqueue support is left as
-an exercise for the reader. Note, however, that the author sees no way
-of implementing C<ev_stat> semantics with kqueue).
+is the Linux inotify interface (implementing kqueue support is left as an
+exercise for the reader. Note, however, that the author sees no way of
+implementing C<ev_stat> semantics with kqueue, except as a hint).
 
 =head3 ABI Issues (Largefile Support)
 
@@ -1980,17 +1981,19 @@ default compilation environment.
 
 =head3 Inotify and Kqueue
 
-When C<inotify (7)> support has been compiled into libev (generally
-only available with Linux 2.6.25 or above due to bugs in earlier
-implementations) and present at runtime, it will be used to speed up
-change detection where possible. The inotify descriptor will be created
-lazily when the first C<ev_stat> watcher is being started.
+When C<inotify (7)> support has been compiled into libev and present at
+runtime, it will be used to speed up change detection where possible. The
+inotify descriptor will be created lazily when the first C<ev_stat>
+watcher is being started.
 
 Inotify presence does not change the semantics of C<ev_stat> watchers
 except that changes might be detected earlier, and in some cases, to avoid
 making regular C<stat> calls. Even in the presence of inotify support
 there are many cases where libev has to resort to regular C<stat> polling,
-but as long as the path exists, libev usually gets away without polling.
+but as long as kernel 2.6.25 or newer is used (2.6.24 and older have too
+many bugs), the path exists (i.e. stat succeeds), and the path resides on
+a local filesystem (libev currently assumes only ext2/3, jfs, reiserfs and
+xfs are fully working) libev usually gets away without polling.
 
 There is no support for kqueue, as apparently it cannot be used to
 implement this functionality, due to the requirement of having a file
