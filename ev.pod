@@ -420,6 +420,9 @@ extra overhead. A fork can both result in spurious notifications as well
 as in libev having to destroy and recreate the epoll object, which can
 take considerable time and thus should be avoided.
 
+All this means that, in practise, C<EVBACKEND_SELECT> is as fast or faster
+then epoll for maybe up to a hundred file descriptors. So sad.
+
 While nominally embeddable in other event loops, this feature is broken in
 all kernel versions tested so far.
 
