@@ -58,7 +58,8 @@ namespace ev {
 
   typedef ev_tstamp tstamp;
 
-  enum {
+  enum
+  {
     UNDEF    = EV_UNDEF,
     NONE     = EV_NONE,
     READ     = EV_READ,
