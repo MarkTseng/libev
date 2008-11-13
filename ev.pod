@@ -1421,7 +1421,7 @@ within the callback:
          // callback was invoked, but there was some activity, re-arm
          // the watcher to fire in last_activity + 60, which is
          // guaranteed to be in the future, so "again" is positive:
-         w->again = timeout - now;
+         w->repeat = timeout - now;
          ev_timer_again (EV_A_ w);
        }
    }
