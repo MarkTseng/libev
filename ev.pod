@@ -11,6 +11,8 @@ libev - a high performance full-featured event loop written in C
    // a single header file is required
    #include <ev.h>
 
+   #include <stdio.h> // for puts
+
    // every watcher type has its own typedef'd struct
    // with the name ev_TYPE
    ev_io stdin_watcher;

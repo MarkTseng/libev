@@ -41,10 +41,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#ifndef WIN32
-# include <sys/time.h>
-#endif
-
 #ifdef EV_EVENT_H
 # include EV_EVENT_H
 #else
