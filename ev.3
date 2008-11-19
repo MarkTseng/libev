@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "LIBEV 3"
-.TH LIBEV 3 "2008-10-30" "libev-3.48" "libev - high performance full featured event loop"
+.TH LIBEV 3 "2008-11-17" "libev-3.49" "libev - high performance full featured event loop"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -149,6 +149,8 @@ libev \- a high performance full\-featured event loop written in C
 .Vb 2
 \&   // a single header file is required
 \&   #include <ev.h>
+\&
+\&   #include <stdio.h> // for puts
 \&
 \&   // every watcher type has its own typedef\*(Aqd struct
 \&   // with the name ev_TYPE
@@ -545,6 +547,10 @@ starting a watcher (without re-setting it) also usually doesn't cause
 extra overhead. A fork can both result in spurious notifications as well
 as in libev having to destroy and recreate the epoll object, which can
 take considerable time and thus should be avoided.
+.Sp
+All this means that, in practice, \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR can be as fast or
+faster than epoll for maybe up to a hundred file descriptors, depending on
+the usage. So sad.
 .Sp
 While nominally embeddable in other event loops, this feature is broken in
 all kernel versions tested so far.
@@ -1559,7 +1565,7 @@ within the callback:
 \&         // callback was invoked, but there was some activity, re\-arm
 \&         // the watcher to fire in last_activity + 60, which is
 \&         // guaranteed to be in the future, so "again" is positive:
-\&         w\->again = timeout \- now;
+\&         w\->repeat = timeout \- now;
 \&         ev_timer_again (EV_A_ w);
 \&       }
 \&   }
@@ -2083,10 +2089,11 @@ and sees if it changed compared to the last time, invoking the callback if
 it did.
 .PP
 The path does not need to exist: changing from \*(L"path exists\*(R" to \*(L"path does
-not exist\*(R" is a status change like any other. The condition \*(L"path does
-not exist\*(R" is signified by the \f(CW\*(C`st_nlink\*(C'\fR field being zero (which is
-otherwise always forced to be at least one) and all the other fields of
-the stat buffer having unspecified contents.
+not exist\*(R" is a status change like any other. The condition \*(L"path does not
+exist\*(R" (or more correctly \*(L"path cannot be stat'ed\*(R") is signified by the
+\&\f(CW\*(C`st_nlink\*(C'\fR field being zero (which is otherwise always forced to be at
+least one) and all the other fields of the stat buffer having unspecified
+contents.
 .PP
 The path \fImust not\fR end in a slash or contain special components such as
 \&\f(CW\*(C`.\*(C'\fR or \f(CW\*(C`..\*(C'\fR. The path \fIshould\fR be absolute: If it is relative and
@@ -2106,9 +2113,9 @@ as even with OS-supported change notifications, this can be
 resource-intensive.
 .PP
 At the time of this writing, the only OS-specific interface implemented
-is the Linux inotify interface (implementing kqueue support is left as
-an exercise for the reader. Note, however, that the author sees no way
-of implementing \f(CW\*(C`ev_stat\*(C'\fR semantics with kqueue).
+is the Linux inotify interface (implementing kqueue support is left as an
+exercise for the reader. Note, however, that the author sees no way of
+implementing \f(CW\*(C`ev_stat\*(C'\fR semantics with kqueue, except as a hint).
 .PP
 \fI\s-1ABI\s0 Issues (Largefile Support)\fR
 .IX Subsection "ABI Issues (Largefile Support)"
@@ -2131,22 +2138,43 @@ default compilation environment.
 \fIInotify and Kqueue\fR
 .IX Subsection "Inotify and Kqueue"
 .PP
-When \f(CW\*(C`inotify (7)\*(C'\fR support has been compiled into libev (generally
-only available with Linux 2.6.25 or above due to bugs in earlier
-implementations) and present at runtime, it will be used to speed up
-change detection where possible. The inotify descriptor will be created
-lazily when the first \f(CW\*(C`ev_stat\*(C'\fR watcher is being started.
+When \f(CW\*(C`inotify (7)\*(C'\fR support has been compiled into libev and present at
+runtime, it will be used to speed up change detection where possible. The
+inotify descriptor will be created lazily when the first \f(CW\*(C`ev_stat\*(C'\fR
+watcher is being started.
 .PP
 Inotify presence does not change the semantics of \f(CW\*(C`ev_stat\*(C'\fR watchers
 except that changes might be detected earlier, and in some cases, to avoid
 making regular \f(CW\*(C`stat\*(C'\fR calls. Even in the presence of inotify support
 there are many cases where libev has to resort to regular \f(CW\*(C`stat\*(C'\fR polling,
-but as long as the path exists, libev usually gets away without polling.
+but as long as kernel 2.6.25 or newer is used (2.6.24 and older have too
+many bugs), the path exists (i.e. stat succeeds), and the path resides on
+a local filesystem (libev currently assumes only ext2/3, jfs, reiserfs and
+xfs are fully working) libev usually gets away without polling.
 .PP
 There is no support for kqueue, as apparently it cannot be used to
 implement this functionality, due to the requirement of having a file
 descriptor open on the object at all times, and detecting renames, unlinks
 etc. is difficult.
+.PP
+\fI\f(CI\*(C`stat ()\*(C'\fI is a synchronous operation\fR
+.IX Subsection "stat () is a synchronous operation"
+.PP
+Libev doesn't normally do any kind of I/O itself, and so is not blocking
+the process. The exception are \f(CW\*(C`ev_stat\*(C'\fR watchers \- those call \f(CW\*(C`stat
+()\*(C'\fR, which is a synchronous operation.
+.PP
+For local paths, this usually doesn't matter: unless the system is very
+busy or the intervals between stat's are large, a stat call will be fast,
+as the path data is suually in memory already (except when starting the
+watcher).
+.PP
+For networked file systems, calling \f(CW\*(C`stat ()\*(C'\fR can block an indefinite
+time due to network issues, and even under good conditions, a stat call
+often takes multiple milliseconds.
+.PP
+Therefore, it is best to avoid using \f(CW\*(C`ev_stat\*(C'\fR watchers on networked
+paths, although this is fully supported by libev.
 .PP
 \fIThe special problem of stat time resolution\fR
 .IX Subsection "The special problem of stat time resolution"
