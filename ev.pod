@@ -3001,6 +3001,9 @@ of the libev API and adds file handle abstractions, asynchronous DNS and
 more on top of it. It can be found via gem servers. Its homepage is at
 L<http://rev.rubyforge.org/>.
 
+Roger Pack reports that using the link order C<-lws2_32 -lmsvcrt-ruby-190>
+makes rev work even on mingw.
+
 =item D
 
 Leandro Lucarella has written a D language binding (F<ev.d>) for libev, to
@@ -3186,15 +3189,18 @@ implementations for some libevent functions (such as logging, which is not
 supported). It will also not define any of the structs usually found in
 F<event.h> that are not directly supported by the libev core alone.
 
+In stanbdalone mode, libev will still try to automatically deduce the
+configuration, but has to be more conservative.
+
 =item EV_USE_MONOTONIC
 
 If defined to be C<1>, libev will try to detect the availability of the
-monotonic clock option at both compile time and runtime. Otherwise no use
-of the monotonic clock option will be attempted. If you enable this, you
-usually have to link against librt or something similar. Enabling it when
-the functionality isn't available is safe, though, although you have
+monotonic clock option at both compile time and runtime. Otherwise no
+use of the monotonic clock option will be attempted. If you enable this,
+you usually have to link against librt or something similar. Enabling it
+when the functionality isn't available is safe, though, although you have
 to make sure you link against any libraries where the C<clock_gettime>
-function is hiding in (often F<-lrt>).
+function is hiding in (often F<-lrt>). See also C<EV_USE_CLOCK_SYSCALL>.
 
 =item EV_USE_REALTIME
 
@@ -3204,6 +3210,16 @@ runtime if successful). Otherwise no use of the real-time clock option will
 be attempted. This effectively replaces C<gettimeofday> by C<clock_get
 (CLOCK_REALTIME, ...)> and will not normally affect correctness. See the
 note about libraries in the description of C<EV_USE_MONOTONIC>, though.
+
+=item EV_USE_CLOCK_SYSCALL
+
+If defined to be C<1>, libev will try to use a direct syscall instead
+of calling the system-provided C<clock_gettime> function. This option
+exists because on GNU/Linux, C<clock_gettime> is in C<librt>, but C<librt>
+unconditionally pulls in C<libpthread>, slowing down single-threaded
+programs needlessly. Using a direct syscall is slightly slower, because
+no optimised vdso implementation can be used, but avoids the pthread
+dependency. Defaults to C<1> on GNU/Linux with glibc 2.x or higher.
 
 =item EV_USE_NANOSLEEP
 
@@ -3229,11 +3245,11 @@ will not be compiled in.
 
 If defined to C<1>, then the select backend will use the system C<fd_set>
 structure. This is useful if libev doesn't compile due to a missing
-C<NFDBITS> or C<fd_mask> definition or it mis-guesses the bitset layout on
-exotic systems. This usually limits the range of file descriptors to some
-low limit such as 1024 or might have other limitations (winsocket only
-allows 64 sockets). The C<FD_SETSIZE> macro, set before compilation, might
-influence the size of the C<fd_set> used.
+C<NFDBITS> or C<fd_mask> definition or it mis-guesses the bitset layout
+on exotic systems. This usually limits the range of file descriptors to
+some low limit such as 1024 or might have other limitations (winsocket
+only allows 64 sockets). The C<FD_SETSIZE> macro, set before compilation,
+configures the maximum size of the C<fd_set>.
 
 =item EV_SELECT_IS_WINSOCKET
 

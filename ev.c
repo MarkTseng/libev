@@ -49,6 +49,18 @@ extern "C" {
 #  include "config.h"
 # endif
 
+# if HAVE_CLOCK_SYSCALL
+#  ifndef EV_USE_CLOCK_SYSCALL
+#   define EV_USE_CLOCK_SYSCALL 1
+#   ifndef EV_USE_REALTIME
+#    define EV_USE_REALTIME  0
+#   endif
+#   ifndef EV_USE_MONOTONIC
+#    define EV_USE_MONOTONIC 1
+#   endif
+#  endif
+# endif
+
 # if HAVE_CLOCK_GETTIME
 #  ifndef EV_USE_MONOTONIC
 #   define EV_USE_MONOTONIC 1
@@ -165,6 +177,14 @@ extern "C" {
 #endif
 
 /* this block tries to deduce configuration from header-defined symbols and defaults */
+
+#ifndef EV_USE_CLOCK_SYSCALL
+# if __linux && __GLIBC__ >= 2
+#  define EV_USE_CLOCK_SYSCALL 1
+# else
+#  define EV_USE_CLOCK_SYSCALL 0
+# endif
+#endif
 
 #ifndef EV_USE_MONOTONIC
 # if defined (_POSIX_MONOTONIC_CLOCK) && _POSIX_MONOTONIC_CLOCK >= 0
@@ -300,6 +320,15 @@ extern "C" {
 
 #if EV_SELECT_IS_WINSOCKET
 # include <winsock.h>
+#endif
+
+/* on linux, we can use a (slow) syscall to avoid a dependency on pthread, */
+/* which makes programs even slower. might work on other unices, too. */
+#if EV_USE_CLOCK_SYSCALL
+# include <syscall.h>
+# define clock_gettime(id, ts) syscall (SYS_clock_gettime, (id), (ts))
+# undef EV_USE_MONOTONIC
+# define EV_USE_MONOTONIC 1
 #endif
 
 #if EV_USE_EVENTFD
