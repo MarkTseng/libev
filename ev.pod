@@ -3217,9 +3217,10 @@ If defined to be C<1>, libev will try to use a direct syscall instead
 of calling the system-provided C<clock_gettime> function. This option
 exists because on GNU/Linux, C<clock_gettime> is in C<librt>, but C<librt>
 unconditionally pulls in C<libpthread>, slowing down single-threaded
-programs needlessly. Using a direct syscall is slightly slower, because
-no optimised vdso implementation can be used, but avoids the pthread
-dependency. Defaults to C<1> on GNU/Linux with glibc 2.x or higher.
+programs needlessly. Using a direct syscall is slightly slower (in
+theory), because no optimised vdso implementation can be used, but avoids
+the pthread dependency. Defaults to C<1> on GNU/Linux with glibc 2.x or
+higher, as it simplifies linking (no need for C<-lrt>).
 
 =item EV_USE_NANOSLEEP
 
