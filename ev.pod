@@ -45,7 +45,7 @@ libev - a high performance full-featured event loop written in C
    main (void)
    {
      // use the default event loop unless you have special needs
-     ev_loop *loop = ev_default_loop (0);
+     struct ev_loop *loop = ev_default_loop (0);
 
      // initialise an io watcher, then start it
      // this one will watch for stdin to become readable
