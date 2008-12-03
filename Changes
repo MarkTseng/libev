@@ -5,6 +5,9 @@ Revision history for libev, a high-performance and full-featured event loop.
         - assume negative return values != -1 signals success of port_getn
           (http://cvs.epicsol.org/cgi/viewcvs.cgi/epic5/source/newio.c?rev=1.52)
           (no known failure reports, but it doesn't hurt).
+        - EXPERIMENTAL: default the method to operator () in ev++.h,
+          to make it nicer to use functors (requested by Benedek László).
+        - fixed const object callbacks in ev++.h.
 
 3.49 Wed Nov 19 11:26:53 CET 2008
 	- ev_stat watchers will now use inotify as a mere hint on

@@ -162,24 +162,14 @@ namespace ev {
     }
 
 #if EV_MULTIPLICITY
-    bool operator == (struct ev_loop *other) const throw ()
+    bool operator == (const EV_P) const throw ()
     {
-      return this->EV_AX == other;
+      return this->EV_AX == EV_A;
     }
 
-    bool operator != (struct ev_loop *other) const throw ()
+    bool operator != (const EV_P) const throw ()
     {
-      return ! (*this == other);
-    }
-
-    bool operator == (const struct ev_loop *other) const throw ()
-    {
-      return this->EV_AX == other;
-    }
-
-    bool operator != (const struct ev_loop *other) const throw ()
-    {
-      return (*this == other);
+      return (*this == EV_A);
     }
 
     operator struct ev_loop * () const throw ()
@@ -253,7 +243,7 @@ namespace ev {
     }
 
     // function callback
-    void once (int fd, int events, tstamp timeout, void (*cb)(int, void *), void* arg = 0) throw ()
+    void once (int fd, int events, tstamp timeout, void (*cb)(int, void *), void *arg = 0) throw ()
     {
       ev_once (EV_AX_ fd, events, timeout, cb, arg);
     }
@@ -265,28 +255,21 @@ namespace ev {
       once (fd, events, timeout, method_thunk<K, method>, object);
     }
 
+    // default method == operator ()
+    template<class K>
+    void once (int fd, int events, tstamp timeout, K *object) throw ()
+    {
+      once (fd, events, timeout, method_thunk<K, &K::operator ()>, object);
+    }
+
     template<class K, void (K::*method)(int)>
-    static void method_thunk (int revents, void* arg)
+    static void method_thunk (int revents, void *arg)
     {
-      K *obj = static_cast<K *>(arg);
-      (obj->*method) (revents);
+      static_cast<K *>(arg)->*method
+        (revents);
     }
 
-    // const method callback
-    template<class K, void (K::*method)(int) const>
-    void once (int fd, int events, tstamp timeout, const K *object) throw ()
-    {
-      once (fd, events, timeout, const_method_thunk<K, method>, object);
-    }
-
-    template<class K, void (K::*method)(int) const>
-    static void const_method_thunk (int revents, void* arg)
-    {
-      K *obj = static_cast<K *>(arg);
-      (obj->*method) (revents);
-    }
-
-    // simple method callback
+    // no-argument method callback
     template<class K, void (K::*method)()>
     void once (int fd, int events, tstamp timeout, K *object) throw ()
     {
@@ -294,10 +277,10 @@ namespace ev {
     }
 
     template<class K, void (K::*method)()>
-    static void method_noargs_thunk (int revents, void* arg)
+    static void method_noargs_thunk (int revents, void *arg)
     {
-      K *obj = static_cast<K *>(arg);
-      (obj->*method) ();
+      static_cast<K *>(arg)->*method
+        ();
     }
 
     // simpler function callback
@@ -308,9 +291,10 @@ namespace ev {
     }
 
     template<void (*cb)(int)>
-    static void simpler_func_thunk (int revents, void* arg)
+    static void simpler_func_thunk (int revents, void *arg)
     {
-      (*cb) (revents);
+      (*cb)
+        (revents);
     }
 
     // simplest function callback
@@ -321,9 +305,10 @@ namespace ev {
     }
 
     template<void (*cb)()>
-    static void simplest_func_thunk (int revents, void* arg)
+    static void simplest_func_thunk (int revents, void *arg)
     {
-      (*cb) ();
+      (*cb)
+        ();
     }
 
     void feed_fd_event (int fd, int revents) throw ()
@@ -423,7 +408,7 @@ namespace ev {
     #if EV_MULTIPLICITY
       EV_PX;
 
-      void set (EV_PX) throw ()
+      void set (EV_P) throw ()
       {
         this->EV_A = EV_A;
       }
@@ -437,38 +422,10 @@ namespace ev {
       ev_init (this, 0);
     }
 
-    void set_ (void *data, void (*cb)(EV_P_ ev_watcher *w, int revents)) throw ()
+    void set_ (const void *data, void (*cb)(EV_P_ ev_watcher *w, int revents)) throw ()
     {
-      this->data = data;
+      this->data = (void *)data;
       ev_set_cb (static_cast<ev_watcher *>(this), cb);
-    }
-
-    // method callback
-    template<class K, void (K::*method)(watcher &w, int)>
-    void set (K *object) throw ()
-    {
-      set_ (object, method_thunk<K, method>);
-    }
-
-    template<class K, void (K::*method)(watcher &w, int)>
-    static void method_thunk (EV_P_ ev_watcher *w, int revents)
-    {
-      K *obj = static_cast<K *>(w->data);
-      (obj->*method) (*static_cast<watcher *>(w), revents);
-    }
-
-    // const method callback
-    template<class K, void (K::*method)(watcher &w, int) const>
-    void set (const K *object) throw ()
-    {
-      set_ (object, const_method_thunk<K, method>);
-    }
-
-    template<class K, void (K::*method)(watcher &w, int) const>
-    static void const_method_thunk (EV_P_ ev_watcher *w, int revents)
-    {
-      K *obj = static_cast<K *>(w->data);
-      (static_cast<K *>(w->data)->*method) (*static_cast<watcher *>(w), revents);
     }
 
     // function callback
@@ -481,10 +438,32 @@ namespace ev {
     template<void (*function)(watcher &w, int)>
     static void function_thunk (EV_P_ ev_watcher *w, int revents)
     {
-      function (*static_cast<watcher *>(w), revents);
+      function
+        (*static_cast<watcher *>(w), revents);
     }
 
-    // simple callback
+    // method callback
+    template<class K, void (K::*method)(watcher &w, int)>
+    void set (K *object) throw ()
+    {
+      set_ (object, method_thunk<K, method>);
+    }
+
+    // default method == operator ()
+    template<class K>
+    void set (K *object) throw ()
+    {
+      set_ (object, method_thunk<K, &K::operator ()>);
+    }
+
+    template<class K, void (K::*method)(watcher &w, int)>
+    static void method_thunk (EV_P_ ev_watcher *w, int revents)
+    {
+      (static_cast<K *>(w->data)->*method)
+        (*static_cast<watcher *>(w), revents);
+    }
+
+    // no-argument callback
     template<class K, void (K::*method)()>
     void set (K *object) throw ()
     {
@@ -494,14 +473,15 @@ namespace ev {
     template<class K, void (K::*method)()>
     static void method_noargs_thunk (EV_P_ ev_watcher *w, int revents)
     {
-      K *obj = static_cast<K *>(w->data);
-      (obj->*method) ();
+      static_cast<K *>(w->data)->*method
+        ();
     }
 
     void operator ()(int events = EV_UNDEF)
     {
-      return ev_cb (static_cast<ev_watcher *>(this))
-        (static_cast<ev_watcher *>(this), events);
+      return
+        ev_cb (static_cast<ev_watcher *>(this))
+          (static_cast<ev_watcher *>(this), events);
     }
 
     bool is_active () const throw ()

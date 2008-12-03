@@ -2893,6 +2893,36 @@ Example: simple class declaration and watcher initialisation
    ev::io iow;
    iow.set <myclass, &myclass::io_cb> (&obj);
 
+=item w->set (object *)
+
+This is an B<experimental> feature that might go away in a future version.
+
+This is a variation of a method callback - leaving out the method to call
+will default the method to C<operator ()>, which makes it possible to use
+functor objects without having to manually specify the C<operator ()> all
+the time. Incidentally, you can then also leave out the template argument
+list.
+
+The C<operator ()> method prototype must be C<void operator ()(watcher &w,
+int revents)>.
+
+See the method-C<set> above for more details.
+
+Example: use a functor object as callback.
+
+   struct myfunctor
+   {
+     void operator() (ev::io &w, int revents)
+     {
+       ...
+     }
+   }
+    
+   myfunctor f;
+
+   ev::io w;
+   w.set (&f);
+
 =item w->set<function> (void *data = 0)
 
 Also sets a callback, but uses a static method or plain function as
