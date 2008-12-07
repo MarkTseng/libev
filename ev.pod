@@ -2014,7 +2014,7 @@ the process. The exception are C<ev_stat> watchers - those call C<stat
 
 For local paths, this usually doesn't matter: unless the system is very
 busy or the intervals between stat's are large, a stat call will be fast,
-as the path data is suually in memory already (except when starting the
+as the path data is usually in memory already (except when starting the
 watcher).
 
 For networked file systems, calling C<stat ()> can block an indefinite
