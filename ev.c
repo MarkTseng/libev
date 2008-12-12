@@ -2480,8 +2480,8 @@ infy_add (EV_P_ ev_stat *w)
 
               char *pend = strrchr (path, '/');
 
-              if (!pend)
-                break; /* whoops, no '/', complain to your admin */
+              if (!pend || pend == path)
+                break;
 
               *pend = 0;
               w->wd = inotify_add_watch (fs_fd, path, mask);
@@ -2489,7 +2489,8 @@ infy_add (EV_P_ ev_stat *w)
           while (w->wd < 0 && (errno == ENOENT || errno == EACCES));
         }
     }
-  else
+
+  if (w->wd >= 0)
     {
       wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
 
@@ -2549,6 +2550,7 @@ infy_wd (EV_P_ int slot, int wd, struct inotify_event *ev)
             {
               if (ev->mask & (IN_IGNORED | IN_UNMOUNT | IN_DELETE_SELF))
                 {
+                  wlist_del (&fs_hash [slot & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
                   w->wd = -1;
                   infy_add (EV_A_ w); /* re-add, no matter what */
                 }
