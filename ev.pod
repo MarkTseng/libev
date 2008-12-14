@@ -462,8 +462,8 @@ While nominally embeddable in other event loops, this doesn't work
 everywhere, so you might need to test for this. And since it is broken
 almost everywhere, you should only use it when you have a lot of sockets
 (for which it usually works), by embedding it into another event loop
-(e.g. C<EVBACKEND_SELECT> or C<EVBACKEND_POLL>) and, did I mention it,
-using it only for sockets.
+(e.g. C<EVBACKEND_SELECT> or C<EVBACKEND_POLL> (but C<poll> is of course
+also broken on OS X)) and, did I mention it, using it only for sockets.
 
 This backend maps C<EV_READ> into an C<EVFILT_READ> kevent with
 C<NOTE_EOF>, and C<EV_WRITE> into an C<EVFILT_WRITE> kevent with
@@ -2430,24 +2430,20 @@ and even priorities and idle watchers might have too much overhead. In
 this case you would put all the high priority stuff in one loop and all
 the rest in a second one, and embed the second one in the first.
 
-As long as the watcher is active, the callback will be invoked every time
-there might be events pending in the embedded loop. The callback must then
-call C<ev_embed_sweep (mainloop, watcher)> to make a single sweep and invoke
-their callbacks (you could also start an idle watcher to give the embedded
-loop strictly lower priority for example). You can also set the callback
-to C<0>, in which case the embed watcher will automatically execute the
-embedded loop sweep.
+As long as the watcher is active, the callback will be invoked every
+time there might be events pending in the embedded loop. The callback
+must then call C<ev_embed_sweep (mainloop, watcher)> to make a single
+sweep and invoke their callbacks (the callback doesn't need to invoke the
+C<ev_embed_sweep> function directly, it could also start an idle watcher
+to give the embedded loop strictly lower priority for example).
 
-As long as the watcher is started it will automatically handle events. The
-callback will be invoked whenever some events have been handled. You can
-set the callback to C<0> to avoid having to specify one if you are not
-interested in that.
+You can also set the callback to C<0>, in which case the embed watcher
+will automatically execute the embedded loop sweep whenever necessary.
 
-Also, there have not currently been made special provisions for forking:
-when you fork, you not only have to call C<ev_loop_fork> on both loops,
-but you will also have to stop and restart any C<ev_embed> watchers
-yourself - but you can use a fork watcher to handle this automatically,
-and future versions of libev might do just that.
+Fork detection will be handled transparently while the C<ev_embed> watcher
+is active, i.e., the embedded loop will automatically be forked when the
+embedding loop forks. In other cases, the user is responsible for calling
+C<ev_loop_fork> on the embedded loop.
 
 Unfortunately, not all backends are embeddable: only the ones returned by
 C<ev_embeddable_backends> are, which, unfortunately, does not include any

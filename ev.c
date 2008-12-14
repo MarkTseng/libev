@@ -2907,11 +2907,16 @@ embed_fork_cb (EV_P_ ev_fork *fork_w, int revents)
 {
   ev_embed *w = (ev_embed *)(((char *)fork_w) - offsetof (ev_embed, fork));
 
+  ev_embed_stop (EV_A_ w);
+
   {
     struct ev_loop *loop = w->other;
 
     ev_loop_fork (EV_A);
+    ev_loop (EV_A_ EVLOOP_NONBLOCK);
   }
+
+  ev_embed_start (EV_A_ w);
 }
 
 #if 0
