@@ -1272,8 +1272,8 @@ ev_recommended_backends (void)
   flags &= ~EVBACKEND_KQUEUE;
 #endif
 #ifdef __APPLE__
-  // flags &= ~EVBACKEND_KQUEUE; for documentation
-  flags &= ~EVBACKEND_POLL;
+  // flags &= ~EVBACKEND_KQUEUE & ~EVBACKEND_POLL; for documentation
+  flags &= ~EVBACKEND_SELECT;
 #endif
 
   return flags;

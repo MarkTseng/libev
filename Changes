@@ -1,7 +1,7 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
         - fix a bug where an inotify watcher was added twice, causing
-          freezes on hash collisions.
+          freezes on hash collisions (reported and analysed by Graham Leggett).
 	- new config symbol, EV_USE_CLOCK_SYSCALL, to make libev use
           a direct syscall - slower, but no dependency on librt et al.
         - assume negative return values != -1 signals success of port_getn
@@ -13,6 +13,9 @@ Revision history for libev, a high-performance and full-featured event loop.
         - replaced loop_ref argument of watcher.set (loop) by a direct
           ev_loop * in ev++.h, to avoid clashes with functor patch.
         - do not try to watch the empty string via inotify.
+        - inotify watchers could be leaked under certain circumstances.
+        - OS X 10.5 is actually even more broken than earlier versions,
+          so fall back to select on that piece of garbage.
 
 3.49 Wed Nov 19 11:26:53 CET 2008
 	- ev_stat watchers will now use inotify as a mere hint on
