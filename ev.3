@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "LIBEV 3"
-.TH LIBEV 3 "2008-11-17" "libev-3.49" "libev - high performance full featured event loop"
+.TH LIBEV 3 "2008-12-14" "libev-3.51" "libev - high performance full featured event loop"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -184,7 +184,7 @@ libev \- a high performance full\-featured event loop written in C
 \&   main (void)
 \&   {
 \&     // use the default event loop unless you have special needs
-\&     ev_loop *loop = ev_default_loop (0);
+\&     struct ev_loop *loop = ev_default_loop (0);
 \&
 \&     // initialise an io watcher, then start it
 \&     // this one will watch for stdin to become readable
@@ -588,8 +588,8 @@ While nominally embeddable in other event loops, this doesn't work
 everywhere, so you might need to test for this. And since it is broken
 almost everywhere, you should only use it when you have a lot of sockets
 (for which it usually works), by embedding it into another event loop
-(e.g. \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR) and, did I mention it,
-using it only for sockets.
+(e.g. \f(CW\*(C`EVBACKEND_SELECT\*(C'\fR or \f(CW\*(C`EVBACKEND_POLL\*(C'\fR (but \f(CW\*(C`poll\*(C'\fR is of course
+also broken on \s-1OS\s0 X)) and, did I mention it, using it only for sockets.
 .Sp
 This backend maps \f(CW\*(C`EV_READ\*(C'\fR into an \f(CW\*(C`EVFILT_READ\*(C'\fR kevent with
 \&\f(CW\*(C`NOTE_EOF\*(C'\fR, and \f(CW\*(C`EV_WRITE\*(C'\fR into an \f(CW\*(C`EVFILT_WRITE\*(C'\fR kevent with
@@ -2166,7 +2166,7 @@ the process. The exception are \f(CW\*(C`ev_stat\*(C'\fR watchers \- those call 
 .PP
 For local paths, this usually doesn't matter: unless the system is very
 busy or the intervals between stat's are large, a stat call will be fast,
-as the path data is suually in memory already (except when starting the
+as the path data is usually in memory already (except when starting the
 watcher).
 .PP
 For networked file systems, calling \f(CW\*(C`stat ()\*(C'\fR can block an indefinite
@@ -2582,24 +2582,20 @@ and even priorities and idle watchers might have too much overhead. In
 this case you would put all the high priority stuff in one loop and all
 the rest in a second one, and embed the second one in the first.
 .PP
-As long as the watcher is active, the callback will be invoked every time
-there might be events pending in the embedded loop. The callback must then
-call \f(CW\*(C`ev_embed_sweep (mainloop, watcher)\*(C'\fR to make a single sweep and invoke
-their callbacks (you could also start an idle watcher to give the embedded
-loop strictly lower priority for example). You can also set the callback
-to \f(CW0\fR, in which case the embed watcher will automatically execute the
-embedded loop sweep.
+As long as the watcher is active, the callback will be invoked every
+time there might be events pending in the embedded loop. The callback
+must then call \f(CW\*(C`ev_embed_sweep (mainloop, watcher)\*(C'\fR to make a single
+sweep and invoke their callbacks (the callback doesn't need to invoke the
+\&\f(CW\*(C`ev_embed_sweep\*(C'\fR function directly, it could also start an idle watcher
+to give the embedded loop strictly lower priority for example).
 .PP
-As long as the watcher is started it will automatically handle events. The
-callback will be invoked whenever some events have been handled. You can
-set the callback to \f(CW0\fR to avoid having to specify one if you are not
-interested in that.
+You can also set the callback to \f(CW0\fR, in which case the embed watcher
+will automatically execute the embedded loop sweep whenever necessary.
 .PP
-Also, there have not currently been made special provisions for forking:
-when you fork, you not only have to call \f(CW\*(C`ev_loop_fork\*(C'\fR on both loops,
-but you will also have to stop and restart any \f(CW\*(C`ev_embed\*(C'\fR watchers
-yourself \- but you can use a fork watcher to handle this automatically,
-and future versions of libev might do just that.
+Fork detection will be handled transparently while the \f(CW\*(C`ev_embed\*(C'\fR watcher
+is active, i.e., the embedded loop will automatically be forked when the
+embedding loop forks. In other cases, the user is responsible for calling
+\&\f(CW\*(C`ev_loop_fork\*(C'\fR on the embedded loop.
 .PP
 Unfortunately, not all backends are embeddable: only the ones returned by
 \&\f(CW\*(C`ev_embeddable_backends\*(C'\fR are, which, unfortunately, does not include any
@@ -3018,6 +3014,37 @@ Example: simple class declaration and watcher initialisation
 \&   ev::io iow;
 \&   iow.set <myclass, &myclass::io_cb> (&obj);
 .Ve
+.IP "w\->set (object *)" 4
+.IX Item "w->set (object *)"
+This is an \fBexperimental\fR feature that might go away in a future version.
+.Sp
+This is a variation of a method callback \- leaving out the method to call
+will default the method to \f(CW\*(C`operator ()\*(C'\fR, which makes it possible to use
+functor objects without having to manually specify the \f(CW\*(C`operator ()\*(C'\fR all
+the time. Incidentally, you can then also leave out the template argument
+list.
+.Sp
+The \f(CW\*(C`operator ()\*(C'\fR method prototype must be \f(CW\*(C`void operator ()(watcher &w,
+int revents)\*(C'\fR.
+.Sp
+See the method\-\f(CW\*(C`set\*(C'\fR above for more details.
+.Sp
+Example: use a functor object as callback.
+.Sp
+.Vb 7
+\&   struct myfunctor
+\&   {
+\&     void operator() (ev::io &w, int revents)
+\&     {
+\&       ...
+\&     }
+\&   }
+\&    
+\&   myfunctor f;
+\&
+\&   ev::io w;
+\&   w.set (&f);
+.Ve
 .IP "w\->set<function> (void *data = 0)" 4
 .IX Item "w->set<function> (void *data = 0)"
 Also sets a callback, but uses a static method or plain function as
@@ -3117,6 +3144,9 @@ Tony Arcieri has written a ruby extension that offers access to a subset
 of the libev \s-1API\s0 and adds file handle abstractions, asynchronous \s-1DNS\s0 and
 more on top of it. It can be found via gem servers. Its homepage is at
 <http://rev.rubyforge.org/>.
+.Sp
+Roger Pack reports that using the link order \f(CW\*(C`\-lws2_32 \-lmsvcrt\-ruby\-190\*(C'\fR
+makes rev work even on mingw.
 .IP "D" 4
 .IX Item "D"
 Leandro Lucarella has written a D language binding (\fIev.d\fR) for libev, to
@@ -3309,15 +3339,18 @@ keeps libev from including \fIconfig.h\fR, and it also defines dummy
 implementations for some libevent functions (such as logging, which is not
 supported). It will also not define any of the structs usually found in
 \&\fIevent.h\fR that are not directly supported by the libev core alone.
+.Sp
+In stanbdalone mode, libev will still try to automatically deduce the
+configuration, but has to be more conservative.
 .IP "\s-1EV_USE_MONOTONIC\s0" 4
 .IX Item "EV_USE_MONOTONIC"
 If defined to be \f(CW1\fR, libev will try to detect the availability of the
-monotonic clock option at both compile time and runtime. Otherwise no use
-of the monotonic clock option will be attempted. If you enable this, you
-usually have to link against librt or something similar. Enabling it when
-the functionality isn't available is safe, though, although you have
+monotonic clock option at both compile time and runtime. Otherwise no
+use of the monotonic clock option will be attempted. If you enable this,
+you usually have to link against librt or something similar. Enabling it
+when the functionality isn't available is safe, though, although you have
 to make sure you link against any libraries where the \f(CW\*(C`clock_gettime\*(C'\fR
-function is hiding in (often \fI\-lrt\fR).
+function is hiding in (often \fI\-lrt\fR). See also \f(CW\*(C`EV_USE_CLOCK_SYSCALL\*(C'\fR.
 .IP "\s-1EV_USE_REALTIME\s0" 4
 .IX Item "EV_USE_REALTIME"
 If defined to be \f(CW1\fR, libev will try to detect the availability of the
@@ -3326,6 +3359,16 @@ runtime if successful). Otherwise no use of the real-time clock option will
 be attempted. This effectively replaces \f(CW\*(C`gettimeofday\*(C'\fR by \f(CW\*(C`clock_get
 (CLOCK_REALTIME, ...)\*(C'\fR and will not normally affect correctness. See the
 note about libraries in the description of \f(CW\*(C`EV_USE_MONOTONIC\*(C'\fR, though.
+.IP "\s-1EV_USE_CLOCK_SYSCALL\s0" 4
+.IX Item "EV_USE_CLOCK_SYSCALL"
+If defined to be \f(CW1\fR, libev will try to use a direct syscall instead
+of calling the system-provided \f(CW\*(C`clock_gettime\*(C'\fR function. This option
+exists because on GNU/Linux, \f(CW\*(C`clock_gettime\*(C'\fR is in \f(CW\*(C`librt\*(C'\fR, but \f(CW\*(C`librt\*(C'\fR
+unconditionally pulls in \f(CW\*(C`libpthread\*(C'\fR, slowing down single-threaded
+programs needlessly. Using a direct syscall is slightly slower (in
+theory), because no optimised vdso implementation can be used, but avoids
+the pthread dependency. Defaults to \f(CW1\fR on GNU/Linux with glibc 2.x or
+higher, as it simplifies linking (no need for \f(CW\*(C`\-lrt\*(C'\fR).
 .IP "\s-1EV_USE_NANOSLEEP\s0" 4
 .IX Item "EV_USE_NANOSLEEP"
 If defined to be \f(CW1\fR, libev will assume that \f(CW\*(C`nanosleep ()\*(C'\fR is available
@@ -3347,11 +3390,11 @@ will not be compiled in.
 .IX Item "EV_SELECT_USE_FD_SET"
 If defined to \f(CW1\fR, then the select backend will use the system \f(CW\*(C`fd_set\*(C'\fR
 structure. This is useful if libev doesn't compile due to a missing
-\&\f(CW\*(C`NFDBITS\*(C'\fR or \f(CW\*(C`fd_mask\*(C'\fR definition or it mis-guesses the bitset layout on
-exotic systems. This usually limits the range of file descriptors to some
-low limit such as 1024 or might have other limitations (winsocket only
-allows 64 sockets). The \f(CW\*(C`FD_SETSIZE\*(C'\fR macro, set before compilation, might
-influence the size of the \f(CW\*(C`fd_set\*(C'\fR used.
+\&\f(CW\*(C`NFDBITS\*(C'\fR or \f(CW\*(C`fd_mask\*(C'\fR definition or it mis-guesses the bitset layout
+on exotic systems. This usually limits the range of file descriptors to
+some low limit such as 1024 or might have other limitations (winsocket
+only allows 64 sockets). The \f(CW\*(C`FD_SETSIZE\*(C'\fR macro, set before compilation,
+configures the maximum size of the \f(CW\*(C`fd_set\*(C'\fR.
 .IP "\s-1EV_SELECT_IS_WINSOCKET\s0" 4
 .IX Item "EV_SELECT_IS_WINSOCKET"
 When defined to \f(CW1\fR, the select backend will assume that

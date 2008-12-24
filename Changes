@@ -1,5 +1,6 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+3.51 Wed Dec 24 23:00:11 CET 2008
         - fix a bug where an inotify watcher was added twice, causing
           freezes on hash collisions (reported and analysed by Graham Leggett).
 	- new config symbol, EV_USE_CLOCK_SYSCALL, to make libev use
