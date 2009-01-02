@@ -84,7 +84,7 @@ ev_pipe (int filedes [2])
   if ((sock [1] = accept (listener, 0, 0)) < 0)
     goto fail;
 
-  /* windows vista returns fantasy port numbers for getpeername.
+  /* windows vista returns fantasy port numbers for sockets:
    * example for two interconnected tcp sockets:
    *
    * (Socket::unpack_sockaddr_in getsockname $sock0)[0] == 53364
