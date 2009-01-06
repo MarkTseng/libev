@@ -99,7 +99,7 @@ void *event_init (void)
   else
     ev_x_cur = (struct event_base *)ev_default_loop (EVFLAG_AUTO);
 #else
-  assert (("multiple event bases not supported when not compiled with EV_MULTIPLICITY", !ev_x_cur));
+  assert (("libev: multiple event bases not supported when not compiled with EV_MULTIPLICITY", !ev_x_cur));
 
   ev_x_cur = (struct event_base *)(long)ev_default_loop (EVFLAG_AUTO);
 #endif
