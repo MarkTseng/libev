@@ -79,10 +79,12 @@ ev_tv_get (struct timeval *tv)
     return -1.;
 }
 
-#define EVENT_VERSION(a,b) # a "." # b
+#define EVENT_STRINGIFY(s) # s
+#define EVENT_VERSION(a,b) EVENT_STRINGIFY (a) "." EVENT_STRINGIFY (b)
 
 const char *event_get_version (void)
 {
+  /* returns ABI, not API or library, version */
   return EVENT_VERSION (EV_VERSION_MAJOR, EV_VERSION_MINOR);
 }
 

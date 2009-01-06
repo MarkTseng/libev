@@ -14,6 +14,9 @@ Revision history for libev, a high-performance and full-featured event loop.
           should return fantasy port numbers.
         - include "libev" all assertion messages for potentially
           clearer diagnostics.
+        - event_get_version (libevent compatibility) returned
+          a useless string instead of the expected version string
+          (patch by W.C.A. Wijngaards).
 
 3.51 Wed Dec 24 23:00:11 CET 2008
         - fix a bug where an inotify watcher was added twice, causing

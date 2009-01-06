@@ -167,9 +167,10 @@ struct ev_loop;
 
 /*
  * struct member types:
- * private: you can look at them, but not change them, and they might not mean anything to you.
- * ro: can be read anytime, but only changed when the watcher isn't active
- * rw: can be read and modified anytime, even when the watcher is active
+ * private: you may look at them, but not change them,
+ *          and they might not mean anything to you.
+ * ro: can be read anytime, but only changed when the watcher isn't active.
+ * rw: can be read and modified anytime, even when the watcher is active.
  *
  * some internal details that might be helpful for debugging:
  *
@@ -178,7 +179,7 @@ struct ev_loop;
  *           or the array index + 1 (most other watchers)
  *           or simply 1 for watchers that aren't in some array.
  * pending is either 0, in which case the watcher isn't,
- *            or the array index + 1 in the pendings array.
+ *           or the array index + 1 in the pendings array.
  */
 
 /* shared by all watchers */
