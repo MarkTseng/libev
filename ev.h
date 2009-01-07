@@ -1,7 +1,7 @@
 /*
  * libev native API header
  *
- * Copyright (c) 2007,2008 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-

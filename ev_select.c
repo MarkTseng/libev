@@ -72,6 +72,7 @@ select_modify (EV_P_ int fd, int oev, int nev)
 
   {
 #if EV_SELECT_USE_FD_SET
+
     #if EV_SELECT_IS_WINSOCKET
     SOCKET handle = anfds [fd].handle;
     #else
