@@ -72,13 +72,13 @@ select_modify (EV_P_ int fd, int oev, int nev)
 
   {
 #if EV_SELECT_USE_FD_SET
-    assert (("libev: fd >= FD_SETSIZE passed to fd_set-based select backend", fd < FD_SETSIZE));
-
     #if EV_SELECT_IS_WINSOCKET
     SOCKET handle = anfds [fd].handle;
     #else
     int handle = fd;
     #endif
+
+    assert (("libev: fd >= FD_SETSIZE passed to fd_set-based select backend", fd < FD_SETSIZE));
 
     /* FD_SET is broken on windows (it adds the fd to a set twice or more,
      * which eventually leads to overflows). Need to call it only on changes.
