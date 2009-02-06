@@ -3231,11 +3231,13 @@ function is hiding in (often F<-lrt>). See also C<EV_USE_CLOCK_SYSCALL>.
 =item EV_USE_REALTIME
 
 If defined to be C<1>, libev will try to detect the availability of the
-real-time clock option at compile time (and assume its availability at
-runtime if successful). Otherwise no use of the real-time clock option will
-be attempted. This effectively replaces C<gettimeofday> by C<clock_get
-(CLOCK_REALTIME, ...)> and will not normally affect correctness. See the
-note about libraries in the description of C<EV_USE_MONOTONIC>, though.
+real-time clock option at compile time (and assume its availability
+at runtime if successful). Otherwise no use of the real-time clock
+option will be attempted. This effectively replaces C<gettimeofday>
+by C<clock_get (CLOCK_REALTIME, ...)> and will not normally affect
+correctness. See the note about libraries in the description of
+C<EV_USE_MONOTONIC>, though. Defaults to the opposite value of
+C<EV_USE_CLOCK_SYSCALL>.
 
 =item EV_USE_CLOCK_SYSCALL
 

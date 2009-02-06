@@ -1,5 +1,11 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+	- probe for CLOCK_REALTIME support at runtime as well and fall
+          back to gettimeofday if there is an error, to support older
+          operating systems with newer header files/libraries.
+        - prefer gettimeofday over clock_gettime with USE_CLOCK_SYSCALL
+          (default most everywhere), otherwise not.
+
 3.52 Wed Jan  7 21:43:02 CET 2009
 	- fix compilation of select backend in fd_set mode when NFDBITS is
           missing (to get it to compile on QNX, reported by Rodrigo Campos).
@@ -13,7 +19,7 @@ Revision history for libev, a high-performance and full-featured event loop.
           attacks harder (but not impossible - it's windows). Make sure
           it even works under vista, which thinks that getpeer/sockname
           should return fantasy port numbers.
-        - include "libev" all assertion messages for potentially
+        - include "libev" in all assertion messages for potentially
           clearer diagnostics.
         - event_get_version (libevent compatibility) returned
           a useless string instead of the expected version string
