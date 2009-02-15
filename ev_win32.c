@@ -55,7 +55,7 @@ ev_pipe (int filedes [2])
   struct sockaddr_in addr = { 0 };
   int addr_size = sizeof (addr);
   struct sockaddr_in adr2;
-  int adr2_size;
+  int adr2_size = sizeof (adr2);
   SOCKET listener;
   SOCKET sock [2] = { -1, -1 };
 

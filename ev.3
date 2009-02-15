@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "LIBEV 3"
-.TH LIBEV 3 "2008-12-14" "libev-3.52" "libev - high performance full featured event loop"
+.TH LIBEV 3 "2009-02-06" "libev-3.53" "libev - high performance full featured event loop"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -3354,11 +3354,13 @@ function is hiding in (often \fI\-lrt\fR). See also \f(CW\*(C`EV_USE_CLOCK_SYSCA
 .IP "\s-1EV_USE_REALTIME\s0" 4
 .IX Item "EV_USE_REALTIME"
 If defined to be \f(CW1\fR, libev will try to detect the availability of the
-real-time clock option at compile time (and assume its availability at
-runtime if successful). Otherwise no use of the real-time clock option will
-be attempted. This effectively replaces \f(CW\*(C`gettimeofday\*(C'\fR by \f(CW\*(C`clock_get
-(CLOCK_REALTIME, ...)\*(C'\fR and will not normally affect correctness. See the
-note about libraries in the description of \f(CW\*(C`EV_USE_MONOTONIC\*(C'\fR, though.
+real-time clock option at compile time (and assume its availability
+at runtime if successful). Otherwise no use of the real-time clock
+option will be attempted. This effectively replaces \f(CW\*(C`gettimeofday\*(C'\fR
+by \f(CW\*(C`clock_get (CLOCK_REALTIME, ...)\*(C'\fR and will not normally affect
+correctness. See the note about libraries in the description of
+\&\f(CW\*(C`EV_USE_MONOTONIC\*(C'\fR, though. Defaults to the opposite value of
+\&\f(CW\*(C`EV_USE_CLOCK_SYSCALL\*(C'\fR.
 .IP "\s-1EV_USE_CLOCK_SYSCALL\s0" 4
 .IX Item "EV_USE_CLOCK_SYSCALL"
 If defined to be \f(CW1\fR, libev will try to use a direct syscall instead
