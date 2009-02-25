@@ -1621,7 +1621,7 @@ during the same loop iteration, then order of execution is undefined.
 
 =item ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)
 
-=item ev_periodic_set (ev_periodic *, ev_tstamp after, ev_tstamp repeat, reschedule_cb)
+=item ev_periodic_set (ev_periodic *, ev_tstamp at, ev_tstamp interval, reschedule_cb)
 
 Lots of arguments, lets sort it out... There are basically three modes of
 operation, and we will explain them from simplest to most complex:
@@ -1673,7 +1673,7 @@ reschedule callback will be called with the watcher as first, and the
 current time as second argument.
 
 NOTE: I<This callback MUST NOT stop or destroy any periodic watcher,
-ever, or make ANY event loop modifications whatsoever>.
+ever, or make ANY other event loop modifications whatsoever>.
 
 If you need to stop it, return C<now + 1e30> (or so, fudge fudge) and stop
 it afterwards (e.g. by starting an C<ev_prepare> watcher, which is the
