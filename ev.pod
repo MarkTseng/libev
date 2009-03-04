@@ -2181,7 +2181,7 @@ event loop has handled all outstanding events.
 
 =over 4
 
-=item ev_idle_init (ev_signal *, callback)
+=item ev_idle_init (ev_idle *, callback)
 
 Initialises and configures the idle watcher - it has no parameters of any
 kind. There is a C<ev_idle_set> macro, but using it is utterly pointless,
