@@ -1598,52 +1598,62 @@ inactivity.
 Periodic watchers are also timers of a kind, but they are very versatile
 (and unfortunately a bit complex).
 
-Unlike C<ev_timer>'s, they are not based on real time (or relative time)
-but on wall clock time (absolute time). You can tell a periodic watcher
-to trigger after some specific point in time. For example, if you tell a
-periodic watcher to trigger in 10 seconds (by specifying e.g. C<ev_now ()
-+ 10.>, that is, an absolute time not a delay) and then reset your system
-clock to January of the previous year, then it will take more than year
-to trigger the event (unlike an C<ev_timer>, which would still trigger
-roughly 10 seconds later as it uses a relative timeout).
+Unlike C<ev_timer>, periodic watchers are not based on real time (or
+relative time, the physical time that passes) but on wall clock time
+(absolute time, the thing you can read on your calender or clock). The
+difference is that wall clock time can run faster or slower than real
+time, and time jumps are not uncommon (e.g. when you adjust your
+wrist-watch).
 
-C<ev_periodic>s can also be used to implement vastly more complex timers,
-such as triggering an event on each "midnight, local time", or other
-complicated rules.
+You can tell a periodic watcher to trigger after some specific point
+in time: for example, if you tell a periodic watcher to trigger "in 10
+seconds" (by specifying e.g. C<ev_now () + 10.>, that is, an absolute time
+not a delay) and then reset your system clock to January of the previous
+year, then it will take a year or more to trigger the event (unlike an
+C<ev_timer>, which would still trigger roughly 10 seconds after starting
+it, as it uses a relative timeout).
+
+C<ev_periodic> watchers can also be used to implement vastly more complex
+timers, such as triggering an event on each "midnight, local time", or
+other complicated rules. This cannot be done with C<ev_timer> watchers, as
+those cannot react to time jumps.
 
 As with timers, the callback is guaranteed to be invoked only when the
-time (C<at>) has passed, but if multiple periodic timers become ready
-during the same loop iteration, then order of execution is undefined.
+point in time where it is supposed to trigger has passed, but if multiple
+periodic timers become ready during the same loop iteration, then order of
+execution is undefined.
 
 =head3 Watcher-Specific Functions and Data Members
 
 =over 4
 
-=item ev_periodic_init (ev_periodic *, callback, ev_tstamp at, ev_tstamp interval, reschedule_cb)
+=item ev_periodic_init (ev_periodic *, callback, ev_tstamp offset, ev_tstamp interval, reschedule_cb)
 
-=item ev_periodic_set (ev_periodic *, ev_tstamp at, ev_tstamp interval, reschedule_cb)
+=item ev_periodic_set (ev_periodic *, ev_tstamp offset, ev_tstamp interval, reschedule_cb)
 
-Lots of arguments, lets sort it out... There are basically three modes of
+Lots of arguments, let's sort it out... There are basically three modes of
 operation, and we will explain them from simplest to most complex:
 
 =over 4
 
-=item * absolute timer (at = time, interval = reschedule_cb = 0)
+=item * absolute timer (offset = absolute time, interval = 0, reschedule_cb = 0)
 
 In this configuration the watcher triggers an event after the wall clock
-time C<at> has passed. It will not repeat and will not adjust when a time
-jump occurs, that is, if it is to be run at January 1st 2011 then it will
-only run when the system clock reaches or surpasses this time.
+time C<offset> has passed. It will not repeat and will not adjust when a
+time jump occurs, that is, if it is to be run at January 1st 2011 then it
+will be stopped and invoked when the system clock reaches or surpasses
+this point in time.
 
-=item * repeating interval timer (at = offset, interval > 0, reschedule_cb = 0)
+=item * repeating interval timer (offset = offset within interval, interval > 0, reschedule_cb = 0)
 
 In this mode the watcher will always be scheduled to time out at the next
-C<at + N * interval> time (for some integer N, which can also be negative)
-and then repeat, regardless of any time jumps.
+C<offset + N * interval> time (for some integer N, which can also be
+negative) and then repeat, regardless of any time jumps. The C<offset>
+argument is merely an offset into the C<interval> periods.
 
 This can be used to create timers that do not drift with respect to the
-system clock, for example, here is a C<ev_periodic> that triggers each
-hour, on the hour:
+system clock, for example, here is an C<ev_periodic> that triggers each
+hour, on the hour (with respect to UTC):
 
    ev_periodic_set (&periodic, 0., 3600., 0);
 
@@ -1654,9 +1664,9 @@ by 3600.
 
 Another way to think about it (for the mathematically inclined) is that
 C<ev_periodic> will try to run the callback in this mode at the next possible
-time where C<time = at (mod interval)>, regardless of any time jumps.
+time where C<time = offset (mod interval)>, regardless of any time jumps.
 
-For numerical stability it is preferable that the C<at> value is near
+For numerical stability it is preferable that the C<offset> value is near
 C<ev_now ()> (the current time), but there is no range requirement for
 this value, and in fact is often specified as zero.
 
@@ -1665,15 +1675,16 @@ speed for example), so if C<interval> is very small then timing stability
 will of course deteriorate. Libev itself tries to be exact to be about one
 millisecond (if the OS supports it and the machine is fast enough).
 
-=item * manual reschedule mode (at and interval ignored, reschedule_cb = callback)
+=item * manual reschedule mode (offset ignored, interval ignored, reschedule_cb = callback)
 
-In this mode the values for C<interval> and C<at> are both being
+In this mode the values for C<interval> and C<offset> are both being
 ignored. Instead, each time the periodic watcher gets scheduled, the
 reschedule callback will be called with the watcher as first, and the
 current time as second argument.
 
-NOTE: I<This callback MUST NOT stop or destroy any periodic watcher,
-ever, or make ANY other event loop modifications whatsoever>.
+NOTE: I<This callback MUST NOT stop or destroy any periodic watcher, ever,
+or make ANY other event loop modifications whatsoever, unless explicitly
+allowed by documentation here>.
 
 If you need to stop it, return C<now + 1e30> (or so, fudge fudge) and stop
 it afterwards (e.g. by starting an C<ev_prepare> watcher, which is the
@@ -1713,13 +1724,16 @@ program when the crontabs have changed).
 
 =item ev_tstamp ev_periodic_at (ev_periodic *)
 
-When active, returns the absolute time that the watcher is supposed to
-trigger next.
+When active, returns the absolute time that the watcher is supposed
+to trigger next. This is not the same as the C<offset> argument to
+C<ev_periodic_set>, but indeed works even in interval and manual
+rescheduling modes.
 
 =item ev_tstamp offset [read-write]
 
 When repeating, this contains the offset value, otherwise this is the
-absolute point in time (the C<at> value passed to C<ev_periodic_set>).
+absolute point in time (the C<offset> value passed to C<ev_periodic_set>,
+although libev might modify this value for better numerical stability).
 
 Can be modified any time, but changes only take effect when the periodic
 timer fires or C<ev_periodic_again> is being called.
@@ -2684,9 +2698,14 @@ C<ev_feed_event>, this call is safe to do from other threads, signal or
 similar contexts (see the discussion of C<EV_ATOMIC_T> in the embedding
 section below on what exactly this means).
 
-This call incurs the overhead of a system call only once per loop iteration,
-so while the overhead might be noticeable, it doesn't apply to repeated
-calls to C<ev_async_send>.
+Note that, as with other watchers in libev, multiple events might get
+compressed into a single callback invocation (another way to look at this
+is that C<ev_async> watchers are level-triggered, set on C<ev_async_send>,
+reset when the event loop detects that).
+
+This call incurs the overhead of a system call only once per event loop
+iteration, so while the overhead might be noticeable, it doesn't apply to
+repeated calls to C<ev_async_send> for the same event loop.
 
 =item bool = ev_async_pending (ev_async *)
 
@@ -2699,8 +2718,10 @@ the loop iterates next and checks for the watcher to have become active,
 it will reset the flag again. C<ev_async_pending> can be used to very
 quickly check whether invoking the loop might be a good idea.
 
-Not that this does I<not> check whether the watcher itself is pending, only
-whether it has been requested to make this watcher pending.
+Not that this does I<not> check whether the watcher itself is pending,
+only whether it has been requested to make this watcher pending: there
+is a time window between the event loop checking and resetting the async
+notification, and the callback being invoked.
 
 =back
 
