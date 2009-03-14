@@ -678,7 +678,7 @@ array_realloc (int elem, void *base, int *cur, int cnt)
 #endif
 
 #define array_free(stem, idx) \
-  ev_free (stem ## s idx); stem ## cnt idx = stem ## max idx = 0;
+  ev_free (stem ## s idx); stem ## cnt idx = stem ## max idx = 0; stem ## s idx = 0
 
 /*****************************************************************************/
 
