@@ -768,7 +768,7 @@ fd_reify (EV_P)
         anfd->reify  = 0;
         anfd->events = events;
 
-        if (o_events != events || o_reify & EV_IOFDSET)
+        if (o_events != events || o_reify & EV__IOFDSET)
           backend_modify (EV_A_ fd, o_events, events);
       }
     }
@@ -849,7 +849,7 @@ fd_rearm_all (EV_P)
       {
         anfds [fd].events = 0;
         anfds [fd].emask  = 0;
-        fd_change (EV_A_ fd, EV_IOFDSET | 1);
+        fd_change (EV_A_ fd, EV__IOFDSET | 1);
       }
 }
 
@@ -2176,7 +2176,7 @@ ev_io_start (EV_P_ ev_io *w)
     return;
 
   assert (("libev: ev_io_start called with negative fd", fd >= 0));
-  assert (("libev: ev_io start called with illegal event mask", !(w->events & ~(EV_IOFDSET | EV_READ | EV_WRITE))));
+  assert (("libev: ev_io start called with illegal event mask", !(w->events & ~(EV__IOFDSET | EV_READ | EV_WRITE))));
 
   EV_FREQUENT_CHECK;
 
@@ -2184,8 +2184,8 @@ ev_io_start (EV_P_ ev_io *w)
   array_needsize (ANFD, anfds, anfdmax, fd + 1, array_init_zero);
   wlist_add (&anfds[fd].head, (WL)w);
 
-  fd_change (EV_A_ fd, w->events & EV_IOFDSET | 1);
-  w->events &= ~EV_IOFDSET;
+  fd_change (EV_A_ fd, w->events & EV__IOFDSET | 1);
+  w->events &= ~EV__IOFDSET;
 
   EV_FREQUENT_CHECK;
 }
