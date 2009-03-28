@@ -136,6 +136,7 @@ struct ev_loop;
 #define EV__IOFDSET       0x80 /* internal use only */
 #define EV_IO          EV_READ /* alias for type-detection */
 #define EV_TIMEOUT  0x00000100 /* timer timed out */
+#define EV_TIMER    EV_TIMEOUT /* alias for type-detection */
 #define EV_PERIODIC 0x00000200 /* periodic timer timed out */
 #define EV_SIGNAL   0x00000400 /* signal was received */
 #define EV_CHILD    0x00000800 /* child/pid had status change */
@@ -491,6 +492,13 @@ void ev_default_destroy (void); /* destroy the default loop */
 /* you can call it in either the parent or the child */
 /* you can actually call it at any time, anywhere :) */
 void ev_default_fork (void);
+
+#if 0
+/* walk (almost) all watchers in the loop of a given type, invoking the */
+/* callback on every such watcher. The callback might stop the watcher, */
+/* but do nothing else with the loop */
+void ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w));
+#endif
 
 unsigned int ev_backend (EV_P);    /* backend in use by loop */
 unsigned int ev_loop_count (EV_P); /* number of loop iterations */
