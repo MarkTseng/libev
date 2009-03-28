@@ -3035,11 +3035,7 @@ L<http://software.schmorp.de/pkg/EV>.
 =item Python
 
 Python bindings can be found at L<http://code.google.com/p/pyev/>. It
-seems to be quite complete and well-documented. Note, however, that the
-patch they require for libev is outright dangerous as it breaks the ABI
-for everybody else, and therefore, should never be applied in an installed
-libev (if python requires an incompatible ABI then it needs to embed
-libev).
+seems to be quite complete and well-documented.
 
 =item Ruby
 
@@ -3050,6 +3046,11 @@ L<http://rev.rubyforge.org/>.
 
 Roger Pack reports that using the link order C<-lws2_32 -lmsvcrt-ruby-190>
 makes rev work even on mingw.
+
+=item Haskell
+
+A haskell binding to libev is available at
+L<http://hackage.haskell.org/cgi-bin/hackage-scripts/package/hlibev>.
 
 =item D
 
