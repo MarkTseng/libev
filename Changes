@@ -1,8 +1,8 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
-TODO: ev_time_freeze, ev_time_thaw
 TODO: ev_walk
-TODO: ev_stop_all
+TODO: ev_stop_all docs
+TODO: priority/idle docs
 TODO: fix signal handling(?) under win32
 3.54
 	- multiple timers becoming ready within an event loop iteration
@@ -14,6 +14,7 @@ TODO: fix signal handling(?) under win32
 	- correctly zero the idx values for arrays, so destroying and
           reinitialising the default loop actually works (patch by
           Malek Hadj-Ali).
+        - implement ev_suspend and ev_resume.
         - new EV_CUSTOM revents flag for use by applications.
 
 3.53 Sun Feb 15 02:38:20 CET 2009

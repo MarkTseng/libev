@@ -526,8 +526,16 @@ void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval); /* sleep at lea
 void ev_ref   (EV_P);
 void ev_unref (EV_P);
 
-/* convenience function, wait for a single event, without registering an event watcher */
-/* if timeout is < 0, do wait indefinitely */
+/*
+ * stop/start the timer handling.
+ */
+void ev_suspend (EV_P);
+void ev_resume  (EV_P);
+
+/*
+ * convenience function, wait for a single event, without registering an event watcher
+ * if timeout is < 0, do wait indefinitely
+ */
 void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg);
 #endif
 

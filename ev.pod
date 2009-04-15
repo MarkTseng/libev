@@ -636,6 +636,32 @@ the current time is a good idea.
 
 See also "The special problem of time updates" in the C<ev_timer> section.
 
+=item ev_suspend (loop)
+
+=item ev_resume (loop)
+
+These two functions suspend and resume a loop, for use when the loop is
+not used for a while and timeouts should not be processed.
+
+A typical use case would be an interactive program such as a game:  When
+the user presses C<^Z> to suspend the game and resumes it an hour later it
+would be best to handle timeouts as if no time had actually passed while
+the program was suspended. This can be achieved by calling C<ev_suspend>
+in your C<SIGTSTP> handler, sending yourself a C<SIGSTOP> and calling
+C<ev_resume> directly afterwards to resume timer processing.
+
+Effectively, all C<ev_timer> watchers will be delayed by the time spend
+between C<ev_suspend> and C<ev_resume>, and all C<ev_periodic> watchers
+will be rescheduled (that is, they will lose any events that would have
+occured while suspended).
+
+After calling C<ev_suspend> you B<must not> call I<any> function on the
+given loop other than C<ev_resume>, and you B<must not> call C<ev_resume>
+without a previous call to C<ev_suspend>.
+
+Calling C<ev_suspend>/C<ev_resume> has the side effect of updating the
+event loop time (see C<ev_now_update>).
+
 =item ev_loop (loop, int flags)
 
 Finally, this is it, the event handler. This function usually is called

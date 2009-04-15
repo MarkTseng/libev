@@ -2135,9 +2135,10 @@ ev_resume (EV_P)
   ev_tstamp mn_prev = mn_now;
 
   ev_now_update (EV_A);
-  printf ("update %f\n", mn_now - mn_prev);//D
   timers_reschedule (EV_A_ mn_now - mn_prev);
+#if EV_PERIODIC_ENABLE
   periodics_reschedule (EV_A);
+#endif
 }
 
 /*****************************************************************************/
