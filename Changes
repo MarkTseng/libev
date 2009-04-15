@@ -5,6 +5,8 @@ TODO: ev_walk
 TODO: ev_stop_all
 TODO: fix signal handling(?) under win32
 3.54
+	- multiple timers becoming ready within an event loop iteration
+          will be invoked in the "correct" order now.
 	- do not leave the event loop early just because we have no active
           watchers, fixing a problem when embedding a kqueue loop
           that has active kernel events but no registered watchers

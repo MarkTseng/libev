@@ -1326,8 +1326,10 @@ detecting time jumps is hard, and some inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).
 
 The callback is guaranteed to be invoked only I<after> its timeout has
-passed, but if multiple timers become ready during the same loop iteration
-then order of execution is undefined.
+passed. If multiple timers become ready during the same loop iteration
+then the ones with earlier time-out values are invoked before ones with
+later time-out values (but this is no longer true when a callback calls
+C<ev_loop> recursively).
 
 =head3 Be smart about timeouts
 
@@ -1626,9 +1628,10 @@ other complicated rules. This cannot be done with C<ev_timer> watchers, as
 those cannot react to time jumps.
 
 As with timers, the callback is guaranteed to be invoked only when the
-point in time where it is supposed to trigger has passed, but if multiple
-periodic timers become ready during the same loop iteration, then order of
-execution is undefined.
+point in time where it is supposed to trigger has passed. If multiple
+timers become ready during the same loop iteration then the ones with
+earlier time-out values are invoked before ones with later time-out values
+(but this is no longer true when a callback calls C<ev_loop> recursively).
 
 =head3 Watcher-Specific Functions and Data Members
 
