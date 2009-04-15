@@ -1898,6 +1898,19 @@ periodics_reschedule (EV_P)
 }
 #endif
 
+static void noinline
+timers_reschedule (EV_P_ ev_tstamp adjust)
+{
+  int i;
+
+  for (i = 0; i < timercnt; ++i)
+    {
+      ANHE *he = timers + i + HEAP0;
+      ANHE_w (*he)->at += adjust;
+      ANHE_at_cache (*he);
+    }
+}
+
 inline_speed void
 time_update (EV_P_ ev_tstamp max_block)
 {
@@ -1941,11 +1954,11 @@ time_update (EV_P_ ev_tstamp max_block)
           now_floor = mn_now;
         }
 
+      /* no timer adjustment, as the monotonic clock doesn't jump */
+      /* timers_reschedule (EV_A_ rtmn_diff - odiff) */
 # if EV_PERIODIC_ENABLE
       periodics_reschedule (EV_A);
 # endif
-      /* no timer adjustment, as the monotonic clock doesn't jump */
-      /* timers_reschedule (EV_A_ rtmn_diff - odiff) */
     }
   else
 #endif
@@ -1954,38 +1967,15 @@ time_update (EV_P_ ev_tstamp max_block)
 
       if (expect_false (mn_now > ev_rt_now || ev_rt_now > mn_now + max_block + MIN_TIMEJUMP))
         {
+          /* adjust timers. this is easy, as the offset is the same for all of them */
+          timers_reschedule (EV_A_ ev_rt_now - mn_now);
 #if EV_PERIODIC_ENABLE
           periodics_reschedule (EV_A);
 #endif
-          /* adjust timers. this is easy, as the offset is the same for all of them */
-          for (i = 0; i < timercnt; ++i)
-            {
-              ANHE *he = timers + i + HEAP0;
-              ANHE_w (*he)->at += ev_rt_now - mn_now;
-              ANHE_at_cache (*he);
-            }
         }
 
       mn_now = ev_rt_now;
     }
-}
-
-void
-ev_ref (EV_P)
-{
-  ++activecnt;
-}
-
-void
-ev_unref (EV_P)
-{
-  --activecnt;
-}
-
-void
-ev_now_update (EV_P)
-{
-  time_update (EV_A_ 1e100);
 }
 
 static int loop_done;
@@ -2113,6 +2103,41 @@ void
 ev_unloop (EV_P_ int how)
 {
   loop_done = how;
+}
+
+void
+ev_ref (EV_P)
+{
+  ++activecnt;
+}
+
+void
+ev_unref (EV_P)
+{
+  --activecnt;
+}
+
+void
+ev_now_update (EV_P)
+{
+  time_update (EV_A_ 1e100);
+}
+
+void
+ev_suspend (EV_P)
+{
+  ev_now_update (EV_A);
+}
+
+void
+ev_resume (EV_P)
+{
+  ev_tstamp mn_prev = mn_now;
+
+  ev_now_update (EV_A);
+  printf ("update %f\n", mn_now - mn_prev);//D
+  timers_reschedule (EV_A_ mn_now - mn_prev);
+  periodics_reschedule (EV_A);
 }
 
 /*****************************************************************************/
