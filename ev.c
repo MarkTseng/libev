@@ -572,7 +572,7 @@ ev_time (void)
   return tv.tv_sec + tv.tv_usec * 1e-6;
 }
 
-ev_tstamp inline_size
+inline_size ev_tstamp
 get_clock (void)
 {
 #if EV_USE_MONOTONIC
@@ -627,7 +627,7 @@ ev_sleep (ev_tstamp delay)
 
 #define MALLOC_ROUND 4096 /* prefer to allocate in chunks of this size, must be 2**n and >> 4 longs */
 
-int inline_size
+inline_size int
 array_nextsize (int elem, int cur, int cnt)
 {
   int ncur = cur + 1;
@@ -699,7 +699,22 @@ ev_feed_event (EV_P_ void *w, int revents)
     }
 }
 
-void inline_speed
+inline_speed void
+feed_reverse (EV_P_ W w)
+{
+  array_needsize (W, rfeeds, rfeedmax, rfeedcnt + 1, EMPTY2);
+  rfeeds [rfeedcnt++] = w;
+}
+
+inline_size void
+feed_reverse_done (EV_P_ int revents)
+{
+  do
+    ev_feed_event (EV_A_ rfeeds [--rfeedcnt], revents);
+  while (rfeedcnt);
+}
+
+inline_speed void
 queue_events (EV_P_ W *events, int eventcnt, int type)
 {
   int i;
@@ -710,7 +725,7 @@ queue_events (EV_P_ W *events, int eventcnt, int type)
 
 /*****************************************************************************/
 
-void inline_speed
+inline_speed void
 fd_event (EV_P_ int fd, int revents)
 {
   ANFD *anfd = anfds + fd;
@@ -732,7 +747,7 @@ ev_feed_fd_event (EV_P_ int fd, int revents)
     fd_event (EV_A_ fd, revents);
 }
 
-void inline_size
+inline_size void
 fd_reify (EV_P)
 {
   int i;
@@ -776,7 +791,7 @@ fd_reify (EV_P)
   fdchangecnt = 0;
 }
 
-void inline_size
+inline_size void
 fd_change (EV_P_ int fd, int flags)
 {
   unsigned char reify = anfds [fd].reify;
@@ -790,7 +805,7 @@ fd_change (EV_P_ int fd, int flags)
     }
 }
 
-void inline_speed
+inline_speed void
 fd_kill (EV_P_ int fd)
 {
   ev_io *w;
@@ -802,7 +817,7 @@ fd_kill (EV_P_ int fd)
     }
 }
 
-int inline_size
+inline_size int
 fd_valid (int fd)
 {
 #ifdef _WIN32
@@ -875,7 +890,7 @@ fd_rearm_all (EV_P)
 #define UPHEAP_DONE(p,k) ((p) == (k))
 
 /* away from the root */
-void inline_speed
+inline_speed void
 downheap (ANHE *heap, int N, int k)
 {
   ANHE he = heap [k];
@@ -925,7 +940,7 @@ downheap (ANHE *heap, int N, int k)
 #define UPHEAP_DONE(p,k) (!(p))
 
 /* away from the root */
-void inline_speed
+inline_speed void
 downheap (ANHE *heap, int N, int k)
 {
   ANHE he = heap [k];
@@ -955,7 +970,7 @@ downheap (ANHE *heap, int N, int k)
 #endif
 
 /* towards the root */
-void inline_speed
+inline_speed void
 upheap (ANHE *heap, int k)
 {
   ANHE he = heap [k];
@@ -976,7 +991,7 @@ upheap (ANHE *heap, int k)
   ev_active (ANHE_w (he)) = k;
 }
 
-void inline_size
+inline_size void
 adjustheap (ANHE *heap, int N, int k)
 {
   if (k > HEAP0 && ANHE_at (heap [HPARENT (k)]) >= ANHE_at (heap [k]))
@@ -986,7 +1001,7 @@ adjustheap (ANHE *heap, int N, int k)
 }
 
 /* rebuild the heap: this function is used only once and executed rarely */
-void inline_size
+inline_size void
 reheap (ANHE *heap, int N)
 {
   int i;
@@ -1012,7 +1027,7 @@ static EV_ATOMIC_T gotsig;
 
 /*****************************************************************************/
 
-void inline_speed
+inline_speed void
 fd_intern (int fd)
 {
 #ifdef _WIN32
@@ -1052,7 +1067,7 @@ evpipe_init (EV_P)
     }
 }
 
-void inline_size
+inline_size void
 evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 {
   if (!*flag)
@@ -1166,7 +1181,7 @@ static ev_signal childev;
 # define WIFCONTINUED(status) 0
 #endif
 
-void inline_speed
+inline_speed void
 child_reap (EV_P_ int chain, int pid, int status)
 {
   ev_child *w;
@@ -1454,6 +1469,7 @@ loop_destroy (EV_P)
   ev_free (anfds); anfdmax = 0;
 
   /* have to use the microsoft-never-gets-it-right macro */
+  array_free (rfeed, EMPTY);
   array_free (fdchange, EMPTY);
   array_free (timer, EMPTY);
 #if EV_PERIODIC_ENABLE
@@ -1472,10 +1488,10 @@ loop_destroy (EV_P)
 }
 
 #if EV_USE_INOTIFY
-void inline_size infy_fork (EV_P);
+inline_size void infy_fork (EV_P);
 #endif
 
-void inline_size
+inline_size void
 loop_fork (EV_P)
 {
 #if EV_USE_PORT
@@ -1722,7 +1738,7 @@ ev_invoke (EV_P_ void *w, int revents)
   EV_CB_INVOKE ((W)w, revents);
 }
 
-void inline_speed
+inline_speed void
 call_pending (EV_P)
 {
   int pri;
@@ -1744,7 +1760,7 @@ call_pending (EV_P)
 }
 
 #if EV_IDLE_ENABLE
-void inline_size
+inline_size void
 idle_reify (EV_P)
 {
   if (expect_false (idleall))
@@ -1766,83 +1782,97 @@ idle_reify (EV_P)
 }
 #endif
 
-void inline_size
+inline_size void
 timers_reify (EV_P)
 {
   EV_FREQUENT_CHECK;
 
-  while (timercnt && ANHE_at (timers [HEAP0]) < mn_now)
+  if (timercnt && ANHE_at (timers [HEAP0]) < mn_now)
     {
-      ev_timer *w = (ev_timer *)ANHE_w (timers [HEAP0]);
-
-      /*assert (("libev: inactive timer on timer heap detected", ev_is_active (w)));*/
-
-      /* first reschedule or stop timer */
-      if (w->repeat)
+      do
         {
-          ev_at (w) += w->repeat;
-          if (ev_at (w) < mn_now)
-            ev_at (w) = mn_now;
+          ev_timer *w = (ev_timer *)ANHE_w (timers [HEAP0]);
 
-          assert (("libev: negative ev_timer repeat value found while processing timers", w->repeat > 0.));
+          /*assert (("libev: inactive timer on timer heap detected", ev_is_active (w)));*/
 
-          ANHE_at_cache (timers [HEAP0]);
-          downheap (timers, timercnt, HEAP0);
+          /* first reschedule or stop timer */
+          if (w->repeat)
+            {
+              ev_at (w) += w->repeat;
+              if (ev_at (w) < mn_now)
+                ev_at (w) = mn_now;
+
+              assert (("libev: negative ev_timer repeat value found while processing timers", w->repeat > 0.));
+
+              ANHE_at_cache (timers [HEAP0]);
+              downheap (timers, timercnt, HEAP0);
+            }
+          else
+            ev_timer_stop (EV_A_ w); /* nonrepeating: stop timer */
+
+          EV_FREQUENT_CHECK;
+          feed_reverse (EV_A_ (W)w);
         }
-      else
-        ev_timer_stop (EV_A_ w); /* nonrepeating: stop timer */
+      while (timercnt && ANHE_at (timers [HEAP0]) < mn_now);
 
-      EV_FREQUENT_CHECK;
-      ev_feed_event (EV_A_ (W)w, EV_TIMEOUT);
+      feed_reverse_done (EV_A_ EV_TIMEOUT);
     }
 }
 
 #if EV_PERIODIC_ENABLE
-void inline_size
+inline_size void
 periodics_reify (EV_P)
 {
   EV_FREQUENT_CHECK;
 
   while (periodiccnt && ANHE_at (periodics [HEAP0]) < ev_rt_now)
     {
-      ev_periodic *w = (ev_periodic *)ANHE_w (periodics [HEAP0]);
+      int feed_count = 0;
 
-      /*assert (("libev: inactive timer on periodic heap detected", ev_is_active (w)));*/
-
-      /* first reschedule or stop timer */
-      if (w->reschedule_cb)
+      do
         {
-          ev_at (w) = w->reschedule_cb (w, ev_rt_now);
+          ev_periodic *w = (ev_periodic *)ANHE_w (periodics [HEAP0]);
 
-          assert (("libev: ev_periodic reschedule callback returned time in the past", ev_at (w) >= ev_rt_now));
+          /*assert (("libev: inactive timer on periodic heap detected", ev_is_active (w)));*/
 
-          ANHE_at_cache (periodics [HEAP0]);
-          downheap (periodics, periodiccnt, HEAP0);
-        }
-      else if (w->interval)
-        {
-          ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
-          /* if next trigger time is not sufficiently in the future, put it there */
-          /* this might happen because of floating point inexactness */
-          if (ev_at (w) - ev_rt_now < TIME_EPSILON)
+          /* first reschedule or stop timer */
+          if (w->reschedule_cb)
             {
-              ev_at (w) += w->interval;
+              ev_at (w) = w->reschedule_cb (w, ev_rt_now);
 
-              /* if interval is unreasonably low we might still have a time in the past */
-              /* so correct this. this will make the periodic very inexact, but the user */
-              /* has effectively asked to get triggered more often than possible */
-              if (ev_at (w) < ev_rt_now)
-                ev_at (w) = ev_rt_now;
+              assert (("libev: ev_periodic reschedule callback returned time in the past", ev_at (w) >= ev_rt_now));
+
+              ANHE_at_cache (periodics [HEAP0]);
+              downheap (periodics, periodiccnt, HEAP0);
             }
+          else if (w->interval)
+            {
+              ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
+              /* if next trigger time is not sufficiently in the future, put it there */
+              /* this might happen because of floating point inexactness */
+              if (ev_at (w) - ev_rt_now < TIME_EPSILON)
+                {
+                  ev_at (w) += w->interval;
 
-          ANHE_at_cache (periodics [HEAP0]);
-          downheap (periodics, periodiccnt, HEAP0);
+                  /* if interval is unreasonably low we might still have a time in the past */
+                  /* so correct this. this will make the periodic very inexact, but the user */
+                  /* has effectively asked to get triggered more often than possible */
+                  if (ev_at (w) < ev_rt_now)
+                    ev_at (w) = ev_rt_now;
+                }
+
+              ANHE_at_cache (periodics [HEAP0]);
+              downheap (periodics, periodiccnt, HEAP0);
+            }
+          else
+            ev_periodic_stop (EV_A_ w); /* nonrepeating: stop timer */
+
+          EV_FREQUENT_CHECK;
+          feed_reverse (EV_A_ (W)w);
         }
-      else
-        ev_periodic_stop (EV_A_ w); /* nonrepeating: stop timer */
+      while (periodiccnt && ANHE_at (periodics [HEAP0]) < ev_rt_now);
 
-      EV_FREQUENT_CHECK;
-      ev_feed_event (EV_A_ (W)w, EV_PERIODIC);
+      feed_reverse_done (EV_A_ EV_PERIODIC);
     }
 }
 
@@ -1868,7 +1898,7 @@ periodics_reschedule (EV_P)
 }
 #endif
 
-void inline_speed
+inline_speed void
 time_update (EV_P_ ev_tstamp max_block)
 {
   int i;
@@ -2016,8 +2046,6 @@ ev_loop (EV_P_ int flags)
             /* update time to cancel out callback processing overhead */
             time_update (EV_A_ 1e100);
 
-            waittime = MAX_BLOCKTIME;
-
             if (timercnt)
               {
                 ev_tstamp to = ANHE_at (timers [HEAP0]) - mn_now + backend_fudge;
@@ -2089,14 +2117,14 @@ ev_unloop (EV_P_ int how)
 
 /*****************************************************************************/
 
-void inline_size
+inline_size void
 wlist_add (WL *head, WL elem)
 {
   elem->next = *head;
   *head = elem;
 }
 
-void inline_size
+inline_size void
 wlist_del (WL *head, WL elem)
 {
   while (*head)
@@ -2111,7 +2139,7 @@ wlist_del (WL *head, WL elem)
     }
 }
 
-void inline_speed
+inline_speed void
 clear_pending (EV_P_ W w)
 {
   if (w->pending)
@@ -2138,7 +2166,7 @@ ev_clear_pending (EV_P_ void *w)
     return 0;
 }
 
-void inline_size
+inline_size void
 pri_adjust (EV_P_ W w)
 {
   int pri = w->priority;
@@ -2147,7 +2175,7 @@ pri_adjust (EV_P_ W w)
   w->priority = pri;
 }
 
-void inline_speed
+inline_speed void
 ev_start (EV_P_ W w, int active)
 {
   pri_adjust (EV_A_ w);
@@ -2155,7 +2183,7 @@ ev_start (EV_P_ W w, int active)
   ev_ref (EV_A);
 }
 
-void inline_size
+inline_size void
 ev_stop (EV_P_ W w)
 {
   ev_unref (EV_A);
@@ -2590,7 +2618,7 @@ infy_cb (EV_P_ ev_io *w, int revents)
     infy_wd (EV_A_ ev->wd, ev->wd, ev);
 }
 
-void inline_size
+inline_size void
 check_2625 (EV_P)
 {
   /* kernels < 2.6.25 are borked
@@ -2613,7 +2641,7 @@ check_2625 (EV_P)
   fs_2625 = 1;
 }
 
-void inline_size
+inline_size void
 infy_init (EV_P)
 {
   if (fs_fd != -2)
@@ -2633,7 +2661,7 @@ infy_init (EV_P)
     }
 }
 
-void inline_size
+inline_size void
 infy_fork (EV_P)
 {
   int slot;

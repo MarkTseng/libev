@@ -111,6 +111,11 @@ VAR (pendings, ANPENDING *pendings [NUMPRI])
 VAR (pendingmax, int pendingmax [NUMPRI])
 VAR (pendingcnt, int pendingcnt [NUMPRI])
 
+/* for reverse feeding of events */
+VARx(W *, rfeeds)
+VARx(int, rfeedmax)
+VARx(int, rfeedcnt)
+
 VARx(int *, fdchanges)
 VARx(int, fdchangemax)
 VARx(int, fdchangecnt)

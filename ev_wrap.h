@@ -43,6 +43,9 @@
 #define pendings ((loop)->pendings)
 #define pendingmax ((loop)->pendingmax)
 #define pendingcnt ((loop)->pendingcnt)
+#define rfeeds ((loop)->rfeeds)
+#define rfeedmax ((loop)->rfeedmax)
+#define rfeedcnt ((loop)->rfeedcnt)
 #define fdchanges ((loop)->fdchanges)
 #define fdchangemax ((loop)->fdchangemax)
 #define fdchangecnt ((loop)->fdchangecnt)
@@ -117,6 +120,9 @@
 #undef pendings
 #undef pendingmax
 #undef pendingcnt
+#undef rfeeds
+#undef rfeedmax
+#undef rfeedcnt
 #undef fdchanges
 #undef fdchangemax
 #undef fdchangecnt

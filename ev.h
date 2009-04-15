@@ -147,6 +147,7 @@ struct ev_loop;
 #define EV_EMBED    0x00010000 /* embedded event loop needs sweep */
 #define EV_FORK     0x00020000 /* event loop resumed in child */
 #define EV_ASYNC    0x00040000 /* async intra-loop signal */
+#define EV_CUSTOM   0x01000000 /* for use by user code */
 #define EV_ERROR    0x80000000 /* sent when an error occurs */
 
 /* can be used to add custom fields to all watchers, while losing binary compatibility */

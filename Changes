@@ -4,6 +4,7 @@ TODO: ev_time_freeze, ev_time_thaw
 TODO: ev_walk
 TODO: ev_stop_all
 TODO: fix signal handling(?) under win32
+3.54
 	- do not leave the event loop early just because we have no active
           watchers, fixing a problem when embedding a kqueue loop
           that has active kernel events but no registered watchers
@@ -11,6 +12,7 @@ TODO: fix signal handling(?) under win32
 	- correctly zero the idx values for arrays, so destroying and
           reinitialising the default loop actually works (patch by
           Malek Hadj-Ali).
+        - new EV_CUSTOM revents flag for use by applications.
 
 3.53 Sun Feb 15 02:38:20 CET 2009
 	- fix a bug in event pipe creation on win32 that would cause a
