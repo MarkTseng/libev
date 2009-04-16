@@ -1098,7 +1098,7 @@ or might not have been clamped to the valid range.
 The default priority used by watchers when no priority has been set is
 always C<0>, which is supposed to not be too high and not be too low :).
 
-See L<WATCHER PRIORITIES>, below, for a more thorough treatment of
+See L<WATCHER PRIORITY MODELS>, below, for a more thorough treatment of
 priorities.
 
 =item ev_invoke (loop, ev_TYPE *watcher, int revents)
