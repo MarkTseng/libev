@@ -1085,6 +1085,8 @@ integer between C<EV_MAXPRI> (default: C<2>) and C<EV_MINPRI>
 before watchers with lower priority, but priority will not keep watchers
 from being executed (except for C<ev_idle> watchers).
 
+See L<
+
 This means that priorities are I<only> used for ordering callback
 invocation after new events have been received. This is useful, for
 example, to reduce latency after idling, or more often, to bind two
@@ -1584,7 +1586,7 @@ If the timer is started but non-repeating, stop it (as if it timed out).
 If the timer is repeating, either start it if necessary (with the
 C<repeat> value), or reset the running timer to the C<repeat> value.
 
-This sounds a bit complicated, see "Be smart about timeouts", above, for a
+This sounds a bit complicated, see L<Be smart about timeouts>, above, for a
 usage example.
 
 =item ev_tstamp repeat [read-write]
