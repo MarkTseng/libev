@@ -64,11 +64,23 @@ libev - a high performance full-featured event loop written in C
      return 0;
    }
 
-=head1 DESCRIPTION
+=head1 ABOUT THIS DOCUMENT
+
+This document documents the libev software package.
 
 The newest version of this document is also available as an html-formatted
 web page you might find easier to navigate when reading it for the first
 time: L<http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod>.
+
+While this document tries to be as complete as possible in documenting
+libev, its usage and the rationale behind its design, it is not a tutorial
+on event-based programming, nor will it introduce event-based programming
+with libev.
+
+Familarity with event based programming techniques in general is assumed
+throughout this document.
+
+=head1 ABOUT LIBEV
 
 Libev is an event loop: you register interest in certain events (such as a
 file descriptor being readable or a timeout occurring), and it will manage
