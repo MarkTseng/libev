@@ -4096,6 +4096,82 @@ involves iterating over all running async watchers or all signal numbers.
 =back
 
 
+=head1 GLOSSARY
+
+=over 4
+
+=item active
+
+A watcher is active as long as it has been started (has been attached to
+an event loop) but not yet stopped (disassociated from the event loop).
+
+=item application
+
+In this document, an application is whatever is using libev.
+
+=item callback
+
+The address of a function that is called when some event has been
+detected. Callbacks are being passed the event loop, the watcher that
+received the event, and the actual event bitset.
+
+=item callback invocation
+
+The act of calling the callback associated with a watcher.
+
+=item event
+
+A change of state of some external event, such as data now being available
+for reading on a file descriptor, time having passed or simply not having
+any other events happening anymore.
+
+In libev, events are represented as single bits (such as C<EV_READ> or
+C<EV_TIMEOUT>).
+
+=item event library
+
+A software package implementing an event model and loop.
+
+=item event loop
+
+An entity that handles and processes external events and converts them
+into callback invocations.
+
+=item event model
+
+The model used to describe how an event loop handles and processes
+watchers and events.
+
+=item pending
+
+A watcher is pending as soon as the corresponding event has been detected,
+and stops being pending as soon as the watcher will be invoked or its
+pending status is explicitly cleared by the application.
+
+A watcher can be pending, but not active. Stopping a watcher also clears
+its pending status.
+
+=item real time
+
+The physical time that is observed. It is apparently strictly monotonic :)
+
+=item wall-clock time
+
+The time and date as shown on clocks. Unlike real time, it can actually
+be wrong and jump forwards and backwards, e.g. when the you adjust your
+clock.
+
+=item watcher
+
+A data structure that describes interest in certain events. Watchers need
+to be started (attached to an event loop) before they can receive events.
+
+=item watcher invocation
+
+The act of calling the callback associated with a watcher.
+
+=back
+
 =head1 AUTHOR
 
 Marc Lehmann <libev@schmorp.de>, with repeated corrections by Mikael Magnusson.
