@@ -1085,25 +1085,21 @@ integer between C<EV_MAXPRI> (default: C<2>) and C<EV_MINPRI>
 before watchers with lower priority, but priority will not keep watchers
 from being executed (except for C<ev_idle> watchers).
 
-See L<
-
-This means that priorities are I<only> used for ordering callback
-invocation after new events have been received. This is useful, for
-example, to reduce latency after idling, or more often, to bind two
-watchers on the same event and make sure one is called first.
-
 If you need to suppress invocation when higher priority events are pending
 you need to look at C<ev_idle> watchers, which provide this functionality.
 
 You I<must not> change the priority of a watcher as long as it is active or
 pending.
 
-The default priority used by watchers when no priority has been set is
-always C<0>, which is supposed to not be too high and not be too low :).
-
 Setting a priority outside the range of C<EV_MINPRI> to C<EV_MAXPRI> is
 fine, as long as you do not mind that the priority value you query might
 or might not have been clamped to the valid range.
+
+The default priority used by watchers when no priority has been set is
+always C<0>, which is supposed to not be too high and not be too low :).
+
+See L<WATCHER PRIORITIES>, below, for a more thorough treatment of
+priorities.
 
 =item ev_invoke (loop, ev_TYPE *watcher, int revents)
 
@@ -1188,6 +1184,109 @@ programmers):
      struct my_biggy big = (struct my_biggy *
        (((char *)w) - offsetof (struct my_biggy, t2));
    }
+
+=head2 WATCHER PRIORITY MODELS
+
+Many event loops support I<watcher priorities>, which are usually small
+integers that influence the ordering of event callback invocation
+between watchers in some way, all else being equal.
+
+In libev, Watcher priorities can be set using C<ev_set_priority>. See its
+description for the more technical details such as the actual priority
+range.
+
+There are two common ways how these these priorities are being interpreted
+by event loops:
+
+In the more common lock-out model, higher priorities "lock out" invocation
+of lower priority watchers, which means as long as higher priority
+watchers receive events, lower priority watchers are not being invoked.
+
+The less common only-for-ordering model uses priorities solely to order
+callback invocation within a single event loop iteration: Higher priority
+watchers are invoked before lower priority ones, but they all get invoked
+before polling for new events.
+
+Libev uses the second (only-for-ordering) model for all its watchers
+except for idle watchers (which use the lock-out model).
+
+The rationale behind this is that implementing the lock-out model for
+watchers is not well supported by most kernel interfaces, and most event
+libraries will just poll for the same events again and again as long as
+their callbacks have not been executed, which is very inefficient in the
+common case of one high-priority watcher locking out a mass of lower
+priority ones.
+
+Static (ordering) priorities are most useful when you have two or more
+watchers handling the same resource: a typical usage example is having an
+C<ev_io> watcher to receive data, and an associated C<ev_timer> to handle
+timeouts. Under load, data might be received while the program handles
+other jobs, but since timers normally get invoked first, the timeout
+handler will be executed before checking for data. In that case, giving
+the timer a lower priority than the I/O watcher ensures that I/O will be
+handled first even under adverse conditions (which is usually, but not
+always, what you want).
+
+Since idle watchers use the "lock-out" model, meaning that idle watchers
+will only be executed when no same or higher priority watchers have
+received events, they can be used to implement the "lock-out" model when
+required.
+
+For example, to emulate how many other event libraries handle priorities,
+you can associate an C<ev_idle> watcher to each such watcher, and in
+the normal watcher callback, you just start the idle watcher. The real
+processing is done in the idle watcher callback. This causes libev to
+continously poll and process kernel event data for the watcher, but when
+the lock-out case is known to be rare (which in turn is rare :), this is
+workable.
+
+Usually, however, the lock-out model implemented that way will perform
+miserably under the type of load it was designed to handle. In that case,
+it might be preferable to stop the real watcher before starting the
+idle watcher, so the kernel will not have to process the event in case
+the actual processing will be delayed for considerable time.
+
+Here is an example of an I/O watcher that should run at a strictly lower
+priority than the default, and which should only process data when no
+other events are pending:
+
+   ev_idle idle; // actual processing watcher
+   ev_io io;     // actual event watcher
+
+   static void
+   io_cb (EV_P_ ev_io *w, int revents)
+   {
+     // stop the I/O watcher, we received the event, but
+     // are not yet ready to handle it.
+     ev_io_stop (EV_A_ w);
+
+     // start the idle watcher to ahndle the actual event.
+     // it will not be executed as long as other watchers
+     // with the default priority are receiving events.
+     ev_idle_start (EV_A_ &idle);
+   }
+
+   static void
+   idle-cb (EV_P_ ev_idle *w, int revents)
+   {
+     // actual processing
+     read (STDIN_FILENO, ...);
+
+     // have to start the I/O watcher again, as
+     // we have handled the event
+     ev_io_start (EV_P_ &io);
+   }
+
+   // initialisation
+   ev_idle_init (&idle, idle_cb);
+   ev_io_init (&io, io_cb, STDIN_FILENO, EV_READ);
+   ev_io_start (EV_DEFAULT_ &io);
+
+In the "real" world, it might also be beneficial to start a timer, so that
+low-priority connections can not be locked out forever under load. This
+enables your program to keep a lower latency for important connections
+during short periods of high load, while not completely locking out less
+important ones.
 
 
 =head1 WATCHER TYPES
