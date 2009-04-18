@@ -646,7 +646,7 @@ This function is rarely useful, but when some event callback runs for a
 very long time without entering the event loop, updating libev's idea of
 the current time is a good idea.
 
-See also "The special problem of time updates" in the C<ev_timer> section.
+See also L<The special problem of time updates> in the C<ev_timer> section.
 
 =item ev_suspend (loop)
 
@@ -2709,6 +2709,39 @@ event loop blocks next and before C<ev_check> watchers are being called,
 and only in the child after the fork. If whoever good citizen calling
 C<ev_default_fork> cheats and calls it in the wrong process, the fork
 handlers will be invoked, too, of course.
+
+=head3 The special problem of life after fork - how is it possible?
+
+Most uses of C<fork()> consist of forking, then some simple calls to ste
+up/change the process environment, followed by a call to C<exec()>. This
+sequence should be handled by libev without any problems.
+
+This changes when the application actually wants to do event handling
+in the child, or both parent in child, in effect "continuing" after the
+fork.
+
+The default mode of operation (for libev, with application help to detect
+forks) is to duplicate all the state in the child, as would be expected
+when I<either> the parent I<or> the child process continues.
+
+When both processes want to continue using libev, then this is usually the
+wrong result. In that case, usually one process (typically the parent) is
+supposed to continue with all watchers in place as before, while the other
+process typically wants to start fresh, i.e. without any active watchers.
+
+The cleanest and most efficient way to achieve that with libev is to
+simply create a new event loop, which of course will be "empty", and
+use that for new watchers. This has the advantage of not touching more
+memory than necessary, and thus avoiding the copy-on-write, and the
+disadvantage of having to use multiple event loops (which do not support
+signal watchers).
+
+When this is not possible, or you want to use the default loop for
+other reasons, then in the process that wants to start "fresh", call
+C<ev_default_destroy ()> followed by C<ev_default_loop (...)>. Destroying
+the default loop will "orphan" (not stop) all registered watchers, so you
+have to be careful not to execute code that modifies those watchers. Note
+also that in that case, you have to re-register any signal watchers.
 
 =head3 Watcher-Specific Functions and Data Members
 
