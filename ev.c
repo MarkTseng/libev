@@ -2036,6 +2036,8 @@ ev_loop (EV_P_ int flags)
             /* update time to cancel out callback processing overhead */
             time_update (EV_A_ 1e100);
 
+            waittime = MAX_BLOCKTIME;
+
             if (timercnt)
               {
                 ev_tstamp to = ANHE_at (timers [HEAP0]) - mn_now + backend_fudge;
