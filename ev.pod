@@ -1334,7 +1334,9 @@ required if you know what you are doing).
 
 If you cannot use non-blocking mode, then force the use of a
 known-to-be-good backend (at the time of this writing, this includes only
-C<EVBACKEND_SELECT> and C<EVBACKEND_POLL>).
+C<EVBACKEND_SELECT> and C<EVBACKEND_POLL>). The same applies to file
+descriptors for which non-blocking operation makes no sense (such as
+files) - libev doesn't guarentee any specific behaviour in that case.
 
 Another thing you have to watch out for is that it is quite easy to
 receive "spurious" readiness notifications, that is your callback might
