@@ -1467,10 +1467,11 @@ detecting time jumps is hard, and some inaccuracies are unavoidable (the
 monotonic clock option helps a lot here).
 
 The callback is guaranteed to be invoked only I<after> its timeout has
-passed. If multiple timers become ready during the same loop iteration
-then the ones with earlier time-out values are invoked before ones with
-later time-out values (but this is no longer true when a callback calls
-C<ev_loop> recursively).
+passed (not I<at>, so on systems with very low-resolution clocks this
+might introduce a small delay). If multiple timers become ready during the
+same loop iteration then the ones with earlier time-out values are invoked
+before ones with later time-out values (but this is no longer true when a
+callback calls C<ev_loop> recursively).
 
 =head3 Be smart about timeouts
 

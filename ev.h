@@ -82,6 +82,10 @@ typedef double ev_tstamp;
 # define EV_ASYNC_ENABLE 1
 #endif
 
+#ifndef EV_WALK_ENABLE
+# define EV_WALK_ENABLE 0 /* not yet */
+#endif
+
 #ifndef EV_ATOMIC_T
 # include <signal.h>
 # define EV_ATOMIC_T sig_atomic_t volatile
@@ -494,7 +498,7 @@ void ev_default_destroy (void); /* destroy the default loop */
 /* you can actually call it at any time, anywhere :) */
 void ev_default_fork (void);
 
-#if 0
+#if EV_WALK_ENABLE
 /* walk (almost) all watchers in the loop of a given type, invoking the */
 /* callback on every such watcher. The callback might stop the watcher, */
 /* but do nothing else with the loop */

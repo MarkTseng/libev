@@ -17,6 +17,7 @@ TODO: fix signal handling(?) under win32
         - add documentation section about priorites.
         - add a glossary to the dcoumentation.
         - extend the ev_fork description slightly.
+        - optimize a jump out of call_pending.
 
 3.53 Sun Feb 15 02:38:20 CET 2009
 	- fix a bug in event pipe creation on win32 that would cause a
