@@ -3937,6 +3937,9 @@ way (note also that glib is the slowest event library known to man).
 There is no supported compilation method available on windows except
 embedding it into other applications.
 
+Sensible signal handling is officially unsupported by Microsoft - libev
+tries its best, but under most conditions, signals will simply not work.
+
 Not a libev limitation but worth mentioning: windows apparently doesn't
 accept large writes: instead of resulting in a partial write, windows will
 either accept everything or return C<ENOBUFS> if the buffer is too large,
@@ -3950,7 +3953,7 @@ is not recommended (and not reasonable). If your program needs to use
 more than a hundred or so sockets, then likely it needs to use a totally
 different implementation for windows, as libev offers the POSIX readiness
 notification model, which cannot be implemented efficiently on windows
-(Microsoft monopoly games).
+(due to Microsoft monopoly games).
 
 A typical way to use libev under windows is to embed it (see the embedding
 section for details) and use the following F<evwrap.h> header file instead
@@ -3996,24 +3999,22 @@ Early versions of winsocket's select only supported waiting for a maximum
 of C<64> handles (probably owning to the fact that all windows kernels
 can only wait for C<64> things at the same time internally; Microsoft
 recommends spawning a chain of threads and wait for 63 handles and the
-previous thread in each. Great).
+previous thread in each. Sounds great!).
 
 Newer versions support more handles, but you need to define C<FD_SETSIZE>
 to some high number (e.g. C<2048>) before compiling the winsocket select
-call (which might be in libev or elsewhere, for example, perl does its own
-select emulation on windows).
+call (which might be in libev or elsewhere, for example, perl and many
+other interpreters do their own select emulation on windows).
 
 Another limit is the number of file descriptors in the Microsoft runtime
-libraries, which by default is C<64> (there must be a hidden I<64> fetish
-or something like this inside Microsoft). You can increase this by calling
-C<_setmaxstdio>, which can increase this limit to C<2048> (another
-arbitrary limit), but is broken in many versions of the Microsoft runtime
-libraries.
-
-This might get you to about C<512> or C<2048> sockets (depending on
-windows version and/or the phase of the moon). To get more, you need to
-wrap all I/O functions and provide your own fd management, but the cost of
-calling select (O(n²)) will likely make this unworkable.
+libraries, which by default is C<64> (there must be a hidden I<64>
+fetish or something like this inside Microsoft). You can increase this
+by calling C<_setmaxstdio>, which can increase this limit to C<2048>
+(another arbitrary limit), but is broken in many versions of the Microsoft
+runtime libraries. This might get you to about C<512> or C<2048> sockets
+(depending on windows version and/or the phase of the moon). To get more,
+you need to wrap all I/O functions and provide your own fd management, but
+the cost of calling select (O(n²)) will likely make this unworkable.
 
 =back
 
