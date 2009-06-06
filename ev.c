@@ -1950,11 +1950,10 @@ timers_reschedule (EV_P_ ev_tstamp adjust)
 inline_speed void
 time_update (EV_P_ ev_tstamp max_block)
 {
-  int i;
-
 #if EV_USE_MONOTONIC
   if (expect_true (have_monotonic))
     {
+      int i;
       ev_tstamp odiff = rtmn_diff;
 
       mn_now = get_clock ();
