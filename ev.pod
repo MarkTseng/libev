@@ -1186,14 +1186,14 @@ programmers):
    static void
    t1_cb (EV_P_ ev_timer *w, int revents)
    {
-     struct my_biggy big = (struct my_biggy *
+     struct my_biggy big = (struct my_biggy *)
        (((char *)w) - offsetof (struct my_biggy, t1));
    }
 
    static void
    t2_cb (EV_P_ ev_timer *w, int revents)
    {
-     struct my_biggy big = (struct my_biggy *
+     struct my_biggy big = (struct my_biggy *)
        (((char *)w) - offsetof (struct my_biggy, t2));
    }
 
@@ -1279,7 +1279,7 @@ other events are pending:
    }
 
    static void
-   idle-cb (EV_P_ ev_idle *w, int revents)
+   idle_cb (EV_P_ ev_idle *w, int revents)
    {
      // actual processing
      read (STDIN_FILENO, ...);
@@ -2370,7 +2370,7 @@ callback, free it. Also, use no error checking, as usual.
 
    ev_idle *idle_watcher = malloc (sizeof (ev_idle));
    ev_idle_init (idle_watcher, idle_cb);
-   ev_idle_start (loop, idle_cb);
+   ev_idle_start (loop, idle_watcher);
 
 
 =head2 C<ev_prepare> and C<ev_check> - customise your event loop!
