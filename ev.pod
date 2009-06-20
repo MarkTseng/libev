@@ -1525,7 +1525,7 @@ member and C<ev_timer_again>.
 
 At start:
 
-   ev_timer_init (timer, callback);
+   ev_init (timer, callback);
    timer->repeat = 60.;
    ev_timer_again (loop, timer);
 
@@ -1597,7 +1597,7 @@ To start the timer, simply initialise the watcher and set C<last_activity>
 to the current time (meaning we just have some activity :), then call the
 callback, which will "do the right thing" and start the timer:
 
-   ev_timer_init (timer, callback);
+   ev_init (timer, callback);
    last_activity = ev_now (loop);
    callback (loop, timer, EV_TIMEOUT);
 
@@ -2473,7 +2473,7 @@ the callbacks for the IO/timeout watchers might not have been called yet.
      adns_beforepoll (ads, fds, &nfd, &timeout, timeval_from (ev_time ()));
 
      /* the callback is illegal, but won't be called as we stop during check */
-     ev_timer_init (&tw, 0, timeout * 1e-3);
+     ev_timer_init (&tw, 0, timeout * 1e-3, 0.);
      ev_timer_start (loop, &tw);
 
      // create one ev_io per pollfd
