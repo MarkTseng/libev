@@ -59,6 +59,8 @@ extern "C" {
 #    define EV_USE_MONOTONIC 1
 #   endif
 #  endif
+# elif !defined(EV_USE_CLOCK_SYSCALL)
+#  define EV_USE_CLOCK_SYSCALL 0
 # endif
 
 # if HAVE_CLOCK_GETTIME
@@ -326,9 +328,14 @@ extern "C" {
 /* which makes programs even slower. might work on other unices, too. */
 #if EV_USE_CLOCK_SYSCALL
 # include <syscall.h>
-# define clock_gettime(id, ts) syscall (SYS_clock_gettime, (id), (ts))
-# undef EV_USE_MONOTONIC
-# define EV_USE_MONOTONIC 1
+# ifdef SYS_clock_gettime
+#  define clock_gettime(id, ts) syscall (SYS_clock_gettime, (id), (ts))
+#  undef EV_USE_MONOTONIC
+#  define EV_USE_MONOTONIC 1
+# else
+#  undef EV_USE_CLOCK_SYSCALL
+#  define EV_USE_CLOCK_SYSCALL 0
+# endif
 #endif
 
 #if EV_USE_EVENTFD

@@ -2004,8 +2004,8 @@ exits). It is permissible to install a child watcher I<after> the child
 has been forked (which implies it might have already exited), as long
 as the event loop isn't entered (or is continued from a watcher), i.e.,
 forking and then immediately registering a watcher for the child is fine,
-but forking and registering a watcher a few event loop iterations later is
-not.
+but forking and registering a watcher a few event loop iterations later or
+in the next callback invocation is not.
 
 Only the default event loop is capable of handling signals, and therefore
 you can only register child watchers in the default event loop.
