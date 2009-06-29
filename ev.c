@@ -286,6 +286,20 @@ extern "C" {
 # define EV_HEAP_CACHE_AT !EV_MINIMAL
 #endif
 
+/* on linux, we can use a (slow) syscall to avoid a dependency on pthread, */
+/* which makes programs even slower. might work on other unices, too. */
+#if EV_USE_CLOCK_SYSCALL
+# include <syscall.h>
+# ifdef SYS_clock_gettime
+#  define clock_gettime(id, ts) syscall (SYS_clock_gettime, (id), (ts))
+#  undef EV_USE_MONOTONIC
+#  define EV_USE_MONOTONIC 1
+# else
+#  undef EV_USE_CLOCK_SYSCALL
+#  define EV_USE_CLOCK_SYSCALL 0
+# endif
+#endif
+
 /* this block fixes any misconfiguration where we know we run into trouble otherwise */
 
 #ifndef CLOCK_MONOTONIC
@@ -322,20 +336,6 @@ extern "C" {
 
 #if EV_SELECT_IS_WINSOCKET
 # include <winsock.h>
-#endif
-
-/* on linux, we can use a (slow) syscall to avoid a dependency on pthread, */
-/* which makes programs even slower. might work on other unices, too. */
-#if EV_USE_CLOCK_SYSCALL
-# include <syscall.h>
-# ifdef SYS_clock_gettime
-#  define clock_gettime(id, ts) syscall (SYS_clock_gettime, (id), (ts))
-#  undef EV_USE_MONOTONIC
-#  define EV_USE_MONOTONIC 1
-# else
-#  undef EV_USE_CLOCK_SYSCALL
-#  define EV_USE_CLOCK_SYSCALL 0
-# endif
 #endif
 
 #if EV_USE_EVENTFD
