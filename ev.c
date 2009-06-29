@@ -629,7 +629,7 @@ ev_sleep (ev_tstamp delay)
       tv.tv_usec = (long)((delay - (ev_tstamp)(tv.tv_sec)) * 1e6);
 
       /* here we rely on sys/time.h + sys/types.h + unistd.h providing select */
-      /* somehting nto guaranteed by newer posix versions, but guaranteed */
+      /* somehting not guaranteed by newer posix versions, but guaranteed */
       /* by older ones */
       select (0, 0, 0, 0, &tv);
 #endif
@@ -2077,6 +2077,9 @@ ev_loop (EV_P_ int flags)
 
         if (expect_true (!(flags & EVLOOP_NONBLOCK || idleall || !activecnt)))
           {
+            /* remember old timestamp for io_blocktime calculation */
+            ev_tstamp prev_mn_now = mn_now;
+
             /* update time to cancel out callback processing overhead */
             time_update (EV_A_ 1e100);
 
@@ -2096,18 +2099,23 @@ ev_loop (EV_P_ int flags)
               }
 #endif
 
+            /* don't let timeouts decrease the waittime below timeout_blocktime */
             if (expect_false (waittime < timeout_blocktime))
               waittime = timeout_blocktime;
 
-            sleeptime = waittime - backend_fudge;
-
-            if (expect_true (sleeptime > io_blocktime))
-              sleeptime = io_blocktime;
-
-            if (sleeptime)
+            /* extra check because io_blocktime is commonly 0 */
+            if (expect_false (io_blocktime))
               {
-                ev_sleep (sleeptime);
-                waittime -= sleeptime;
+                sleeptime = io_blocktime - (mn_now - prev_mn_now);
+
+                if (sleeptime > waittime - backend_fudge)
+                  sleeptime = waittime - backend_fudge;
+
+                if (expect_true (sleeptime > 0.))
+                  {
+                    ev_sleep (sleeptime);
+                    waittime -= sleeptime;
+                  }
               }
           }
 
