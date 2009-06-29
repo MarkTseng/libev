@@ -566,6 +566,7 @@ typedef struct
 
 /*****************************************************************************/
 
+#ifndef EV_HAVE_EV_TIME
 ev_tstamp
 ev_time (void)
 {
@@ -582,6 +583,7 @@ ev_time (void)
   gettimeofday (&tv, 0);
   return tv.tv_sec + tv.tv_usec * 1e-6;
 }
+#endif
 
 inline_size ev_tstamp
 get_clock (void)
