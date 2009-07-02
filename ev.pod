@@ -4079,7 +4079,9 @@ watchers.
 The type C<double> is used to represent timestamps. It is required to
 have at least 51 bits of mantissa (and 9 bits of exponent), which is good
 enough for at least into the year 4000. This requirement is fulfilled by
-implementations implementing IEEE 754 (basically all existing ones).
+implementations implementing IEEE 754, which is basically all existing
+ones. With IEEE 754 doubles, you get microsecond accuracy until at least
+2200.
 
 =back
 
