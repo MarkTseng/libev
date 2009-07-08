@@ -393,8 +393,13 @@ int eventfd (unsigned int initval, int flags);
 # define inline_speed      static inline
 #endif
 
-#define NUMPRI    (EV_MAXPRI - EV_MINPRI + 1)
-#define ABSPRI(w) (((W)w)->priority - EV_MINPRI)
+#define NUMPRI (EV_MAXPRI - EV_MINPRI + 1)
+
+#if EV_MINPRI == EV_MAXPRI
+# define ABSPRI(w) (((W)w), 0)
+#else
+# define ABSPRI(w) (((W)w)->priority - EV_MINPRI)
+#endif
 
 #define EMPTY       /* required for microsofts broken pseudo-c compiler */
 #define EMPTY2(a,b) /* used to suppress some warnings */
@@ -2260,10 +2265,10 @@ ev_clear_pending (EV_P_ void *w)
 inline_size void
 pri_adjust (EV_P_ W w)
 {
-  int pri = w->priority;
+  int pri = ev_priority (w);
   pri = pri < EV_MINPRI ? EV_MINPRI : pri;
   pri = pri > EV_MAXPRI ? EV_MAXPRI : pri;
-  w->priority = pri;
+  ev_set_priority (w, pri);
 }
 
 inline_speed void

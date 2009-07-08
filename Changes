@@ -13,6 +13,7 @@ TODO: remain
           slightly higher accuracy.
         - properly declare ev_loop_verify even when !EV_MULTIPLICITY.
         - implement ev_loop_depth.
+        - do not compile in any priority code when EV_MAXPRI == EV_MINPRI.
 
 3.6  Tue Apr 28 02:49:30 CEST 2009
 	- multiple timers becoming ready within an event loop iteration

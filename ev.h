@@ -189,11 +189,17 @@ struct ev_loop;
  *           or the array index + 1 in the pendings array.
  */
 
+#if EV_MINPRI == EV_MAXPRI
+# define EV_DECL_PRIORITY
+#else
+# define EV_DECL_PRIORITY int priority;
+#endif
+
 /* shared by all watchers */
 #define EV_WATCHER(type)			\
   int active; /* private */			\
   int pending; /* private */			\
-  int priority; /* private */			\
+  EV_DECL_PRIORITY /* private */		\
   EV_COMMON /* rw */				\
   EV_CB_DECLARE (type) /* private */
 
@@ -548,9 +554,9 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 /* these may evaluate ev multiple times, and the other arguments at most once */
 /* either use ev_init + ev_TYPE_set, or the ev_TYPE_init macro, below, to first initialise a watcher */
 #define ev_init(ev,cb_) do {			\
-  ((ev_watcher *)(void *)(ev))->active   =	\
-  ((ev_watcher *)(void *)(ev))->pending  =	\
-  ((ev_watcher *)(void *)(ev))->priority = 0;	\
+  ((ev_watcher *)(void *)(ev))->active  =	\
+  ((ev_watcher *)(void *)(ev))->pending = 0;	\
+  ev_set_priority ((ev), 0);			\
   ev_set_cb ((ev), cb_);			\
 } while (0)
 
@@ -583,9 +589,15 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 #define ev_is_pending(ev)                    (0 + ((ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
 #define ev_is_active(ev)                     (0 + ((ev_watcher *)(void *)(ev))->active) /* ro, true when the watcher has been started */
 
-#define ev_priority(ev)                      ((((ev_watcher *)(void *)(ev))->priority) + 0)
 #define ev_cb(ev)                            (ev)->cb /* rw */
-#define ev_set_priority(ev,pri)              ((ev_watcher *)(void *)(ev))->priority = (pri)
+
+#if EV_MINPRI == EV_MAXPRI
+# define ev_priority(ev)                     ((ev), EV_MINPRI)
+# define ev_set_priority(ev,pri)             ((ev), (pri))
+#else
+# define ev_priority(ev)                     ((((ev_watcher *)(void *)(ev))->priority) + 0)
+# define ev_set_priority(ev,pri)             (  (ev_watcher *)(void *)(ev))->priority = (pri)
+#endif
 
 #define ev_periodic_at(ev)                   (((ev_watcher_time *)(ev))->at + 0.)
 
