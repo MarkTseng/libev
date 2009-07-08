@@ -3,7 +3,8 @@ Revision history for libev, a high-performance and full-featured event loop.
 TODO: ev_walk
 TODO: child wactehr execution order w.r.t. childsigcb reg. priorities
 TODO: remain
-TODO: io_collect documentation
+	- ev_unloop and ev_loop wrongly used a global variable to exit loops,
+          instead of using a per-loop variable (bug caught by accident...).
 	- Denis F. Latypoff corrected many typos in example code snippets.
 	- the ev_set_io_collect_interval interpretation has changed.
         - honor autoconf detection of EV_USE_CLOCK_SYSCALL, also double-
@@ -11,6 +12,8 @@ TODO: io_collect documentation
           use it (reported by ry@tinyclouds).
         - use GetSystemTimeAsFileTime instead of _timeb on windows, for
           slightly higher accuracy.
+        - properly declare ev_loop_verify even when !EV_MULTIPLICITY.
+        - implement ev_loop_depth.
 
 3.6  Tue Apr 28 02:49:30 CEST 2009
 	- multiple timers becoming ready within an event loop iteration

@@ -1360,6 +1360,12 @@ ev_loop_count (EV_P)
   return loop_count;
 }
 
+unsigned int
+ev_loop_depth (EV_P)
+{
+  return loop_depth;
+}
+
 void
 ev_set_io_collect_interval (EV_P_ ev_tstamp interval)
 {
@@ -2022,11 +2028,11 @@ time_update (EV_P_ ev_tstamp max_block)
     }
 }
 
-static int loop_done;
-
 void
 ev_loop (EV_P_ int flags)
 {
+  ++loop_depth;
+
   loop_done = EVUNLOOP_CANCEL;
 
   call_pending (EV_A); /* in case we recurse, ensure ordering stays nice and clean */
@@ -2151,6 +2157,8 @@ ev_loop (EV_P_ int flags)
 
   if (loop_done == EVUNLOOP_ONE)
     loop_done = EVUNLOOP_CANCEL;
+
+  --loop_depth;
 }
 
 void

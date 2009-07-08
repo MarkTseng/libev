@@ -623,6 +623,18 @@ This value can sometimes be useful as a generation counter of sorts (it
 "ticks" the number of loop iterations), as it roughly corresponds with
 C<ev_prepare> and C<ev_check> calls.
 
+=item unsigned int ev_loop_depth (loop)
+
+Returns the number of times C<ev_loop> was entered minus the number of
+times C<ev_loop> was exited, in other words, the recursion depth.
+
+Outside C<ev_loop>, this number is zero. In a callback, this number is
+C<1>, unless C<ev_loop> was invoked recursively (or from another thread),
+in which case it is higher.
+
+Leaving C<ev_loop> abnormally (setjmp/longjmp, cancelling the thread
+etc.), doesn't count as exit.
+
 =item unsigned int ev_backend (loop)
 
 Returns one of the C<EVBACKEND_*> flags indicating the event backend in

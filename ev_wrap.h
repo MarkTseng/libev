@@ -9,6 +9,8 @@
 #define backend ((loop)->backend)
 #define activecnt ((loop)->activecnt)
 #define loop_count ((loop)->loop_count)
+#define loop_depth ((loop)->loop_depth)
+#define loop_done ((loop)->loop_done)
 #define backend_fd ((loop)->backend_fd)
 #define backend_fudge ((loop)->backend_fudge)
 #define backend_modify ((loop)->backend_modify)
@@ -87,6 +89,8 @@
 #undef backend
 #undef activecnt
 #undef loop_count
+#undef loop_depth
+#undef loop_done
 #undef backend_fd
 #undef backend_fudge
 #undef backend_modify

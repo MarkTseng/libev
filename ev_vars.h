@@ -1,7 +1,7 @@
 /*
  * loop member variable declarations
  *
- * Copyright (c) 2007,2008 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -49,6 +49,8 @@ VARx(ev_tstamp, timeout_blocktime)
 VARx(int, backend)
 VARx(int, activecnt) /* total number of active events ("refcount") */
 VARx(unsigned int, loop_count) /* total number of loop iterations/blocks */
+VARx(unsigned int, loop_depth) /* #ev_loop enters - #ev_loop leaves */
+VARx(char, loop_done)  /* signal by ev_unloop */
 
 VARx(int, backend_fd)
 VARx(ev_tstamp, backend_fudge) /* assumed typical timer resolution */

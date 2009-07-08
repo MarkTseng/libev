@@ -461,7 +461,6 @@ ev_default_loop (unsigned int flags)
 struct ev_loop *ev_loop_new (unsigned int flags);
 void ev_loop_destroy (EV_P);
 void ev_loop_fork (EV_P);
-void ev_loop_verify (EV_P);
 
 ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after each poll */
 void ev_now_update (EV_P);
@@ -498,6 +497,11 @@ void ev_default_destroy (void); /* destroy the default loop */
 /* you can actually call it at any time, anywhere :) */
 void ev_default_fork (void);
 
+unsigned int ev_backend (EV_P);     /* backend in use by loop */
+unsigned int ev_loop_count (EV_P);  /* number of loop iterations */
+unsigned int ev_loop_depth (EV_P);  /* #ev_loop enters - #ev_loop leaves */
+void         ev_loop_verify (EV_P); /* abort if loop data corrupted */
+
 #if EV_WALK_ENABLE
 /* walk (almost) all watchers in the loop of a given type, invoking the */
 /* callback on every such watcher. The callback might stop the watcher, */
@@ -505,8 +509,6 @@ void ev_default_fork (void);
 void ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w));
 #endif
 
-unsigned int ev_backend (EV_P);    /* backend in use by loop */
-unsigned int ev_loop_count (EV_P); /* number of loop iterations */
 #endif /* prototypes */
 
 #define EVLOOP_NONBLOCK	1 /* do not block/wait */

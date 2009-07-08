@@ -27,6 +27,7 @@ ev_io_start
 ev_io_stop
 ev_loop
 ev_loop_count
+ev_loop_depth
 ev_loop_destroy
 ev_loop_fork
 ev_loop_new
