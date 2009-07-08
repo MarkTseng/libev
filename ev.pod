@@ -1494,8 +1494,8 @@ The callback is guaranteed to be invoked only I<after> its timeout has
 passed (not I<at>, so on systems with very low-resolution clocks this
 might introduce a small delay). If multiple timers become ready during the
 same loop iteration then the ones with earlier time-out values are invoked
-before ones with later time-out values (but this is no longer true when a
-callback calls C<ev_loop> recursively).
+before ones of the same priority with later time-out values (but this is
+no longer true when a callback calls C<ev_loop> recursively).
 
 =head3 Be smart about timeouts
 
@@ -2033,6 +2033,9 @@ in the next callback invocation is not.
 
 Only the default event loop is capable of handling signals, and therefore
 you can only register child watchers in the default event loop.
+
+Due to some design glitches inside libev, child watchers will always be
+handled at maximum priority (their priority is set to EV_MAXPRI by libev)
 
 =head3 Process Interaction
 
