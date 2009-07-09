@@ -85,9 +85,11 @@ port_poll (EV_P_ ev_tstamp timeout)
   struct timespec ts;
   uint_t nget = 1;
 
+  if (expect_false (suspend_cb)) suspend_cb (EV_A);
   ts.tv_sec  = (time_t)timeout;
   ts.tv_nsec = (long)(timeout - (ev_tstamp)ts.tv_sec) * 1e9;
   res = port_getn (backend_fd, port_events, port_eventmax, &nget, &ts);
+  if (expect_false (resume_cb))  resume_cb  (EV_A);
 
   if (res == -1)
     { 

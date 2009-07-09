@@ -168,5 +168,10 @@ VARx(char, fs_2625) /* whether we are running in linux 2.6.25 or newer */
 VAR (fs_hash, ANFS fs_hash [EV_INOTIFY_HASHSIZE])
 #endif
 
+VARx(void *, userdata)
+VAR (suspend_cb, void (*suspend_cb)(EV_P))
+VAR (resume_cb , void (*resume_cb) (EV_P))
+VAR (invoke_cb , void (*invoke_cb) (EV_P))
+
 #undef VARx
 

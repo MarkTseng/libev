@@ -79,6 +79,10 @@
 #define fs_w ((loop)->fs_w)
 #define fs_2625 ((loop)->fs_2625)
 #define fs_hash ((loop)->fs_hash)
+#define userdata ((loop)->userdata)
+#define suspend_cb ((loop)->suspend_cb)
+#define resume_cb ((loop)->resume_cb)
+#define invoke_cb ((loop)->invoke_cb)
 #else
 #undef EV_WRAP_H
 #undef now_floor
@@ -159,4 +163,8 @@
 #undef fs_w
 #undef fs_2625
 #undef fs_hash
+#undef userdata
+#undef suspend_cb
+#undef resume_cb
+#undef invoke_cb
 #endif

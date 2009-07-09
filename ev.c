@@ -1413,6 +1413,7 @@ loop_init (EV_P_ unsigned int flags)
       mn_now            = get_clock ();
       now_floor         = mn_now;
       rtmn_diff         = ev_rt_now - mn_now;
+      invoke_cb         = ev_invoke_pending;
 
       io_blocktime      = 0.;
       timeout_blocktime = 0.;
@@ -1787,8 +1788,8 @@ ev_invoke (EV_P_ void *w, int revents)
   EV_CB_INVOKE ((W)w, revents);
 }
 
-inline_speed void
-call_pending (EV_P)
+void
+ev_invoke_pending (EV_P)
 {
   int pri;
 
@@ -2040,7 +2041,7 @@ ev_loop (EV_P_ int flags)
 
   loop_done = EVUNLOOP_CANCEL;
 
-  call_pending (EV_A); /* in case we recurse, ensure ordering stays nice and clean */
+  invoke_cb (EV_A); /* in case we recurse, ensure ordering stays nice and clean */
 
   do
     {
@@ -2063,7 +2064,7 @@ ev_loop (EV_P_ int flags)
         if (forkcnt)
           {
             queue_events (EV_A_ (W *)forks, forkcnt, EV_FORK);
-            call_pending (EV_A);
+            invoke_cb (EV_A);
           }
 #endif
 
@@ -2071,7 +2072,7 @@ ev_loop (EV_P_ int flags)
       if (expect_false (preparecnt))
         {
           queue_events (EV_A_ (W *)prepares, preparecnt, EV_PREPARE);
-          call_pending (EV_A);
+          invoke_cb (EV_A);
         }
 
       /* we might have forked, so reify kernel state if necessary */
@@ -2152,7 +2153,7 @@ ev_loop (EV_P_ int flags)
       if (expect_false (checkcnt))
         queue_events (EV_A_ (W *)checks, checkcnt, EV_CHECK);
 
-      call_pending (EV_A);
+      invoke_cb (EV_A);
     }
   while (expect_true (
     activecnt

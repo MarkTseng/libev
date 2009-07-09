@@ -3673,9 +3673,13 @@ defined to be C<0>, then they are not.
 =item EV_MINIMAL
 
 If you need to shave off some kilobytes of code at the expense of some
-speed, define this symbol to C<1>. Currently this is used to override some
-inlining decisions, saves roughly 30% code size on amd64. It also selects a
-much smaller 2-heap for timer management over the default 4-heap.
+speed (but with the full API), define this symbol to C<1>. Currently this
+is used to override some inlining decisions, saves roughly 30% code size
+on amd64. It also selects a much smaller 2-heap for timer management over
+the default 4-heap.
+
+You can save even more by disabling watcher types you do not need and
+setting C<EV_MAXPRI> == C<EV_MINPRI>.
 
 =item EV_PID_HASHSIZE
 
