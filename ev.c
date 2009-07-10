@@ -569,6 +569,16 @@ typedef struct
 
 #endif
 
+#if EV_MINIMAL < 2
+# define EV_SUSPEND_CB if (expect_false (suspend_cb)) suspend_cb (EV_A)
+# define EV_RESUME_CB  if (expect_false (resume_cb )) resume_cb  (EV_A)
+# define EV_INVOKE_PENDING invoke_cb (EV_A)
+#else
+# define EV_SUSPEND_CB (void)0
+# define EV_RESUME_CB  (void)0
+# define EV_INVOKE_PENDING ev_invoke_pending (EV_A)
+#endif
+
 /*****************************************************************************/
 
 #ifndef EV_HAVE_EV_TIME
@@ -1359,6 +1369,7 @@ ev_backend (EV_P)
   return backend;
 }
 
+#if EV_MINIMAL < 2
 unsigned int
 ev_loop_count (EV_P)
 {
@@ -1382,6 +1393,30 @@ ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval)
 {
   timeout_blocktime = interval;
 }
+
+void
+ev_set_userdata (EV_P_ void *data)
+{
+  userdata = data;
+}
+
+void *
+ev_userdata (EV_P)
+{
+  return userdata;
+}
+
+void ev_set_invoke_pending_cb (EV_P_ void (*invoke_pending_cb)(EV_P))
+{
+  invoke_cb = invoke_pending_cb;
+}
+
+void ev_set_blocking_cb (EV_P_ void (*suspend_cb_)(EV_P), void (*resume_cb_)(EV_P))
+{
+  suspend_cb = suspend_cb_;
+  resume_cb  = resume_cb_;
+}
+#endif
 
 /* initialise a loop structure, must be zero-initialised */
 static void noinline
@@ -1413,7 +1448,9 @@ loop_init (EV_P_ unsigned int flags)
       mn_now            = get_clock ();
       now_floor         = mn_now;
       rtmn_diff         = ev_rt_now - mn_now;
+#if EV_MINIMAL < 2
       invoke_cb         = ev_invoke_pending;
+#endif
 
       io_blocktime      = 0.;
       timeout_blocktime = 0.;
@@ -1617,6 +1654,7 @@ ev_loop_fork (EV_P)
 {
   postfork = 1; /* must be in line with ev_default_fork */
 }
+#endif /* multiplicity */
 
 #if EV_VERIFY
 static void noinline
@@ -1654,6 +1692,7 @@ array_verify (EV_P_ W *ws, int cnt)
 }
 #endif
 
+#if EV_MINIMAL < 2
 void
 ev_loop_verify (EV_P)
 {
@@ -1716,8 +1755,7 @@ ev_loop_verify (EV_P)
 # endif
 #endif
 }
-
-#endif /* multiplicity */
+#endif
 
 #if EV_MULTIPLICITY
 struct ev_loop *
@@ -1788,7 +1826,7 @@ ev_invoke (EV_P_ void *w, int revents)
   EV_CB_INVOKE ((W)w, revents);
 }
 
-void
+void noinline
 ev_invoke_pending (EV_P)
 {
   int pri;
@@ -2037,11 +2075,13 @@ time_update (EV_P_ ev_tstamp max_block)
 void
 ev_loop (EV_P_ int flags)
 {
+#if EV_MINIMAL < 2
   ++loop_depth;
+#endif
 
   loop_done = EVUNLOOP_CANCEL;
 
-  invoke_cb (EV_A); /* in case we recurse, ensure ordering stays nice and clean */
+  EV_INVOKE_PENDING; /* in case we recurse, ensure ordering stays nice and clean */
 
   do
     {
@@ -2064,7 +2104,7 @@ ev_loop (EV_P_ int flags)
         if (forkcnt)
           {
             queue_events (EV_A_ (W *)forks, forkcnt, EV_FORK);
-            invoke_cb (EV_A);
+            EV_INVOKE_PENDING;
           }
 #endif
 
@@ -2072,7 +2112,7 @@ ev_loop (EV_P_ int flags)
       if (expect_false (preparecnt))
         {
           queue_events (EV_A_ (W *)prepares, preparecnt, EV_PREPARE);
-          invoke_cb (EV_A);
+          EV_INVOKE_PENDING;
         }
 
       /* we might have forked, so reify kernel state if necessary */
@@ -2131,7 +2171,9 @@ ev_loop (EV_P_ int flags)
               }
           }
 
+#if EV_MINIMAL < 2
         ++loop_count;
+#endif
         backend_poll (EV_A_ waittime);
 
         /* update ev_rt_now, do magic */
@@ -2153,7 +2195,7 @@ ev_loop (EV_P_ int flags)
       if (expect_false (checkcnt))
         queue_events (EV_A_ (W *)checks, checkcnt, EV_CHECK);
 
-      invoke_cb (EV_A);
+      EV_INVOKE_PENDING;
     }
   while (expect_true (
     activecnt
@@ -2164,7 +2206,9 @@ ev_loop (EV_P_ int flags)
   if (loop_done == EVUNLOOP_ONE)
     loop_done = EVUNLOOP_CANCEL;
 
+#if EV_MINIMAL < 2
   --loop_depth;
+#endif
 }
 
 void

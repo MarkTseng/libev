@@ -3681,6 +3681,11 @@ the default 4-heap.
 You can save even more by disabling watcher types you do not need and
 setting C<EV_MAXPRI> == C<EV_MINPRI>.
 
+Defining C<EV_MINIMAL> to C<2> will additionally reduce the core API to
+provide a bare-bones event library. See C<ev.h> for details on what parts
+of the API are still available, and do not complain if this subset changes
+over time.
+
 =item EV_PID_HASHSIZE
 
 C<ev_child> watchers use a small hash table to distribute workload by

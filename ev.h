@@ -502,13 +502,9 @@ void ev_default_destroy (void); /* destroy the default loop */
 /* you can actually call it at any time, anywhere :) */
 void ev_default_fork (void);
 
-unsigned int ev_backend     (EV_P); /* backend in use by loop */
-unsigned int ev_loop_count  (EV_P); /* number of loop iterations */
-unsigned int ev_loop_depth  (EV_P); /* #ev_loop enters - #ev_loop leaves */
-void         ev_loop_verify (EV_P); /* abort if loop data corrupted */
+unsigned int ev_backend (EV_P); /* backend in use by loop */
 
-void ev_now_update     (EV_P); /* update event loop time */
-void ev_invoke_pending (EV_P); /* invoke all pending watchers */
+void ev_now_update (EV_P); /* update event loop time */
 
 #if EV_WALK_ENABLE
 /* walk (almost) all watchers in the loop of a given type, invoking the */
@@ -529,28 +525,51 @@ void ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w));
 void ev_loop (EV_P_ int flags);
 void ev_unloop (EV_P_ int how); /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
 
-void ev_set_io_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
-void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
-
 /*
  * ref/unref can be used to add or remove a refcount on the mainloop. every watcher
- * keeps one reference. if you have a long-runing watcher you never unregister that
+ * keeps one reference. if you have a long-running watcher you never unregister that
  * should not keep ev_loop from running, unref() after starting, and ref() before stopping.
  */
 void ev_ref   (EV_P);
 void ev_unref (EV_P);
 
 /*
- * stop/start the timer handling.
- */
-void ev_suspend (EV_P);
-void ev_resume  (EV_P);
-
-/*
  * convenience function, wait for a single event, without registering an event watcher
  * if timeout is < 0, do wait indefinitely
  */
 void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg);
+
+# if EV_MINIMAL < 2
+unsigned int ev_loop_count  (EV_P); /* number of loop iterations */
+unsigned int ev_loop_depth  (EV_P); /* #ev_loop enters - #ev_loop leaves */
+void         ev_loop_verify (EV_P); /* abort if loop data corrupted */
+
+void ev_set_io_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
+void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
+
+/*
+ * a single void * can be attached to each loop. this is intended
+ * to aid the invoke_pending/blocking callbacks.
+ */
+void ev_set_userdata (EV_P_ void *data);
+void *ev_userdata (EV_P);
+
+/*
+ * hooks to overide how and when libev invokes callbacks,
+ * and hooks that wrap the actual eventloop blocking call.
+ */
+void ev_set_invoke_pending_cb (EV_P_ void (*invoke_pending_cb)(EV_P));
+void ev_set_blocking_cb (EV_P_ void (*suspend_cb_)(EV_P), void (*resume_cb_)(EV_P));
+
+void ev_invoke_pending (EV_P); /* invoke all pending watchers */
+
+/*
+ * stop/start the timer handling.
+ */
+void ev_suspend (EV_P);
+void ev_resume  (EV_P);
+#endif
+
 #endif
 
 /* these may evaluate ev multiple times, and the other arguments at most once */

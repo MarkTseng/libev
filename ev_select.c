@@ -140,7 +140,7 @@ select_poll (EV_P_ ev_tstamp timeout)
   int res;
   int fd_setsize;
 
-  if (expect_false (suspend_cb)) suspend_cb (EV_A);
+  EV_SUSPEND_CB;
   tv.tv_sec  = (long)timeout;
   tv.tv_usec = (long)((timeout - (ev_tstamp)tv.tv_sec) * 1e6);
 
@@ -167,7 +167,7 @@ select_poll (EV_P_ ev_tstamp timeout)
 #else
   res = select (vec_max * NFDBITS, (fd_set *)vec_ro, (fd_set *)vec_wo, 0, &tv);
 #endif
-  if (expect_false (resume_cb))  resume_cb  (EV_A);
+  EV_RESUME_CB;
 
   if (expect_false (res < 0))
     {

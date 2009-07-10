@@ -16,6 +16,7 @@ TODO: on_call_pending, on_suspend_resume ev_invoke_pending (EV_P)
           !EV_MULTIPLICITY.
         - implement ev_loop_depth.
         - do not compile in any priority code when EV_MAXPRI == EV_MINPRI.
+        - support EV_MINIMAL==2 for a reduced API.
 
 3.6  Tue Apr 28 02:49:30 CEST 2009
 	- multiple timers becoming ready within an event loop iteration

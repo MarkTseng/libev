@@ -91,9 +91,9 @@ poll_poll (EV_P_ ev_tstamp timeout)
   struct pollfd *p;
   int res;
   
-  if (expect_false (suspend_cb)) suspend_cb (EV_A);
+  EV_SUSPEND_CB;
   res = poll (polls, pollcnt, (int)ceil (timeout * 1000.));
-  if (expect_false (resume_cb))  resume_cb  (EV_A);
+  EV_RESUME_CB;
 
   if (expect_false (res < 0))
     {
