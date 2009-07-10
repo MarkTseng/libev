@@ -492,12 +492,15 @@ ev_realloc (void *ptr, long size)
 
 /*****************************************************************************/
 
+/* set in reify when reification needed */
+#define EV_ANFD_REIFY 1
+
 /* file descriptor info structure */
 typedef struct
 {
   WL head;
   unsigned char events; /* the events watched for */
-  unsigned char reify;  /* flag set when this ANFD needs reification */
+  unsigned char reify;  /* flag set when this ANFD needs reification (EV_ANFD_REIFY, EV__IOFDSET) */
   unsigned char emask;  /* the epoll backend stores the actual kernel mask in here */
   unsigned char unused;
 #if EV_USE_EPOLL
@@ -570,14 +573,16 @@ typedef struct
 #endif
 
 #if EV_MINIMAL < 2
-# define EV_SUSPEND_CB if (expect_false (suspend_cb)) suspend_cb (EV_A)
-# define EV_RESUME_CB  if (expect_false (resume_cb )) resume_cb  (EV_A)
+# define EV_RELEASE_CB if (expect_false (release_cb)) release_cb (EV_A)
+# define EV_ACQUIRE_CB if (expect_false (acquire_cb)) acquire_cb (EV_A)
 # define EV_INVOKE_PENDING invoke_cb (EV_A)
 #else
-# define EV_SUSPEND_CB (void)0
-# define EV_RESUME_CB  (void)0
+# define EV_RELEASE_CB (void)0
+# define EV_ACQUIRE_CB (void)0
 # define EV_INVOKE_PENDING ev_invoke_pending (EV_A)
 #endif
+
+#define EVUNLOOP_RECURSE 0x80
 
 /*****************************************************************************/
 
@@ -762,7 +767,7 @@ queue_events (EV_P_ W *events, int eventcnt, int type)
 /*****************************************************************************/
 
 inline_speed void
-fd_event (EV_P_ int fd, int revents)
+fd_event_nc (EV_P_ int fd, int revents)
 {
   ANFD *anfd = anfds + fd;
   ev_io *w;
@@ -776,11 +781,22 @@ fd_event (EV_P_ int fd, int revents)
     }
 }
 
+/* do not submit kernel events for fds that have reify set */
+/* because that means they changed while we were polling for new events */
+inline_speed void
+fd_event (EV_P_ int fd, int revents)
+{
+  ANFD *anfd = anfds + fd;
+
+  if (expect_true (!anfd->reify))
+    fd_event_nc (EV_A_ fd, revents);
+}
+
 void
 ev_feed_fd_event (EV_P_ int fd, int revents)
 {
   if (fd >= 0 && fd < anfdmax)
-    fd_event (EV_A_ fd, revents);
+    fd_event_nc (EV_A_ fd, revents);
 }
 
 /* make sure the external fd watch events are in-sync */
@@ -905,7 +921,7 @@ fd_rearm_all (EV_P)
       {
         anfds [fd].events = 0;
         anfds [fd].emask  = 0;
-        fd_change (EV_A_ fd, EV__IOFDSET | 1);
+        fd_change (EV_A_ fd, EV__IOFDSET | EV_ANFD_REIFY);
       }
 }
 
@@ -1411,10 +1427,10 @@ void ev_set_invoke_pending_cb (EV_P_ void (*invoke_pending_cb)(EV_P))
   invoke_cb = invoke_pending_cb;
 }
 
-void ev_set_blocking_cb (EV_P_ void (*suspend_cb_)(EV_P), void (*resume_cb_)(EV_P))
+void ev_set_loop_release_cb (EV_P_ void (*release)(EV_P), void (*acquire)(EV_P))
 {
-  suspend_cb = suspend_cb_;
-  resume_cb  = resume_cb_;
+  release_cb = release;
+  acquire_cb = acquire;
 }
 #endif
 
@@ -2079,6 +2095,8 @@ ev_loop (EV_P_ int flags)
   ++loop_depth;
 #endif
 
+  assert (("libev: ev_loop recursion during release detected", loop_done != EVUNLOOP_RECURSE));
+
   loop_done = EVUNLOOP_CANCEL;
 
   EV_INVOKE_PENDING; /* in case we recurse, ensure ordering stays nice and clean */
@@ -2114,6 +2132,9 @@ ev_loop (EV_P_ int flags)
           queue_events (EV_A_ (W *)prepares, preparecnt, EV_PREPARE);
           EV_INVOKE_PENDING;
         }
+
+      if (expect_false (loop_done))
+        break;
 
       /* we might have forked, so reify kernel state if necessary */
       if (expect_false (postfork))
@@ -2174,7 +2195,9 @@ ev_loop (EV_P_ int flags)
 #if EV_MINIMAL < 2
         ++loop_count;
 #endif
+        assert ((loop_done = EVUNLOOP_RECURSE, 1)); /* assert for side effect */
         backend_poll (EV_A_ waittime);
+        assert ((loop_done = EVUNLOOP_CANCEL, 1)); /* assert for side effect */
 
         /* update ev_rt_now, do magic */
         time_update (EV_A_ waittime + sleeptime);
@@ -2350,7 +2373,7 @@ ev_io_start (EV_P_ ev_io *w)
   array_needsize (ANFD, anfds, anfdmax, fd + 1, array_init_zero);
   wlist_add (&anfds[fd].head, (WL)w);
 
-  fd_change (EV_A_ fd, w->events & EV__IOFDSET | 1);
+  fd_change (EV_A_ fd, w->events & EV__IOFDSET | EV_ANFD_REIFY);
   w->events &= ~EV__IOFDSET;
 
   EV_FREQUENT_CHECK;

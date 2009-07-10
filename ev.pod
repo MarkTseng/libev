@@ -3678,8 +3678,9 @@ is used to override some inlining decisions, saves roughly 30% code size
 on amd64. It also selects a much smaller 2-heap for timer management over
 the default 4-heap.
 
-You can save even more by disabling watcher types you do not need and
-setting C<EV_MAXPRI> == C<EV_MINPRI>.
+You can save even more by disabling watcher types you do not need
+and setting C<EV_MAXPRI> == C<EV_MINPRI>. Also, disabling C<assert>
+(C<-DNDEBUG>) will usually reduce code size a lot.
 
 Defining C<EV_MINIMAL> to C<2> will additionally reduce the core API to
 provide a bare-bones event library. See C<ev.h> for details on what parts

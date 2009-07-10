@@ -121,9 +121,9 @@ epoll_poll (EV_P_ ev_tstamp timeout)
   int i;
   int eventcnt;
   
-  EV_SUSPEND_CB;
+  EV_RELEASE_CB;
   eventcnt = epoll_wait (backend_fd, epoll_events, epoll_eventmax, (int)ceil (timeout * 1000.));
-  EV_RESUME_CB;
+  EV_ACQUIRE_CB;
 
   if (expect_false (eventcnt < 0))
     {

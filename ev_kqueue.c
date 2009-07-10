@@ -85,7 +85,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
   int res, i;
   struct timespec ts;
 
-  EV_SUSPEND_CB;
+  EV_RELEASE_CB;
 
   /* need to resize so there is enough space for errors */
   if (kqueue_changecnt > kqueue_eventmax)
@@ -100,7 +100,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
   res = kevent (backend_fd, kqueue_changes, kqueue_changecnt, kqueue_events, kqueue_eventmax, &ts);
   kqueue_changecnt = 0;
 
-  EV_RESUME_CB;
+  EV_ACQUIRE_CB;
 
   if (expect_false (res < 0))
     { 

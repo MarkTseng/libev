@@ -8,8 +8,6 @@
 #define timeout_blocktime ((loop)->timeout_blocktime)
 #define backend ((loop)->backend)
 #define activecnt ((loop)->activecnt)
-#define loop_count ((loop)->loop_count)
-#define loop_depth ((loop)->loop_depth)
 #define loop_done ((loop)->loop_done)
 #define backend_fd ((loop)->backend_fd)
 #define backend_fudge ((loop)->backend_fudge)
@@ -79,9 +77,11 @@
 #define fs_w ((loop)->fs_w)
 #define fs_2625 ((loop)->fs_2625)
 #define fs_hash ((loop)->fs_hash)
+#define loop_count ((loop)->loop_count)
+#define loop_depth ((loop)->loop_depth)
 #define userdata ((loop)->userdata)
-#define suspend_cb ((loop)->suspend_cb)
-#define resume_cb ((loop)->resume_cb)
+#define release_cb ((loop)->release_cb)
+#define acquire_cb ((loop)->acquire_cb)
 #define invoke_cb ((loop)->invoke_cb)
 #else
 #undef EV_WRAP_H
@@ -92,8 +92,6 @@
 #undef timeout_blocktime
 #undef backend
 #undef activecnt
-#undef loop_count
-#undef loop_depth
 #undef loop_done
 #undef backend_fd
 #undef backend_fudge
@@ -163,8 +161,10 @@
 #undef fs_w
 #undef fs_2625
 #undef fs_hash
+#undef loop_count
+#undef loop_depth
 #undef userdata
-#undef suspend_cb
-#undef resume_cb
+#undef release_cb
+#undef acquire_cb
 #undef invoke_cb
 #endif

@@ -3,8 +3,11 @@ Revision history for libev, a high-performance and full-featured event loop.
 TODO: ev_walk
 TODO: remain
 TODO: on_call_pending, on_suspend_resume ev_invoke_pending (EV_P)
+TODO: EV_MINIMAL
 	- ev_unloop and ev_loop wrongly used a global variable to exit loops,
           instead of using a per-loop variable (bug caught by accident...).
+        - calling ev_unloop in fork/prepare watchers will no longer poll
+          for new events.
 	- Denis F. Latypoff corrected many typos in example code snippets.
 	- the ev_set_io_collect_interval interpretation has changed.
         - honor autoconf detection of EV_USE_CLOCK_SYSCALL, also double-

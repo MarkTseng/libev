@@ -547,19 +547,11 @@ void         ev_loop_verify (EV_P); /* abort if loop data corrupted */
 void ev_set_io_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
 void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
 
-/*
- * a single void * can be attached to each loop. this is intended
- * to aid the invoke_pending/blocking callbacks.
- */
+/* advanced stuff for threading etc. support, see docs */
 void ev_set_userdata (EV_P_ void *data);
 void *ev_userdata (EV_P);
-
-/*
- * hooks to overide how and when libev invokes callbacks,
- * and hooks that wrap the actual eventloop blocking call.
- */
 void ev_set_invoke_pending_cb (EV_P_ void (*invoke_pending_cb)(EV_P));
-void ev_set_blocking_cb (EV_P_ void (*suspend_cb_)(EV_P), void (*resume_cb_)(EV_P));
+void ev_set_loop_release_cb (EV_P_ void (*release)(EV_P), void (*acquire)(EV_P));
 
 void ev_invoke_pending (EV_P); /* invoke all pending watchers */
 
