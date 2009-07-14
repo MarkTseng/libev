@@ -858,6 +858,53 @@ more often than 100 times per second:
    ev_set_timeout_collect_interval (EV_DEFAULT_UC_ 0.1);
    ev_set_io_collect_interval (EV_DEFAULT_UC_ 0.01);
 
+=item ev_invoke_pending (loop)
+
+This call will simply invoke all pending watchers while resetting their
+pending state. Normally, C<ev_loop> does this automatically when required,
+but when overriding the invoke callback this call comes handy.
+
+=item ev_set_invoke_pending_cb (loop, void (*invoke_pending_cb)(EV_P))
+
+This overrides the invoke pending functionality of the loop: Instead of
+invoking all pending watchers when there are any, C<ev_loop> will call
+this callback instead. This is useful, for example, when you want to
+invoke the actual watchers inside another context (another thread etc.).
+
+If you want to reset the callback, use C<ev_invoke_pending> as new
+callback.
+
+=item ev_set_loop_release_cb (loop, void (*release)(EV_P), void (*acquire)(EV_P))
+
+Sometimes you want to share the same loop between multiple threads. This
+can be done relatively simply by putting mutex_lock/unlock calls around
+each call to a libev function.
+
+However, C<ev_loop> can run an indefinite time, so it is not feasible to
+wait for it to return. One way around this is to wake up the loop via
+C<ev_unloop> and C<av_async_send>, another way is to set these I<release>
+and I<acquire> callbacks on the loop.
+
+When set, then C<release> will be called just before the thread is
+suspended waiting for new events, and C<acquire> is called just
+afterwards.
+
+Ideally, C<release> will just call your mutex_unlock function, and
+C<acquire> will just call the mutex_lock function again.
+
+=item ev_set_userdata (loop, void *data)
+
+=item ev_userdata (loop)
+
+Set and retrieve a single C<void *> associated with a loop. When
+C<ev_set_userdata> has never been called, then C<ev_userdata> returns
+C<0.>
+
+These two functions can be used to associate arbitrary data with a loop,
+and are intended solely for the C<invoke_pending_cb>, C<release> and
+C<acquire> callbacks described above, but of course can be (ab-)used for
+any other purpose as well.
+
 =item ev_loop_verify (loop)
 
 This function only does something when C<EV_VERIFY> support has been
@@ -3880,6 +3927,8 @@ default loop and triggering an C<ev_async> watcher from the default loop
 watcher callback into the event loop interested in the signal.
 
 =back
+
+=head4 THREAD LOCKING EXAMPLE
 
 =head3 COROUTINES
 
