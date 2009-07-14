@@ -2587,7 +2587,7 @@ ev_signal_start (EV_P_ ev_signal *w)
 #if _WIN32
       signal (w->signum, ev_sighandler);
 #else
-      struct sigaction sa;
+      struct sigaction sa = { };
       sa.sa_handler = ev_sighandler;
       sigfillset (&sa.sa_mask);
       sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
