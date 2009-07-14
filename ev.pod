@@ -892,6 +892,19 @@ afterwards.
 Ideally, C<release> will just call your mutex_unlock function, and
 C<acquire> will just call the mutex_lock function again.
 
+While event loop modifications are allowed between invocations of
+C<release> and C<acquire> (that's their only purpose after all), no
+modifications done will affect the event loop, i.e. adding watchers will
+have no effect on the set of file descriptors being watched, or the time
+waited. USe an C<ev_async> watcher to wake up C<ev_loop> when you want it
+to take note of any changes you made.
+
+In theory, threads executing C<ev_loop> will be async-cancel safe between
+invocations of C<release> and C<acquire>.
+
+See also the locking example in the C<THREADS> section later in this
+document.
+
 =item ev_set_userdata (loop, void *data)
 
 =item ev_userdata (loop)
@@ -3929,6 +3942,138 @@ watcher callback into the event loop interested in the signal.
 =back
 
 =head4 THREAD LOCKING EXAMPLE
+
+Here is a fictitious example of how to run an event loop in a different
+thread than where callbacks are being invoked and watchers are
+created/added/removed.
+
+For a real-world example, see the C<EV::Loop::Async> perl module,
+which uses exactly this technique (which is suited for many high-level
+languages).
+
+The example uses a pthread mutex to protect the loop data, a condition
+variable to wait for callback invocations, an async watcher to notify the
+event loop thread and an unspecified mechanism to wake up the main thread.
+
+First, you need to associate some data with the event loop:
+
+   typedef struct {
+     mutex_t lock; /* global loop lock */
+     ev_async async_w;
+     thread_t tid;
+     cond_t invoke_cv;
+   } userdata;
+
+   void prepare_loop (EV_P)
+   {
+      // for simplicity, we use a static userdata struct.
+      static userdata u;
+
+      ev_async_init (&u->async_w, async_cb);
+      ev_async_start (EV_A_ &u->async_w);
+
+      pthread_mutex_init (&u->lock, 0);
+      pthread_cond_init (&u->invoke_cv, 0);
+
+      // now associate this with the loop
+      ev_set_userdata (EV_A_ u);
+      ev_set_invoke_pending_cb (EV_A_ l_invoke);
+      ev_set_loop_release_cb (EV_A_ l_release, l_acquire);
+
+      // then create the thread running ev_loop
+      pthread_create (&u->tid, 0, l_run, EV_A);
+   }
+
+The callback for the C<ev_async> watcher does nothing: the watcher is used
+solely to wake up the event loop so it takes notice of any new watchers
+that might have been added:
+
+   static void
+   async_cb (EV_P_ ev_async *w, int revents)
+   {
+      // just used for the side effects
+   }
+
+The C<l_release> and C<l_acquire> callbacks simply unlock/lock the mutex
+protecting the loop data, respectively.
+
+   static void
+   l_release (EV_P)
+   {
+     udat *u = ev_userdata (EV_A);
+     pthread_mutex_unlock (&u->lock);
+   }
+
+   static void
+   l_acquire (EV_P)
+   {
+     udat *u = ev_userdata (EV_A);
+     pthread_mutex_lock (&u->lock);
+   }
+
+The event loop thread first acquires the mutex, and then jumps straight
+into C<ev_loop>:
+
+   void *
+   l_run (void *thr_arg)
+   {
+     struct ev_loop *loop = (struct ev_loop *)thr_arg;
+
+     l_acquire (EV_A);
+     pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
+     ev_loop (EV_A_ 0);
+     l_release (EV_A);
+
+     return 0;
+   }
+
+Instead of invoking all pending watchers, the C<l_invoke> callback will
+signal the main thread via some unspecified mechanism (signals? pipe
+writes? C<Async::Interrupt>?) and then waits until all pending watchers
+have been called:
+
+   static void
+   l_invoke (EV_P)
+   {
+     udat *u = ev_userdata (EV_A);
+
+     wake_up_other_thread_in_some_magic_or_not_so_magic_way ();
+
+     pthread_cond_wait (&u->invoke_cv, &u->lock);
+   }
+
+Now, whenever the main thread gets told to invoke pending watchers, it
+will grab the lock, call C<ev_invoke_pending> and then signal the loop
+thread to continue:
+
+   static void
+   real_invoke_pending (EV_P)
+   {
+     udat *u = ev_userdata (EV_A);
+
+     pthread_mutex_lock (&u->lock);
+     ev_invoke_pending (EV_A);
+     pthread_cond_signal (&u->invoke_cv);
+     pthread_mutex_unlock (&u->lock);
+   }
+
+Whenever you want to start/stop a watcher or do other modifications to an
+event loop, you will now have to lock:
+
+   ev_timer timeout_watcher;
+   udat *u = ev_userdata (EV_A);
+
+   ev_timer_init (&timeout_watcher, timeout_cb, 5.5, 0.);
+
+   pthread_mutex_lock (&u->lock);
+   ev_timer_start (EV_A_ &timeout_watcher);
+   ev_async_send (EV_A_ &u->async_w);
+   pthread_mutex_unlock (&u->lock);
+
+Note that sending the C<ev_async> watcher is required because otherwise
+an event loop currently blocking in the kernel will have no knowledge
+about the newly added timer. By waking up the loop it will pick up any new
+watchers in the next event loop iteration.
 
 =head3 COROUTINES
 
