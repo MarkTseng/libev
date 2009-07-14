@@ -864,6 +864,11 @@ This call will simply invoke all pending watchers while resetting their
 pending state. Normally, C<ev_loop> does this automatically when required,
 but when overriding the invoke callback this call comes handy.
 
+=item int ev_pending_count (loop)
+
+Returns the number of pending watchers - zero indicates that no watchers
+are pending.
+
 =item ev_set_invoke_pending_cb (loop, void (*invoke_pending_cb)(EV_P))
 
 This overrides the invoke pending functionality of the loop: Instead of
@@ -4030,16 +4035,20 @@ into C<ev_loop>:
 Instead of invoking all pending watchers, the C<l_invoke> callback will
 signal the main thread via some unspecified mechanism (signals? pipe
 writes? C<Async::Interrupt>?) and then waits until all pending watchers
-have been called:
+have been called (in a while loop because a) spurious wakeups are possible
+and b) skipping inter-thread-communication when there are no pending
+watchers is very beneficial):
 
    static void
    l_invoke (EV_P)
    {
      userdata *u = ev_userdata (EV_A);
 
-     wake_up_other_thread_in_some_magic_or_not_so_magic_way ();
-
-     pthread_cond_wait (&u->invoke_cv, &u->lock);
+     while (ev_pending_count (EV_A))
+       {
+         wake_up_other_thread_in_some_magic_or_not_so_magic_way ();
+         pthread_cond_wait (&u->invoke_cv, &u->lock);
+       }
    }
 
 Now, whenever the main thread gets told to invoke pending watchers, it

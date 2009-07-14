@@ -553,6 +553,7 @@ void *ev_userdata (EV_P);
 void ev_set_invoke_pending_cb (EV_P_ void (*invoke_pending_cb)(EV_P));
 void ev_set_loop_release_cb (EV_P_ void (*release)(EV_P), void (*acquire)(EV_P));
 
+unsigned int ev_pending_count (EV_P); /* number of pending events, if any */
 void ev_invoke_pending (EV_P); /* invoke all pending watchers */
 
 /*

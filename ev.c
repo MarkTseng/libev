@@ -1842,6 +1842,18 @@ ev_invoke (EV_P_ void *w, int revents)
   EV_CB_INVOKE ((W)w, revents);
 }
 
+unsigned int
+ev_pending_count (EV_P)
+{
+  int pri;
+  unsigned int count = 0;
+
+  for (pri = NUMPRI; pri--; )
+    count += pendingcnt [pri];
+
+  return count;
+}
+
 void noinline
 ev_invoke_pending (EV_P)
 {
