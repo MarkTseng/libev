@@ -4000,14 +4000,14 @@ protecting the loop data, respectively.
    static void
    l_release (EV_P)
    {
-     udat *u = ev_userdata (EV_A);
+     userdata *u = ev_userdata (EV_A);
      pthread_mutex_unlock (&u->lock);
    }
 
    static void
    l_acquire (EV_P)
    {
-     udat *u = ev_userdata (EV_A);
+     userdata *u = ev_userdata (EV_A);
      pthread_mutex_lock (&u->lock);
    }
 
@@ -4035,7 +4035,7 @@ have been called:
    static void
    l_invoke (EV_P)
    {
-     udat *u = ev_userdata (EV_A);
+     userdata *u = ev_userdata (EV_A);
 
      wake_up_other_thread_in_some_magic_or_not_so_magic_way ();
 
@@ -4049,7 +4049,7 @@ thread to continue:
    static void
    real_invoke_pending (EV_P)
    {
-     udat *u = ev_userdata (EV_A);
+     userdata *u = ev_userdata (EV_A);
 
      pthread_mutex_lock (&u->lock);
      ev_invoke_pending (EV_A);
@@ -4061,7 +4061,7 @@ Whenever you want to start/stop a watcher or do other modifications to an
 event loop, you will now have to lock:
 
    ev_timer timeout_watcher;
-   udat *u = ev_userdata (EV_A);
+   userdata *u = ev_userdata (EV_A);
 
    ev_timer_init (&timeout_watcher, timeout_cb, 5.5, 0.);
 
@@ -4080,9 +4080,9 @@ watchers in the next event loop iteration.
 Libev is very accommodating to coroutines ("cooperative threads"):
 libev fully supports nesting calls to its functions from different
 coroutines (e.g. you can call C<ev_loop> on the same loop from two
-different coroutines, and switch freely between both coroutines running the
-loop, as long as you don't confuse yourself). The only exception is that
-you must not do this from C<ev_periodic> reschedule callbacks.
+different coroutines, and switch freely between both coroutines running
+the loop, as long as you don't confuse yourself). The only exception is
+that you must not do this from C<ev_periodic> reschedule callbacks.
 
 Care has been taken to ensure that libev does not keep local state inside
 C<ev_loop>, and other calls do not usually allow for coroutine switches as
