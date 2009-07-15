@@ -1757,6 +1757,36 @@ If the event loop is suspended for a long time, you can also force an
 update of the time returned by C<ev_now ()> by calling C<ev_now_update
 ()>.
 
+=head3 The special problems of suspended animation
+
+When you leave the server world it is quite customary to hit machines that
+can suspend/hibernate - what happens to the clocks during such a suspend?
+
+Some quick tests made with a Linux 2.6.28 indicate that a suspend freezes
+all processes, while the clocks (C<times>, C<CLOCK_MONOTONIC>) continue
+to run until the system is suspended, but they will not advance while the
+system is suspended. That means, on resume, it will be as if the program
+was frozen for a few seconds, but the suspend time will not be counted
+towards C<ev_timer> when a monotonic clock source is used. The real time
+clock advanced as expected, but if it is used as sole clocksource, then a
+long suspend would be detected as a time jump by libev, and timers would
+be adjusted accordingly.
+
+I would not be surprised to see different behaviour in different between
+operating systems, OS versions or even different hardware.
+
+The other form of suspend (job control, or sending a SIGSTOP) will see a
+time jump in the monotonic clocks and the realtime clock. If the program
+is suspended for a very long time, and monotonic clock sources are in use,
+then you can expect C<ev_timer>s to expire as the full suspension time
+will be counted towards the timers. When no monotonic clock source is in
+use, then libev will again assume a timejump and adjust accordingly.
+
+It might be beneficial for this latter case to call C<ev_suspend>
+and C<ev_resume> in code that handles C<SIGTSTP>, to at least get
+deterministic behaviour in this case (you can do nothing against
+C<SIGSTOP>).
+
 =head3 Watcher-Specific Functions and Data Members
 
 =over 4
