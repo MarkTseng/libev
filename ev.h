@@ -638,6 +638,8 @@ void ev_timer_start    (EV_P_ ev_timer *w);
 void ev_timer_stop     (EV_P_ ev_timer *w);
 /* stops if active and no repeat, restarts if active and repeating, starts if inactive and repeating */
 void ev_timer_again    (EV_P_ ev_timer *w);
+/* return remaining time */
+ev_tstamp ev_timer_remaining (EV_P_ ev_timer *w);
 
 #if EV_PERIODIC_ENABLE
 void ev_periodic_start (EV_P_ ev_periodic *w);

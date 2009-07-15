@@ -1822,6 +1822,18 @@ C<repeat> value), or reset the running timer to the C<repeat> value.
 This sounds a bit complicated, see L<Be smart about timeouts>, above, for a
 usage example.
 
+=item ev_timer_remaining (loop, ev_timer *)
+
+Returns the remaining time until a timer fires. If the timer is active,
+then this time is relative to the current event loop time, otherwise it's
+the timeout value currently configured.
+
+That is, after an C<ev_timer_set (w, 5, 7)>, C<ev_timer_remaining> returns
+C<5>. When the timer is started and one second passes, C<ev_timer_remain>
+will return C<4>. When the timer expires and is restarted, it will return
+roughly C<7> (likely slightly less as callback invocation takes some time,
+too), and so on.
+
 =item ev_tstamp repeat [read-write]
 
 The current C<repeat> value. Will be used each time the watcher times out

@@ -2489,6 +2489,12 @@ ev_timer_again (EV_P_ ev_timer *w)
   EV_FREQUENT_CHECK;
 }
 
+ev_tstamp
+ev_timer_remaining (EV_P_ ev_timer *w)
+{
+  return ev_at (w) - (ev_is_active (w) ? mn_now : 0.);
+}
+
 #if EV_PERIODIC_ENABLE
 void noinline
 ev_periodic_start (EV_P_ ev_periodic *w)
