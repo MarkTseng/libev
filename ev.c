@@ -649,7 +649,7 @@ ev_sleep (ev_tstamp delay)
       tv.tv_usec = (long)((delay - (ev_tstamp)(tv.tv_sec)) * 1e6);
 
       /* here we rely on sys/time.h + sys/types.h + unistd.h providing select */
-      /* somehting not guaranteed by newer posix versions, but guaranteed */
+      /* something not guaranteed by newer posix versions, but guaranteed */
       /* by older ones */
       select (0, 0, 0, 0, &tv);
 #endif
