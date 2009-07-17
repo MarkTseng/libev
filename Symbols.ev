@@ -23,6 +23,7 @@ ev_fork_stop
 ev_idle_start
 ev_idle_stop
 ev_invoke
+ev_invoke_pending
 ev_io_start
 ev_io_stop
 ev_loop
@@ -35,6 +36,7 @@ ev_loop_verify
 ev_now
 ev_now_update
 ev_once
+ev_pending_count
 ev_periodic_again
 ev_periodic_start
 ev_periodic_stop
@@ -44,9 +46,12 @@ ev_recommended_backends
 ev_ref
 ev_resume
 ev_set_allocator
+ev_set_invoke_pending_cb
 ev_set_io_collect_interval
+ev_set_loop_release_cb
 ev_set_syserr_cb
 ev_set_timeout_collect_interval
+ev_set_userdata
 ev_signal_start
 ev_signal_stop
 ev_sleep
@@ -57,9 +62,11 @@ ev_supported_backends
 ev_suspend
 ev_time
 ev_timer_again
+ev_timer_remaining
 ev_timer_start
 ev_timer_stop
 ev_unloop
 ev_unref
+ev_userdata
 ev_version_major
 ev_version_minor
