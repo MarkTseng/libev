@@ -12,6 +12,8 @@ TODO: nsig
 	- take advantage of signalfd on GNU/Linux systems.
 	- document that the signal mask might be in an unspecified
           state when using libev's signal handling.
+        - take advantage of some GNU/Linux calls to set cloexec/nonblock
+          on fd creation, to avoid race conditions.
 
 3.7  Fri Jul 17 16:36:32 CEST 2009
 	- ev_unloop and ev_loop wrongly used a global variable to exit loops,
