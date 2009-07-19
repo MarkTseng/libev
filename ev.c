@@ -2685,7 +2685,9 @@ ev_signal_start (EV_P_ ev_signal *w)
     array_needsize (ANSIG, signals, signalmax, w->signum, array_init_zero);
 
 #ifndef _WIN32
+# if EV_USE_SIGNALFD
     if (sigfd < 0)/*TODO*/
+# endif
       sigdelset (&prev, w->signum);
     sigprocmask (SIG_SETMASK, &prev, 0);
 #endif
@@ -2699,7 +2701,9 @@ ev_signal_start (EV_P_ ev_signal *w)
 #if _WIN32
       signal (w->signum, ev_sighandler);
 #else
+# if EV_USE_SIGNALFD
       if (sigfd < 0) /*TODO*/
+# endif
         {
           struct sigaction sa = { };
           sa.sa_handler = ev_sighandler;
