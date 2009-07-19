@@ -6,7 +6,7 @@ TODO: signal handling per loop
 TODO: nsig
 	- incompatible change: do not necessarily reset signal handler
           to SIG_DFL when a sighandler is stopped.
-        - ev_default_destroy did not properly set one member to zero,
+        - ev_default_destroy did not properly free or zero some members,
           potentially causing crashes and memory corruption on repated
           ev_default_destroy/ev_default_loop calls.
 	- take advantage of signalfd on GNU/Linux systems.
