@@ -4,6 +4,7 @@ TODO: ev_walk
 TODO: signal handling per loop
 TODO: NSIG etc.
 TODO: NOSIGFD/NOEVTFD/NOINOTIFY?
+TODO: gotsig per-loop
 	- incompatible change: do not necessarily reset signal handler
           to SIG_DFL when a sighandler is stopped.
         - ev_default_destroy did not properly free or zero some members,

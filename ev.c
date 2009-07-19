@@ -189,7 +189,6 @@ extern "C" {
 /* this block tries to deduce configuration from header-defined symbols and defaults */
 
 /* try to deduce the maximum number of signals on this platform */
-/* one some platforms, NSIG is one too large. we do not bother */
 #if defined (EV_NSIG)
 /* use what's provided */
 #elif defined (NSIG)
@@ -960,7 +959,7 @@ fd_enomem (EV_P)
     if (anfds [fd].events)
       {
         fd_kill (EV_A_ fd);
-        return;
+        break;
       }
 }
 
@@ -1129,15 +1128,14 @@ reheap (ANHE *heap, int N)
 /* associate signal watchers to a signal signal */
 typedef struct
 {
+  EV_ATOMIC_T pending;
 #if EV_MULTIPLICITY
   EV_P;
 #endif
   WL head;
-  EV_ATOMIC_T gotsig;
 } ANSIG;
 
 static ANSIG signals [EV_NSIG - 1];
-static EV_ATOMIC_T gotsig;
 
 /*****************************************************************************/
 
@@ -1215,6 +1213,8 @@ evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 static void
 pipecb (EV_P_ ev_io *iow, int revents)
 {
+  int i;
+
 #if EV_USE_EVENTFD
   if (evfd >= 0)
     {
@@ -1228,21 +1228,19 @@ pipecb (EV_P_ ev_io *iow, int revents)
       read (evpipe [0], &dummy, 1);
     }
 
-  if (gotsig && ev_is_default_loop (EV_A))
+  if (sig_pending)
     {    
-      int signum;
-      gotsig = 0;
+      sig_pending = 0;
 
-      for (signum = EV_NSIG - 1; signum--; )
-        if (signals [signum].gotsig)
-          ev_feed_signal_event (EV_A_ signum + 1);
+      for (i = EV_NSIG - 1; i--; )
+        if (expect_false (signals [i].pending))
+          ev_feed_signal_event (EV_A_ i + 1);
     }
 
 #if EV_ASYNC_ENABLE
-  if (gotasync)
+  if (async_pending)
     {
-      int i;
-      gotasync = 0;
+      async_pending = 0;
 
       for (i = asynccnt; i--; )
         if (asyncs [i]->sent)
@@ -1267,8 +1265,8 @@ ev_sighandler (int signum)
   signal (signum, ev_sighandler);
 #endif
 
-  signals [signum - 1].gotsig = 1;
-  evpipe_write (EV_A_ &gotsig);
+  signals [signum - 1].pending = 1;
+  evpipe_write (EV_A_ &sig_pending);
 }
 
 void noinline
@@ -1276,16 +1274,20 @@ ev_feed_signal_event (EV_P_ int signum)
 {
   WL w;
 
-#if EV_MULTIPLICITY
-  assert (("libev: feeding signal events is only supported in the default loop", loop == ev_default_loop_ptr));
-#endif
-
-  if (signum <= 0 || signum > EV_NSIG)
+  if (expect_false (signum <= 0 || signum > EV_NSIG))
     return;
 
   --signum;
 
-  signals [signum].gotsig = 0;
+#if EV_MULTIPLICITY
+  /* it is permissible to try to feed a signal to the wrong loop */
+  /* or, likely more useful, feeding a signal nobody is waiting for */
+
+  if (expect_false (signals [signum].loop != EV_A))
+    return;
+#endif
+
+  signals [signum].pending = 0;
 
   for (w = signals [signum].head; w; w = w->next)
     ev_feed_event (EV_A_ (W)w, EV_SIGNAL);
@@ -1562,7 +1564,10 @@ loop_init (EV_P_ unsigned int flags)
       timeout_blocktime = 0.;
       backend           = 0;
       backend_fd        = -1;
-      gotasync          = 0;
+      sig_pending       = 0;
+#if EV_ASYNC_ENABLE
+      async_pending     = 0;
+#endif
 #if EV_USE_INOTIFY
       fs_fd             = flags & EVFLAG_NOINOTIFY ? -1 : -2;
 #endif
@@ -1706,9 +1711,9 @@ loop_fork (EV_P)
     {
       /* this "locks" the handlers against writing to the pipe */
       /* while we modify the fd vars */
-      gotsig = 1;
+      sig_pending   = 1;
 #if EV_ASYNC_ENABLE
-      gotasync = 1;
+      async_pending = 1;
 #endif
 
       ev_ref (EV_A);
@@ -1858,7 +1863,7 @@ ev_loop_verify (EV_P)
 
 # if 0
   for (w = (ev_child *)childs [chain & (EV_PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
-  for (signum = EV_NSIG; signum--; ) if (signals [signum].gotsig)
+  for (signum = EV_NSIG; signum--; ) if (signals [signum].pending)
 # endif
 #endif
 }
@@ -2395,10 +2400,10 @@ wlist_del (WL *head, WL elem)
 {
   while (*head)
     {
-      if (*head == elem)
+      if (expect_true (*head == elem))
         {
           *head = elem->next;
-          return;
+          break;
         }
 
       head = &(*head)->next;
@@ -2749,10 +2754,10 @@ ev_signal_stop (EV_P_ ev_signal *w)
 
   if (!signals [w->signum - 1].head)
     {
-      #if EV_MULTIPLICITY
+#if EV_MULTIPLICITY
       signals [w->signum - 1].loop = 0; /* unattach from signal */
-      #endif
-      #if EV_USE_SIGNALFD
+#endif
+#if EV_USE_SIGNALFD
       if (sigfd >= 0)
         {
           sigprocmask (SIG_UNBLOCK, &sigfd_set, 0);//D
@@ -2762,7 +2767,7 @@ ev_signal_stop (EV_P_ ev_signal *w)
           /*TODO: maybe unblock signal? */
         }
       else
-      #endif
+#endif
         signal (w->signum, SIG_DFL);
     }
 
@@ -3418,7 +3423,7 @@ void
 ev_async_send (EV_P_ ev_async *w)
 {
   w->sent = 1;
-  evpipe_write (EV_A_ &gotasync);
+  evpipe_write (EV_A_ &async_pending);
 }
 #endif
 

@@ -69,7 +69,8 @@
 #define forks ((loop)->forks)
 #define forkmax ((loop)->forkmax)
 #define forkcnt ((loop)->forkcnt)
-#define gotasync ((loop)->gotasync)
+#define sig_pending ((loop)->sig_pending)
+#define async_pending ((loop)->async_pending)
 #define asyncs ((loop)->asyncs)
 #define asyncmax ((loop)->asyncmax)
 #define asynccnt ((loop)->asynccnt)
@@ -156,7 +157,8 @@
 #undef forks
 #undef forkmax
 #undef forkcnt
-#undef gotasync
+#undef sig_pending
+#undef async_pending
 #undef asyncs
 #undef asyncmax
 #undef asynccnt
