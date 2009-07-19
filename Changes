@@ -2,11 +2,13 @@ Revision history for libev, a high-performance and full-featured event loop.
 
 TODO: ev_walk
 TODO: signal handling per loop
-TODO: signalfd
 
-TODO: document signalfd procmask
+TODO: nsig
 	- incompatible change: do not necessarily reset signal handler
           to SIG_DFL when a sighandler is stopped.
+        - ev_default_destroy did not properly set one member to zero,
+          potentially causing crashes and memory corruption on repated
+          ev_default_destroy/ev_default_loop calls.
 	- take advantage of signalfd on GNU/Linux systems.
 	- document that the signal mask might be in an unspecified
           state when using libev's signal handling.

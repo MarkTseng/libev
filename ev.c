@@ -188,6 +188,40 @@ extern "C" {
 
 /* this block tries to deduce configuration from header-defined symbols and defaults */
 
+/* try to deduce the maximum number of signals on this platform */
+#if defined (EV_NSIG)
+/* use what's provided */
+#elif defined (NSIG)
+# define EV_NSIG (NSIG)
+#elif defined(_NSIG)
+# define EV_NSIG (_NSIG)
+#elif defined (SIGMAX)
+# define EV_NSIG (SIGMAX+1)
+#elif defined (SIG_MAX)
+# define EV_NSIG (SIG_MAX+1)
+#elif defined (_SIG_MAX)
+# define EV_NSIG (_SIG_MAX+1)
+#elif defined (MAXSIG)
+# define EV_NSIG (MAXSIG+1)
+#elif defined (MAX_SIG)
+# define EV_NSIG (MAX_SIG+1)
+#elif defined (SIGARRAYSIZE)
+# define EV_NSIG SIGARRAYSIZE /* Assume ary[SIGARRAYSIZE] */
+#elif defined (_sys_nsig)
+# define EV_NSIG (_sys_nsig) /* Solaris 2.5 */
+#else
+# error "unable to find value for NSIG, please report"
+/* to make it compile regardless, just remove the above line */
+# define EV_NSIG 64
+#endif
+
+/* Default to some arbitrary number that's big enough to get most
+   of the common signals.
+*/
+#ifndef NSIG
+#    define NSIG 50
+#endif
+/* <-- NSIG logic from Configure */
 #ifndef EV_USE_CLOCK_SYSCALL
 # if __linux && __GLIBC__ >= 2
 #  define EV_USE_CLOCK_SYSCALL 1
@@ -1632,7 +1666,7 @@ loop_destroy (EV_P)
 #endif
     }
 
-  ev_free (anfds); anfdmax = 0;
+  ev_free (anfds); anfds = 0; anfdmax = 0;
 
   /* have to use the microsoft-never-gets-it-right macro */
   array_free (rfeed, EMPTY);
