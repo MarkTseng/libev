@@ -2673,7 +2673,7 @@ ev_signal_start (EV_P_ ev_signal *w)
   assert (("libev: ev_signal_start called with illegal signal number", w->signum > 0 && w->signum < EV_NSIG));
 
 #if EV_MULTIPLICITY
-  assert (("libev: tried to attach to a signal from two different loops",
+  assert (("libev: a signal must not be attached to two different loops",
            !signals [w->signum - 1].loop || signals [w->signum - 1].loop == loop));
 
   signals [w->signum - 1].loop = EV_A;
