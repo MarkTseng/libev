@@ -135,6 +135,14 @@ extern "C" {
 #  endif
 # endif
 
+# ifndef EV_USE_SIGNALFD
+#  if HAVE_SIGNALFD && HAVE_SYS_SIGNALFD_H
+#   define EV_USE_SIGNALFD 1
+#  else
+#   define EV_USE_SIGNALFD 0
+#  endif
+# endif
+
 # ifndef EV_USE_EVENTFD
 #  if HAVE_EVENTFD
 #   define EV_USE_EVENTFD 1
@@ -268,6 +276,14 @@ extern "C" {
 # endif
 #endif
 
+#ifndef EV_USE_SIGNALFD
+# if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 9))
+#  define EV_USE_SIGNALFD 1
+# else
+#  define EV_USE_SIGNALFD 0
+# endif
+#endif
+
 #if 0 /* debugging */
 # define EV_VERIFY 3
 # define EV_USE_4HEAP 1
@@ -341,6 +357,12 @@ extern "C" {
 #if EV_USE_EVENTFD
 /* our minimum requirement is glibc 2.7 which has the stub, but not the header */
 # include <stdint.h>
+# ifndef EFD_NONBLOCK
+#  define EFD_NONBLOCK O_NONBLOCK
+# endif
+# ifndef EFD_CLOEXEC
+#  define EFD_CLOEXEC O_CLOEXEC
+# endif
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -348,6 +370,10 @@ int eventfd (unsigned int initval, int flags);
 # ifdef __cplusplus
 }
 # endif
+#endif
+
+#if EV_USE_SIGNALFD
+# include <sys/signalfd.h>
 #endif
 
 /**/
@@ -1106,10 +1132,14 @@ evpipe_init (EV_P)
   if (!ev_is_active (&pipe_w))
     {
 #if EV_USE_EVENTFD
-      if ((evfd = eventfd (0, 0)) >= 0)
+      evfd = eventfd (0, EFD_NONBLOCK | EFD_CLOEXEC);
+      if (evfd < 0 && errno == EINVAL)
+        evfd = eventfd (0, 0);
+
+      if (evfd >= 0)
         {
           evpipe [0] = -1;
-          fd_intern (evfd);
+          fd_intern (evfd); /* doing it twice doesn't hurt */
           ev_io_set (&pipe_w, evfd, EV_READ);
         }
       else
@@ -1231,6 +1261,26 @@ ev_feed_signal_event (EV_P_ int signum)
   for (w = signals [signum].head; w; w = w->next)
     ev_feed_event (EV_A_ (W)w, EV_SIGNAL);
 }
+
+#if EV_USE_SIGNALFD
+static void
+sigfdcb (EV_P_ ev_io *iow, int revents)
+{
+  struct signalfd_siginfo si[4], *sip;
+
+  for (;;)
+    {
+      ssize_t res = read (sigfd, si, sizeof (si));
+
+      /* not ISO-C, as res might be -1, but works with SuS */
+      for (sip = si; (char *)sip < (char *)si + res; ++sip)
+        ev_feed_signal_event (EV_A_ sip->ssi_signo);
+
+      if (res < (ssize_t)sizeof (si))
+        break;
+    }
+}
+#endif
 
 /*****************************************************************************/
 
@@ -1476,6 +1526,9 @@ loop_init (EV_P_ unsigned int flags)
 #if EV_USE_INOTIFY
       fs_fd             = -2;
 #endif
+#if EV_USE_SIGNALFD
+      sigfd             = -2;
+#endif
 
       /* pid check not overridable via env */
 #ifndef _WIN32
@@ -1522,8 +1575,8 @@ loop_destroy (EV_P)
 
   if (ev_is_active (&pipe_w))
     {
-      ev_ref (EV_A); /* signal watcher */
-      ev_io_stop (EV_A_ &pipe_w);
+      /*ev_ref (EV_A);*/
+      /*ev_io_stop (EV_A_ &pipe_w);*/
 
 #if EV_USE_EVENTFD
       if (evfd >= 0)
@@ -1536,6 +1589,16 @@ loop_destroy (EV_P)
           close (evpipe [1]);
         }
     }
+
+#if EV_USE_SIGNALFD
+  if (ev_is_active (&sigfd_w))
+    {
+      /*ev_ref (EV_A);*/
+      /*ev_io_stop (EV_A_ &sigfd_w);*/
+
+      close (sigfd);
+    }
+#endif
 
 #if EV_USE_INOTIFY
   if (fs_fd >= 0)
@@ -1649,7 +1712,6 @@ ev_loop_new (unsigned int flags)
   struct ev_loop *loop = (struct ev_loop *)ev_malloc (sizeof (struct ev_loop));
 
   memset (loop, 0, sizeof (struct ev_loop));
-
   loop_init (EV_A_ flags);
 
   if (ev_backend (EV_A))
@@ -2579,9 +2641,39 @@ ev_signal_start (EV_P_ ev_signal *w)
 
   assert (("libev: ev_signal_start called with illegal signal number", w->signum > 0));
 
-  evpipe_init (EV_A);
-
   EV_FREQUENT_CHECK;
+
+#if EV_USE_SIGNALFD
+  if (sigfd == -2)
+    {
+      sigfd = signalfd (-1, &sigfd_set, SFD_NONBLOCK | SFD_CLOEXEC);
+      if (sigfd < 0 && errno == EINVAL)
+        sigfd = signalfd (-1, &sigfd_set, 0); /* retry without flags */
+
+      if (sigfd >= 0)
+        {
+          fd_intern (sigfd); /* doing it twice will not hurt */
+
+          sigemptyset (&sigfd_set);
+
+          ev_io_init (&sigfd_w, sigfdcb, sigfd, EV_READ);
+          ev_set_priority (&sigfd_w, EV_MAXPRI);
+          ev_io_start (EV_A_ &sigfd_w);
+          ev_unref (EV_A); /* signalfd watcher should not keep loop alive */
+        }
+    }
+
+  if (sigfd >= 0)
+    {
+      /* TODO: check .head */
+      sigaddset (&sigfd_set, w->signum);
+      sigprocmask (SIG_BLOCK, &sigfd_set, 0);
+
+      signalfd (sigfd, &sigfd_set, 0);
+    }
+  else
+#endif
+    evpipe_init (EV_A);
 
   {
 #ifndef _WIN32
@@ -2593,6 +2685,8 @@ ev_signal_start (EV_P_ ev_signal *w)
     array_needsize (ANSIG, signals, signalmax, w->signum, array_init_zero);
 
 #ifndef _WIN32
+    if (sigfd < 0)/*TODO*/
+      sigdelset (&prev, w->signum);
     sigprocmask (SIG_SETMASK, &prev, 0);
 #endif
   }
@@ -2605,11 +2699,14 @@ ev_signal_start (EV_P_ ev_signal *w)
 #if _WIN32
       signal (w->signum, ev_sighandler);
 #else
-      struct sigaction sa = { };
-      sa.sa_handler = ev_sighandler;
-      sigfillset (&sa.sa_mask);
-      sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
-      sigaction (w->signum, &sa, 0);
+      if (sigfd < 0) /*TODO*/
+        {
+          struct sigaction sa = { };
+          sa.sa_handler = ev_sighandler;
+          sigfillset (&sa.sa_mask);
+          sa.sa_flags = SA_RESTART; /* if restarting works we save one iteration */
+          sigaction (w->signum, &sa, 0);
+        }
 #endif
     }
 
@@ -2629,7 +2726,18 @@ ev_signal_stop (EV_P_ ev_signal *w)
   ev_stop (EV_A_ (W)w);
 
   if (!signals [w->signum - 1].head)
-    signal (w->signum, SIG_DFL);
+#if EV_USE_SIGNALFD
+    if (sigfd >= 0)
+      {
+        sigprocmask (SIG_UNBLOCK, &sigfd_set, 0);//D
+        sigdelset (&sigfd_set, w->signum);
+        signalfd (sigfd, &sigfd_set, 0);
+        sigprocmask (SIG_BLOCK, &sigfd_set, 0);//D
+        /*TODO: maybe unblock signal? */
+      }
+    else
+#endif
+      signal (w->signum, SIG_DFL);
 
   EV_FREQUENT_CHECK;
 }

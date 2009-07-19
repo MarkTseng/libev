@@ -166,6 +166,12 @@ VARx(char, fs_2625) /* whether we are running in linux 2.6.25 or newer */
 VAR (fs_hash, ANFS fs_hash [EV_INOTIFY_HASHSIZE])
 #endif
 
+#if EV_USE_SIGNALFD || EV_GENWRAP
+VARx(int, sigfd)
+VARx(ev_io, sigfd_w)
+VARx(sigset_t, sigfd_set)
+#endif
+
 #if EV_MINIMAL < 2 || EV_GENWRAP
 VARx(unsigned int, loop_count) /* total number of loop iterations/blocks */
 VARx(unsigned int, loop_depth) /* #ev_loop enters - #ev_loop leaves */

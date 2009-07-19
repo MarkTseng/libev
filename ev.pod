@@ -2078,22 +2078,28 @@ signal one or more times. Even though signals are very asynchronous, libev
 will try it's best to deliver signals synchronously, i.e. as part of the
 normal event processing, like any other event.
 
+Note that only the default loop supports registering signal watchers
+currently.
+
 If you want signals asynchronously, just use C<sigaction> as you would
 do without libev and forget about sharing the signal. You can even use
 C<ev_async> from a signal handler to synchronously wake up an event loop.
 
 You can configure as many watchers as you like per signal. Only when the
-first watcher gets started will libev actually register a signal handler
-with the kernel (thus it coexists with your own signal handlers as long as
-you don't register any with libev for the same signal). Similarly, when
-the last signal watcher for a signal is stopped, libev will reset the
-signal handler to SIG_DFL (regardless of what it was set to before).
+first watcher gets started will libev actually register something with
+the kernel (thus it coexists with your own signal handlers as long as you
+don't register any with libev for the same signal).
+
+Both the signal mask state (C<sigprocmask>) and the signal handler state
+(C<sigaction>) are unspecified after starting a signal watcher (and after
+sotpping it again), that is, libev might or might not block the signal,
+and might or might not set or restore the installed signal handler.
 
 If possible and supported, libev will install its handlers with
-C<SA_RESTART> behaviour enabled, so system calls should not be unduly
-interrupted. If you have a problem with system calls getting interrupted by
-signals you can block all signals in an C<ev_check> watcher and unblock
-them in an C<ev_prepare> watcher.
+C<SA_RESTART> (or equivalent) behaviour enabled, so system calls should
+not be unduly interrupted. If you have a problem with system calls getting
+interrupted by signals you can block all signals in an C<ev_check> watcher
+and unblock them in an C<ev_prepare> watcher.
 
 =head3 Watcher-Specific Functions and Data Members
 
@@ -2148,8 +2154,8 @@ libev)
 =head3 Process Interaction
 
 Libev grabs C<SIGCHLD> as soon as the default event loop is
-initialised. This is necessary to guarantee proper behaviour even if
-the first child watcher is started after the child exits. The occurrence
+initialised. This is necessary to guarantee proper behaviour even if the
+first child watcher is started after the child exits. The occurrence
 of C<SIGCHLD> is recorded asynchronously, but child reaping is done
 synchronously as part of the event loop processing. Libev always reaps all
 children, even ones not watched.
@@ -2169,7 +2175,8 @@ that, so other libev users can use C<ev_child> watchers freely.
 Currently, the child watcher never gets stopped, even when the
 child terminates, so normally one needs to stop the watcher in the
 callback. Future versions of libev might stop the watcher automatically
-when a child exit is detected.
+when a child exit is detected (calling C<ev_child_stop> twice is not a
+problem).
 
 =head3 Watcher-Specific Functions and Data Members
 
