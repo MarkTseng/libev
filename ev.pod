@@ -3584,7 +3584,7 @@ implementations for some libevent functions (such as logging, which is not
 supported). It will also not define any of the structs usually found in
 F<event.h> that are not directly supported by the libev core alone.
 
-In stanbdalone mode, libev will still try to automatically deduce the
+In standalone mode, libev will still try to automatically deduce the
 configuration, but has to be more conservative.
 
 =item EV_USE_MONOTONIC
