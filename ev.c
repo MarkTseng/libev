@@ -1105,7 +1105,7 @@ upheap (ANHE *heap, int k)
 inline_size void
 adjustheap (ANHE *heap, int N, int k)
 {
-  if (k > HEAP0 && ANHE_at (heap [HPARENT (k)]) >= ANHE_at (heap [k]))
+  if (k > HEAP0 && ANHE_at (heap [k]) <= ANHE_at (heap [HPARENT (k)]))
     upheap (heap, k);
   else
     downheap (heap, N, k);
