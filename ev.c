@@ -1059,7 +1059,7 @@ downheap (ANHE *heap, int N, int k)
     {
       int c = k << 1;
 
-      if (c > N + HEAP0 - 1)
+      if (c >= N + HEAP0)
         break;
 
       c += c + 1 < N + HEAP0 && ANHE_at (heap [c]) > ANHE_at (heap [c + 1])
