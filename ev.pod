@@ -3409,6 +3409,12 @@ be found at L<http://proj.llucax.com.ar/wiki/evd>.
 Erkki Seppala has written Ocaml bindings for libev, to be found at
 L<http://modeemi.cs.tut.fi/~flux/software/ocaml-ev/>.
 
+=item Lua
+
+Brian Maher has written a partial interface to libev
+for lua (only C<ev_io> and C<ev_timer>), to be found at
+L<http://github.com/brimworks/lua-ev>.
+
 =back
 
 
