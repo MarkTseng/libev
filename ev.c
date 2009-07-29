@@ -388,7 +388,11 @@ extern "C" {
 #  define EFD_NONBLOCK O_NONBLOCK
 # endif
 # ifndef EFD_CLOEXEC
-#  define EFD_CLOEXEC O_CLOEXEC
+#  ifdef O_CLOEXEC
+#   define EFD_CLOEXEC O_CLOEXEC
+#  else
+#   define EFD_CLOEXEC 02000000
+#  endif
 # endif
 # ifdef __cplusplus
 extern "C" {
