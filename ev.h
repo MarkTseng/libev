@@ -37,8 +37,8 @@
  * either the BSD or the GPL.
  */
 
-#ifndef EV_H__
-#define EV_H__
+#ifndef EV_H_
+#define EV_H_
 
 #ifdef __cplusplus
 extern "C" {
