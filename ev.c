@@ -2863,12 +2863,13 @@ infy_add (EV_P_ ev_stat *w)
 
   if (w->wd >= 0)
     {
+      struct statfs sfs;
+
       wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
 
       /* now local changes will be tracked by inotify, but remote changes won't */
       /* unless the filesystem it known to be local, we therefore still poll */
       /* also do poll on <2.6.25, but with normal frequency */
-      struct statfs sfs;
 
       if (fs_2625 && !statfs (w->path, &sfs))
         if (sfs.f_type == 0x1373 /* devfs */
