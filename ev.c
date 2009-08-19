@@ -478,6 +478,16 @@ static EV_ATOMIC_T have_realtime; /* did clock_gettime (CLOCK_REALTIME) work? */
 static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? */
 #endif
 
+#ifndef EV_FD_TO_WIN32_HANDLE
+# define EV_FD_TO_WIN32_HANDLE(fd) _get_osfhandle (fd)
+#endif
+#ifndef EV_WIN32_HANDLE_TO_FD
+# define EV_WIN32_HANDLE_TO_FD(handle) _open_osfhandle (fd, 0)
+#endif
+#ifndef EV_WIN32_CLOSE_FD
+# define EV_WIN32_CLOSE_FD(fd) close (fd)
+#endif
+
 #ifdef _WIN32
 # include "ev_win32.c"
 #endif
@@ -878,11 +888,7 @@ fd_reify (EV_P)
       if (events)
         {
           unsigned long arg;
-          #ifdef EV_FD_TO_WIN32_HANDLE
-            anfd->handle = EV_FD_TO_WIN32_HANDLE (fd);
-          #else
-            anfd->handle = _get_osfhandle (fd);
-          #endif
+          anfd->handle = EV_FD_TO_WIN32_HANDLE (fd);
           assert (("libev: only socket fds supported in this configuration", ioctlsocket (anfd->handle, FIONREAD, &arg) == 0));
         }
 #endif
@@ -1623,8 +1629,8 @@ loop_destroy (EV_P)
 
       if (evpipe [0] >= 0)
         {
-          close (evpipe [0]);
-          close (evpipe [1]);
+          EV_WIN32_CLOSE_FD (evpipe [0]);
+          EV_WIN32_CLOSE_FD (evpipe [1]);
         }
     }
 
@@ -1730,8 +1736,8 @@ loop_fork (EV_P)
 
       if (evpipe [0] >= 0)
         {
-          close (evpipe [0]);
-          close (evpipe [1]);
+          EV_WIN32_CLOSE_FD (evpipe [0]);
+          EV_WIN32_CLOSE_FD (evpipe [1]);
         }
 
       evpipe_init (EV_A);

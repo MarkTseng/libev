@@ -3665,13 +3665,27 @@ C<_get_osfhandle> on the fd to convert it to an OS handle. Otherwise,
 it is assumed that all these functions actually work on fds, even
 on win32. Should not be defined on non-win32 platforms.
 
-=item EV_FD_TO_WIN32_HANDLE
+=item EV_FD_TO_WIN32_HANDLE(fd)
 
 If C<EV_SELECT_IS_WINSOCKET> is enabled, then libev needs a way to map
 file descriptors to socket handles. When not defining this symbol (the
 default), then libev will call C<_get_osfhandle>, which is usually
 correct. In some cases, programs use their own file descriptor management,
 in which case they can provide this function to map fds to socket handles.
+
+=item EV_WIN32_HANDLE_TO_FD(handle)
+
+If C<EV_SELECT_IS_WINSOCKET> then libev maps handles to file descriptors
+using the standard C<_open_osfhandle> function. For programs implementing
+their own fd to handle mapping, overwriting this function makes it easier
+to do so. This can be done by defining this macro to an appropriate value.
+
+=item EV_WIN32_CLOSE_FD(fd)
+
+If programs implement their own fd to handle mapping on win32, then this
+macro can be used to override the C<close> function, useful to unregister
+file descriptors again. Note that the replacement function has to close
+the underlying OS handle.
 
 =item EV_USE_POLL
 
