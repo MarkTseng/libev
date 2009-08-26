@@ -304,7 +304,7 @@ extern "C" {
 #endif
 
 #ifndef EV_USE_SIGNALFD
-# if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 9))
+# if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 7))
 #  define EV_USE_SIGNALFD 1
 # else
 #  define EV_USE_SIGNALFD 0
@@ -404,8 +404,33 @@ int eventfd (unsigned int initval, int flags);
 #endif
 
 #if EV_USE_SIGNALFD
-# include <sys/signalfd.h>
+/* our minimum requirement is glibc 2.7 which has the stub, but not the header */
+# include <stdint.h>
+# ifndef SFD_NONBLOCK
+#  define SFD_NONBLOCK O_NONBLOCK
+# endif
+# ifndef SFD_CLOEXEC
+#  ifdef O_CLOEXEC
+#   define SFD_CLOEXEC O_CLOEXEC
+#  else
+#   define SFD_CLOEXEC 02000000
+#  endif
+# endif
+# ifdef __cplusplus
+extern "C" {
+# endif
+int signalfd (int fd, const sigset_t *mask, int flags);
+
+struct signalfd_siginfo
+{
+  uint32_t ssi_signo;
+  char pad[128 - sizeof (uint32_t)];
+};
+# ifdef __cplusplus
+}
+# endif
 #endif
+
 
 /**/
 
