@@ -2110,16 +2110,27 @@ When the first watcher gets started will libev actually register something
 with the kernel (thus it coexists with your own signal handlers as long as
 you don't register any with libev for the same signal).
 
-Both the signal mask state (C<sigprocmask>) and the signal handler state
-(C<sigaction>) are unspecified after starting a signal watcher (and after
-sotpping it again), that is, libev might or might not block the signal,
-and might or might not set or restore the installed signal handler.
-
 If possible and supported, libev will install its handlers with
 C<SA_RESTART> (or equivalent) behaviour enabled, so system calls should
 not be unduly interrupted. If you have a problem with system calls getting
 interrupted by signals you can block all signals in an C<ev_check> watcher
 and unblock them in an C<ev_prepare> watcher.
+
+=head3 The special problem of inheritance over execve
+
+Both the signal mask (C<sigprocmask>) and the signal disposition
+(C<sigaction>) are unspecified after starting a signal watcher (and after
+stopping it again), that is, libev might or might not block the signal,
+and might or might not set or restore the installed signal handler.
+
+While this does not matter for the signal disposition (libev never
+sets signals to C<SIG_IGN>, so handlers will be reset to C<SIG_DFL> on
+C<execve>), this matters for the signal mask: many programs do not expect
+many signals to be blocked.
+
+This means that before calling C<exec> (from the child) you should reset
+the signal mask to whatever "default" you expect (all clear is a good
+choice usually).
 
 =head3 Watcher-Specific Functions and Data Members
 
