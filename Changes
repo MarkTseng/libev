@@ -1,11 +1,15 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 	- backport inotify code to C89.
+        - inotify file descriptors were not properly recreated after a fork,
+          and could leak into child processes.
         - implement EV_WIN32_HANDLE_TO_FD and EV_WIN32_CLOSE_FD configuration
           symbols to make it easier for apps to do their own fd management.
         - support EV_IDLE_ENABLE being disabled in ev++.h
           (patch by Didier Spezia).
         - point out the unspecified signal mask in the documentation.
+        - take advantage of inotify_init1, if available, to set cloexec/nonblock
+          on fd creation, to avoid races.
         - changed minimum glibc requirement from glibc 2.9 to 2.7, for
           signalfd.
 

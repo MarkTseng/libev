@@ -2999,6 +2999,17 @@ check_2625 (EV_P)
   fs_2625 = 1;
 }
 
+inline_size int
+infy_newfd (void)
+{
+#if defined (IN_CLOEXEC) && defined (IN_NONBLOCK)
+  int fd = inotify_init1 (IN_CLOEXEC | IN_NONBLOCK);
+  if (fd >= 0)
+    return fd;
+#endif
+  return inotify_init ();
+}
+
 inline_size void
 infy_init (EV_P)
 {
@@ -3009,10 +3020,11 @@ infy_init (EV_P)
 
   check_2625 (EV_A);
 
-  fs_fd = inotify_init ();
+  fs_fd = infy_newfd ();
 
   if (fs_fd >= 0)
     {
+      fd_intern (fs_fd);
       ev_io_init (&fs_w, infy_cb, fs_fd, EV_READ);
       ev_set_priority (&fs_w, EV_MAXPRI);
       ev_io_start (EV_A_ &fs_w);
@@ -3027,8 +3039,16 @@ infy_fork (EV_P)
   if (fs_fd < 0)
     return;
 
+  ev_io_stop (EV_A_ &fs_w);
   close (fs_fd);
-  fs_fd = inotify_init ();
+  fs_fd = infy_newfd ();
+
+  if (fs_fd >= 0)
+    {
+      fd_intern (fs_fd);
+      ev_io_set (&fs_w, fs_fd, EV_READ);
+      ev_io_start (EV_A_ &fs_w);
+    }
 
   for (slot = 0; slot < EV_INOTIFY_HASHSIZE; ++slot)
     {
