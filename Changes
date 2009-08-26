@@ -1,8 +1,7 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 	- backport inotify code to C89.
-        - inotify file descriptors were not properly recreated after a fork,
-          and could leak into child processes.
+        - inotify file descriptors could leak into child processes.
         - implement EV_WIN32_HANDLE_TO_FD and EV_WIN32_CLOSE_FD configuration
           symbols to make it easier for apps to do their own fd management.
         - support EV_IDLE_ENABLE being disabled in ev++.h
