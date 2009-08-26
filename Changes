@@ -2,9 +2,10 @@ Revision history for libev, a high-performance and full-featured event loop.
 
 	- backport inotify code to C89.
         - implement EV_WIN32_HANDLE_TO_FD and EV_WIN32_CLOSE_FD configuration
-          symbols to make ti easier for apps to do their own fd management.
+          symbols to make it easier for apps to do their own fd management.
         - support EV_IDLE_ENABLE being disabled in ev++.h
           (patch by Didier Spezia).
+        - point out the unspecified signal mask in the documentation.
 
 3.8  Sun Aug  9 14:30:45 CEST 2009
 	- incompatible change: do not necessarily reset signal handler

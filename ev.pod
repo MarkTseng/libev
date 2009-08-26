@@ -2126,11 +2126,16 @@ and might or might not set or restore the installed signal handler.
 While this does not matter for the signal disposition (libev never
 sets signals to C<SIG_IGN>, so handlers will be reset to C<SIG_DFL> on
 C<execve>), this matters for the signal mask: many programs do not expect
-many signals to be blocked.
+certain signals to be blocked.
 
 This means that before calling C<exec> (from the child) you should reset
 the signal mask to whatever "default" you expect (all clear is a good
 choice usually).
+
+In current versions of libev, you can ensure that the signal mask is not
+blocking any signals (except temporarily, so thread users watch out) by
+specifying the C<EVFLAG_NOSIGNALFD> when creating the event loop. This is
+not guaranteed for future versions, however.
 
 =head3 Watcher-Specific Functions and Data Members
 
