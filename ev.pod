@@ -2132,10 +2132,14 @@ This means that before calling C<exec> (from the child) you should reset
 the signal mask to whatever "default" you expect (all clear is a good
 choice usually).
 
-In current versions of libev, you can ensure that the signal mask is not
-blocking any signals (except temporarily, so thread users watch out) by
-specifying the C<EVFLAG_NOSIGNALFD> when creating the event loop. This is
-not guaranteed for future versions, however.
+The simplest way to ensure that the signal mask is reset in the child is
+to install a fork handler with C<pthread_atfork> that resets it. That will
+catch fork calls done by libraries (such as the libc) as well.
+
+In current versions of libev, you can also ensure that the signal mask is
+not blocking any signals (except temporarily, so thread users watch out)
+by specifying the C<EVFLAG_NOSIGNALFD> when creating the event loop. This
+is not guaranteed for future versions, however.
 
 =head3 Watcher-Specific Functions and Data Members
 
