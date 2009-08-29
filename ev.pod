@@ -706,8 +706,8 @@ event loop time (see C<ev_now_update>).
 =item ev_loop (loop, int flags)
 
 Finally, this is it, the event handler. This function usually is called
-after you initialised all your watchers and you want to start handling
-events.
+after you have initialised all your watchers and you want to start
+handling events.
 
 If the flags argument is specified as C<0>, it will not return until
 either no event watchers are active anymore or C<ev_unloop> was called.
