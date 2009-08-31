@@ -592,7 +592,7 @@ as signal and child watchers) would need to be stopped manually.
 In general it is not advisable to call this function except in the
 rare occasion where you really need to free e.g. the signal handling
 pipe fds. If you need dynamically allocated loops it is better to use
-C<ev_loop_new> and C<ev_loop_destroy>).
+C<ev_loop_new> and C<ev_loop_destroy>.
 
 =item ev_loop_destroy (loop)
 
