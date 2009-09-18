@@ -414,6 +414,7 @@ union ev_any_watcher
 #define EVBACKEND_KQUEUE  0x00000008U /* bsd */
 #define EVBACKEND_DEVPOLL 0x00000010U /* solaris 8 */ /* NYI */
 #define EVBACKEND_PORT    0x00000020U /* solaris 10 */
+#define EVBACKEND_ALL     0x0000003FU
 
 #if EV_PROTOTYPES
 int ev_version_major (void);

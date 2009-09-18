@@ -452,7 +452,6 @@ struct signalfd_siginfo
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 59.743 /* never wait longer than this time (to detect time jumps) */
-/*#define CLEANUP_INTERVAL (MAX_BLOCKTIME * 5.) /* how often to try to free memory and re-check fds, TODO */
 
 #if __GNUC__ >= 4
 # define expect(expr,value)         __builtin_expect ((expr),(value))

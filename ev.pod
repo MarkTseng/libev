@@ -372,7 +372,7 @@ I<inotify> API for it's C<ev_stat> watchers. Apart from debugging and
 testing, this flag can be useful to conserve inotify file descriptors, as
 otherwise each loop using C<ev_stat> watchers consumes one inotify handle.
 
-=item C<EVFLAG_NOSIGNALFD>
+=item C<EVFLAG_NOSIGFD>
 
 When this flag is specified, then libev will not attempt to use the
 I<signalfd> API for it's C<ev_signal> (and C<ev_child>) watchers. This is
