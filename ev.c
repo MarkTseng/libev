@@ -1660,12 +1660,7 @@ loop_destroy (EV_P)
 
 #if EV_USE_SIGNALFD
   if (ev_is_active (&sigfd_w))
-    {
-      /*ev_ref (EV_A);*/
-      /*ev_io_stop (EV_A_ &sigfd_w);*/
-
-      close (sigfd);
-    }
+    close (sigfd);
 #endif
 
 #if EV_USE_INOTIFY
@@ -2754,6 +2749,8 @@ ev_signal_start (EV_P_ ev_signal *w)
 # endif
       {
 # if _WIN32
+        evpipe_init (EV_A);
+
         signal (w->signum, ev_sighandler);
 # else
         struct sigaction sa;
@@ -2898,7 +2895,7 @@ infy_add (EV_P_ ev_stat *w)
       wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
 
       /* now local changes will be tracked by inotify, but remote changes won't */
-      /* unless the filesystem it known to be local, we therefore still poll */
+      /* unless the filesystem is known to be local, we therefore still poll */
       /* also do poll on <2.6.25, but with normal frequency */
 
       if (fs_2625 && !statfs (w->path, &sfs))
@@ -3027,6 +3024,7 @@ infy_init (EV_P)
       ev_io_init (&fs_w, infy_cb, fs_fd, EV_READ);
       ev_set_priority (&fs_w, EV_MAXPRI);
       ev_io_start (EV_A_ &fs_w);
+      ev_unref (EV_A);
     }
 }
 
@@ -3038,6 +3036,7 @@ infy_fork (EV_P)
   if (fs_fd < 0)
     return;
 
+  ev_ref (EV_A);
   ev_io_stop (EV_A_ &fs_w);
   close (fs_fd);
   fs_fd = infy_newfd ();
@@ -3047,6 +3046,7 @@ infy_fork (EV_P)
       fd_intern (fs_fd);
       ev_io_set (&fs_w, fs_fd, EV_READ);
       ev_io_start (EV_A_ &fs_w);
+      ev_unref (EV_A);
     }
 
   for (slot = 0; slot < EV_INOTIFY_HASHSIZE; ++slot)
