@@ -2858,12 +2858,33 @@ infy_add (EV_P_ ev_stat *w)
 {
   w->wd = inotify_add_watch (fs_fd, w->path, IN_ATTRIB | IN_DELETE_SELF | IN_MOVE_SELF | IN_MODIFY | IN_DONT_FOLLOW | IN_MASK_ADD);
 
-  if (w->wd < 0)
+  if (w->wd >= 0)
     {
-      w->timer.repeat = w->interval ? w->interval : DEF_STAT_INTERVAL;
-      ev_timer_again (EV_A_ &w->timer); /* this is not race-free, so we still need to recheck periodically */
+      struct statfs sfs;
 
-      /* monitor some parent directory for speedup hints */
+      /* now local changes will be tracked by inotify, but remote changes won't */
+      /* unless the filesystem is known to be local, we therefore still poll */
+      /* also do poll on <2.6.25, but with normal frequency */
+
+      if (!fs_2625)
+        w->timer.repeat = w->interval ? w->interval : DEF_STAT_INTERVAL;
+      else if (!statfs (w->path, &sfs)
+               && (sfs.f_type == 0x1373 /* devfs */
+                   || sfs.f_type == 0xEF53 /* ext2/3 */
+                   || sfs.f_type == 0x3153464a /* jfs */
+                   || sfs.f_type == 0x52654973 /* reiser3 */
+                   || sfs.f_type == 0x01021994 /* tempfs */
+                   || sfs.f_type == 0x58465342 /* xfs */))
+        w->timer.repeat = 0.; /* filesystem is local, kernel new enough */
+      else
+        w->timer.repeat = w->interval ? w->interval : NFS_STAT_INTERVAL; /* remote, use reduced frequency */
+    }
+  else
+    {
+      /* can't use inotify, continue to stat */
+      w->timer.repeat = w->interval ? w->interval : DEF_STAT_INTERVAL;
+
+      /* if path is not there, monitor some parent directory for speedup hints */
       /* note that exceeding the hardcoded path limit is not a correctness issue, */
       /* but an efficiency issue only */
       if ((errno == ENOENT || errno == EACCES) && strlen (w->path) < 4096)
@@ -2889,27 +2910,12 @@ infy_add (EV_P_ ev_stat *w)
     }
 
   if (w->wd >= 0)
-    {
-      struct statfs sfs;
+    wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
 
-      wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
-
-      /* now local changes will be tracked by inotify, but remote changes won't */
-      /* unless the filesystem is known to be local, we therefore still poll */
-      /* also do poll on <2.6.25, but with normal frequency */
-
-      if (fs_2625 && !statfs (w->path, &sfs))
-        if (sfs.f_type == 0x1373 /* devfs */
-            || sfs.f_type == 0xEF53 /* ext2/3 */
-            || sfs.f_type == 0x3153464a /* jfs */
-            || sfs.f_type == 0x52654973 /* reiser3 */
-            || sfs.f_type == 0x01021994 /* tempfs */
-            || sfs.f_type == 0x58465342 /* xfs */)
-          return;
-
-      w->timer.repeat = w->interval ? w->interval : fs_2625 ? NFS_STAT_INTERVAL : DEF_STAT_INTERVAL;
-      ev_timer_again (EV_A_ &w->timer);
-    }
+  /* now re-arm timer, if required */
+  if (ev_is_active (&w->timer)) ev_ref (EV_A);
+  ev_timer_again (EV_A_ &w->timer);
+  if (ev_is_active (&w->timer)) ev_unref (EV_A);
 }
 
 static void noinline
@@ -3064,7 +3070,12 @@ infy_fork (EV_P)
           if (fs_fd >= 0)
             infy_add (EV_A_ w); /* re-add, no matter what */
           else
-            ev_timer_again (EV_A_ &w->timer);
+            {
+              w->timer.repeat = w->interval ? w->interval : DEF_STAT_INTERVAL;
+              if (ev_is_active (&w->timer)) ev_ref (EV_A);
+              ev_timer_again (EV_A_ &w->timer);
+              if (ev_is_active (&w->timer)) ev_unref (EV_A);
+            }
         }
     }
 }
@@ -3144,7 +3155,10 @@ ev_stat_start (EV_P_ ev_stat *w)
     infy_add (EV_A_ w);
   else
 #endif
-    ev_timer_again (EV_A_ &w->timer);
+    {
+      ev_timer_again (EV_A_ &w->timer);
+      ev_unref (EV_A);
+    }
 
   ev_start (EV_A_ (W)w, 1);
 
@@ -3163,7 +3177,12 @@ ev_stat_stop (EV_P_ ev_stat *w)
 #if EV_USE_INOTIFY
   infy_del (EV_A_ w);
 #endif
-  ev_timer_stop (EV_A_ &w->timer);
+
+  if (ev_is_active (&w->timer))
+    {
+      ev_ref (EV_A);
+      ev_timer_stop (EV_A_ &w->timer);
+    }
 
   ev_stop (EV_A_ (W)w);
 
