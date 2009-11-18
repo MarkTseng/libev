@@ -17,6 +17,7 @@ TODO: somehow unblock procmask?
           (analysed by lekma).
         - changed minimum glibc requirement from glibc 2.9 to 2.7, for
           signalfd.
+        - add missing string.h include (Denis F. Latypoff).
 
 3.8  Sun Aug  9 14:30:45 CEST 2009
 	- incompatible change: do not necessarily reset signal handler
