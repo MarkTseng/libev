@@ -1238,6 +1238,20 @@ watcher isn't pending it does nothing and returns C<0>.
 Sometimes it can be useful to "poll" a watcher instead of waiting for its
 callback to be invoked, which can be accomplished with this function.
 
+=item ev_feed_event (struct ev_loop *, watcher *, int revents)
+
+Feeds the given event set into the event loop, as if the specified event
+had happened for the specified watcher (which must be a pointer to an
+initialised but not necessarily started event watcher). Obviously you must
+not free the watcher as long as it has pending events.
+
+Stopping the watcher, letting libev invoke it, or calling
+C<ev_clear_pending> will clear the pending event, even if the watcher was
+not started in the first place.
+
+See also C<ev_feed_fd_event> and C<ev_feed_signal_event> for related
+functions that do not need a watcher.
+
 =back
 
 
@@ -3136,12 +3150,6 @@ Example: wait up to ten seconds for data to appear on STDIN_FILENO.
    }
 
    ev_once (STDIN_FILENO, EV_READ, 10., stdin_ready, 0);
-
-=item ev_feed_event (struct ev_loop *, watcher *, int revents)
-
-Feeds the given event set into the event loop, as if the specified event
-had happened for the specified watcher (which must be a pointer to an
-initialised but not necessarily started event watcher).
 
 =item ev_feed_fd_event (struct ev_loop *, int fd, int revents)
 
