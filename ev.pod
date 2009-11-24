@@ -120,7 +120,7 @@ configuration will be described, which supports multiple event loops. For
 more info about various configuration options please have a look at
 B<EMBED> section in this manual. If libev was configured without support
 for multiple event loops, then all functions taking an initial argument of
-name C<loop> (which is always of type C<ev_loop *>) will not have
+name C<loop> (which is always of type C<struct ev_loop *>) will not have
 this argument.
 
 =head2 TIME REPRESENTATION
@@ -921,7 +921,7 @@ While event loop modifications are allowed between invocations of
 C<release> and C<acquire> (that's their only purpose after all), no
 modifications done will affect the event loop, i.e. adding watchers will
 have no effect on the set of file descriptors being watched, or the time
-waited. USe an C<ev_async> watcher to wake up C<ev_loop> when you want it
+waited. Use an C<ev_async> watcher to wake up C<ev_loop> when you want it
 to take note of any changes you made.
 
 In theory, threads executing C<ev_loop> will be async-cancel safe between
@@ -1128,7 +1128,7 @@ Example: Initialise an C<ev_io> watcher in two steps.
    ev_init (&w, my_cb);
    ev_io_set (&w, STDIN_FILENO, EV_READ);
 
-=item C<ev_TYPE_set> (ev_TYPE *, [args])
+=item C<ev_TYPE_set> (ev_TYPE *watcher, [args])
 
 This macro initialises the type-specific parts of a watcher. You need to
 call C<ev_init> at least once before you call this macro, but you can
@@ -1151,7 +1151,7 @@ Example: Initialise and set an C<ev_io> watcher in one step.
 
    ev_io_init (&w, my_cb, STDIN_FILENO, EV_READ);
 
-=item C<ev_TYPE_start> (loop *, ev_TYPE *watcher)
+=item C<ev_TYPE_start> (loop, ev_TYPE *watcher)
 
 Starts (activates) the given watcher. Only active watchers will receive
 events. If the watcher is already active nothing will happen.
@@ -1161,7 +1161,7 @@ whole section.
 
    ev_io_start (EV_DEFAULT_UC, &w);
 
-=item C<ev_TYPE_stop> (loop *, ev_TYPE *watcher)
+=item C<ev_TYPE_stop> (loop, ev_TYPE *watcher)
 
 Stops the given watcher if active, and clears the pending status (whether
 the watcher was active or not).
@@ -1196,7 +1196,7 @@ Returns the callback currently set on the watcher.
 Change the callback. You can change the callback at virtually any time
 (modulo threads).
 
-=item ev_set_priority (ev_TYPE *watcher, priority)
+=item ev_set_priority (ev_TYPE *watcher, int priority)
 
 =item int ev_priority (ev_TYPE *watcher)
 
@@ -1238,7 +1238,7 @@ watcher isn't pending it does nothing and returns C<0>.
 Sometimes it can be useful to "poll" a watcher instead of waiting for its
 callback to be invoked, which can be accomplished with this function.
 
-=item ev_feed_event (struct ev_loop *, watcher *, int revents)
+=item ev_feed_event (loop, ev_TYPE *watcher, int revents)
 
 Feeds the given event set into the event loop, as if the specified event
 had happened for the specified watcher (which must be a pointer to an
@@ -2983,7 +2983,8 @@ just the default loop.
 C<ev_async> does not support queueing of data in any way. The reason
 is that the author does not know of a simple (or any) algorithm for a
 multiple-writer-single-reader queue that works in all cases and doesn't
-need elaborate support such as pthreads.
+need elaborate support such as pthreads or unportable memory access
+semantics.
 
 That means that if you want to queue data, you have to provide your own
 queue. But at least I can tell you how to implement locking around your
@@ -3151,12 +3152,12 @@ Example: wait up to ten seconds for data to appear on STDIN_FILENO.
 
    ev_once (STDIN_FILENO, EV_READ, 10., stdin_ready, 0);
 
-=item ev_feed_fd_event (struct ev_loop *, int fd, int revents)
+=item ev_feed_fd_event (loop, int fd, int revents)
 
 Feed an event on the given fd, as if a file descriptor backend detected
 the given events it.
 
-=item ev_feed_signal_event (struct ev_loop *loop, int signum)
+=item ev_feed_signal_event (loop, int signum)
 
 Feed an event as if the given signal occurred (C<loop> must be the default
 loop!).
@@ -3246,7 +3247,7 @@ All of those classes have these methods:
 
 =item ev::TYPE::TYPE ()
 
-=item ev::TYPE::TYPE (struct ev_loop *)
+=item ev::TYPE::TYPE (loop)
 
 =item ev::TYPE::~TYPE
 
@@ -3333,7 +3334,7 @@ Example: Use a plain function as callback.
    static void io_cb (ev::io &w, int revents) { }
    iow.set <io_cb> ();
 
-=item w->set (struct ev_loop *)
+=item w->set (loop)
 
 Associates a different C<struct ev_loop> with this watcher. You can only
 do this when the watcher is inactive (and not pending either).
