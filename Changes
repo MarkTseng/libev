@@ -18,6 +18,9 @@ TODO: somehow unblock procmask?
         - changed minimum glibc requirement from glibc 2.9 to 2.7, for
           signalfd.
         - add missing string.h include (Denis F. Latypoff).
+        - only replace ev_stat.prev when we detect an actual difference,
+          so prev is (almost) always different to attr. this might
+          have caused the probems with 04_stat.t.
 
 3.8  Sun Aug  9 14:30:45 CEST 2009
 	- incompatible change: do not necessarily reset signal handler
