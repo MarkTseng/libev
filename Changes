@@ -21,6 +21,7 @@ TODO: somehow unblock procmask?
         - only replace ev_stat.prev when we detect an actual difference,
           so prev is (almost) always different to attr. this might
           have caused the probems with 04_stat.t.
+        - add ev::timer->remaining () method to C++ API.
 
 3.8  Sun Aug  9 14:30:45 CEST 2009
 	- incompatible change: do not necessarily reset signal handler
