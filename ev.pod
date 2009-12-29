@@ -794,9 +794,10 @@ Ref/unref can be used to add or remove a reference count on the event
 loop: Every watcher keeps one reference, and as long as the reference
 count is nonzero, C<ev_loop> will not return on its own.
 
-If you have a watcher you never unregister that should not keep C<ev_loop>
-from returning, call ev_unref() after starting, and ev_ref() before
-stopping it.
+This is useful when you have a watcher that you never intend to
+unregister, but that nevertheless should not keep C<ev_loop> from
+returning. In such a case, call C<ev_unref> after starting, and C<ev_ref>
+before stopping it.
 
 As an example, libev itself uses this for its internal signal pipe: It
 is not visible to the libev user and should not keep C<ev_loop> from
