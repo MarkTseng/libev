@@ -1,5 +1,6 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested
           explicitly - this means that easy to catch bugs become hard to
           catch race conditions, but the users have spoken.
