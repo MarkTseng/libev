@@ -163,7 +163,7 @@ struct ev_loop;
 #endif
 
 #define EV_VERSION_MAJOR 3
-#define EV_VERSION_MINOR 8
+#define EV_VERSION_MINOR 9
 
 #ifndef EV_CB_DECLARE
 # define EV_CB_DECLARE(type) void (*cb)(EV_P_ struct type *w, int revents);

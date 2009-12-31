@@ -376,8 +376,10 @@ otherwise each loop using C<ev_stat> watchers consumes one inotify handle.
 
 When this flag is specified, then libev will attempt to use the
 I<signalfd> API for it's C<ev_signal> (and C<ev_child>) watchers. This API
-delivers signals synchronously, which makes is both faster and might make
-it possible to get the queued signal data.
+delivers signals synchronously, which makes it both faster and might make
+it possible to get the queued signal data. It can also simplify signal
+handling with threads, as long as you properly block signals in your
+threads that are not interested in handling them.
 
 Signalfd will not be used by default as this changes your signal mask, and
 there are a lot of shoddy libraries and programs (glib's threadpool for
@@ -2162,10 +2164,9 @@ unless you use the C<signalfd> API (C<EV_SIGNALFD>). While this reduces
 the window of opportunity for problems, it will not go away, as libev
 I<has> to modify the signal mask, at least temporarily.
 
-So I can't stress this enough I<if you do not reset your signal mask
-when you expect it to be empty, you have a race condition in your
-program>. This is not a libev-specific thing, this is true for most event
-libraries.
+So I can't stress this enough: I<If you do not reset your signal mask when
+you expect it to be empty, you have a race condition in your code>. This
+is not a libev-specific thing, this is true for most event libraries.
 
 =head3 Watcher-Specific Functions and Data Members
 
