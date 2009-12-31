@@ -372,13 +372,16 @@ I<inotify> API for it's C<ev_stat> watchers. Apart from debugging and
 testing, this flag can be useful to conserve inotify file descriptors, as
 otherwise each loop using C<ev_stat> watchers consumes one inotify handle.
 
-=item C<EVFLAG_NOSIGFD>
+=item C<EVFLAG_SIGNALFD>
 
-When this flag is specified, then libev will not attempt to use the
-I<signalfd> API for it's C<ev_signal> (and C<ev_child>) watchers. This is
-probably only useful to work around any bugs in libev. Consequently, this
-flag might go away once the signalfd functionality is considered stable,
-so it's useful mostly in environment variables and not in program code.
+When this flag is specified, then libev will attempt to use the
+I<signalfd> API for it's C<ev_signal> (and C<ev_child>) watchers. This API
+delivers signals synchronously, which makes is both faster and might make
+it possible to get the queued signal data.
+
+Signalfd will not be used by default as this changes your signal mask, and
+there are a lot of shoddy libraries and programs (glib's threadpool for
+example) that can't properly initialise their signal masks.
 
 =item C<EVBACKEND_SELECT>  (value 1, portable select backend)
 
@@ -2134,7 +2137,7 @@ not be unduly interrupted. If you have a problem with system calls getting
 interrupted by signals you can block all signals in an C<ev_check> watcher
 and unblock them in an C<ev_prepare> watcher.
 
-=head3 The special problem of inheritance over execve
+=head3 The special problem of inheritance over fork/execve/pthread_create
 
 Both the signal mask (C<sigprocmask>) and the signal disposition
 (C<sigaction>) are unspecified after starting a signal watcher (and after
@@ -2154,10 +2157,15 @@ The simplest way to ensure that the signal mask is reset in the child is
 to install a fork handler with C<pthread_atfork> that resets it. That will
 catch fork calls done by libraries (such as the libc) as well.
 
-In current versions of libev, you can also ensure that the signal mask is
-not blocking any signals (except temporarily, so thread users watch out)
-by specifying the C<EVFLAG_NOSIGFD> when creating the event loop. This
-is not guaranteed for future versions, however.
+In current versions of libev, the signal will not be blocked indefinitely
+unless you use the C<signalfd> API (C<EV_SIGNALFD>). While this reduces
+the window of opportunity for problems, it will not go away, as libev
+I<has> to modify the signal mask, at least temporarily.
+
+So I can't stress this enough I<if you do not reset your signal mask
+when you expect it to be empty, you have a race condition in your
+program>. This is not a libev-specific thing, this is true for most event
+libraries.
 
 =head3 Watcher-Specific Functions and Data Members
 

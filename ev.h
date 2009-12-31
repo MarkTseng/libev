@@ -406,7 +406,8 @@ union ev_any_watcher
 #define EVFLAG_FORKCHECK  0x02000000U /* check for a fork in each iteration */
 /* debugging/feature disable */
 #define EVFLAG_NOINOTIFY  0x00100000U /* do not attempt to use inotify */
-#define EVFLAG_NOSIGFD    0x00200000U /* do not attempt to use signalfd */
+#define EVFLAG_NOSIGFD 0 /* compatibility to pre-3.9 */
+#define EVFLAG_SIGNALFD   0x00200000U /* attempt to use signalfd */
 /* method bits to be ored together */
 #define EVBACKEND_SELECT  0x00000001U /* about anywhere */
 #define EVBACKEND_POLL    0x00000002U /* !win */

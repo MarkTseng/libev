@@ -1607,7 +1607,7 @@ loop_init (EV_P_ unsigned int flags)
       fs_fd             = flags & EVFLAG_NOINOTIFY ? -1 : -2;
 #endif
 #if EV_USE_SIGNALFD
-      sigfd             = flags & EVFLAG_NOSIGFD   ? -1 : -2;
+      sigfd             = flags & EVFLAG_SIGNALFD  ? -2 : -1;
 #endif
 
       if (!(flags & 0x0000ffffU))
@@ -2792,11 +2792,14 @@ ev_signal_stop (EV_P_ ev_signal *w)
 #if EV_USE_SIGNALFD
       if (sigfd >= 0)
         {
-          sigprocmask (SIG_UNBLOCK, &sigfd_set, 0);//D
+          sigset_t ss;
+
+          sigemptyset (&ss);
+          sigaddset (&ss, w->signum);
           sigdelset (&sigfd_set, w->signum);
+
           signalfd (sigfd, &sigfd_set, 0);
-          sigprocmask (SIG_BLOCK, &sigfd_set, 0);//D
-          /*TODO: maybe unblock signal? */
+          sigprocmask (SIG_UNBLOCK, &ss, 0);
         }
       else
 #endif
