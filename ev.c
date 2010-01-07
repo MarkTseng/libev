@@ -507,7 +507,7 @@ static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? 
 # define EV_FD_TO_WIN32_HANDLE(fd) _get_osfhandle (fd)
 #endif
 #ifndef EV_WIN32_HANDLE_TO_FD
-# define EV_WIN32_HANDLE_TO_FD(handle) _open_osfhandle (fd, 0)
+# define EV_WIN32_HANDLE_TO_FD(handle) _open_osfhandle (handle, 0)
 #endif
 #ifndef EV_WIN32_CLOSE_FD
 # define EV_WIN32_CLOSE_FD(fd) close (fd)
@@ -966,7 +966,7 @@ inline_size int
 fd_valid (int fd)
 {
 #ifdef _WIN32
-  return _get_osfhandle (fd) != -1;
+  return EV_FD_TO_WIN32_HANDLE (fd) != -1;
 #else
   return fcntl (fd, F_GETFD) != -1;
 #endif
@@ -1181,7 +1181,7 @@ fd_intern (int fd)
 {
 #ifdef _WIN32
   unsigned long arg = 1;
-  ioctlsocket (_get_osfhandle (fd), FIONBIO, &arg);
+  ioctlsocket (EV_FD_TO_WIN32_HANDLE (fd), FIONBIO, &arg);
 #else
   fcntl (fd, F_SETFD, FD_CLOEXEC);
   fcntl (fd, F_SETFL, O_NONBLOCK);
@@ -1296,7 +1296,7 @@ ev_sighandler (int signum)
   EV_P = signals [signum - 1].loop;
 #endif
 
-#if _WIN32
+#ifdef _WIN32
   signal (signum, ev_sighandler);
 #endif
 
@@ -2749,7 +2749,7 @@ ev_signal_start (EV_P_ ev_signal *w)
     if (sigfd < 0) /*TODO*/
 # endif
       {
-# if _WIN32
+# ifdef _WIN32
         evpipe_init (EV_A);
 
         signal (w->signum, ev_sighandler);
