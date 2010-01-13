@@ -1,6 +1,7 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 	- applied win32 fixes by Michael Lenaghan.
+        - remove dependency on sys/queue.h on freebsd (patch by Vanilla Hsu).
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

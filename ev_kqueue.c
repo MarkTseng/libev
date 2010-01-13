@@ -39,7 +39,6 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
-#include <sys/queue.h>
 #include <sys/event.h>
 #include <string.h>
 #include <errno.h>

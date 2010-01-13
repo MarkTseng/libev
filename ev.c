@@ -112,7 +112,7 @@ extern "C" {
 # endif
    
 # ifndef EV_USE_KQUEUE
-#  if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H
+#  if HAVE_KQUEUE && HAVE_SYS_EVENT_H
 #   define EV_USE_KQUEUE 1
 #  else
 #   define EV_USE_KQUEUE 0
