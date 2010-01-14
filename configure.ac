@@ -9,7 +9,7 @@ AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
 if test "x$GCC" = xyes ; then
-  CFLAGS="$CFLAGS -O3"
+  CFLAGS="-O3 $CFLAGS"
 fi
 
 m4_include([libev.m4])
