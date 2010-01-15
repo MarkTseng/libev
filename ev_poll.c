@@ -42,7 +42,7 @@
 void inline_size
 pollidx_init (int *base, int count)
 {
-  /* consider using memset (.., -1, ...), which is pratically guarenteed
+  /* consider using memset (.., -1, ...), which is pratically guaranteed
    * to work on all systems implementing poll */
   while (count--)
     *base++ = -1;
