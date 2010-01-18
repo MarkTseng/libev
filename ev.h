@@ -615,7 +615,7 @@ void ev_resume  (EV_P);
 # define ev_set_priority(ev,pri)             ((ev), (pri))
 #else
 # define ev_priority(ev)                     (+(((ev_watcher *)(void *)(ev))->priority))
-# define ev_set_priority(ev,pri)             (  (ev_watcher *)(void *)(ev))->priority = (pri)
+# define ev_set_priority(ev,pri)             (   (ev_watcher *)(void *)(ev))->priority = (pri)
 #endif
 
 #define ev_periodic_at(ev)                   (+((ev_watcher_time *)(ev))->at)
