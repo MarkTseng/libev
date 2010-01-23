@@ -2159,7 +2159,7 @@ timers_reschedule (EV_P_ ev_tstamp adjust)
 }
 
 /* fetch new monotonic and realtime times from the kernel */
-/* also detetc if there was a timejump, and act accordingly */
+/* also detect if there was a timejump, and act accordingly */
 inline_speed void
 time_update (EV_P_ ev_tstamp max_block)
 {
