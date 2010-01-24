@@ -346,6 +346,12 @@ extern "C" {
 
 /* this block fixes any misconfiguration where we know we run into trouble otherwise */
 
+#ifdef _AIX
+/* AIX has a completely broken poll.h header */
+# undef EV_USE_POLL
+# define EV_USE_POLL 0
+#endif
+
 #ifndef CLOCK_MONOTONIC
 # undef EV_USE_MONOTONIC
 # define EV_USE_MONOTONIC 0
