@@ -1,7 +1,7 @@
 /*
  * libev event processing core, watcher management
  *
- * Copyright (c) 2007,2008,2009 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009,2010 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -165,6 +165,7 @@ extern "C" {
 #include <errno.h>
 #include <sys/types.h>
 #include <time.h>
+#include <limits.h>
 
 #include <signal.h>
 
@@ -2861,7 +2862,9 @@ ev_child_stop (EV_P_ ev_child *w)
 static void noinline stat_timer_cb (EV_P_ ev_timer *w_, int revents);
 
 #if EV_USE_INOTIFY
-# define EV_INOTIFY_BUFSIZE 8192
+
+/* the * 2 is to allow for alignment padding, which for some reason is >> 8 */
+# define EV_INOTIFY_BUFSIZE (sizeof (struct inotify_event) * 2 + NAME_MAX)
 
 static void noinline
 infy_add (EV_P_ ev_stat *w)
@@ -2980,12 +2983,15 @@ static void
 infy_cb (EV_P_ ev_io *w, int revents)
 {
   char buf [EV_INOTIFY_BUFSIZE];
-  struct inotify_event *ev = (struct inotify_event *)buf;
   int ofs;
   int len = read (fs_fd, buf, sizeof (buf));
 
-  for (ofs = 0; ofs < len; ofs += sizeof (struct inotify_event) + ev->len)
-    infy_wd (EV_A_ ev->wd, ev->wd, ev);
+  for (ofs = 0; ofs < len; )
+    {
+      struct inotify_event *ev = (struct inotify_event *)(buf + ofs);
+      infy_wd (EV_A_ ev->wd, ev->wd, ev);
+      ofs += sizeof (struct inotify_event) + ev->len;
+    }
 }
 
 inline_size void
