@@ -2590,11 +2590,11 @@ ev_timer_stop (EV_P_ ev_timer *w)
       }
   }
 
-  EV_FREQUENT_CHECK;
-
   ev_at (w) -= mn_now;
 
   ev_stop (EV_A_ (W)w);
+
+  EV_FREQUENT_CHECK;
 }
 
 void noinline
@@ -2683,9 +2683,9 @@ ev_periodic_stop (EV_P_ ev_periodic *w)
       }
   }
 
-  EV_FREQUENT_CHECK;
-
   ev_stop (EV_A_ (W)w);
+
+  EV_FREQUENT_CHECK;
 }
 
 void noinline
@@ -3430,6 +3430,8 @@ ev_embed_stop (EV_P_ ev_embed *w)
   ev_io_stop      (EV_A_ &w->io);
   ev_prepare_stop (EV_A_ &w->prepare);
   ev_fork_stop    (EV_A_ &w->fork);
+
+  ev_stop (EV_A_ (W)w);
 
   EV_FREQUENT_CHECK;
 }
