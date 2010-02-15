@@ -3453,8 +3453,8 @@ L<http://modeemi.cs.tut.fi/~flux/software/ocaml-ev/>.
 
 =item Lua
 
-Brian Maher has written a partial interface to libev
-for lua (only C<ev_io> and C<ev_timer>), to be found at
+Brian Maher has written a partial interface to libev for lua (at the
+time of this writing, only C<ev_io> and C<ev_timer>), to be found at
 L<http://github.com/brimworks/lua-ev>.
 
 =back
