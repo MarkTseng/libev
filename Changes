@@ -9,6 +9,8 @@ Revision history for libev, a high-performance and full-featured event loop.
         - disable poll backend on AIX, the poll header spams the namespace
           and it's not worth working around dead platforms (reported
           and analyzed by Aivars Kalvans).
+        - improve header file compatibility of the standalone eventfd code
+          in an obscure case.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

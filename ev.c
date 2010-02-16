@@ -405,7 +405,7 @@ extern "C" {
 # ifdef __cplusplus
 extern "C" {
 # endif
-int eventfd (unsigned int initval, int flags);
+int (eventfd) (unsigned int initval, int flags);
 # ifdef __cplusplus
 }
 # endif
