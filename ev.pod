@@ -1869,7 +1869,7 @@ then this time is relative to the current event loop time, otherwise it's
 the timeout value currently configured.
 
 That is, after an C<ev_timer_set (w, 5, 7)>, C<ev_timer_remaining> returns
-C<5>. When the timer is started and one second passes, C<ev_timer_remain>
+C<5>. When the timer is started and one second passes, C<ev_timer_remaining>
 will return C<4>. When the timer expires and is restarted, it will return
 roughly C<7> (likely slightly less as callback invocation takes some time,
 too), and so on.
