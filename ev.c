@@ -186,6 +186,7 @@ extern "C" {
 # ifndef EV_SELECT_IS_WINSOCKET
 #  define EV_SELECT_IS_WINSOCKET 1
 # endif
+# undef EV_AVOID_STDIO
 #endif
 
 /* this block tries to deduce configuration from header-defined symbols and defaults */
@@ -526,6 +527,14 @@ static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? 
 
 /*****************************************************************************/
 
+#if EV_AVOID_STDIO
+static void noinline
+ev_printerr (const char *msg)
+{
+  write (STDERR_FILENO, msg, strlen (msg));
+}
+#endif
+
 static void (*syserr_cb)(const char *msg);
 
 void
@@ -545,11 +554,12 @@ ev_syserr (const char *msg)
   else
     {
 #if EV_AVOID_STDIO
-      write (STDERR_FILENO, msg, strlen (msg));
-      write (STDERR_FILENO, ": ", 2);
-      msg = strerror (errno);
-      write (STDERR_FILENO, msg, strlen (msg));
-      write (STDERR_FILENO, "\n", 1);
+      const char *err = strerror (errno);
+
+      ev_printerr (msg);
+      ev_printerr (": ");
+      ev_printerr (err);
+      ev_printerr ("\n");
 #else
       perror (msg);
 #endif
@@ -588,8 +598,7 @@ ev_realloc (void *ptr, long size)
   if (!ptr && size)
     {
 #if EV_AVOID_STDIO
-      write (STDERR_FILENO, "libev: memory allocation failed, aborting.",
-                    sizeof ("libev: memory allocation failed, aborting.") - 1);
+      ev_printerr ("libev: memory allocation failed, aborting.\n");
 #else
       fprintf (stderr, "libev: cannot allocate %ld bytes, aborting.", size);
 #endif
