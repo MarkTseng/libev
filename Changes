@@ -11,6 +11,9 @@ Revision history for libev, a high-performance and full-featured event loop.
           and analyzed by Aivars Kalvans).
         - improve header file compatibility of the standalone eventfd code
           in an obscure case.
+        - implement EV_AVOID_STDIO option.
+        - do not use sscanf to parse linux version number (smaller, faster,
+          no sscanf dependency).
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

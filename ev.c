@@ -544,7 +544,15 @@ ev_syserr (const char *msg)
     syserr_cb (msg);
   else
     {
+#if EV_AVOID_STDIO
+      write (STDERR_FILENO, msg, strlen (msg));
+      write (STDERR_FILENO, ": ", 2);
+      msg = strerror (errno);
+      write (STDERR_FILENO, msg, strlen (msg));
+      write (STDERR_FILENO, "\n", 1);
+#else
       perror (msg);
+#endif
       abort ();
     }
 }
@@ -579,7 +587,12 @@ ev_realloc (void *ptr, long size)
 
   if (!ptr && size)
     {
+#if EV_AVOID_STDIO
+      write (STDERR_FILENO, "libev: memory allocation failed, aborting.",
+                    sizeof ("libev: memory allocation failed, aborting.") - 1);
+#else
       fprintf (stderr, "libev: cannot allocate %ld bytes, aborting.", size);
+#endif
       abort ();
     }
 
@@ -2994,24 +3007,45 @@ infy_cb (EV_P_ ev_io *w, int revents)
     }
 }
 
+inline_size unsigned int
+ev_linux_version (void)
+{
+  struct utsname buf;
+  unsigned int v;
+  int i;
+  char *p = buf.release;
+
+  if (uname (&buf))
+    return 0;
+
+  for (i = 3+1; --i; )
+    {
+      unsigned int c = 0;
+
+      for (;;)
+        {
+          if (*p >= '0' && *p <= '9')
+            c = c * 10 + *p++ - '0';
+          else
+            {
+              p += *p == '.';
+              break;
+            }
+        }
+
+      v = (v << 8) | c;
+    }
+
+  return v;
+}
+
 inline_size void
-check_2625 (EV_P)
+ev_check_2625 (EV_P)
 {
   /* kernels < 2.6.25 are borked
    * http://www.ussg.indiana.edu/hypermail/linux/kernel/0711.3/1208.html
    */
-  struct utsname buf;
-  int major, minor, micro;
-
-  if (uname (&buf))
-    return;
-
-  if (sscanf (buf.release, "%d.%d.%d", &major, &minor, &micro) != 3)
-    return;
-
-  if (major < 2
-      || (major == 2 && minor < 6)
-      || (major == 2 && minor == 6 && micro < 25))
+  if (ev_linux_version () < 0x020619)
     return;
 
   fs_2625 = 1;
@@ -3036,7 +3070,7 @@ infy_init (EV_P)
 
   fs_fd = -1;
 
-  check_2625 (EV_A);
+  ev_check_2625 (EV_A);
 
   fs_fd = infy_newfd ();
 

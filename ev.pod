@@ -3619,12 +3619,19 @@ For this of course you need the m4 file:
 =head2 PREPROCESSOR SYMBOLS/MACROS
 
 Libev can be configured via a variety of preprocessor symbols you have to
-define before including any of its files. The default in the absence of
-autoconf is documented for every option.
+define before including (or compiling) any of its files. The default in
+the absence of autoconf is documented for every option.
+
+Symbols marked with "(h)" do not change the ABI, and can have different
+values when compiling libev vs. including F<ev.h>, so it is permissible
+to redefine them before including F<ev.h> without breakign compatibility
+to a compiled library. All other symbols change the ABI, which means all
+users of libev and the libev code itself must be compiled with compatible
+settings.
 
 =over 4
 
-=item EV_STANDALONE
+=item EV_STANDALONE (h)
 
 Must always be C<1> if you do not use autoconf configuration, which
 keeps libev from including F<config.h>, and it also defines dummy
@@ -3784,24 +3791,24 @@ as well as for signal and thread safety in C<ev_async> watchers.
 In the absence of this define, libev will use C<sig_atomic_t volatile>
 (from F<signal.h>), which is usually good enough on most platforms.
 
-=item EV_H
+=item EV_H (h)
 
 The name of the F<ev.h> header file used to include it. The default if
 undefined is C<"ev.h"> in F<event.h>, F<ev.c> and F<ev++.h>. This can be
 used to virtually rename the F<ev.h> header file in case of conflicts.
 
-=item EV_CONFIG_H
+=item EV_CONFIG_H (h)
 
 If C<EV_STANDALONE> isn't C<1>, this variable can be used to override
 F<ev.c>'s idea of where to find the F<config.h> file, similarly to
 C<EV_H>, above.
 
-=item EV_EVENT_H
+=item EV_EVENT_H (h)
 
 Similarly to C<EV_H>, this macro can be used to override F<event.c>'s idea
 of how the F<event.h> header can be found, the default is C<"event.h">.
 
-=item EV_PROTOTYPES
+=item EV_PROTOTYPES (h)
 
 If defined to be C<0>, then F<ev.h> will not define any function
 prototypes, but still define all the structs and other symbols. This is
@@ -3882,6 +3889,17 @@ Defining C<EV_MINIMAL> to C<2> will additionally reduce the core API to
 provide a bare-bones event library. See C<ev.h> for details on what parts
 of the API are still available, and do not complain if this subset changes
 over time.
+
+=item EV_AVOID_STDIO
+
+If this is set to C<1> at compiletime, then libev will avoid using stdio
+functions (printf, scanf, perror etc.). This will increase the codesize
+somewhat, but if your program doesn't otherwise depend on stdio and your
+libc allows it, this avoids linking in the stdio library which is quite
+big.
+
+Note that error messages might become less precise when this option is
+enabled.
 
 =item EV_NSIG
 
