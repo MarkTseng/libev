@@ -574,7 +574,7 @@ ev_realloc_emul (void *ptr, long size)
   return realloc (ptr, size);
 #else
   /* some systems, notably openbsd and darwin, fail to properly
-   * implement realloc (x, 0) (as required by both ansi c-98 and
+   * implement realloc (x, 0) (as required by both ansi c-89 and
    * the single unix specification, so work around them here.
    */
 
