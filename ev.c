@@ -574,7 +574,6 @@ ev_realloc_emul (void *ptr, long size)
    * implement realloc (x, 0) (as required by both ansi c-98 and
    * the single unix specification, so work around them here.
    */
-
   if (size)
     return realloc (ptr, size);
 
