@@ -570,6 +570,9 @@ ev_syserr (const char *msg)
 static void *
 ev_realloc_emul (void *ptr, long size)
 {
+#if __GLIBC__
+  return realloc (ptr, size);
+#else
   /* some systems, notably openbsd and darwin, fail to properly
    * implement realloc (x, 0) (as required by both ansi c-98 and
    * the single unix specification, so work around them here.
@@ -580,6 +583,7 @@ ev_realloc_emul (void *ptr, long size)
 
   free (ptr);
   return 0;
+#endif
 }
 
 static void *(*alloc)(void *ptr, long size) = ev_realloc_emul;
