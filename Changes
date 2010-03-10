@@ -1,8 +1,9 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+TODO: accept() documentation
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
-	- applied win32 fixes by Michael Lenaghan.
+	- applied win32 fixes by Michael Lenaghan (also James Mansion).
         - remove dependency on sys/queue.h on freebsd (patch by Vanilla Hsu).
         - configure now prepends -O3, not appends it, so one can still
           override it.
@@ -14,6 +15,7 @@ Revision history for libev, a high-performance and full-featured event loop.
         - implement EV_AVOID_STDIO option.
         - do not use sscanf to parse linux version number (smaller, faster,
           no sscanf dependency).
+        - new EV_CHILD_ENABLE and EV_SIGNAL_ENABLE configurable settings.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

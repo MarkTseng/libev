@@ -74,12 +74,24 @@ typedef double ev_tstamp;
 # define EV_FORK_ENABLE 1
 #endif
 
-#ifndef EV_EMBED_ENABLE
-# define EV_EMBED_ENABLE 1
+#ifndef EV_SIGNAL_ENABLE
+# define EV_SIGNAL_ENABLE 1
+#endif
+
+#ifndef EV_CHILD_ENABLE
+# ifdef _WIN32
+#  define EV_CHILD_ENABLE 0
+# else
+#  define EV_CHILD_ENABLE 1
+#endif
 #endif
 
 #ifndef EV_ASYNC_ENABLE
 # define EV_ASYNC_ENABLE 1
+#endif
+
+#ifndef EV_EMBED_ENABLE
+# define EV_EMBED_ENABLE 1
 #endif
 
 #ifndef EV_WALK_ENABLE
@@ -92,6 +104,11 @@ typedef double ev_tstamp;
 #endif
 
 /*****************************************************************************/
+
+#if EV_CHILD_ENABLE && !EV_SIGNAL_ENABLE
+# undef EV_SIGNAL_ENABLE
+# define EV_SIGNAL_ENABLE 1
+#endif
 
 #if EV_STAT_ENABLE
 # ifdef _WIN32
@@ -632,7 +649,9 @@ void ev_resume  (EV_P);
 /* accepts any ev_watcher type */
 void ev_feed_event     (EV_P_ void *w, int revents);
 void ev_feed_fd_event  (EV_P_ int fd, int revents);
+#if EV_SIGNAL_ENABLE
 void ev_feed_signal_event (EV_P_ int signum);
+#endif
 void ev_invoke         (EV_P_ void *w, int revents);
 int  ev_clear_pending  (EV_P_ void *w);
 
@@ -653,12 +672,16 @@ void ev_periodic_again (EV_P_ ev_periodic *w);
 #endif
 
 /* only supported in the default loop */
+#if EV_SIGNAL_ENABLE
 void ev_signal_start   (EV_P_ ev_signal *w);
 void ev_signal_stop    (EV_P_ ev_signal *w);
+#endif
 
 /* only supported in the default loop */
+# if EV_CHILD_ENABLE
 void ev_child_start    (EV_P_ ev_child *w);
 void ev_child_stop     (EV_P_ ev_child *w);
+# endif
 
 # if EV_STAT_ENABLE
 void ev_stat_start     (EV_P_ ev_stat *w);

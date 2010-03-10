@@ -209,12 +209,13 @@ extern "C" {
 #elif defined (MAX_SIG)
 # define EV_NSIG (MAX_SIG+1)
 #elif defined (SIGARRAYSIZE)
-# define EV_NSIG SIGARRAYSIZE /* Assume ary[SIGARRAYSIZE] */
+# define EV_NSIG (SIGARRAYSIZE) /* Assume ary[SIGARRAYSIZE] */
 #elif defined (_sys_nsig)
 # define EV_NSIG (_sys_nsig) /* Solaris 2.5 */
 #else
 # error "unable to find value for NSIG, please report"
-/* to make it compile regardless, just remove the above line */
+/* to make it compile regardless, just remove the above line, */
+/* but consider reporting it, too! :) */
 # define EV_NSIG 65
 #endif
 
@@ -994,7 +995,7 @@ fd_kill (EV_P_ int fd)
     }
 }
 
-/* check whether the given fd is atcually valid, for error recovery */
+/* check whether the given fd is actually valid, for error recovery */
 inline_size int
 fd_valid (int fd)
 {
@@ -1044,6 +1045,20 @@ fd_rearm_all (EV_P)
         anfds [fd].emask  = 0;
         fd_change (EV_A_ fd, EV__IOFDSET | EV_ANFD_REIFY);
       }
+}
+
+/* used to prepare libev internal fd's */
+/* this is not fork-safe */
+inline_speed void
+fd_intern (int fd)
+{
+#ifdef _WIN32
+  unsigned long arg = 1;
+  ioctlsocket (EV_FD_TO_WIN32_HANDLE (fd), FIONBIO, &arg);
+#else
+  fcntl (fd, F_SETFD, FD_CLOEXEC);
+  fcntl (fd, F_SETFL, O_NONBLOCK);
+#endif
 }
 
 /*****************************************************************************/
@@ -1207,26 +1222,14 @@ static ANSIG signals [EV_NSIG - 1];
 
 /*****************************************************************************/
 
-/* used to prepare libev internal fd's */
-/* this is not fork-safe */
-inline_speed void
-fd_intern (int fd)
-{
-#ifdef _WIN32
-  unsigned long arg = 1;
-  ioctlsocket (EV_FD_TO_WIN32_HANDLE (fd), FIONBIO, &arg);
-#else
-  fcntl (fd, F_SETFD, FD_CLOEXEC);
-  fcntl (fd, F_SETFL, O_NONBLOCK);
-#endif
-}
+#if EV_SIGNAL_ENABLE || EV_ASYNC_ENABLE
 
 static void noinline
 evpipe_init (EV_P)
 {
   if (!ev_is_active (&pipe_w))
     {
-#if EV_USE_EVENTFD
+# if EV_USE_EVENTFD
       evfd = eventfd (0, EFD_NONBLOCK | EFD_CLOEXEC);
       if (evfd < 0 && errno == EINVAL)
         evfd = eventfd (0, 0);
@@ -1238,7 +1241,7 @@ evpipe_init (EV_P)
           ev_io_set (&pipe_w, evfd, EV_READ);
         }
       else
-#endif
+# endif
         {
           while (pipe (evpipe))
             ev_syserr ("(libev) error creating signal/async pipe");
@@ -1259,6 +1262,7 @@ evpipe_write (EV_P_ EV_ATOMIC_T *flag)
   if (!*flag)
     {
       int old_errno = errno; /* save errno because write might clobber it */
+      char dummy;
 
       *flag = 1;
 
@@ -1270,7 +1274,7 @@ evpipe_write (EV_P_ EV_ATOMIC_T *flag)
         }
       else
 #endif
-        write (evpipe [1], &old_errno, 1);
+        write (evpipe [1], &dummy, 1);
 
       errno = old_errno;
     }
@@ -1381,11 +1385,12 @@ sigfdcb (EV_P_ ev_io *iow, int revents)
 }
 #endif
 
+#endif
+
 /*****************************************************************************/
 
+#if EV_CHILD_ENABLE
 static WL childs [EV_PID_HASHSIZE];
-
-#ifndef _WIN32
 
 static ev_signal childev;
 
@@ -1664,8 +1669,10 @@ loop_init (EV_P_ unsigned int flags)
 
       ev_prepare_init (&pending_w, pendingcb);
 
+#if EV_SIGNAL_ENABLE || EV_ASYNC_ENABLE
       ev_init (&pipe_w, pipecb);
       ev_set_priority (&pipe_w, EV_MAXPRI);
+#endif
     }
 }
 
@@ -1925,8 +1932,10 @@ ev_loop_verify (EV_P)
   array_verify (EV_A_ (W *)checks, checkcnt);
 
 # if 0
+#if EV_CHILD_ENABLE
   for (w = (ev_child *)childs [chain & (EV_PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
   for (signum = EV_NSIG; signum--; ) if (signals [signum].pending)
+#endif
 # endif
 #endif
 }
@@ -1952,7 +1961,7 @@ ev_default_loop (unsigned int flags)
 
       if (ev_backend (EV_A))
         {
-#ifndef _WIN32
+#if EV_CHILD_ENABLE
           ev_signal_init (&childev, childcb, SIGCHLD);
           ev_set_priority (&childev, EV_MAXPRI);
           ev_signal_start (EV_A_ &childev);
@@ -1975,7 +1984,7 @@ ev_default_destroy (void)
 
   ev_default_loop_ptr = 0;
 
-#ifndef _WIN32
+#if EV_CHILD_ENABLE
   ev_ref (EV_A); /* child watcher */
   ev_signal_stop (EV_A_ &childev);
 #endif
@@ -2727,6 +2736,8 @@ ev_periodic_again (EV_P_ ev_periodic *w)
 # define SA_RESTART 0
 #endif
 
+#if EV_SIGNAL_ENABLE
+
 void noinline
 ev_signal_start (EV_P_ ev_signal *w)
 {
@@ -2842,6 +2853,10 @@ ev_signal_stop (EV_P_ ev_signal *w)
   EV_FREQUENT_CHECK;
 }
 
+#endif
+
+#if EV_CHILD_ENABLE
+
 void
 ev_child_start (EV_P_ ev_child *w)
 {
@@ -2873,6 +2888,8 @@ ev_child_stop (EV_P_ ev_child *w)
 
   EV_FREQUENT_CHECK;
 }
+
+#endif
 
 #if EV_STAT_ENABLE
 

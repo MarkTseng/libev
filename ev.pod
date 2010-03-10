@@ -3868,10 +3868,20 @@ defined to be C<0>, then they are not.
 If undefined or defined to be C<1>, then fork watchers are supported. If
 defined to be C<0>, then they are not.
 
+=item EV_SIGNAL_ENABLE
+
+If undefined or defined to be C<1>, then signal watchers are supported. If
+defined to be C<0>, then they are not.
+
 =item EV_ASYNC_ENABLE
 
 If undefined or defined to be C<1>, then async watchers are supported. If
 defined to be C<0>, then they are not.
+
+=item EV_CHILD_ENABLE
+
+If undefined or defined to be C<1> (and C<_WIN32> is not defined), then
+child watchers are supported. If defined to be C<0>, then they are not.
 
 =item EV_MINIMAL
 
@@ -3883,12 +3893,49 @@ the default 4-heap.
 
 You can save even more by disabling watcher types you do not need
 and setting C<EV_MAXPRI> == C<EV_MINPRI>. Also, disabling C<assert>
-(C<-DNDEBUG>) will usually reduce code size a lot.
+(C<-DNDEBUG>) will usually reduce code size a lot. Disabling inotify,
+eventfd and signalfd will further help, and disabling backends one doesn't
+need (e.g. poll, epoll, kqueue, ports) will help further.
 
 Defining C<EV_MINIMAL> to C<2> will additionally reduce the core API to
 provide a bare-bones event library. See C<ev.h> for details on what parts
 of the API are still available, and do not complain if this subset changes
 over time.
+
+This example set of settings reduces the compiled size of libev from 24Kb
+to 8Kb on my GNU/Linux amd64 system (and leaves little in - there is also
+an effect on the amount of memory used). With an intelligent-enough linker
+further unused functions might be left out as well automatically.
+
+   // tuning and API changes
+   #define EV_MINIMAL 2
+   #define EV_MULTIPLICITY 0
+   #define EV_MINPRI 0
+   #define EV_MAXPRI 0
+
+   // OS-specific backends
+   #define EV_USE_INOTIFY 0
+   #define EV_USE_EVENTFD 0
+   #define EV_USE_SIGNALFD 0
+   #define EV_USE_REALTIME 0
+   #define EV_USE_MONOTONIC 0
+   #define EV_USE_CLOCK_SYSCALL 0
+
+   // disable all backends except select
+   #define EV_USE_POLL 0
+   #define EV_USE_PORT 0
+   #define EV_USE_KQUEUE 0
+   #define EV_USE_EPOLL 0
+
+   // disable all watcher types that cna be disabled
+   #define EV_STAT_ENABLE 0
+   #define EV_PERIODIC_ENABLE 0
+   #define EV_IDLE_ENABLE 0
+   #define EV_FORK_ENABLE 0
+   #define EV_SIGNAL_ENABLE 0
+   #define EV_CHILD_ENABLE 0
+   #define EV_ASYNC_ENABLE 0
+   #define EV_EMBED_ENABLE 0
 
 =item EV_AVOID_STDIO
 
