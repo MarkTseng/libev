@@ -66,6 +66,14 @@ typedef double ev_tstamp;
 # define EV_STAT_ENABLE 1
 #endif
 
+#ifndef EV_PREPARE_ENABLE
+# define EV_PREPARE_ENABLE 1
+#endif
+
+#ifndef EV_CHECK_ENABLE
+# define EV_CHECK_ENABLE 1
+#endif
+
 #ifndef EV_IDLE_ENABLE
 # define EV_IDLE_ENABLE 1
 #endif
@@ -694,11 +702,15 @@ void ev_idle_start     (EV_P_ ev_idle *w);
 void ev_idle_stop      (EV_P_ ev_idle *w);
 # endif
 
+#if EV_PREPARE_ENABLE
 void ev_prepare_start  (EV_P_ ev_prepare *w);
 void ev_prepare_stop   (EV_P_ ev_prepare *w);
+#endif
 
+#if EV_CHECK_ENABLE
 void ev_check_start    (EV_P_ ev_check *w);
 void ev_check_stop     (EV_P_ ev_check *w);
+#endif
 
 # if EV_FORK_ENABLE
 void ev_fork_start     (EV_P_ ev_fork *w);

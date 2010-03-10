@@ -1,7 +1,7 @@
 /*
  * libev simple C++ wrapper classes
  *
- * Copyright (c) 2007,2008 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2010 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -674,6 +674,7 @@ namespace ev {
   EV_END_WATCHER (periodic, periodic)
   #endif
 
+  #if EV_SIGNAL_ENABLE
   EV_BEGIN_WATCHER (sig, signal)
     void set (int signum) throw ()
     {
@@ -689,7 +690,9 @@ namespace ev {
       start ();
     }
   EV_END_WATCHER (sig, signal)
+  #endif
 
+  #if EV_CHILD_ENABLE
   EV_BEGIN_WATCHER (child, child)
     void set (int pid, int trace = 0) throw ()
     {
@@ -705,6 +708,7 @@ namespace ev {
       start ();
     }
   EV_END_WATCHER (child, child)
+  #endif
 
   #if EV_STAT_ENABLE
   EV_BEGIN_WATCHER (stat, stat)
@@ -730,19 +734,23 @@ namespace ev {
   EV_END_WATCHER (stat, stat)
   #endif
 
-#if EV_IDLE_ENABLE
+  #if EV_IDLE_ENABLE
   EV_BEGIN_WATCHER (idle, idle)
     void set () throw () { }
   EV_END_WATCHER (idle, idle)
-#endif
+  #endif
 
+  #if EV_PREPARE_ENABLE
   EV_BEGIN_WATCHER (prepare, prepare)
     void set () throw () { }
   EV_END_WATCHER (prepare, prepare)
+  #endif
 
+  #if EV_CHECK_ENABLE
   EV_BEGIN_WATCHER (check, check)
     void set () throw () { }
   EV_END_WATCHER (check, check)
+  #endif
 
   #if EV_EMBED_ENABLE
   EV_BEGIN_WATCHER (embed, embed)

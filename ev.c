@@ -893,7 +893,7 @@ queue_events (EV_P_ W *events, int eventcnt, int type)
 /*****************************************************************************/
 
 inline_speed void
-fd_event_nc (EV_P_ int fd, int revents)
+fd_event_nocheck (EV_P_ int fd, int revents)
 {
   ANFD *anfd = anfds + fd;
   ev_io *w;
@@ -915,14 +915,14 @@ fd_event (EV_P_ int fd, int revents)
   ANFD *anfd = anfds + fd;
 
   if (expect_true (!anfd->reify))
-    fd_event_nc (EV_A_ fd, revents);
+    fd_event_nocheck (EV_A_ fd, revents);
 }
 
 void
 ev_feed_fd_event (EV_P_ int fd, int revents)
 {
   if (fd >= 0 && fd < anfdmax)
-    fd_event_nc (EV_A_ fd, revents);
+    fd_event_nocheck (EV_A_ fd, revents);
 }
 
 /* make sure the external fd watch events are in-sync */
@@ -1800,9 +1800,11 @@ loop_fork (EV_P)
           EV_WIN32_CLOSE_FD (evpipe [1]);
         }
 
+#if EV_SIGNAL_ENABLE || EV_ASYNC_ENABLE
       evpipe_init (EV_A);
       /* now iterate over everything, in case we missed something */
       pipecb (EV_A_ &pipe_w, EV_READ);
+#endif
     }
 
   postfork = 0;
@@ -1925,11 +1927,15 @@ ev_loop_verify (EV_P)
   array_verify (EV_A_ (W *)asyncs, asynccnt);
 #endif
 
+#if EV_PREPARE_ENABLE
   assert (preparemax >= preparecnt);
   array_verify (EV_A_ (W *)prepares, preparecnt);
+#endif
 
+#if EV_CHECK_ENABLE
   assert (checkmax >= checkcnt);
   array_verify (EV_A_ (W *)checks, checkcnt);
+#endif
 
 # if 0
 #if EV_CHILD_ENABLE
@@ -2306,12 +2312,14 @@ ev_loop (EV_P_ int flags)
           }
 #endif
 
+#if EV_PREPARE_ENABLE
       /* queue prepare watchers (and execute them) */
       if (expect_false (preparecnt))
         {
           queue_events (EV_A_ (W *)prepares, preparecnt, EV_PREPARE);
           EV_INVOKE_PENDING;
         }
+#endif
 
       if (expect_false (loop_done))
         break;
@@ -2394,9 +2402,11 @@ ev_loop (EV_P_ int flags)
       idle_reify (EV_A);
 #endif
 
+#if EV_CHECK_ENABLE
       /* queue check watchers, to be executed first */
       if (expect_false (checkcnt))
         queue_events (EV_A_ (W *)checks, checkcnt, EV_CHECK);
+#endif
 
       EV_INVOKE_PENDING;
     }
@@ -3320,6 +3330,7 @@ ev_idle_stop (EV_P_ ev_idle *w)
 }
 #endif
 
+#if EV_PREPARE_ENABLE
 void
 ev_prepare_start (EV_P_ ev_prepare *w)
 {
@@ -3355,7 +3366,9 @@ ev_prepare_stop (EV_P_ ev_prepare *w)
 
   EV_FREQUENT_CHECK;
 }
+#endif
 
+#if EV_CHECK_ENABLE
 void
 ev_check_start (EV_P_ ev_check *w)
 {
@@ -3391,6 +3404,7 @@ ev_check_stop (EV_P_ ev_check *w)
 
   EV_FREQUENT_CHECK;
 }
+#endif
 
 #if EV_EMBED_ENABLE
 void noinline
@@ -3729,17 +3743,22 @@ ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w))
       cb (EV_A_ EV_ASYNC, asyncs [i]);
 #endif
 
+#if EV_PREPARE_ENABLE
   if (types & EV_PREPARE)
     for (i = preparecnt; i--; )
-#if EV_EMBED_ENABLE
+# if EV_EMBED_ENABLE
       if (ev_cb (prepares [i]) != embed_prepare_cb)
-#endif
+# endif
         cb (EV_A_ EV_PREPARE, prepares [i]);
+#endif
 
+#if EV_CHECK_ENABLE
   if (types & EV_CHECK)
     for (i = checkcnt; i--; )
       cb (EV_A_ EV_CHECK, checks [i]);
+#endif
 
+#if EV_SIGNAL_ENABLE
   if (types & EV_SIGNAL)
     for (i = 0; i < EV_NSIG - 1; ++i)
       for (wl = signals [i].head; wl; )
@@ -3748,7 +3767,9 @@ ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w))
           cb (EV_A_ EV_SIGNAL, wl);
           wl = wn;
         }
+#endif
 
+#if EV_CHILD_ENABLE
   if (types & EV_CHILD)
     for (i = EV_PID_HASHSIZE; i--; )
       for (wl = childs [i]; wl; )
@@ -3757,6 +3778,7 @@ ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w))
           cb (EV_A_ EV_CHILD, wl);
           wl = wn;
         }
+#endif
 /* EV_STAT     0x00001000 /* stat data changed */
 /* EV_EMBED    0x00010000 /* embedded event loop needs sweep */
 }

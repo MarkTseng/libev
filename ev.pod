@@ -3840,48 +3840,13 @@ fine.
 If your embedding application does not need any priorities, defining these
 both to C<0> will save some memory and CPU.
 
-=item EV_PERIODIC_ENABLE
+=item EV_PERIODIC_ENABLE, EV_IDLE_ENABLE, EV_EMBED_ENABLE, EV_STAT_ENABLE,
+EV_PREPARE_ENABLE, EV_CHECK_ENABLE, EV_FORK_ENABLE, EV_SIGNAL_ENABLE,
+EV_ASYNC_ENABLE, EV_CHILD_ENABLE.
 
-If undefined or defined to be C<1>, then periodic timers are supported. If
-defined to be C<0>, then they are not. Disabling them saves a few kB of
-code.
-
-=item EV_IDLE_ENABLE
-
-If undefined or defined to be C<1>, then idle watchers are supported. If
-defined to be C<0>, then they are not. Disabling them saves a few kB of
-code.
-
-=item EV_EMBED_ENABLE
-
-If undefined or defined to be C<1>, then embed watchers are supported. If
-defined to be C<0>, then they are not. Embed watchers rely on most other
-watcher types, which therefore must not be disabled.
-
-=item EV_STAT_ENABLE
-
-If undefined or defined to be C<1>, then stat watchers are supported. If
-defined to be C<0>, then they are not.
-
-=item EV_FORK_ENABLE
-
-If undefined or defined to be C<1>, then fork watchers are supported. If
-defined to be C<0>, then they are not.
-
-=item EV_SIGNAL_ENABLE
-
-If undefined or defined to be C<1>, then signal watchers are supported. If
-defined to be C<0>, then they are not.
-
-=item EV_ASYNC_ENABLE
-
-If undefined or defined to be C<1>, then async watchers are supported. If
-defined to be C<0>, then they are not.
-
-=item EV_CHILD_ENABLE
-
-If undefined or defined to be C<1> (and C<_WIN32> is not defined), then
-child watchers are supported. If defined to be C<0>, then they are not.
+If undefined or defined to be C<1> (and the platform supports it), then
+the respective watcher type is supported. If defined to be C<0>, then it
+is not. Disabling watcher types mainly saves codesize.
 
 =item EV_MINIMAL
 
@@ -3902,10 +3867,13 @@ provide a bare-bones event library. See C<ev.h> for details on what parts
 of the API are still available, and do not complain if this subset changes
 over time.
 
-This example set of settings reduces the compiled size of libev from 24Kb
-to 8Kb on my GNU/Linux amd64 system (and leaves little in - there is also
-an effect on the amount of memory used). With an intelligent-enough linker
-further unused functions might be left out as well automatically.
+This example set of settings reduces the compiled size of libev from
+23.9Kb to 7.7Kb on my GNU/Linux amd64 system (and leaves little
+in - there is also an effect on the amount of memory used). With
+an intelligent-enough linker (gcc+binutils do this when you use
+C<-Wl,--gc-sections -ffunction-sections>) further unused functions might
+be left out as well automatically - a binary starting a timer and an I/O
+watcher then might come out at only 5Kb.
 
    // tuning and API changes
    #define EV_MINIMAL 2
@@ -3931,6 +3899,8 @@ further unused functions might be left out as well automatically.
    #define EV_STAT_ENABLE 0
    #define EV_PERIODIC_ENABLE 0
    #define EV_IDLE_ENABLE 0
+   #define EV_CHECK_ENABLE 0
+   #define EV_PREPARE_ENABLE 0
    #define EV_FORK_ENABLE 0
    #define EV_SIGNAL_ENABLE 0
    #define EV_CHILD_ENABLE 0
