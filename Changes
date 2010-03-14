@@ -16,6 +16,7 @@ TODO: accept() documentation
         - do not use sscanf to parse linux version number (smaller, faster,
           no sscanf dependency).
         - new EV_CHILD_ENABLE and EV_SIGNAL_ENABLE configurable settings.
+        - add section on accept() problems to the manpage.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested
