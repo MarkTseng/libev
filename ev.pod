@@ -1034,7 +1034,7 @@ are:
 The file descriptor in the C<ev_io> watcher has become readable and/or
 writable.
 
-=item C<EV_TIMEOUT>
+=item C<EV_TIMER>
 
 The C<ev_timer> watcher has timed out.
 
@@ -1766,7 +1766,7 @@ callback, which will "do the right thing" and start the timer:
 
    ev_init (timer, callback);
    last_activity = ev_now (loop);
-   callback (loop, timer, EV_TIMEOUT);
+   callback (loop, timer, EV_TIMER);
 
 And when there is some activity, simply store the current time in
 C<last_activity>, no libev calls at all:
@@ -3181,9 +3181,9 @@ If C<timeout> is less than 0, then no timeout watcher will be
 started. Otherwise an C<ev_timer> watcher with after = C<timeout> (and
 repeat = 0) will be started. C<0> is a valid timeout.
 
-The callback has the type C<void (*cb)(int revents, void *arg)> and gets
+The callback has the type C<void (*cb)(int revents, void *arg)> and is
 passed an C<revents> set like normal event callbacks (a combination of
-C<EV_ERROR>, C<EV_READ>, C<EV_WRITE> or C<EV_TIMEOUT>) and the C<arg>
+C<EV_ERROR>, C<EV_READ>, C<EV_WRITE> or C<EV_TIMER>) and the C<arg>
 value passed to C<ev_once>. Note that it is possible to receive I<both>
 a timeout and an io event at the same time - you probably should give io
 events precedence.
@@ -3194,7 +3194,7 @@ Example: wait up to ten seconds for data to appear on STDIN_FILENO.
    {
      if (revents & EV_READ)
        /* stdin might have data for us, joy! */;
-     else if (revents & EV_TIMEOUT)
+     else if (revents & EV_TIMER)
        /* doh, nothing entered */;
    }
 
@@ -4623,6 +4623,30 @@ involves iterating over all running async watchers or all signal numbers.
 =back
 
 
+=head1 PORTING FROM 3.X TO 4.X
+
+The major version 4 introduced some minor incompatible changes to the API.
+
+=over 4
+
+=item C<EV_TIMEOUT> replaced by C<EV_TIMER> in C<revents>
+
+This is a simple rename - all other watcher types use their name
+as revents flag, and now C<ev_timer> does, too.
+
+Both C<EV_TIMER> and C<EV_TIMEOUT> symbols were present in 3.x versions
+and continue to be present for the forseeable future, so this is mostly a
+documentation change.
+
+=item C<EV_MINIMAL> mechanism replaced by C<EV_FEATURES>
+
+The preprocessor symbol C<EV_MINIMAL> has been replaced by a different
+mechanism, C<EV_FEATURES>. Programs using C<EV_MINIMAL> usually compile
+and work, but the library code will of course be larger.
+
+=back
+
+
 =head1 GLOSSARY
 
 =over 4
@@ -4653,7 +4677,7 @@ for reading on a file descriptor, time having passed or simply not having
 any other events happening anymore.
 
 In libev, events are represented as single bits (such as C<EV_READ> or
-C<EV_TIMEOUT>).
+C<EV_TIMER>).
 
 =item event library
 

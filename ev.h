@@ -47,7 +47,7 @@ extern "C" {
 /*****************************************************************************/
 
 #ifndef EV_FEATURES
-# define EV_FEATURES 0x3f
+# define EV_FEATURES 0x7f
 #endif
 
 #define EV_FEATURE_CODE     ((EV_FEATURES) &  1)
@@ -58,7 +58,7 @@ extern "C" {
 #define EV_FEATURE_BACKENDS ((EV_FEATURES) & 32)
 #define EV_FEATURE_OS       ((EV_FEATURES) & 64)
 
-/* these priorities are inclusive, higher priorities will be called earlier */
+/* these priorities are inclusive, higher priorities will be invoked earlier */
 #ifndef EV_MINPRI
 # define EV_MINPRI (EV_FEATURE_CONFIG ? -2 : 0)
 #endif
@@ -171,7 +171,14 @@ struct ev_loop;
 # define EV_INLINE static
 #endif
 
+#ifndef EV_PROTOTYPES
+# define EV_PROTOTYPES 1
+#endif
+
 /*****************************************************************************/
+
+#define EV_VERSION_MAJOR 4
+#define EV_VERSION_MINOR 0
 
 /* eventmask, revents, events... */
 #define EV_UNDEF            -1 /* guaranteed to be invalid */
@@ -199,12 +206,6 @@ struct ev_loop;
 #ifndef EV_COMMON
 # define EV_COMMON void *data;
 #endif
-#ifndef EV_PROTOTYPES
-# define EV_PROTOTYPES 1
-#endif
-
-#define EV_VERSION_MAJOR 3
-#define EV_VERSION_MINOR 9
 
 #ifndef EV_CB_DECLARE
 # define EV_CB_DECLARE(type) void (*cb)(EV_P_ struct type *w, int revents);
@@ -212,6 +213,9 @@ struct ev_loop;
 #ifndef EV_CB_INVOKE
 # define EV_CB_INVOKE(watcher,revents) (watcher)->cb (EV_A_ (watcher), (revents))
 #endif
+
+/* not official, do not use */
+#define EV_CB(type,name) void name (EV_P_ struct ev_ ## type *w, int revents)
 
 /*
  * struct member types:
@@ -232,7 +236,7 @@ struct ev_loop;
 
 #if EV_MINPRI == EV_MAXPRI
 # define EV_DECL_PRIORITY
-#else
+#elif !defined (EV_DECL_PRIORITY)
 # define EV_DECL_PRIORITY int priority;
 #endif
 

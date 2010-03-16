@@ -1,6 +1,7 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 TODO: ABI??? API????? Changes???
+TODO: win32 write() to socket for signal handling
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
 	- applied win32 fixes by Michael Lenaghan (also James Mansion).
@@ -19,6 +20,8 @@ TODO: ABI??? API????? Changes???
         - new EV_CHILD_ENABLE and EV_SIGNAL_ENABLE configurable settings.
         - update libev.m4 HAVE_CLOCK_SYSCALL test for newwer glibcs.
         - add section on accept() problems to the manpage.
+        - rename EV_TIMEOUT to EV_TIMER.
+        - switch to two-digit minor version.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested
