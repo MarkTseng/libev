@@ -3893,9 +3893,6 @@ speed (but with the full API), you can define this symbol to request
 certain subsets of functionality. The default is to enable all features
 that can be enabled on the platform.
 
-Note that using autoconf will usually override most of the features, so
-using this symbol makes sense mostly when embedding libev.
-
 A typical way to use this symbol is to define it to C<0> (or to a bitset
 with some broad features you want) and then selectively re-enable
 additional parts you want, for example if you want everything minimal,
@@ -3936,23 +3933,25 @@ runtime.
 This enables priorities (sets C<EV_MAXPRI>=2 and C<EV_MINPRI>=-2), and
 enables multiplicity (C<EV_MULTIPLICITY>=1).
 
-It also enables a lot of the "lesser used" core API functions. See C<ev.h>
-for details on which parts of the API are still available without this
+=item C<8> - full API
+
+This enables a lot of the "lesser used" API functions. See C<ev.h> for
+details on which parts of the API are still available without this
 feature, and do not complain if this subset changes over time.
 
-=item C<8> - enable all optional watcher types
+=item C<16> - enable all optional watcher types
 
 Enables all optional watcher types.  If you want to selectively enable
 only some watcher types other than I/O and timers (e.g. prepare,
 embed, async, child...) you can enable them manually by defining
 C<EV_watchertype_ENABLE> to C<1> instead.
 
-=item C<16> - enable all backends
+=item C<32> - enable all backends
 
 This enables all backends - without this feature, you need to enable at
 least one backend manually (C<EV_USE_SELECT> is a good choice).
 
-=item C<32> - enable OS-specific "helper" APIs
+=item C<64> - enable OS-specific "helper" APIs
 
 Enable inotify, eventfd, signalfd and similar OS-specific helper APIs by
 default.
@@ -4105,8 +4104,13 @@ file.
 The usage in rxvt-unicode is simpler. It has a F<ev_cpp.h> header file
 that everybody includes and which overrides some configure choices:
 
-   #define EV_FEATURES 0
+   #define EV_FEATURES 8
    #define EV_USE_SELECT 1
+   #define EV_PREPARE_ENABLE 1
+   #define EV_IDLE_ENABLE 1
+   #define EV_SIGNAL_ENABLE 1
+   #define EV_CHILD_ENABLE 1
+   #define EV_USE_STDEXCEPT 0
    #define EV_CONFIG_H <config.h>
 
    #include "ev++.h"

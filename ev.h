@@ -52,21 +52,22 @@ extern "C" {
 
 #define EV_FEATURE_CODE     ((EV_FEATURES) &  1)
 #define EV_FEATURE_DATA     ((EV_FEATURES) &  2)
-#define EV_FEATURE_API      ((EV_FEATURES) &  4)
-#define EV_FEATURE_WATCHERS ((EV_FEATURES) &  8)
-#define EV_FEATURE_BACKENDS ((EV_FEATURES) & 16)
-#define EV_FEATURE_OS       ((EV_FEATURES) & 32)
+#define EV_FEATURE_CONFIG   ((EV_FEATURES) &  4)
+#define EV_FEATURE_API      ((EV_FEATURES) &  8)
+#define EV_FEATURE_WATCHERS ((EV_FEATURES) & 16)
+#define EV_FEATURE_BACKENDS ((EV_FEATURES) & 32)
+#define EV_FEATURE_OS       ((EV_FEATURES) & 64)
 
 /* these priorities are inclusive, higher priorities will be called earlier */
 #ifndef EV_MINPRI
-# define EV_MINPRI (EV_FEATURE_API ? -2 : 0)
+# define EV_MINPRI (EV_FEATURE_CONFIG ? -2 : 0)
 #endif
 #ifndef EV_MAXPRI
-# define EV_MAXPRI (EV_FEATURE_API ? +2 : 0)
+# define EV_MAXPRI (EV_FEATURE_CONFIG ? +2 : 0)
 #endif
 
 #ifndef EV_MULTIPLICITY
-# define EV_MULTIPLICITY EV_FEATURE_API
+# define EV_MULTIPLICITY EV_FEATURE_CONFIG
 #endif
 
 #ifndef EV_PERIODIC_ENABLE

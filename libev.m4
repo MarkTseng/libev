@@ -11,7 +11,8 @@ AC_CHECK_FUNC(clock_gettime, [], [
    if test $(uname) = Linux; then
       AC_MSG_CHECKING(for clock_gettime syscall)
       AC_LINK_IFELSE([AC_LANG_PROGRAM(
-                      [#include <syscall.h>
+                      [#include <unistd.h>
+                       #include <sys/syscall.h>
                        #include <time.h>],
                       [struct timespec ts; int status = syscall (SYS_clock_gettime, CLOCK_REALTIME, &ts)])],
                      [ac_have_clock_syscall=1

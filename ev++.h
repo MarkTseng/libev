@@ -227,7 +227,7 @@ namespace ev {
       ev_unref (EV_AX);
     }
 
-#if EV_MINIMAL < 2
+#if EV_FEATURE_API
     unsigned int count () const throw ()
     {
       return ev_loop_count (EV_AX);
