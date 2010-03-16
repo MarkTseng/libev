@@ -11,6 +11,7 @@ ev_default_destroy
 ev_default_fork
 ev_default_loop_init
 ev_default_loop_ptr
+ev_depth
 ev_embed_start
 ev_embed_stop
 ev_embed_sweep
@@ -26,13 +27,11 @@ ev_invoke
 ev_invoke_pending
 ev_io_start
 ev_io_stop
+ev_iteration
 ev_loop
-ev_loop_count
-ev_loop_depth
 ev_loop_destroy
 ev_loop_fork
 ev_loop_new
-ev_loop_verify
 ev_now
 ev_now_update
 ev_once
@@ -68,5 +67,6 @@ ev_timer_stop
 ev_unloop
 ev_unref
 ev_userdata
+ev_verify
 ev_version_major
 ev_version_minor
