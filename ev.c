@@ -2098,7 +2098,7 @@ timers_reify (EV_P)
         }
       while (timercnt && ANHE_at (timers [HEAP0]) < mn_now);
 
-      feed_reverse_done (EV_A_ EV_TIMEOUT);
+      feed_reverse_done (EV_A_ EV_TIMER);
     }
 }
 
@@ -3638,7 +3638,7 @@ ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, vo
 
   if (expect_false (!once))
     {
-      cb (EV_ERROR | EV_READ | EV_WRITE | EV_TIMEOUT, arg);
+      cb (EV_ERROR | EV_READ | EV_WRITE | EV_TIMER, arg);
       return;
     }
 

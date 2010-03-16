@@ -187,8 +187,8 @@ struct ev_loop;
 #define EV_WRITE          0x02 /* ev_io detected write will not block */
 #define EV__IOFDSET       0x80 /* internal use only */
 #define EV_IO          EV_READ /* alias for type-detection */
-#define EV_TIMEOUT  0x00000100 /* timer timed out */
-#define EV_TIMER    EV_TIMEOUT /* alias for type-detection */
+#define EV_TIMER    0x00000100 /* timer timed out */
+#define EV_TIMEOUT    EV_TIMER /* pre 4.0 API compatibility */
 #define EV_PERIODIC 0x00000200 /* periodic timer timed out */
 #define EV_SIGNAL   0x00000400 /* signal was received */
 #define EV_CHILD    0x00000800 /* child/pid had status change */
@@ -594,10 +594,11 @@ unsigned int ev_iteration (EV_P); /* number of loop iterations */
 unsigned int ev_depth     (EV_P); /* #ev_loop enters - #ev_loop leaves */
 void         ev_verify    (EV_P); /* abort if loop data corrupted */
 
-/* pre 4.0 API */
+/* pre 4.0 API compatibility */
 #  if EV_MULTIPLICITY
-#   define ev_loop_count(l) ev_iteration (l)
-#   define ev_loop_depth(l) ev_depth (l)
+#   define ev_loop_count(l)  ev_iteration (l)
+#   define ev_loop_depth(l)  ev_depth (l)
+#   define ev_loop_verify(l) ev_verify (l)
 #  endif
 
 void ev_set_io_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
