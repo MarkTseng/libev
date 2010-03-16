@@ -3886,64 +3886,90 @@ If undefined or defined to be C<1> (and the platform supports it), then
 the respective watcher type is supported. If defined to be C<0>, then it
 is not. Disabling watcher types mainly saves codesize.
 
-=item EV_MINIMAL
+=item EV_FEATURES
 
 If you need to shave off some kilobytes of code at the expense of some
-speed (but with the full API), define this symbol to C<1>. Currently this
-is used to override some inlining decisions, saves roughly 30% code size
-on amd64. It also selects a much smaller 2-heap for timer management over
-the default 4-heap.
+speed (but with the full API), you can define this symbol to request
+certain subsets of functionality. The default is to enable all features
+that can be enabled on the platform.
 
-You can save even more by disabling watcher types you do not need
-and setting C<EV_MAXPRI> == C<EV_MINPRI>. Also, disabling C<assert>
-(C<-DNDEBUG>) will usually reduce code size a lot. Disabling inotify,
-eventfd and signalfd will further help, and disabling backends one doesn't
-need (e.g. poll, epoll, kqueue, ports) will help further.
+Note that using autoconf will usually override most of the features, so
+using this symbol makes sense mostly when embedding libev.
 
-Defining C<EV_MINIMAL> to C<2> will additionally reduce the core API to
-provide a bare-bones event library. See C<ev.h> for details on what parts
-of the API are still available, and do not complain if this subset changes
-over time.
+A typical way to use this symbol is to define it to C<0> (or to a bitset
+with some broad features you want) and then selectively re-enable
+additional parts you want, for example if you want everything minimal,
+but multiple event loop support, async and child watchers and the poll
+backend, use this:
 
-This example set of settings reduces the compiled size of libev from
-23.9Kb to 7.7Kb on my GNU/Linux amd64 system (and leaves little
-in - there is also an effect on the amount of memory used). With
-an intelligent-enough linker (gcc+binutils do this when you use
-C<-Wl,--gc-sections -ffunction-sections>) further unused functions might
-be left out as well automatically - a binary starting a timer and an I/O
-watcher then might come out at only 5Kb.
+   #define EV_FEATURES 0
+   #define EV_MULTIPLICITY 1
+   #define EV_USE_POLL 1
+   #define EV_CHILD_ENABLE 1
+   #define EV_ASYNC_ENABLE 1
 
-   // tuning and API changes
-   #define EV_MINIMAL 2
-   #define EV_MULTIPLICITY 0
-   #define EV_MINPRI 0
-   #define EV_MAXPRI 0
+The actual value is a bitset, it can be a combination of the following
+values:
 
-   // OS-specific backends
-   #define EV_USE_INOTIFY 0
-   #define EV_USE_EVENTFD 0
-   #define EV_USE_SIGNALFD 0
-   #define EV_USE_REALTIME 0
-   #define EV_USE_MONOTONIC 0
-   #define EV_USE_CLOCK_SYSCALL 0
+=over 4
 
-   // disable all backends except select
-   #define EV_USE_POLL 0
-   #define EV_USE_PORT 0
-   #define EV_USE_KQUEUE 0
-   #define EV_USE_EPOLL 0
+=item C<1> - faster/larger code
 
-   // disable all watcher types that cna be disabled
-   #define EV_STAT_ENABLE 0
-   #define EV_PERIODIC_ENABLE 0
-   #define EV_IDLE_ENABLE 0
-   #define EV_CHECK_ENABLE 0
-   #define EV_PREPARE_ENABLE 0
-   #define EV_FORK_ENABLE 0
-   #define EV_SIGNAL_ENABLE 0
-   #define EV_CHILD_ENABLE 0
-   #define EV_ASYNC_ENABLE 0
-   #define EV_EMBED_ENABLE 0
+Use larger code to speed up some operations.
+
+Currently this is used to override some inlining decisions (enlarging the  roughly
+30% code size on amd64.
+
+Also disables C<assert>'s in the code, unless you define C<NDEBUG>
+explicitly to C<0>.
+
+Use of compiler flags such as C<-Os> with gcc that optimise for size are
+recommended when disabling this feature.
+
+=item C<2> - faster/larger data structures
+
+Replaces the small 2-heap for timer management by a faster 4-heap, larger
+hash table sizes and so on. This will usually further increase codesize
+and can additionally have an effect on the size of data structures at
+runtime.
+
+=item C<4> - full API configuration
+
+This enables priorities (sets C<EV_MAXPRI>=2 and C<EV_MINPRI>=-2), and
+enables multiplicity (C<EV_MULTIPLICITY>=1).
+
+It also enables a lot of the "lesser used" core API functions. See C<ev.h>
+for details on which parts of the API are still available without this
+feature, and do not complain if this subset changes over time.
+
+=item C<8> - enable all optional watcher types
+
+Enables all optional watcher types.  If you want to selectively enable
+only some watcher types other than I/O and timers (e.g. prepare,
+embed, async, child...) you can enable them manually by defining
+C<EV_watchertype_ENABLE> to C<1> instead.
+
+=item C<16> - enable all backends
+
+This enables all backends - without this feature, you need to enable at
+least one backend manually (C<EV_USE_SELECT> is a good choice).
+
+=item C<32> - enable OS-specific "helper" APIs
+
+Enable inotify, eventfd, signalfd and similar OS-specific helper APIs by
+default.
+
+=back
+
+Compiling with C<gcc -Os -DEV_STANDALONE -DEV_USE_EPOLL=1 -DEV_FEATURES=0>
+reduces the compiled size of libev from 24.7Kb to 6.5Kb on my GNU/Linux
+amd64 system, while still giving you I/O watchers, timers and monotonic
+clock support.
+
+With an intelligent-enough linker (gcc+binutils are intelligent enough
+when you use C<-Wl,--gc-sections -ffunction-sections>) functions unused by
+your program might be left out as well - a binary starting a timer and an
+I/O watcher then might come out at only 5Kb.
 
 =item EV_AVOID_STDIO
 
@@ -3968,17 +3994,17 @@ statically allocates some 12-24 bytes per signal number.
 =item EV_PID_HASHSIZE
 
 C<ev_child> watchers use a small hash table to distribute workload by
-pid. The default size is C<16> (or C<1> with C<EV_MINIMAL>), usually more
-than enough. If you need to manage thousands of children you might want to
-increase this value (I<must> be a power of two).
+pid. The default size is C<16> (or C<1> with C<EV_FEATURES> disabled),
+usually more than enough. If you need to manage thousands of children you
+might want to increase this value (I<must> be a power of two).
 
 =item EV_INOTIFY_HASHSIZE
 
 C<ev_stat> watchers use a small hash table to distribute workload by
-inotify watch id. The default size is C<16> (or C<1> with C<EV_MINIMAL>),
-usually more than enough. If you need to manage thousands of C<ev_stat>
-watchers you might want to increase this value (I<must> be a power of
-two).
+inotify watch id. The default size is C<16> (or C<1> with C<EV_FEATURES>
+disabled), usually more than enough. If you need to manage thousands of
+C<ev_stat> watchers you might want to increase this value (I<must> be a
+power of two).
 
 =item EV_USE_4HEAP
 
@@ -3987,8 +4013,8 @@ timer and periodics heaps, libev uses a 4-heap when this symbol is defined
 to C<1>. The 4-heap uses more complicated (longer) code but has noticeably
 faster performance with many (thousands) of watchers.
 
-The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
-(disabled).
+The default is C<1>, unless C<EV_FEATURES> overrides it, in which case it
+will be C<0>.
 
 =item EV_HEAP_CACHE_AT
 
@@ -3999,8 +4025,8 @@ which uses 8-12 bytes more per watcher and a few hundred bytes more code,
 but avoids random read accesses on heap changes. This improves performance
 noticeably with many (hundreds) of watchers.
 
-The default is C<1> unless C<EV_MINIMAL> is set in which case it is C<0>
-(disabled).
+The default is C<1>, unless C<EV_FEATURES> overrides it, in which case it
+will be C<0>.
 
 =item EV_VERIFY
 
@@ -4012,8 +4038,8 @@ called once per loop, which can slow down libev. If set to C<3>, then the
 verification code will be called very frequently, which will slow down
 libev considerably.
 
-The default is C<1>, unless C<EV_MINIMAL> is set, in which case it will be
-C<0>.
+The default is C<1>, unless C<EV_FEATURES> overrides it, in which case it
+will be C<0>.
 
 =item EV_COMMON
 
@@ -4081,15 +4107,9 @@ file.
 The usage in rxvt-unicode is simpler. It has a F<ev_cpp.h> header file
 that everybody includes and which overrides some configure choices:
 
-   #define EV_MINIMAL 1
-   #define EV_USE_POLL 0
-   #define EV_MULTIPLICITY 0
-   #define EV_PERIODIC_ENABLE 0
-   #define EV_STAT_ENABLE 0
-   #define EV_FORK_ENABLE 0
+   #define EV_FEATURES 0
+   #define EV_USE_SELECT 1
    #define EV_CONFIG_H <config.h>
-   #define EV_MINPRI 0
-   #define EV_MAXPRI 0
 
    #include "ev++.h"
 

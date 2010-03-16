@@ -221,7 +221,7 @@ extern "C" {
 
 #ifndef EV_USE_CLOCK_SYSCALL
 # if __linux && __GLIBC__ >= 2
-#  define EV_USE_CLOCK_SYSCALL 1
+#  define EV_USE_CLOCK_SYSCALL EV_FEATURE_OS
 # else
 #  define EV_USE_CLOCK_SYSCALL 0
 # endif
@@ -229,7 +229,7 @@ extern "C" {
 
 #ifndef EV_USE_MONOTONIC
 # if defined (_POSIX_MONOTONIC_CLOCK) && _POSIX_MONOTONIC_CLOCK >= 0
-#  define EV_USE_MONOTONIC 1
+#  define EV_USE_MONOTONIC EV_FEATURE_OS
 # else
 #  define EV_USE_MONOTONIC 0
 # endif
@@ -241,27 +241,27 @@ extern "C" {
 
 #ifndef EV_USE_NANOSLEEP
 # if _POSIX_C_SOURCE >= 199309L
-#  define EV_USE_NANOSLEEP 1
+#  define EV_USE_NANOSLEEP EV_FEATURE_OS
 # else
 #  define EV_USE_NANOSLEEP 0
 # endif
 #endif
 
 #ifndef EV_USE_SELECT
-# define EV_USE_SELECT 1
+# define EV_USE_SELECT EV_FEATURE_BACKENDS
 #endif
 
 #ifndef EV_USE_POLL
 # ifdef _WIN32
 #  define EV_USE_POLL 0
 # else
-#  define EV_USE_POLL 1
+#  define EV_USE_POLL EV_FEATURE_BACKENDS
 # endif
 #endif
 
 #ifndef EV_USE_EPOLL
 # if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 4))
-#  define EV_USE_EPOLL 1
+#  define EV_USE_EPOLL EV_FEATURE_BACKENDS
 # else
 #  define EV_USE_EPOLL 0
 # endif
@@ -277,31 +277,23 @@ extern "C" {
 
 #ifndef EV_USE_INOTIFY
 # if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 4))
-#  define EV_USE_INOTIFY 1
+#  define EV_USE_INOTIFY EV_FEATURE_OS
 # else
 #  define EV_USE_INOTIFY 0
 # endif
 #endif
 
 #ifndef EV_PID_HASHSIZE
-# if EV_MINIMAL
-#  define EV_PID_HASHSIZE 1
-# else
-#  define EV_PID_HASHSIZE 16
-# endif
+# define EV_PID_HASHSIZE EV_FEATURE_DATA ? 16 : 1
 #endif
 
 #ifndef EV_INOTIFY_HASHSIZE
-# if EV_MINIMAL
-#  define EV_INOTIFY_HASHSIZE 1
-# else
-#  define EV_INOTIFY_HASHSIZE 16
-# endif
+# define EV_INOTIFY_HASHSIZE EV_FEATURE_DATA ? 16 : 1
 #endif
 
 #ifndef EV_USE_EVENTFD
 # if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 7))
-#  define EV_USE_EVENTFD 1
+#  define EV_USE_EVENTFD EV_FEATURE_OS
 # else
 #  define EV_USE_EVENTFD 0
 # endif
@@ -309,7 +301,7 @@ extern "C" {
 
 #ifndef EV_USE_SIGNALFD
 # if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 7))
-#  define EV_USE_SIGNALFD 1
+#  define EV_USE_SIGNALFD EV_FEATURE_OS
 # else
 #  define EV_USE_SIGNALFD 0
 # endif
@@ -322,15 +314,15 @@ extern "C" {
 #endif
 
 #ifndef EV_VERIFY
-# define EV_VERIFY !EV_MINIMAL
+# define EV_VERIFY (EV_FEATURE_API ? 1 : 0)
 #endif
 
 #ifndef EV_USE_4HEAP
-# define EV_USE_4HEAP !EV_MINIMAL
+# define EV_USE_4HEAP EV_FEATURE_DATA
 #endif
 
 #ifndef EV_HEAP_CACHE_AT
-# define EV_HEAP_CACHE_AT !EV_MINIMAL
+# define EV_HEAP_CACHE_AT EV_FEATURE_DATA
 #endif
 
 /* on linux, we can use a (slow) syscall to avoid a dependency on pthread, */
@@ -478,10 +470,10 @@ struct signalfd_siginfo
 #define expect_true(expr)  expect ((expr) != 0, 1)
 #define inline_size        static inline
 
-#if EV_MINIMAL
-# define inline_speed      static noinline
-#else
+#if EV_FEATURE_CODE
 # define inline_speed      static inline
+#else
+# define inline_speed      static noinline
 #endif
 
 #define NUMPRI (EV_MAXPRI - EV_MINPRI + 1)
@@ -698,7 +690,7 @@ typedef struct
 
 #endif
 
-#if EV_MINIMAL < 2
+#if EV_FEATURE_API
 # define EV_RELEASE_CB if (expect_false (release_cb)) release_cb (EV_A)
 # define EV_ACQUIRE_CB if (expect_false (acquire_cb)) acquire_cb (EV_A)
 # define EV_INVOKE_PENDING invoke_cb (EV_A)
@@ -1405,7 +1397,7 @@ child_reap (EV_P_ int chain, int pid, int status)
   ev_child *w;
   int traced = WIFSTOPPED (status) || WIFCONTINUED (status);
 
-  for (w = (ev_child *)childs [chain & (EV_PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
+  for (w = (ev_child *)childs [chain & ((EV_PID_HASHSIZE) - 1)]; w; w = (ev_child *)((WL)w)->next)
     {
       if ((w->pid == pid || !w->pid)
           && (!traced || (w->flags & 1)))
@@ -1440,7 +1432,7 @@ childcb (EV_P_ ev_signal *sw, int revents)
   ev_feed_event (EV_A_ (W)sw, EV_SIGNAL);
 
   child_reap (EV_A_ pid, pid, status);
-  if (EV_PID_HASHSIZE > 1)
+  if ((EV_PID_HASHSIZE) > 1)
     child_reap (EV_A_ 0, pid, status); /* this might trigger a watcher twice, but feed_event catches that */
 }
 
@@ -1539,7 +1531,7 @@ ev_backend (EV_P)
   return backend;
 }
 
-#if EV_MINIMAL < 2
+#if EV_FEATURE_API
 unsigned int
 ev_loop_count (EV_P)
 {
@@ -1629,7 +1621,7 @@ loop_init (EV_P_ unsigned int flags)
       mn_now            = get_clock ();
       now_floor         = mn_now;
       rtmn_diff         = ev_rt_now - mn_now;
-#if EV_MINIMAL < 2
+#if EV_FEATURE_API
       invoke_cb         = ev_invoke_pending;
 #endif
 
@@ -1876,7 +1868,7 @@ array_verify (EV_P_ W *ws, int cnt)
 }
 #endif
 
-#if EV_MINIMAL < 2
+#if EV_FEATURE_API
 void
 ev_loop_verify (EV_P)
 {
@@ -1939,7 +1931,7 @@ ev_loop_verify (EV_P)
 
 # if 0
 #if EV_CHILD_ENABLE
-  for (w = (ev_child *)childs [chain & (EV_PID_HASHSIZE - 1)]; w; w = (ev_child *)((WL)w)->next)
+  for (w = (ev_child *)childs [chain & ((EV_PID_HASHSIZE) - 1)]; w; w = (ev_child *)((WL)w)->next)
   for (signum = EV_NSIG; signum--; ) if (signals [signum].pending)
 #endif
 # endif
@@ -2277,7 +2269,7 @@ time_update (EV_P_ ev_tstamp max_block)
 void
 ev_loop (EV_P_ int flags)
 {
-#if EV_MINIMAL < 2
+#if EV_FEATURE_API
   ++loop_depth;
 #endif
 
@@ -2380,7 +2372,7 @@ ev_loop (EV_P_ int flags)
               }
           }
 
-#if EV_MINIMAL < 2
+#if EV_FEATURE_API
         ++loop_count;
 #endif
         assert ((loop_done = EVUNLOOP_RECURSE, 1)); /* assert for side effect */
@@ -2419,7 +2411,7 @@ ev_loop (EV_P_ int flags)
   if (loop_done == EVUNLOOP_ONE)
     loop_done = EVUNLOOP_CANCEL;
 
-#if EV_MINIMAL < 2
+#if EV_FEATURE_API
   --loop_depth;
 #endif
 }
@@ -2879,7 +2871,7 @@ ev_child_start (EV_P_ ev_child *w)
   EV_FREQUENT_CHECK;
 
   ev_start (EV_A_ (W)w, 1);
-  wlist_add (&childs [w->pid & (EV_PID_HASHSIZE - 1)], (WL)w);
+  wlist_add (&childs [w->pid & ((EV_PID_HASHSIZE) - 1)], (WL)w);
 
   EV_FREQUENT_CHECK;
 }
@@ -2893,7 +2885,7 @@ ev_child_stop (EV_P_ ev_child *w)
 
   EV_FREQUENT_CHECK;
 
-  wlist_del (&childs [w->pid & (EV_PID_HASHSIZE - 1)], (WL)w);
+  wlist_del (&childs [w->pid & ((EV_PID_HASHSIZE) - 1)], (WL)w);
   ev_stop (EV_A_ (W)w);
 
   EV_FREQUENT_CHECK;
@@ -2976,7 +2968,7 @@ infy_add (EV_P_ ev_stat *w)
     }
 
   if (w->wd >= 0)
-    wlist_add (&fs_hash [w->wd & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
+    wlist_add (&fs_hash [w->wd & ((EV_INOTIFY_HASHSIZE) - 1)].head, (WL)w);
 
   /* now re-arm timer, if required */
   if (ev_is_active (&w->timer)) ev_ref (EV_A);
@@ -2994,7 +2986,7 @@ infy_del (EV_P_ ev_stat *w)
     return;
 
   w->wd = -2;
-  slot = wd & (EV_INOTIFY_HASHSIZE - 1);
+  slot = wd & ((EV_INOTIFY_HASHSIZE) - 1);
   wlist_del (&fs_hash [slot].head, (WL)w);
 
   /* remove this watcher, if others are watching it, they will rearm */
@@ -3006,13 +2998,13 @@ infy_wd (EV_P_ int slot, int wd, struct inotify_event *ev)
 {
   if (slot < 0)
     /* overflow, need to check for all hash slots */
-    for (slot = 0; slot < EV_INOTIFY_HASHSIZE; ++slot)
+    for (slot = 0; slot < (EV_INOTIFY_HASHSIZE); ++slot)
       infy_wd (EV_A_ slot, wd, ev);
   else
     {
       WL w_;
 
-      for (w_ = fs_hash [slot & (EV_INOTIFY_HASHSIZE - 1)].head; w_; )
+      for (w_ = fs_hash [slot & ((EV_INOTIFY_HASHSIZE) - 1)].head; w_; )
         {
           ev_stat *w = (ev_stat *)w_;
           w_ = w_->next; /* lets us remove this watcher and all before it */
@@ -3021,7 +3013,7 @@ infy_wd (EV_P_ int slot, int wd, struct inotify_event *ev)
             {
               if (ev->mask & (IN_IGNORED | IN_UNMOUNT | IN_DELETE_SELF))
                 {
-                  wlist_del (&fs_hash [slot & (EV_INOTIFY_HASHSIZE - 1)].head, (WL)w);
+                  wlist_del (&fs_hash [slot & ((EV_INOTIFY_HASHSIZE) - 1)].head, (WL)w);
                   w->wd = -1;
                   infy_add (EV_A_ w); /* re-add, no matter what */
                 }
@@ -3145,7 +3137,7 @@ infy_fork (EV_P)
       ev_unref (EV_A);
     }
 
-  for (slot = 0; slot < EV_INOTIFY_HASHSIZE; ++slot)
+  for (slot = 0; slot < (EV_INOTIFY_HASHSIZE); ++slot)
     {
       WL w_ = fs_hash [slot].head;
       fs_hash [slot].head = 0;
@@ -3771,7 +3763,7 @@ ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w))
 
 #if EV_CHILD_ENABLE
   if (types & EV_CHILD)
-    for (i = EV_PID_HASHSIZE; i--; )
+    for (i = (EV_PID_HASHSIZE); i--; )
       for (wl = childs [i]; wl; )
         {
           wn = wl->next;

@@ -1,7 +1,7 @@
 /*
  * libev native API header
  *
- * Copyright (c) 2007,2008,2009 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009,2010 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -44,71 +44,77 @@
 extern "C" {
 #endif
 
-typedef double ev_tstamp;
+/*****************************************************************************/
+
+#ifndef EV_FEATURES
+# define EV_FEATURES 0x3f
+#endif
+
+#define EV_FEATURE_CODE     ((EV_FEATURES) &  1)
+#define EV_FEATURE_DATA     ((EV_FEATURES) &  2)
+#define EV_FEATURE_API      ((EV_FEATURES) &  4)
+#define EV_FEATURE_WATCHERS ((EV_FEATURES) &  8)
+#define EV_FEATURE_BACKENDS ((EV_FEATURES) & 16)
+#define EV_FEATURE_OS       ((EV_FEATURES) & 32)
 
 /* these priorities are inclusive, higher priorities will be called earlier */
 #ifndef EV_MINPRI
-# define EV_MINPRI -2
+# define EV_MINPRI (EV_FEATURE_API ? -2 : 0)
 #endif
 #ifndef EV_MAXPRI
-# define EV_MAXPRI +2
+# define EV_MAXPRI (EV_FEATURE_API ? +2 : 0)
 #endif
 
 #ifndef EV_MULTIPLICITY
-# define EV_MULTIPLICITY 1
+# define EV_MULTIPLICITY EV_FEATURE_API
 #endif
 
 #ifndef EV_PERIODIC_ENABLE
-# define EV_PERIODIC_ENABLE 1
+# define EV_PERIODIC_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_STAT_ENABLE
-# define EV_STAT_ENABLE 1
+# define EV_STAT_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_PREPARE_ENABLE
-# define EV_PREPARE_ENABLE 1
+# define EV_PREPARE_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_CHECK_ENABLE
-# define EV_CHECK_ENABLE 1
+# define EV_CHECK_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_IDLE_ENABLE
-# define EV_IDLE_ENABLE 1
+# define EV_IDLE_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_FORK_ENABLE
-# define EV_FORK_ENABLE 1
+# define EV_FORK_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_SIGNAL_ENABLE
-# define EV_SIGNAL_ENABLE 1
+# define EV_SIGNAL_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_CHILD_ENABLE
 # ifdef _WIN32
 #  define EV_CHILD_ENABLE 0
 # else
-#  define EV_CHILD_ENABLE 1
+#  define EV_CHILD_ENABLE EV_FEATURE_WATCHERS
 #endif
 #endif
 
 #ifndef EV_ASYNC_ENABLE
-# define EV_ASYNC_ENABLE 1
+# define EV_ASYNC_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_EMBED_ENABLE
-# define EV_EMBED_ENABLE 1
+# define EV_EMBED_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_WALK_ENABLE
 # define EV_WALK_ENABLE 0 /* not yet */
-#endif
-
-#ifndef EV_ATOMIC_T
-# include <signal.h>
-# define EV_ATOMIC_T sig_atomic_t volatile
 #endif
 
 /*****************************************************************************/
@@ -116,6 +122,20 @@ typedef double ev_tstamp;
 #if EV_CHILD_ENABLE && !EV_SIGNAL_ENABLE
 # undef EV_SIGNAL_ENABLE
 # define EV_SIGNAL_ENABLE 1
+#endif
+
+/*****************************************************************************/
+
+#if !EV_FEATURE_CODE && !defined (NDEBUG)
+# define NDEBUG 1
+# include <assert.h>
+#endif
+
+typedef double ev_tstamp;
+
+#ifndef EV_ATOMIC_T
+# include <signal.h>
+# define EV_ATOMIC_T sig_atomic_t volatile
 #endif
 
 #if EV_STAT_ENABLE
@@ -569,7 +589,7 @@ void ev_unref (EV_P);
  */
 void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg);
 
-# if EV_MINIMAL < 2
+# if EV_FEATURE_API
 unsigned int ev_loop_count  (EV_P); /* number of loop iterations */
 unsigned int ev_loop_depth  (EV_P); /* #ev_loop enters - #ev_loop leaves */
 void         ev_loop_verify (EV_P); /* abort if loop data corrupted */
