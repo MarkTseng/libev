@@ -437,7 +437,7 @@ struct signalfd_siginfo
 /**/
 
 #if EV_VERIFY >= 3
-# define EV_FREQUENT_CHECK ev_loop_verify (EV_A)
+# define EV_FREQUENT_CHECK ev_verify (EV_A)
 #else
 # define EV_FREQUENT_CHECK do { } while (0)
 #endif
@@ -1533,13 +1533,13 @@ ev_backend (EV_P)
 
 #if EV_FEATURE_API
 unsigned int
-ev_loop_count (EV_P)
+ev_iteration (EV_P)
 {
   return loop_count;
 }
 
 unsigned int
-ev_loop_depth (EV_P)
+ev_depth (EV_P)
 {
   return loop_depth;
 }
@@ -1870,7 +1870,7 @@ array_verify (EV_P_ W *ws, int cnt)
 
 #if EV_FEATURE_API
 void
-ev_loop_verify (EV_P)
+ev_verify (EV_P)
 {
 #if EV_VERIFY
   int i;
@@ -2282,7 +2282,7 @@ ev_loop (EV_P_ int flags)
   do
     {
 #if EV_VERIFY >= 2
-      ev_loop_verify (EV_A);
+      ev_verify (EV_A);
 #endif
 
 #ifndef _WIN32
