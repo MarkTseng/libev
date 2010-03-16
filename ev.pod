@@ -569,11 +569,9 @@ fds):
 =item struct ev_loop *ev_loop_new (unsigned int flags)
 
 Similar to C<ev_default_loop>, but always creates a new event loop that is
-always distinct from the default loop. Unlike the default loop, it cannot
-handle signal and child watchers, and attempts to do so will be greeted by
-undefined behaviour (or a failed assertion if assertions are enabled).
+always distinct from the default loop.
 
-Note that this function I<is> thread-safe, and the recommended way to use
+Note that this function I<is> thread-safe, and one common way to use
 libev with threads is indeed to create one loop per thread, and using the
 default loop in the "main" or "initial" thread.
 
@@ -585,13 +583,12 @@ Example: Try to create a event loop that uses epoll and nothing else.
 
 =item ev_default_destroy ()
 
-Destroys the default loop again (frees all memory and kernel state
-etc.). None of the active event watchers will be stopped in the normal
-sense, so e.g. C<ev_is_active> might still return true. It is your
-responsibility to either stop all watchers cleanly yourself I<before>
-calling this function, or cope with the fact afterwards (which is usually
-the easiest thing, you can just ignore the watchers and/or C<free ()> them
-for example).
+Destroys the default loop (frees all memory and kernel state etc.). None
+of the active event watchers will be stopped in the normal sense, so
+e.g. C<ev_is_active> might still return true. It is your responsibility to
+either stop all watchers cleanly yourself I<before> calling this function,
+or cope with the fact afterwards (which is usually the easiest thing, you
+can just ignore the watchers and/or C<free ()> them for example).
 
 Note that certain global state, such as signal state (and installed signal
 handlers), will not be freed by this function, and related watchers (such
