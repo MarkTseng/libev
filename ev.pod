@@ -3920,11 +3920,9 @@ Use larger code to speed up some operations.
 Currently this is used to override some inlining decisions (enlarging the  roughly
 30% code size on amd64.
 
-Also disables C<assert>'s in the code, unless you define C<NDEBUG>
-explicitly to C<0>.
-
-Use of compiler flags such as C<-Os> with gcc that optimise for size are
-recommended when disabling this feature.
+When optimising for size, use of compiler flags such as C<-Os> with
+gcc recommended, as well as C<-DNDEBUG>, as libev contains a number of
+assertions.
 
 =item C<2> - faster/larger data structures
 

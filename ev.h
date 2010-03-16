@@ -126,11 +126,6 @@ extern "C" {
 
 /*****************************************************************************/
 
-#if !EV_FEATURE_CODE && !defined (NDEBUG)
-# define NDEBUG 1
-# include <assert.h>
-#endif
-
 typedef double ev_tstamp;
 
 #ifndef EV_ATOMIC_T
