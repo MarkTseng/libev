@@ -3959,9 +3959,9 @@ default.
 =back
 
 Compiling with C<gcc -Os -DEV_STANDALONE -DEV_USE_EPOLL=1 -DEV_FEATURES=0>
-reduces the compiled size of libev from 24.7Kb to 6.5Kb on my GNU/Linux
-amd64 system, while still giving you I/O watchers, timers and monotonic
-clock support.
+reduces the compiled size of libev from 24.7Kb code/2.8Kb data to 6.5Kb
+code/0.3Kb data on my GNU/Linux amd64 system, while still giving you I/O
+watchers, timers and monotonic clock support.
 
 With an intelligent-enough linker (gcc+binutils are intelligent enough
 when you use C<-Wl,--gc-sections -ffunction-sections>) functions unused by
