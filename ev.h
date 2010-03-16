@@ -590,9 +590,15 @@ void ev_unref (EV_P);
 void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg);
 
 # if EV_FEATURE_API
-unsigned int ev_loop_count  (EV_P); /* number of loop iterations */
-unsigned int ev_loop_depth  (EV_P); /* #ev_loop enters - #ev_loop leaves */
-void         ev_loop_verify (EV_P); /* abort if loop data corrupted */
+unsigned int ev_iteration (EV_P); /* number of loop iterations */
+unsigned int ev_depth     (EV_P); /* #ev_loop enters - #ev_loop leaves */
+void         ev_verify    (EV_P); /* abort if loop data corrupted */
+
+/* pre 4.0 API */
+#  if EV_MULTIPLICITY
+#   define ev_loop_count(l) ev_iteration (l)
+#   define ev_loop_depth(l) ev_depth (l)
+#  endif
 
 void ev_set_io_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
 void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */

@@ -347,9 +347,8 @@ around bugs.
 
 =item C<EVFLAG_FORKCHECK>
 
-Instead of calling C<ev_default_fork> or C<ev_loop_fork> manually after
-a fork, you can also make libev check for a fork in each iteration by
-enabling this flag.
+Instead of calling C<ev_loop_fork> manually after a fork, you can also
+make libev check for a fork in each iteration by enabling this flag.
 
 This works by calling C<getpid ()> on every iteration of the loop,
 and thus this might slow down your event loop if you do a lot of loop
@@ -613,9 +612,15 @@ the child process (or both child and parent, but that again makes little
 sense). You I<must> call it in the child before using any of the libev
 functions, and it will only take effect at the next C<ev_loop> iteration.
 
+Again, you I<have> to call it on I<any> loop that you want to re-use after 
+a fork, I<even if you do not plan to use the loop in the parent>. This is
+because some kernel interfaces *cough* I<kqueue> *cough* do funny things
+during fork.
+
 On the other hand, you only need to call this function in the child
-process if and only if you want to use the event library in the child. If
-you just fork+exec, you don't have to call it at all.
+process if and only if you want to use the event loop in the child. If you
+just fork+exec or create a new loop in the child, you don't have to call
+it at all.
 
 The function itself is quite fast and it's usually not a problem to call
 it just in case after a fork. To make this easy, the function will fit in
@@ -627,25 +632,26 @@ quite nicely into a call to C<pthread_atfork>:
 
 Like C<ev_default_fork>, but acts on an event loop created by
 C<ev_loop_new>. Yes, you have to call this on every allocated event loop
-after fork that you want to re-use in the child, and how you do this is
-entirely your own problem.
+after fork that you want to re-use in the child, and how you keep track of 
+them is entirely your own problem.
 
 =item int ev_is_default_loop (loop)
 
 Returns true when the given loop is, in fact, the default loop, and false
 otherwise.
 
-=item unsigned int ev_loop_count (loop)
+=item unsigned int ev_iteration (loop)
 
-Returns the count of loop iterations for the loop, which is identical to
+Returns the current iteration count for the loop, which is identical to
 the number of times libev did poll for new events. It starts at C<0> and
 happily wraps around with enough iterations.
 
 This value can sometimes be useful as a generation counter of sorts (it
 "ticks" the number of loop iterations), as it roughly corresponds with
-C<ev_prepare> and C<ev_check> calls.
+C<ev_prepare> and C<ev_check> calls - and is incremented between the
+prepare and check phases.
 
-=item unsigned int ev_loop_depth (loop)
+=item unsigned int ev_depth (loop)
 
 Returns the number of times C<ev_loop> was entered minus the number of
 times C<ev_loop> was exited, in other words, the recursion depth.
@@ -655,7 +661,8 @@ C<1>, unless C<ev_loop> was invoked recursively (or from another thread),
 in which case it is higher.
 
 Leaving C<ev_loop> abnormally (setjmp/longjmp, cancelling the thread
-etc.), doesn't count as exit.
+etc.), doesn't count as "exit" - consider this as a hint to avoid such
+ungentleman behaviour unless it's really convenient.
 
 =item unsigned int ev_backend (loop)
 
@@ -4620,13 +4627,28 @@ involves iterating over all running async watchers or all signal numbers.
 =back
 
 
-=head1 PORTING FROM 3.X TO 4.X
+=head1 PORTING FROM LIBEV 3.X TO 4.X
 
 The major version 4 introduced some minor incompatible changes to the API.
 
+At the moment, the C<ev.h> header file tries to implement superficial
+compatibility, so most programs should still compile. Those might be
+removed in later versions of libev, so better update early than late.
+
 =over 4
 
-=item C<EV_TIMEOUT> replaced by C<EV_TIMER> in C<revents>
+=item C<ev_loop_count> renamed to C<ev_iteration>
+
+=item C<ev_loop_depth> renamed to C<ev_depth>
+
+=item C<ev_loop_verify> renamed to C<ev_verify>
+
+Most functions working on C<struct ev_loop> objects don't have an
+C<ev_loop_> prefix, so it was removed. Note that C<ev_loop_fork> is
+still called C<ev_loop_fork> because it would otherwise clash with the
+C<ev_frok> typedef.
+
+=item C<EV_TIMEOUT> renamed to C<EV_TIMER> in C<revents>
 
 This is a simple rename - all other watcher types use their name
 as revents flag, and now C<ev_timer> does, too.
