@@ -1547,7 +1547,7 @@ somewhere, as that would have given you a big clue).
 =head3 The special problem of accept()ing when you can't
 
 Many implementations of the POSIX C<accept> function (for example,
-found in port-2004 Linux) have the peculiar behaviour of not removing a
+found in post-2004 Linux) have the peculiar behaviour of not removing a
 connection from the pending queue in all error cases.
 
 For example, larger servers often run out of file descriptors (because
@@ -3666,7 +3666,7 @@ the absence of autoconf is documented for every option.
 
 Symbols marked with "(h)" do not change the ABI, and can have different
 values when compiling libev vs. including F<ev.h>, so it is permissible
-to redefine them before including F<ev.h> without breakign compatibility
+to redefine them before including F<ev.h> without breaking compatibility
 to a compiled library. All other symbols change the ABI, which means all
 users of libev and the libev code itself must be compiled with compatible
 settings.
@@ -4646,7 +4646,7 @@ removed in later versions of libev, so better update early than late.
 Most functions working on C<struct ev_loop> objects don't have an
 C<ev_loop_> prefix, so it was removed. Note that C<ev_loop_fork> is
 still called C<ev_loop_fork> because it would otherwise clash with the
-C<ev_frok> typedef.
+C<ev_fork> typedef.
 
 =item C<EV_TIMEOUT> renamed to C<EV_TIMER> in C<revents>
 
