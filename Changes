@@ -22,7 +22,7 @@ TODO: win32 write() to socket for signal handling
         - update libev.m4 HAVE_CLOCK_SYSCALL test for newer glibcs.
         - add section on accept() problems to the manpage.
         - rename EV_TIMEOUT to EV_TIMER.
-        - remove loop_ name component from ev_loop_count/depth/verify.
+        - rename ev_loop_count/depth/verify.
         - switch to two-digit minor version.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
