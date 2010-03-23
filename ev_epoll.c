@@ -1,7 +1,7 @@
 /*
  * libev epoll fd activity backend
  *
- * Copyright (c) 2007,2008,2009 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009,2010 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -49,6 +49,11 @@
  * c) the inability to handle fork or file descriptors (think dup)
  *    limits the applicability over poll, so this is not a generic
  *    poll replacement.
+ * d) epoll doesn't work the same as select with many file descriptors
+ *    (such as files). while not critical, no other advanced interface
+ *    seems to share this (rather non-unixy) limitation.
+ * e) epoll claims to be embeddable, but in practise you never get
+ *    a ready event for the epoll fd.
  *
  * lots of "weird code" and complication handling in this file is due
  * to these design problems with epoll, as we try very hard to avoid
