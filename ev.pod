@@ -126,13 +126,14 @@ this argument.
 =head2 TIME REPRESENTATION
 
 Libev represents time as a single floating point number, representing
-the (fractional) number of seconds since the (POSIX) epoch (somewhere
-near the beginning of 1970, details are complicated, don't ask). This
-type is called C<ev_tstamp>, which is what you should use too. It usually
-aliases to the C<double> type in C. When you need to do any calculations
-on it, you should treat it as some floating point value. Unlike the name
-component C<stamp> might indicate, it is also used for time differences
-throughout libev.
+the (fractional) number of seconds since the (POSIX) epoch (in practise
+somewhere near the beginning of 1970, details are complicated, don't
+ask). This type is called C<ev_tstamp>, which is what you should use
+too. It usually aliases to the C<double> type in C. When you need to do
+any calculations on it, you should treat it as some floating point value.
+
+Unlike the name component C<stamp> might indicate, it is also used for
+time differences (e.g. delays) throughout libev.
 
 =head1 ERROR HANDLING
 
