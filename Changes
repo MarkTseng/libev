@@ -8,6 +8,8 @@ TODO: win32 write() to socket for signal handling
 	- applied win32 fixes by Michael Lenaghan (also James Mansion).
 	- replace EV_MINIMAL by EV_FEATURES.
         - remove dependency on sys/queue.h on freebsd (patch by Vanilla Hsu).
+        - add (undocumented) EV_ENABLE when adding events with kqueue,
+          this might help (helpfully pointed out by Tilghman Lesher).
         - configure now prepends -O3, not appends it, so one can still
           override it.
         - disable poll backend on AIX, the poll header spams the namespace

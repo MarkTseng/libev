@@ -52,6 +52,10 @@ kqueue_change (EV_P_ int fd, int filter, int flags, int fflags)
   EV_SET (&kqueue_changes [kqueue_changecnt - 1], fd, filter, flags, fflags, 0, 0);
 }
 
+/* OS X at least needs this */
+#ifndef EV_ENABLE
+# define EV_ENABLE 0
+#endif
 #ifndef NOTE_EOF
 # define NOTE_EOF 0
 #endif
@@ -72,10 +76,10 @@ kqueue_modify (EV_P_ int fd, int oev, int nev)
   /* event requests even when oev == nev */
 
   if (nev & EV_READ)
-    kqueue_change (EV_A_ fd, EVFILT_READ , EV_ADD, NOTE_EOF);
+    kqueue_change (EV_A_ fd, EVFILT_READ , EV_ADD | EV_ENABLE, NOTE_EOF);
 
   if (nev & EV_WRITE)
-    kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_ADD, NOTE_EOF);
+    kqueue_change (EV_A_ fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, NOTE_EOF);
 }
 
 static void
