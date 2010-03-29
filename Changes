@@ -2,6 +2,7 @@ Revision history for libev, a high-performance and full-featured event loop.
 
 TODO: ABI??? API????? Changes???
 TODO: win32 write() to socket for signal handling
+TODO: poll asert
 	- "PORTING FROM LIBEV 3.X TO 4.X" (in ev.pod) is recommended reading.
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
@@ -11,6 +12,8 @@ TODO: win32 write() to socket for signal handling
         - add (undocumented) EV_ENABLE when adding events with kqueue,
           this might help with OS X, which seems to need it despite documenting
           not to need it (helpfully pointed out by Tilghman Lesher).
+        - do not use poll by default on freebsd, it's broken (what isn't
+          on freebsd...).
         - configure now prepends -O3, not appends it, so one can still
           override it.
         - disable poll backend on AIX, the poll header spams the namespace
