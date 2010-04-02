@@ -79,76 +79,85 @@ extern "C" {
 #  endif
 # endif
 
-# ifndef EV_USE_NANOSLEEP
-#  if HAVE_NANOSLEEP
-#   define EV_USE_NANOSLEEP EV_FEATURE_OS
-#  else
+# if HAVE_NANOSLEEP
+#  ifndef EV_USE_NANOSLEEP
+#    define EV_USE_NANOSLEEP EV_FEATURE_OS
+#  endif
+# else
+#   undef EV_USE_NANOSLEEP
 #   define EV_USE_NANOSLEEP 0
-#  endif
 # endif
 
-# ifndef EV_USE_SELECT
-#  if HAVE_SELECT && HAVE_SYS_SELECT_H
+# if HAVE_SELECT && HAVE_SYS_SELECT_H
+#  ifndef EV_USE_SELECT
 #   define EV_USE_SELECT EV_FEATURE_BACKENDS
-#  else
-#   define EV_USE_SELECT 0
 #  endif
+# else
+#  undef EV_USE_SELECT
+#  define EV_USE_SELECT 0
 # endif
 
-# ifndef EV_USE_POLL
-#  if HAVE_POLL && HAVE_POLL_H
+# if HAVE_POLL && HAVE_POLL_H
+#  ifndef EV_USE_POLL
 #   define EV_USE_POLL EV_FEATURE_BACKENDS
-#  else
-#   define EV_USE_POLL 0
 #  endif
+# else
+#  undef EV_USE_POLL
+#  define EV_USE_POLL 0
 # endif
    
-# ifndef EV_USE_EPOLL
-#  if HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H
+# if HAVE_EPOLL_CTL && HAVE_SYS_EPOLL_H
+#  ifndef EV_USE_EPOLL
 #   define EV_USE_EPOLL EV_FEATURE_BACKENDS
-#  else
-#   define EV_USE_EPOLL 0
 #  endif
+# else
+#  undef EV_USE_EPOLL
+#  define EV_USE_EPOLL 0
 # endif
    
-# ifndef EV_USE_KQUEUE
-#  if HAVE_KQUEUE && HAVE_SYS_EVENT_H
+# if HAVE_KQUEUE && HAVE_SYS_EVENT_H
+#  ifndef EV_USE_KQUEUE
 #   define EV_USE_KQUEUE EV_FEATURE_BACKENDS
-#  else
-#   define EV_USE_KQUEUE 0
 #  endif
+# else
+#  undef EV_USE_KQUEUE
+#  define EV_USE_KQUEUE 0
 # endif
    
-# ifndef EV_USE_PORT
-#  if HAVE_PORT_H && HAVE_PORT_CREATE
+# if HAVE_PORT_H && HAVE_PORT_CREATE
+#  ifndef EV_USE_PORT
 #   define EV_USE_PORT EV_FEATURE_BACKENDS
-#  else
-#   define EV_USE_PORT 0
 #  endif
+# else
+#  undef EV_USE_PORT
+#  define EV_USE_PORT 0
 # endif
 
-# ifndef EV_USE_INOTIFY
-#  if HAVE_INOTIFY_INIT && HAVE_SYS_INOTIFY_H
+# if HAVE_INOTIFY_INIT && HAVE_SYS_INOTIFY_H
+#  ifndef EV_USE_INOTIFY
 #   define EV_USE_INOTIFY EV_FEATURE_OS
-#  else
-#   define EV_USE_INOTIFY 0
 #  endif
+# else
+#  undef EV_USE_INOTIFY
+#  define EV_USE_INOTIFY 0
 # endif
 
-# ifndef EV_USE_SIGNALFD
-#  if HAVE_SIGNALFD && HAVE_SYS_SIGNALFD_H
+# if HAVE_SIGNALFD && HAVE_SYS_SIGNALFD_H
+#  ifndef EV_USE_SIGNALFD
 #   define EV_USE_SIGNALFD EV_FEATURE_OS
-#  else
-#   define EV_USE_SIGNALFD 0
 #  endif
+# else
+#  undef EV_USE_SIGNALFD
+#  define EV_USE_SIGNALFD 0
 # endif
 
-# ifndef EV_USE_EVENTFD
-#  if HAVE_EVENTFD
+# if HAVE_EVENTFD
+#  ifndef EV_USE_EVENTFD
 #   define EV_USE_EVENTFD EV_FEATURE_OS
-#  else
-#   define EV_USE_EVENTFD 0
 #  endif
+# else
+#  undef EV_USE_EVENTFD
+#  define EV_USE_EVENTFD 0
 # endif
  
 #endif
