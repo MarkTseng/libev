@@ -117,11 +117,11 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
 
       if (expect_false (kqueue_events [i].flags & EV_ERROR))
         {
-	  int err = kqueue_events [i].data;
+          int err = kqueue_events [i].data;
 
           /* we are only interested in errors for fds that we are interested in :) */
           if (anfds [fd].events)
-	    {
+            {
               if (err == ENOENT) /* resubmit changes on ENOENT */
                 kqueue_modify (EV_A_ fd, 0, anfds [fd].events);
               else if (err == EBADF) /* on EBADF, we re-check the fd */
@@ -133,7 +133,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
                 }
               else /* on all other errors, we error out on the fd */
                 fd_kill (EV_A_ fd);
-	    }
+            }
         }
       else
         fd_event (
