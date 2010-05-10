@@ -74,7 +74,10 @@ static ev_tstamp
 ev_tv_get (struct timeval *tv)
 {
   if (tv)
-    return tv->tv_sec + tv->tv_usec * 1e-6;
+    {
+      ev_tstamp after = tv->tv_sec + tv->tv_usec * 1e-6;
+      return after ? after : 1e-6;
+    }
   else
     return -1.;
 }

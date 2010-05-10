@@ -7,6 +7,8 @@ TODO: EV_USE__XXX default with config, document
 	- "PORTING FROM LIBEV 3.X TO 4.X" (in ev.pod) is recommended reading.
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
+        - fix a bug where a timeout of zero caused the timer not to fire
+          in the libevent emulation (testcase by Péter Szabó).
 	- applied win32 fixes by Michael Lenaghan (also James Mansion).
 	- replace EV_MINIMAL by EV_FEATURES.
         - prefer EPOLL_CTL_ADD over EPOLL_CTL_MOD in some more cases, as it
