@@ -4,6 +4,10 @@ TODO: ABI??? API????? Changes???
 TODO: win32 write() to socket for signal handling
 TODO: poll asert
 TODO: EV_USE__XXX default with config, document
+TODO: pendingall => idleall?
+TODO: portbality section, solaris errno rrentrant, aix, win32, linux 32 bit
+TODO: include ev_xyz_start in each example?
+TODO: section watcher states/lifetime
 	- "PORTING FROM LIBEV 3.X TO 4.X" (in ev.pod) is recommended reading.
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
@@ -35,6 +39,7 @@ TODO: EV_USE__XXX default with config, document
         - rename EV_TIMEOUT to EV_TIMER.
         - rename ev_loop_count/depth/verify.
         - switch to two-digit minor version.
+        - work around an apparent gentoo compiler bug.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

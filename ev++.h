@@ -480,7 +480,7 @@ namespace ev {
     template<class K, void (K::*method)()>
     static void method_noargs_thunk (EV_P_ ev_watcher *w, int revents)
     {
-      static_cast<K *>(w->data)->*method
+      (static_cast<K *>(w->data)->*method)
         ();
     }
 
