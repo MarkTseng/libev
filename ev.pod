@@ -1776,7 +1776,7 @@ callback, which will "do the right thing" and start the timer:
 And when there is some activity, simply store the current time in
 C<last_activity>, no libev calls at all:
 
-   last_actiivty = ev_now (loop);
+   last_activity = ev_now (loop);
 
 This technique is slightly more complex, but in most cases where the
 time-out is unlikely to be triggered, much more efficient.
