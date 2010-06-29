@@ -1406,7 +1406,7 @@ other events are pending:
      // are not yet ready to handle it.
      ev_io_stop (EV_A_ w);
 
-     // start the idle watcher to ahndle the actual event.
+     // start the idle watcher to handle the actual event.
      // it will not be executed as long as other watchers
      // with the default priority are receiving events.
      ev_idle_start (EV_A_ &idle);
