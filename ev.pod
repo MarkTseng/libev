@@ -3344,8 +3344,6 @@ Example: simple class declaration and watcher initialisation
 
 =item w->set (object *)
 
-This is an B<experimental> feature that might go away in a future version.
-
 This is a variation of a method callback - leaving out the method to call
 will default the method to C<operator ()>, which makes it possible to use
 functor objects without having to manually specify the C<operator ()> all
