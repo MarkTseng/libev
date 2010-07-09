@@ -40,6 +40,7 @@ TODO: section watcher states/lifetime
         - rename ev_loop_count/depth/verify.
         - switch to two-digit minor version.
         - work around an apparent gentoo compiler bug.
+        - define _DARWIN_UNLIMITED_SELECT. just so.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

@@ -198,6 +198,14 @@ extern "C" {
 # undef EV_AVOID_STDIO
 #endif
 
+/* OS X, in its infinite idiocy, actually HARDCODES
+ * a limit of 1024 into their select. Where people have brains,
+ * OS X engineers apparently have a vacuum. Or maybe they were
+ * ordered to have a vacuum, or they do anything for money.
+ * This might help. Or not.
+ */
+#define _DARWIN_UNLIMITED_SELECT 1
+
 /* this block tries to deduce configuration from header-defined symbols and defaults */
 
 /* try to deduce the maximum number of signals on this platform */
