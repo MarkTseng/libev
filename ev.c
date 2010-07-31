@@ -513,7 +513,7 @@ typedef ev_watcher_time *WT;
 
 #if EV_USE_REALTIME
 /* sig_atomic_t is used to avoid per-thread variables or locking but still */
-/* giving it a reasonably high chance of working on typical architetcures */
+/* giving it a reasonably high chance of working on typical architectures */
 static EV_ATOMIC_T have_realtime; /* did clock_gettime (CLOCK_REALTIME) work? */
 #endif
 
@@ -796,7 +796,7 @@ ev_sleep (ev_tstamp delay)
 #define MALLOC_ROUND 4096 /* prefer to allocate in chunks of this size, must be 2**n and >> 4 longs */
 
 /* find a suitable new size for the given array, */
-/* hopefully by rounding to a ncie-to-malloc size */
+/* hopefully by rounding to a nice-to-malloc size */
 inline_size int
 array_nextsize (int elem, int cur, int cnt)
 {
@@ -1073,7 +1073,7 @@ fd_intern (int fd)
 /*****************************************************************************/
 
 /*
- * the heap functions want a real array index. array index 0 uis guaranteed to not
+ * the heap functions want a real array index. array index 0 is guaranteed to not
  * be in-use at any time. the first heap entry is at array [HEAP0]. DHEAP gives
  * the branching factor of the d-tree.
  */
@@ -2181,7 +2181,7 @@ periodics_reify (EV_P)
 }
 
 /* simply recalculate all periodics */
-/* TODO: maybe ensure that at leats one event happens when jumping forward? */
+/* TODO: maybe ensure that at least one event happens when jumping forward? */
 static void noinline
 periodics_reschedule (EV_P)
 {
