@@ -156,7 +156,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
 int inline_size
 kqueue_init (EV_P_ int flags)
 {
-  /* Initalize the kernel queue */
+  /* Initialize the kernel queue */
   if ((backend_fd = kqueue ()) < 0)
     return 0;
 

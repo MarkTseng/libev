@@ -77,7 +77,7 @@ libev, its usage and the rationale behind its design, it is not a tutorial
 on event-based programming, nor will it introduce event-based programming
 with libev.
 
-Familarity with event based programming techniques in general is assumed
+Familiarity with event based programming techniques in general is assumed
 throughout this document.
 
 =head1 ABOUT LIBEV
@@ -707,7 +707,7 @@ C<ev_resume> directly afterwards to resume timer processing.
 Effectively, all C<ev_timer> watchers will be delayed by the time spend
 between C<ev_suspend> and C<ev_resume>, and all C<ev_periodic> watchers
 will be rescheduled (that is, they will lose any events that would have
-occured while suspended).
+occurred while suspended).
 
 After calling C<ev_suspend> you B<must not> call I<any> function on the
 given loop other than C<ev_resume>, and you B<must not> call C<ev_resume>
@@ -794,7 +794,7 @@ C<EVUNLOOP_ALL>, which will make all nested C<ev_loop> calls return.
 
 This "unloop state" will be cleared when entering C<ev_loop> again.
 
-It is safe to call C<ev_unloop> from otuside any C<ev_loop> calls.
+It is safe to call C<ev_unloop> from outside any C<ev_loop> calls.
 
 =item ev_ref (loop)
 
@@ -874,7 +874,7 @@ as this approaches the timing granularity of most systems. Note that if
 you do transactions with the outside world and you can't increase the
 parallelity, then this setting will limit your transaction rate (if you
 need to poll once per transaction and the I/O collect interval is 0.01,
-then you can't do more than 100 transations per second).
+then you can't do more than 100 transactions per second).
 
 Setting the I<timeout collect interval> can improve the opportunity for
 saving power, as the program will "bundle" timer callback invocations that
@@ -1382,7 +1382,7 @@ For example, to emulate how many other event libraries handle priorities,
 you can associate an C<ev_idle> watcher to each such watcher, and in
 the normal watcher callback, you just start the idle watcher. The real
 processing is done in the idle watcher callback. This causes libev to
-continously poll and process kernel event data for the watcher, but when
+continuously poll and process kernel event data for the watcher, but when
 the lock-out case is known to be rare (which in turn is rare :), this is
 workable.
 
@@ -1470,7 +1470,7 @@ If you cannot use non-blocking mode, then force the use of a
 known-to-be-good backend (at the time of this writing, this includes only
 C<EVBACKEND_SELECT> and C<EVBACKEND_POLL>). The same applies to file
 descriptors for which non-blocking operation makes no sense (such as
-files) - libev doesn't guarentee any specific behaviour in that case.
+files) - libev doesn't guarantee any specific behaviour in that case.
 
 Another thing you have to watch out for is that it is quite easy to
 receive "spurious" readiness notifications, that is your callback might
@@ -1739,7 +1739,7 @@ within the callback:
      // if last_activity + 60. is older than now, we did time out
      if (timeout < now)
        {
-         // timeout occured, take action
+         // timeout occurred, take action
        }
      else
        {
@@ -3988,7 +3988,7 @@ The highest supported signal number, +1 (or, the number of
 signals): Normally, libev tries to deduce the maximum number of signals
 automatically, but sometimes this fails, in which case it can be
 specified. Also, using a lower number than detected (C<32> should be
-good for about any system in existance) can save some memory, as libev
+good for about any system in existence) can save some memory, as libev
 statically allocates some 12-24 bytes per signal number.
 
 =item EV_PID_HASHSIZE
@@ -4653,7 +4653,7 @@ This is a simple rename - all other watcher types use their name
 as revents flag, and now C<ev_timer> does, too.
 
 Both C<EV_TIMER> and C<EV_TIMEOUT> symbols were present in 3.x versions
-and continue to be present for the forseeable future, so this is mostly a
+and continue to be present for the foreseeable future, so this is mostly a
 documentation change.
 
 =item C<EV_MINIMAL> mechanism replaced by C<EV_FEATURES>

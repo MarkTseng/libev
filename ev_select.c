@@ -184,7 +184,7 @@ select_poll (EV_P_ ev_tstamp timeout)
       #endif
 
       #ifdef _WIN32
-      /* select on windows errornously returns EINVAL when no fd sets have been
+      /* select on windows erroneously returns EINVAL when no fd sets have been
        * provided (this is documented). what microsoft doesn't tell you that this bug
        * exists even when the fd sets _are_ provided, so we have to check for this bug
        * here and emulate by sleeping manually.
