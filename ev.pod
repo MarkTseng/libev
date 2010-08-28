@@ -3887,7 +3887,7 @@ EV_ASYNC_ENABLE, EV_CHILD_ENABLE.
 
 If undefined or defined to be C<1> (and the platform supports it), then
 the respective watcher type is supported. If defined to be C<0>, then it
-is not. Disabling watcher types mainly saves codesize.
+is not. Disabling watcher types mainly saves code size.
 
 =item EV_FEATURES
 
@@ -3917,17 +3917,17 @@ values:
 
 Use larger code to speed up some operations.
 
-Currently this is used to override some inlining decisions (enlarging the  roughly
-30% code size on amd64.
+Currently this is used to override some inlining decisions (enlarging the
+code size by roughly 30% on amd64).
 
 When optimising for size, use of compiler flags such as C<-Os> with
-gcc recommended, as well as C<-DNDEBUG>, as libev contains a number of
+gcc is recommended, as well as C<-DNDEBUG>, as libev contains a number of
 assertions.
 
 =item C<2> - faster/larger data structures
 
 Replaces the small 2-heap for timer management by a faster 4-heap, larger
-hash table sizes and so on. This will usually further increase codesize
+hash table sizes and so on. This will usually further increase code size
 and can additionally have an effect on the size of data structures at
 runtime.
 
@@ -3974,7 +3974,7 @@ I/O watcher then might come out at only 5Kb.
 =item EV_AVOID_STDIO
 
 If this is set to C<1> at compiletime, then libev will avoid using stdio
-functions (printf, scanf, perror etc.). This will increase the codesize
+functions (printf, scanf, perror etc.). This will increase the code size
 somewhat, but if your program doesn't otherwise depend on stdio and your
 libc allows it, this avoids linking in the stdio library which is quite
 big.
