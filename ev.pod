@@ -4044,7 +4044,7 @@ will be C<0>.
 =item EV_COMMON
 
 By default, all watchers have a C<void *data> member. By redefining
-this macro to a something else you can include more and other types of
+this macro to something else you can include more and other types of
 members. You have to define it each time you include one of the files,
 though, and it must be identical each time.
 
@@ -4353,7 +4353,7 @@ maintainable.
 And of course, some compiler warnings are just plain stupid, or simply
 wrong (because they don't actually warn about the condition their message
 seems to warn about). For example, certain older gcc versions had some
-warnings that resulted an extreme number of false positives. These have
+warnings that resulted in an extreme number of false positives. These have
 been fixed, but some people still insist on making code warn-free with
 such buggy versions.
 
