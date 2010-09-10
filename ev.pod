@@ -2125,7 +2125,7 @@ system time is divisible by 3600. The callback invocation times have
 potentially a lot of jitter, but good long-term stability.
 
    static void
-   clock_cb (struct ev_loop *loop, ev_io *w, int revents)
+   clock_cb (struct ev_loop *loop, ev_periodic *w, int revents)
    {
      ... its now a full hour (UTC, or TAI or whatever your clock follows)
    }
