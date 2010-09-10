@@ -228,14 +228,14 @@ namespace ev {
     }
 
 #if EV_FEATURE_API
-    unsigned int count () const throw ()
+    unsigned int iteration () const throw ()
     {
-      return ev_loop_count (EV_AX);
+      return ev_iteration (EV_AX);
     }
 
     unsigned int depth () const throw ()
     {
-      return ev_loop_depth (EV_AX);
+      return ev_depth (EV_AX);
     }
 
     void set_io_collect_interval (tstamp interval) throw ()
