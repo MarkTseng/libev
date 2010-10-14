@@ -4425,15 +4425,19 @@ OpenGL drivers.
 The kqueue syscall is broken in all known versions - most versions support
 only sockets, many support pipes.
 
+Libev tries to work around this by not using C<kqueue> by default on
+this rotten platform, but of course you can still ask for it when creating
+a loop.
+
 =head3 C<poll> is buggy
 
 Instead of fixing C<kqueue>, Apple replaced their (working) C<poll>
 implementation by something calling C<kqueue> internally around the 10.5.6
 release, so now C<kqueue> I<and> C<poll> are broken.
 
-Libev tries to work around this by neither using C<kqueue> nor C<poll> by
-default on this rotten platform, but of course you cna still ask for them
-when creating a loop.
+Libev tries to work around this by not using C<poll> by default on
+this rotten platform, but of course you can still ask for it when creating
+a loop.
 
 =head3 C<select> is buggy
 
