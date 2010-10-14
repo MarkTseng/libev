@@ -4443,7 +4443,7 @@ a loop.
 
 All that's left is C<select>, and of course Apple found a way to fuck this
 one up as well: On OS/X, C<select> actively limits the number of file
-descriptors you can pass in to 1024 - your program suddenyl crashes when
+descriptors you can pass in to 1024 - your program suddenly crashes when
 you use more.
 
 There is an undocumented "workaround" for this - defining
@@ -4470,8 +4470,9 @@ freezes or you get a large number of spurious wakeups, make sure you have
 all the relevant and latest kernel patches applied. No, I don't know which
 ones, but there are multiple ones.
 
-If you can't get it to work, you can try running the program with
-C<LIBEV_FLAGS=3> to only allow C<poll> and C<select> backends.
+If you can't get it to work, you can try running the program by setting
+the environment variable C<LIBEV_FLAGS=3> to only allow C<poll> and
+C<select> backends.
 
 =head2 AIX POLL BUG
 
