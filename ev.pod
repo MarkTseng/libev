@@ -4401,10 +4401,10 @@ I suggest using suppression lists.
 =head2 GNU/LINUX 32 BIT LIMITATIONS
 
 GNU/Linux is the only common platform that supports 64 bit file/large file
-interfaces but disables them by default.
+interfaces but I<disables> them by default.
 
 That means that libev compiled in the default environment doesn't support
-files larger than 2GiB, which mainly affects C<ev_stat> watchers.
+files larger than 2GiB or so, which mainly affects C<ev_stat> watchers.
 
 Unfortunately, many programs try to work around this GNU/Linux issue
 by enabling the large file API, which makes them incompatible with the
@@ -4417,17 +4417,15 @@ i.e. all programs not using special compile switches.
 =head2 OS/X AND DARWIN BUGS
 
 The whole thing is a bug if you ask me - basically any system interface
-you touch is broken, whether it is locales, poll, kqueue or even their
+you touch is broken, whether it is locales, poll, kqueue or even the
 OpenGL drivers.
 
-=over 4
-
-=item KQUEUE IS BUGGY
+=head3 C<kqueue> is buggy
 
 The kqueue syscall is broken in all known versions - most versions support
 only sockets, many support pipes.
 
-=item POLL IS BUGGY
+=head3 C<poll> is buggy
 
 Instead of fixing C<kqueue>, Apple replaced their (working) C<poll>
 implementation by something calling C<kqueue> internally around the 10.5.6
@@ -4437,7 +4435,7 @@ Libev tries to work around this by neither using C<kqueue> nor C<poll> by
 default on this rotten platform, but of course you cna still ask for them
 when creating a loop.
 
-=item SELECT IS BUGGY
+=head3 C<select> is buggy
 
 All that's left is C<select>, and of course Apple found a way to fuck this
 one up as well: On OS/X, C<select> actively limits the number of file
@@ -4448,13 +4446,9 @@ There is an undocumented "workaround" for this - defining
 C<_DARWIN_UNLIMITED_SELECT>, which libev tries to use, so select I<should>
 work on OS/X.
 
-=back
-
 =head2 SOLARIS PROBLEMS AND WORKAROUNDS
 
-=over 4
-
-=item C<errno> reentrancy
+=head3 C<errno> reentrancy
 
 The default compile environment on Solaris is unfortunately so
 thread-unsafe that you can't even use components/libraries compiled
@@ -4464,7 +4458,7 @@ isn't defined by default.
 If you want to use libev in threaded environments you have to make sure
 it's compiled with C<_REENTRANT> defined.
 
-=item Event Port Backend
+=head3 Event port backend
 
 The scalable event interface for Solaris is called "event ports". Unfortunately,
 this mechanism is very buggy. If you run into high CPU usage, your program
@@ -4475,8 +4469,6 @@ ones, but there are multiple ones.
 If you can't get it to work, you can try running the program with
 C<LIBEV_FLAGS=3> to only allow C<poll> and C<select> backends.
 
-=back
-
 =head2 AIX POLL BUG
 
 AIX unfortunately has a broken C<poll.h> header. Libev works around
@@ -4486,17 +4478,21 @@ with large bitsets, and AIX is dead anyway.
 
 =head2 WIN32 PLATFORM LIMITATIONS AND WORKAROUNDS
 
+=head3 General issues
+
 Win32 doesn't support any of the standards (e.g. POSIX) that libev
 requires, and its I/O model is fundamentally incompatible with the POSIX
 model. Libev still offers limited functionality on this platform in
 the form of the C<EVBACKEND_SELECT> backend, and only supports socket
 descriptors. This only applies when using Win32 natively, not when using
-e.g. cygwin.
+e.g. cygwin. Actually, it only applies to the microsofts own compilers,
+as every compielr comes with a slightly differently broken/incompatible
+environment.
 
 Lifting these limitations would basically require the full
-re-implementation of the I/O system. If you are into these kinds of
-things, then note that glib does exactly that for you in a very portable
-way (note also that glib is the slowest event library known to man).
+re-implementation of the I/O system. If you are into this kind of thing,
+then note that glib does exactly that for you in a very portable way (note
+also that glib is the slowest event library known to man).
 
 There is no supported compilation method available on windows except
 embedding it into other applications.
@@ -4534,9 +4530,7 @@ you do I<not> compile the F<ev.c> or any other embedded source files!):
    #include "evwrap.h"
    #include "ev.c"
 
-=over 4
-
-=item The winsocket select function
+=head3 The winsocket C<select> function
 
 The winsocket C<select> function doesn't follow POSIX in that it
 requires socket I<handles> and not socket I<file descriptors> (it is
@@ -4555,7 +4549,7 @@ libraries and raw winsocket select is:
 Note that winsockets handling of fd sets is O(n), so you can easily get a
 complexity in the O(n²) range when using win32.
 
-=item Limited number of file descriptors
+=head3 Limited number of file descriptors
 
 Windows has numerous arbitrary (and low) limits on things.
 
@@ -4579,8 +4573,6 @@ runtime libraries. This might get you to about C<512> or C<2048> sockets
 (depending on windows version and/or the phase of the moon). To get more,
 you need to wrap all I/O functions and provide your own fd management, but
 the cost of calling select (O(n²)) will likely make this unworkable.
-
-=back
 
 =head2 PORTABILITY REQUIREMENTS
 
