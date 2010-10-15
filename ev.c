@@ -783,7 +783,7 @@ ev_sleep (ev_tstamp delay)
       /* here we rely on sys/time.h + sys/types.h + unistd.h providing select */
       /* something not guaranteed by newer posix versions, but guaranteed */
       /* by older ones */
-      EV_TS_SET (tv, delay);
+      EV_TV_SET (tv, delay);
       select (0, 0, 0, 0, &tv);
 #endif
     }
