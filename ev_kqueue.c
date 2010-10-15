@@ -97,7 +97,7 @@ kqueue_poll (EV_P_ ev_tstamp timeout)
     }
 
   EV_RELEASE_CB;
-  EV_SET_TV (tv, timeout);
+  EV_TS_SET (ts, timeout);
   res = kevent (backend_fd, kqueue_changes, kqueue_changecnt, kqueue_events, kqueue_eventmax, &ts);
   EV_ACQUIRE_CB;
   kqueue_changecnt = 0;
