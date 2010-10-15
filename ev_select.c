@@ -141,8 +141,7 @@ select_poll (EV_P_ ev_tstamp timeout)
   int fd_setsize;
 
   EV_RELEASE_CB;
-  tv.tv_sec  = (long)timeout;
-  tv.tv_usec = (long)((timeout - (ev_tstamp)tv.tv_sec) * 1e6);
+  EV_TV_SET (tv, timeout);
 
 #if EV_SELECT_USE_FD_SET
   fd_setsize = sizeof (fd_set);

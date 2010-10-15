@@ -86,8 +86,7 @@ port_poll (EV_P_ ev_tstamp timeout)
   uint_t nget = 1;
 
   EV_RELEASE_CB;
-  ts.tv_sec  = (time_t)timeout;
-  ts.tv_nsec = ((long)(timeout - (ev_tstamp)ts.tv_sec) * 1e9);
+  EV_TS_SET (ts, timeout);
   res = port_getn (backend_fd, port_events, port_eventmax, &nget, &ts);
   EV_ACQUIRE_CB;
 

@@ -63,13 +63,6 @@ struct event_base
 
 static struct event_base *ev_x_cur;
 
-static void
-ev_tv_set (struct timeval *tv, ev_tstamp at)
-{
-  tv->tv_sec  = (long)at;
-  tv->tv_usec = (long)((at - (ev_tstamp)tv->tv_sec) * 1e6);
-}
-
 static ev_tstamp
 ev_tv_get (struct timeval *tv)
 {
@@ -305,7 +298,7 @@ int event_pending (struct event *ev, short events, struct timeval *tv)
       revents |= EV_TIMEOUT;
 
       if (tv)
-        ev_tv_set (tv, ev_now (EV_A)); /* not sure if this is right :) */
+        EV_TV_SET (tv, ev_now (EV_A)); /* not sure if this is right :) */
     }
 
   return events & revents;

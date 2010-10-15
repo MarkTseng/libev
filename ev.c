@@ -450,7 +450,6 @@ struct signalfd_siginfo
 # endif
 #endif
 
-
 /**/
 
 #if EV_VERIFY >= 3
@@ -471,6 +470,9 @@ struct signalfd_siginfo
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 59.743 /* never wait longer than this time (to detect time jumps) */
+
+#define EV_TV_SET(tv,t) do { tv.tv_sec = (long)t; tv.tv_usec = (long)((t - tv.tv_sec) * 1e6); } while (0)
+#define EV_TS_SET(ts,t) do { ts.tv_sec = (long)t; tv.tv_nsec = (long)((t - tv.tv_sec) * 1e9); } while (0)
 
 #if __GNUC__ >= 4
 # define expect(expr,value)         __builtin_expect ((expr),(value))
@@ -771,21 +773,17 @@ ev_sleep (ev_tstamp delay)
 #if EV_USE_NANOSLEEP
       struct timespec ts;
 
-      ts.tv_sec  = (time_t)delay;
-      ts.tv_nsec = (long)((delay - (ev_tstamp)(ts.tv_sec)) * 1e9);
-
+      EV_SET_TS (ts, delay);
       nanosleep (&ts, 0);
 #elif defined(_WIN32)
       Sleep ((unsigned long)(delay * 1e3));
 #else
       struct timeval tv;
 
-      tv.tv_sec  = (time_t)delay;
-      tv.tv_usec = (long)((delay - (ev_tstamp)(tv.tv_sec)) * 1e6);
-
       /* here we rely on sys/time.h + sys/types.h + unistd.h providing select */
       /* something not guaranteed by newer posix versions, but guaranteed */
       /* by older ones */
+      EV_SET_TV (tv, delay);
       select (0, 0, 0, 0, &tv);
 #endif
     }
