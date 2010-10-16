@@ -966,7 +966,7 @@ fd_reify (EV_P)
           for (w = (ev_io *)anfd->head; w; w = (ev_io *)((WL)w)->next)
             anfd->events |= (unsigned char)w->events;
 
-          if (o_events !=anfd-> events)
+          if (o_events != anfd->events)
             o_reify = EV__IOFDSET; /* actually |= */
         }
 
