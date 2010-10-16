@@ -945,13 +945,13 @@ fd_reify (EV_P)
       ANFD *anfd = anfds + fd;
       ev_io *w;
 
-      unsigned char events = 0;
+      unsigned char o_events = anfd->events;
+      unsigned char o_reify  = anfd->reify;
 
-      for (w = (ev_io *)anfd->head; w; w = (ev_io *)((WL)w)->next)
-        events |= (unsigned char)w->events;
+      anfd->reify  = 0;
 
 #if EV_SELECT_IS_WINSOCKET
-      if (events)
+      if (o_reify & EV__IOFDSET)
         {
           unsigned long arg;
           anfd->handle = EV_FD_TO_WIN32_HANDLE (fd);
@@ -959,16 +959,19 @@ fd_reify (EV_P)
         }
 #endif
 
-      {
-        unsigned char o_events = anfd->events;
-        unsigned char o_reify  = anfd->reify;
+      /*if (expect_true (o_reify & EV_ANFD_REIFY)) probably a deoptimisation */
+        {
+          anfd->events = 0;
 
-        anfd->reify  = 0;
-        anfd->events = events;
+          for (w = (ev_io *)anfd->head; w; w = (ev_io *)((WL)w)->next)
+            anfd->events |= (unsigned char)w->events;
 
-        if (o_events != events || o_reify & EV__IOFDSET)
-          backend_modify (EV_A_ fd, o_events, events);
-      }
+          if (o_events !=anfd-> events)
+            o_reify = EV__IOFDSET; /* actually |= */
+        }
+
+      if (o_reify & EV__IOFDSET)
+        backend_modify (EV_A_ fd, o_events, anfd->events);
     }
 
   fdchangecnt = 0;
@@ -2599,7 +2602,7 @@ ev_io_stop (EV_P_ ev_io *w)
   wlist_del (&anfds[w->fd].head, (WL)w);
   ev_stop (EV_A_ (W)w);
 
-  fd_change (EV_A_ w->fd, 1);
+  fd_change (EV_A_ w->fd, EV_ANFD_REIFY);
 
   EV_FREQUENT_CHECK;
 }

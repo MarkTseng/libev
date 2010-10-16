@@ -12,6 +12,7 @@ TODO: section watcher states/lifetime
 	- replace EV_MINIMAL by EV_FEATURES.
         - prefer EPOLL_CTL_ADD over EPOLL_CTL_MOD in some more cases, as it
           seems the former is *much* faster than the latter.
+        - reduce the number of spurious wake-ups with the ports backend.
         - remove dependency on sys/queue.h on freebsd (patch by Vanilla Hsu).
         - add (undocumented) EV_ENABLE when adding events with kqueue,
           this might help with OS X, which seems to need it despite documenting

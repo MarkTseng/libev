@@ -1,7 +1,7 @@
 /*
  * libev solaris event port backend
  *
- * Copyright (c) 2007,2008,2009 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009,2010 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -111,7 +111,7 @@ port_poll (EV_P_ ev_tstamp timeout)
             | (port_events [i].portev_events & (POLLIN | POLLERR | POLLHUP) ? EV_READ : 0)
           );
 
-          port_associate_and_check (EV_A_ fd, anfds [fd].events);
+          fd_change (EV_A_ fd, EV__IOFDSET);
         }
     }
 
