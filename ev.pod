@@ -441,7 +441,9 @@ I<different> file descriptors (even already closed ones, so one cannot
 even remove them from the set) than registered in the set (especially
 on SMP systems). Libev tries to counter these spurious notifications by
 employing an additional generation counter and comparing that against the
-events to filter out spurious ones, recreating the set when required.
+events to filter out spurious ones, recreating the set when required. Last
+not least, it also refuses to work with some file descriptors which work
+perfectly fine with C<select> (files, many character devices...).
 
 While stopping, setting and starting an I/O watcher in the same iteration
 will result in some caching, there is still a system call per such
