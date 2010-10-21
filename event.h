@@ -46,6 +46,12 @@
 # include "ev.h"
 #endif
 
+#ifndef EVLOOP_NONBLOCK
+# define EVLOOP_NONBLOCK EVRUN_NOWAIT
+#endif
+#ifndef EVLOOP_ONESHOT
+# define EVLOOP_ONESHOT EVRUN_ONCE
+#endif
 #ifndef EV_TIMEOUT
 # define EV_TIMEOUT EV_TIMER
 #endif

@@ -1,12 +1,13 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
-TODO: ABI??? API????? Changes???
 TODO: include ev_xyz_start in each example?
 TODO: section watcher states/lifetime
-TODO: ALL ev_xxx_set funtions must be called from ev++ set methods, somehow.
+TODO: use enums //TODO: enum?
 	- "PORTING FROM LIBEV 3.X TO 4.X" (in ev.pod) is recommended reading.
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
+        - ev_run will now always update the current loop time - it errornously
+          didn't when idle watchers were active, causing timers not to fire.
         - fix a bug where a timeout of zero caused the timer not to fire
           in the libevent emulation (testcase by Péter Szabó).
 	- applied win32 fixes by Michael Lenaghan (also James Mansion).

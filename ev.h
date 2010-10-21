@@ -181,6 +181,7 @@ struct ev_loop;
 #define EV_VERSION_MINOR 0
 
 /* eventmask, revents, events... */
+//TODO: enum?
 #define EV_UNDEF            -1 /* guaranteed to be invalid */
 #define EV_NONE           0x00 /* no events */
 #define EV_READ           0x01 /* ev_io detected read will not block */
@@ -443,6 +444,7 @@ union ev_any_watcher
 #endif
 };
 
+//TODO: enum?
 /* bits for ev_default_loop and ev_loop_new */
 /* the default */
 #define EVFLAG_AUTO       0x00000000U /* not quite a mask */
@@ -453,6 +455,7 @@ union ev_any_watcher
 #define EVFLAG_NOINOTIFY  0x00100000U /* do not attempt to use inotify */
 #define EVFLAG_NOSIGFD 0 /* compatibility to pre-3.9 */
 #define EVFLAG_SIGNALFD   0x00200000U /* attempt to use signalfd */
+//TODO: enum?
 /* method bits to be ored together */
 #define EVBACKEND_SELECT  0x00000001U /* about anywhere */
 #define EVBACKEND_POLL    0x00000002U /* !win */
@@ -565,15 +568,17 @@ void ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w));
 
 #endif /* prototypes */
 
-#define EVLOOP_NONBLOCK	1 /* do not block/wait */
-#define EVLOOP_ONESHOT	2 /* block *once* only */
-#define EVUNLOOP_CANCEL 0 /* undo unloop */
-#define EVUNLOOP_ONE    1 /* unloop once */
-#define EVUNLOOP_ALL    2 /* unloop all loops */
+//TODO: enum?
+#define EVRUN_NOWAIT	1 /* do not block/wait */
+#define EVRUN_ONCE	2 /* block *once* only */
+
+#define EVBREAK_CANCEL 0 /* undo unloop */
+#define EVBREAK_ONE    1 /* unloop once */
+#define EVBREAK_ALL    2 /* unloop all loops */
 
 #if EV_PROTOTYPES
-void ev_loop (EV_P_ int flags);
-void ev_unloop (EV_P_ int how); /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
+void ev_run (EV_P_ int flags);
+void ev_break (EV_P_ int how); /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
 
 /*
  * ref/unref can be used to add or remove a refcount on the mainloop. every watcher
@@ -593,13 +598,6 @@ void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revent
 unsigned int ev_iteration (EV_P); /* number of loop iterations */
 unsigned int ev_depth     (EV_P); /* #ev_loop enters - #ev_loop leaves */
 void         ev_verify    (EV_P); /* abort if loop data corrupted */
-
-/* pre 4.0 API compatibility */
-#  if EV_MULTIPLICITY
-#   define ev_loop_count(l)  ev_iteration (l)
-#   define ev_loop_depth(l)  ev_depth (l)
-#   define ev_loop_verify(l) ev_verify (l)
-#  endif
 
 void ev_set_io_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
 void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
@@ -756,6 +754,30 @@ void ev_async_start    (EV_P_ ev_async *w);
 void ev_async_stop     (EV_P_ ev_async *w);
 void ev_async_send     (EV_P_ ev_async *w);
 # endif
+
+/* pre-4.0 compatibility */
+#ifndef EV_COMPAT3
+# define EV_COMPAT3 1
+#endif
+
+#if EV_COMPAT3
+  #define EVLOOP_NONBLOCK EVRUN_NOWAIT
+  #define EVLOOP_ONESHOT  EVRUN_ONCE
+  #define EVUNLOOP_CANCEL EVBREAK_CANCEL
+  #define EVUNLOOP_ONE    EVBREAK_ONE
+  #define EVUNLOOP_ALL    EVBREAK_ALL
+  #if EV_PROTOTYPES
+    EV_INLINE void ev_loop   (EV_P_ int flags) { ev_run   (EV_A_ flags); }
+    EV_INLINE void ev_unloop (EV_P_ int how  ) { ev_break (EV_A_ how  ); }
+    #if EV_FEATURE_API
+      EV_INLINE void ev_loop_count  (EV_P) { ev_iteration  (EV_A); }
+      EV_INLINE void ev_loop_depth  (EV_P) { ev_depth      (EV_A); }
+      EV_INLINE void ev_loop_verify (EV_P) { ev_verify     (EV_A); }
+    #endif
+  #endif
+#else
+  typedef struct ev_loop ev_loop;
+#endif
 
 #endif
 

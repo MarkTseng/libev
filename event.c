@@ -140,7 +140,7 @@ int event_loopexit (struct timeval *tv)
 static void
 ev_x_cb (struct event *ev, int revents)
 {
-  revents &= EV_READ | EV_WRITE | EV_TIMEOUT | EV_SIGNAL;
+  revents &= EV_READ | EV_WRITE | EV_TIMER | EV_SIGNAL;
 
   ev->ev_res = revents;
   ev->ev_callback (ev->ev_fd, (short)revents, ev->ev_arg);
@@ -327,7 +327,7 @@ int event_base_loop (struct event_base *base, int flags)
 {
   dLOOPbase;
 
-  ev_loop (EV_A_ flags);
+  ev_run (EV_A_ flags);
 
   return 0;
 }
@@ -342,7 +342,7 @@ ev_x_loopexit_cb (int revents, void *base)
 {
   dLOOPbase;
 
-  ev_unloop (EV_A_ EVUNLOOP_ONE);
+  ev_break (EV_A_ EVBREAK_ONE);
 }
 
 int event_base_loopexit (struct event_base *base, struct timeval *tv)

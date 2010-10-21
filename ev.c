@@ -719,7 +719,7 @@ typedef struct
 # define EV_INVOKE_PENDING ev_invoke_pending (EV_A)
 #endif
 
-#define EVUNLOOP_RECURSE 0x80
+#define EVBREAK_RECURSE 0x80
 
 /*****************************************************************************/
 
@@ -2294,15 +2294,15 @@ time_update (EV_P_ ev_tstamp max_block)
 }
 
 void
-ev_loop (EV_P_ int flags)
+ev_run (EV_P_ int flags)
 {
 #if EV_FEATURE_API
   ++loop_depth;
 #endif
 
-  assert (("libev: ev_loop recursion during release detected", loop_done != EVUNLOOP_RECURSE));
+  assert (("libev: ev_loop recursion during release detected", loop_done != EVBREAK_RECURSE));
 
-  loop_done = EVUNLOOP_CANCEL;
+  loop_done = EVBREAK_CANCEL;
 
   EV_INVOKE_PENDING; /* in case we recurse, ensure ordering stays nice and clean */
 
@@ -2355,14 +2355,14 @@ ev_loop (EV_P_ int flags)
         ev_tstamp waittime  = 0.;
         ev_tstamp sleeptime = 0.;
 
-        if (expect_true (!(flags & EVLOOP_NONBLOCK || idleall || !activecnt)))
+        /* remember old timestamp for io_blocktime calculation */
+        ev_tstamp prev_mn_now = mn_now;
+
+        /* update time to cancel out callback processing overhead */
+        time_update (EV_A_ 1e100);
+
+        if (expect_true (!(flags & EVRUN_NOWAIT || idleall || !activecnt)))
           {
-            /* remember old timestamp for io_blocktime calculation */
-            ev_tstamp prev_mn_now = mn_now;
-
-            /* update time to cancel out callback processing overhead */
-            time_update (EV_A_ 1e100);
-
             waittime = MAX_BLOCKTIME;
 
             if (timercnt)
@@ -2402,9 +2402,9 @@ ev_loop (EV_P_ int flags)
 #if EV_FEATURE_API
         ++loop_count;
 #endif
-        assert ((loop_done = EVUNLOOP_RECURSE, 1)); /* assert for side effect */
+        assert ((loop_done = EVBREAK_RECURSE, 1)); /* assert for side effect */
         backend_poll (EV_A_ waittime);
-        assert ((loop_done = EVUNLOOP_CANCEL, 1)); /* assert for side effect */
+        assert ((loop_done = EVBREAK_CANCEL, 1)); /* assert for side effect */
 
         /* update ev_rt_now, do magic */
         time_update (EV_A_ waittime + sleeptime);
@@ -2432,11 +2432,11 @@ ev_loop (EV_P_ int flags)
   while (expect_true (
     activecnt
     && !loop_done
-    && !(flags & (EVLOOP_ONESHOT | EVLOOP_NONBLOCK))
+    && !(flags & (EVRUN_ONCE | EVRUN_NOWAIT))
   ));
 
-  if (loop_done == EVUNLOOP_ONE)
-    loop_done = EVUNLOOP_CANCEL;
+  if (loop_done == EVBREAK_ONE)
+    loop_done = EVBREAK_CANCEL;
 
 #if EV_FEATURE_API
   --loop_depth;
@@ -2444,7 +2444,7 @@ ev_loop (EV_P_ int flags)
 }
 
 void
-ev_unloop (EV_P_ int how)
+ev_break (EV_P_ int how)
 {
   loop_done = how;
 }
@@ -3429,7 +3429,7 @@ ev_check_stop (EV_P_ ev_check *w)
 void noinline
 ev_embed_sweep (EV_P_ ev_embed *w)
 {
-  ev_loop (w->other, EVLOOP_NONBLOCK);
+  ev_run (w->other, EVRUN_NOWAIT);
 }
 
 static void
@@ -3440,7 +3440,7 @@ embed_io_cb (EV_P_ ev_io *io, int revents)
   if (ev_cb (w))
     ev_feed_event (EV_A_ (W)w, EV_EMBED);
   else
-    ev_loop (w->other, EVLOOP_NONBLOCK);
+    ev_run (w->other, EVRUN_NOWAIT);
 }
 
 static void
@@ -3454,7 +3454,7 @@ embed_prepare_cb (EV_P_ ev_prepare *prepare, int revents)
     while (fdchangecnt)
       {
         fd_reify (EV_A);
-        ev_loop (EV_A_ EVLOOP_NONBLOCK);
+        ev_run (EV_A_ EVRUN_NOWAIT);
       }
   }
 }
@@ -3470,7 +3470,7 @@ embed_fork_cb (EV_P_ ev_fork *fork_w, int revents)
     EV_P = w->other;
 
     ev_loop_fork (EV_A);
-    ev_loop (EV_A_ EVLOOP_NONBLOCK);
+    ev_run (EV_A_ EVRUN_NOWAIT);
   }
 
   ev_embed_start (EV_A_ w);
