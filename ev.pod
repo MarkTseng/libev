@@ -1161,7 +1161,7 @@ and call libev functions on it that are documented to work on active watchers.
 =item pending
 
 If a watcher is active and libev determines that an event it is interested
-in has occured (such as a timer expiring), it will become pending. It will
+in has occurred (such as a timer expiring), it will become pending. It will
 stay in this pending state until either it is stopped or its callback is
 about to be invoked, so it is not normally pending inside the watcher
 callback.

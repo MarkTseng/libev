@@ -2,6 +2,7 @@ ev_async_send
 ev_async_start
 ev_async_stop
 ev_backend
+ev_break
 ev_check_start
 ev_check_stop
 ev_child_start
@@ -28,7 +29,6 @@ ev_invoke_pending
 ev_io_start
 ev_io_stop
 ev_iteration
-ev_loop
 ev_loop_destroy
 ev_loop_fork
 ev_loop_new
@@ -44,6 +44,7 @@ ev_prepare_stop
 ev_recommended_backends
 ev_ref
 ev_resume
+ev_run
 ev_set_allocator
 ev_set_invoke_pending_cb
 ev_set_io_collect_interval
@@ -64,7 +65,6 @@ ev_timer_again
 ev_timer_remaining
 ev_timer_start
 ev_timer_stop
-ev_unloop
 ev_unref
 ev_userdata
 ev_verify

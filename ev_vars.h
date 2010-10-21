@@ -48,7 +48,7 @@ VARx(ev_tstamp, timeout_blocktime)
 
 VARx(int, backend)
 VARx(int, activecnt) /* total number of active events ("refcount") */
-VARx(unsigned char, loop_done)  /* signal by ev_unloop */
+VARx(EV_ATOMIC_T, loop_done)  /* signal by ev_break */
 
 VARx(int, backend_fd)
 VARx(ev_tstamp, backend_fudge) /* assumed typical timer resolution */
@@ -175,7 +175,7 @@ VARx(sigset_t, sigfd_set)
 
 #if EV_FEATURE_API || EV_GENWRAP
 VARx(unsigned int, loop_count) /* total number of loop iterations/blocks */
-VARx(unsigned int, loop_depth) /* #ev_loop enters - #ev_loop leaves */
+VARx(unsigned int, loop_depth) /* #ev_run enters - #ev_run leaves */
 
 VARx(void *, userdata)
 VAR (release_cb, void (*release_cb)(EV_P))
