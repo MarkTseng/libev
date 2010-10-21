@@ -3,6 +3,7 @@ Revision history for libev, a high-performance and full-featured event loop.
 TODO: ABI??? API????? Changes???
 TODO: include ev_xyz_start in each example?
 TODO: section watcher states/lifetime
+TODO: ALL ev_xxx_set funtions must be called from ev++ set methods, somehow.
 	- "PORTING FROM LIBEV 3.X TO 4.X" (in ev.pod) is recommended reading.
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
@@ -14,6 +15,9 @@ TODO: section watcher states/lifetime
           seems the former is *much* faster than the latter.
         - reduce the number of spurious wake-ups with the ports backend.
         - remove dependency on sys/queue.h on freebsd (patch by Vanilla Hsu).
+        - do async init within ev_async_start, not ev_async_set, which avoids
+          an API quirk where the set function must be called in the C++ API
+          even when there is nothing to set.
         - add (undocumented) EV_ENABLE when adding events with kqueue,
           this might help with OS X, which seems to need it despite documenting
           not to need it (helpfully pointed out by Tilghman Lesher).

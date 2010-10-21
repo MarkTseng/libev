@@ -3579,6 +3579,8 @@ ev_async_start (EV_P_ ev_async *w)
   if (expect_false (ev_is_active (w)))
     return;
 
+  w->sent = 0;
+
   evpipe_init (EV_A);
 
   EV_FREQUENT_CHECK;

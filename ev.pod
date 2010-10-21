@@ -3393,15 +3393,21 @@ do this when the watcher is inactive (and not pending either).
 
 =item w->set ([arguments])
 
-Basically the same as C<ev_TYPE_set>, with the same arguments. Must be
-called at least once. Unlike the C counterpart, an active watcher gets
-automatically stopped and restarted when reconfiguring it with this
-method.
+Basically the same as C<ev_TYPE_set>, with the same arguments. Either this
+method or a suitable start method must be called at least once. Unlike the
+C counterpart, an active watcher gets automatically stopped and restarted
+when reconfiguring it with this method.
 
 =item w->start ()
 
 Starts the watcher. Note that there is no C<loop> argument, as the
 constructor already stores the event loop.
+
+=item w->start ([arguments])
+
+Instead of calling C<set> and C<start> methods separately, it is often
+convenient to wrap them in one call. Uses the same type of arguments as
+the configure C<set> method of the watcher.
 
 =item w->stop ()
 
@@ -3424,20 +3430,25 @@ Invokes C<ev_stat_stat>.
 
 =back
 
-Example: Define a class with an IO and idle watcher, start one of them in
-the constructor.
+Example: Define a class with two I/O and idle watchers, start the I/O
+watchers in the constructor.
 
    class myclass
    {
      ev::io   io  ; void io_cb   (ev::io   &w, int revents);
+     ev::io2  io2 ; void io2_cb  (ev::io   &w, int revents);
      ev::idle idle; void idle_cb (ev::idle &w, int revents);
 
      myclass (int fd)
      {
        io  .set <myclass, &myclass::io_cb  > (this);
+       io2 .set <myclass, &myclass::io2_cb > (this);
        idle.set <myclass, &myclass::idle_cb> (this);
 
-       io.start (fd, ev::READ);
+       io.set (fd, ev::WRITE); // configure the watcher
+       io.start ();            // start it whenever convenient
+
+       io2.start (fd, ev::READ); // set + start in one call
      }
    };
 

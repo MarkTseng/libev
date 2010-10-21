@@ -415,6 +415,7 @@ namespace ev {
     #if EV_MULTIPLICITY
       EV_PX;
 
+      // loop set
       void set (EV_P) throw ()
       {
         this->EV_A = EV_A;
@@ -783,8 +784,6 @@ namespace ev {
 
   #if EV_ASYNC_ENABLE
   EV_BEGIN_WATCHER (async, async)
-    void set () throw () { }
-
     void send () throw ()
     {
       ev_async_send (EV_A_ static_cast<ev_async *>(this));
