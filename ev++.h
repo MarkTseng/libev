@@ -76,7 +76,7 @@ namespace ev {
     ASYNC    = EV_ASYNC,
     EMBED    = EV_EMBED,
 #   undef ERROR // some systems stupidly #define ERROR
-    ERROR    = EV_ERROR,
+    ERROR    = EV_ERROR
   };
 
   enum

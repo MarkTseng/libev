@@ -43,6 +43,8 @@ TODO: use enums //TODO: enum?
         - switch to two-digit minor version.
         - work around an apparent gentoo compiler bug.
         - define _DARWIN_UNLIMITED_SELECT. just so.
+        - use enum instead of #define for most constants.
+        - improve compatibility to older C++ compilers.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

@@ -46,6 +46,11 @@ extern "C" {
 
 /*****************************************************************************/
 
+/* pre-4.0 compatibility */
+#ifndef EV_COMPAT3
+# define EV_COMPAT3 1
+#endif
+
 #ifndef EV_FEATURES
 # define EV_FEATURES 0x7f
 #endif
@@ -181,27 +186,28 @@ struct ev_loop;
 #define EV_VERSION_MINOR 0
 
 /* eventmask, revents, events... */
-//TODO: enum?
-#define EV_UNDEF            -1 /* guaranteed to be invalid */
-#define EV_NONE           0x00 /* no events */
-#define EV_READ           0x01 /* ev_io detected read will not block */
-#define EV_WRITE          0x02 /* ev_io detected write will not block */
-#define EV__IOFDSET       0x80 /* internal use only */
-#define EV_IO          EV_READ /* alias for type-detection */
-#define EV_TIMER    0x00000100 /* timer timed out */
-#define EV_TIMEOUT    EV_TIMER /* pre 4.0 API compatibility */
-#define EV_PERIODIC 0x00000200 /* periodic timer timed out */
-#define EV_SIGNAL   0x00000400 /* signal was received */
-#define EV_CHILD    0x00000800 /* child/pid had status change */
-#define EV_STAT     0x00001000 /* stat data changed */
-#define EV_IDLE     0x00002000 /* event loop is idling */
-#define EV_PREPARE  0x00004000 /* event loop about to poll */
-#define EV_CHECK    0x00008000 /* event loop finished poll */
-#define EV_EMBED    0x00010000 /* embedded event loop needs sweep */
-#define EV_FORK     0x00020000 /* event loop resumed in child */
-#define EV_ASYNC    0x00040000 /* async intra-loop signal */
-#define EV_CUSTOM   0x01000000 /* for use by user code */
-#define EV_ERROR    0x80000000 /* sent when an error occurs */
+enum {
+  EV_UNDEF    =         -1, /* guaranteed to be invalid */
+  EV_NONE     =       0x00, /* no events */
+  EV_READ     =       0x01, /* ev_io detected read will not block */
+  EV_WRITE    =       0x02, /* ev_io detected write will not block */
+  EV__IOFDSET =       0x80, /* internal use only */
+  EV_IO       =    EV_READ, /* alias for type-detection */
+  EV_TIMER    = 0x00000100, /* timer timed out */
+  EV_TIMEOUT  =   EV_TIMER, /* pre 4.0 API compatibility */
+  EV_PERIODIC = 0x00000200, /* periodic timer timed out */
+  EV_SIGNAL   = 0x00000400, /* signal was received */
+  EV_CHILD    = 0x00000800, /* child/pid had status change */
+  EV_STAT     = 0x00001000, /* stat data changed */
+  EV_IDLE     = 0x00002000, /* event loop is idling */
+  EV_PREPARE  = 0x00004000, /* event loop about to poll */
+  EV_CHECK    = 0x00008000, /* event loop finished poll */
+  EV_EMBED    = 0x00010000, /* embedded event loop needs sweep */
+  EV_FORK     = 0x00020000, /* event loop resumed in child */
+  EV_ASYNC    = 0x00040000, /* async intra-loop signal */
+  EV_CUSTOM   = 0x01000000, /* for use by user code */
+  EV_ERROR    = 0x80000000  /* sent when an error occurs */
+};
 
 /* can be used to add custom fields to all watchers, while losing binary compatibility */
 #ifndef EV_COMMON
@@ -444,26 +450,31 @@ union ev_any_watcher
 #endif
 };
 
-//TODO: enum?
-/* bits for ev_default_loop and ev_loop_new */
-/* the default */
-#define EVFLAG_AUTO       0x00000000U /* not quite a mask */
-/* flag bits */
-#define EVFLAG_NOENV      0x01000000U /* do NOT consult environment */
-#define EVFLAG_FORKCHECK  0x02000000U /* check for a fork in each iteration */
-/* debugging/feature disable */
-#define EVFLAG_NOINOTIFY  0x00100000U /* do not attempt to use inotify */
-#define EVFLAG_NOSIGFD 0 /* compatibility to pre-3.9 */
-#define EVFLAG_SIGNALFD   0x00200000U /* attempt to use signalfd */
-//TODO: enum?
+/* flag bits for ev_default_loop and ev_loop_new */
+enum {
+  /* the default */
+  EVFLAG_AUTO      = 0x00000000U, /* not quite a mask */
+  /* flag bits */
+  EVFLAG_NOENV     = 0x01000000U, /* do NOT consult environment */
+  EVFLAG_FORKCHECK = 0x02000000U, /* check for a fork in each iteration */
+  /* debugging/feature disable */
+  EVFLAG_NOINOTIFY = 0x00100000U, /* do not attempt to use inotify */
+#if EV_COMPAT3
+  EVFLAG_NOSIGFD   = 0, /* compatibility to pre-3.9 */
+#endif
+  EVFLAG_SIGNALFD  = 0x00200000U  /* attempt to use signalfd */
+};
+
 /* method bits to be ored together */
-#define EVBACKEND_SELECT  0x00000001U /* about anywhere */
-#define EVBACKEND_POLL    0x00000002U /* !win */
-#define EVBACKEND_EPOLL   0x00000004U /* linux */
-#define EVBACKEND_KQUEUE  0x00000008U /* bsd */
-#define EVBACKEND_DEVPOLL 0x00000010U /* solaris 8 */ /* NYI */
-#define EVBACKEND_PORT    0x00000020U /* solaris 10 */
-#define EVBACKEND_ALL     0x0000003FU
+enum {
+  EVBACKEND_SELECT  = 0x00000001U, /* about anywhere */
+  EVBACKEND_POLL    = 0x00000002U, /* !win */
+  EVBACKEND_EPOLL   = 0x00000004U, /* linux */
+  EVBACKEND_KQUEUE  = 0x00000008U, /* bsd */
+  EVBACKEND_DEVPOLL = 0x00000010U, /* solaris 8 */ /* NYI */
+  EVBACKEND_PORT    = 0x00000020U, /* solaris 10 */
+  EVBACKEND_ALL     = 0x0000003FU
+};
 
 #if EV_PROTOTYPES
 int ev_version_major (void);
@@ -568,13 +579,18 @@ void ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w));
 
 #endif /* prototypes */
 
-//TODO: enum?
-#define EVRUN_NOWAIT	1 /* do not block/wait */
-#define EVRUN_ONCE	2 /* block *once* only */
+/* ev_run flags values */
+enum {
+  EVRUN_NOWAIT = 1, /* do not block/wait */
+  EVRUN_ONCE   = 2  /* block *once* only */
+};
 
-#define EVBREAK_CANCEL 0 /* undo unloop */
-#define EVBREAK_ONE    1 /* unloop once */
-#define EVBREAK_ALL    2 /* unloop all loops */
+/* ev_break how values */
+enum {
+  EVBREAK_CANCEL = 0, /* undo unloop */
+  EVBREAK_ONE    = 1, /* unloop once */
+  EVBREAK_ALL    = 2  /* unloop all loops */
+};
 
 #if EV_PROTOTYPES
 void ev_run (EV_P_ int flags);
@@ -754,11 +770,6 @@ void ev_async_start    (EV_P_ ev_async *w);
 void ev_async_stop     (EV_P_ ev_async *w);
 void ev_async_send     (EV_P_ ev_async *w);
 # endif
-
-/* pre-4.0 compatibility */
-#ifndef EV_COMPAT3
-# define EV_COMPAT3 1
-#endif
 
 #if EV_COMPAT3
   #define EVLOOP_NONBLOCK EVRUN_NOWAIT
