@@ -956,7 +956,7 @@ and are intended solely for the C<invoke_pending_cb>, C<release> and
 C<acquire> callbacks described above, but of course can be (ab-)used for
 any other purpose as well.
 
-=item ev_loop_verify (loop)
+=item ev_verify (loop)
 
 This function only does something when C<EV_VERIFY> support has been
 compiled in, which is the default for non-minimal builds. It tries to go
@@ -4042,7 +4042,7 @@ will be C<0>.
 
 =item EV_VERIFY
 
-Controls how much internal verification (see C<ev_loop_verify ()>) will
+Controls how much internal verification (see C<ev_verify ()>) will
 be done: If set to C<0>, no internal verification code will be compiled
 in. If set to C<1>, then verification code will be compiled in, but not
 called. If set to C<2>, then the internal verification code will be
