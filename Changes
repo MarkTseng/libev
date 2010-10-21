@@ -4,7 +4,7 @@ TODO: include ev_xyz_start in each example?
 	- "PORTING FROM LIBEV 3.X TO 4.X" (in ev.pod) is recommended reading.
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
-        - ev_run will now always update the current loop time - it errornously
+        - ev_run will now always update the current loop time - it erroneously
           didn't when idle watchers were active, causing timers not to fire.
         - fix a bug where a timeout of zero caused the timer not to fire
           in the libevent emulation (testcase by Péter Szabó).
@@ -69,14 +69,14 @@ TODO: include ev_xyz_start in each example?
         - add missing string.h include (Denis F. Latypoff).
         - only replace ev_stat.prev when we detect an actual difference,
           so prev is (almost) always different to attr. this might
-          have caused the probems with 04_stat.t.
+          have caused the problems with 04_stat.t.
         - add ev::timer->remaining () method to C++ API.
 
 3.8  Sun Aug  9 14:30:45 CEST 2009
 	- incompatible change: do not necessarily reset signal handler
           to SIG_DFL when a sighandler is stopped.
         - ev_default_destroy did not properly free or zero some members,
-          potentially causing crashes and memory corruption on repated
+          potentially causing crashes and memory corruption on repeated
           ev_default_destroy/ev_default_loop calls.
 	- take advantage of signalfd on GNU/Linux systems.
 	- document that the signal mask might be in an unspecified
@@ -208,7 +208,7 @@ TODO: include ev_xyz_start in each example?
 3.45 Tue Oct 21 21:59:26 CEST 2008
 	- disable inotify usage on linux <2.6.25, as it is broken
           (reported by Yoann Vandoorselaere).
-        - ev_stat errornously would try to add inotify watchers
+        - ev_stat erroneously would try to add inotify watchers
           even when inotify wasn't available (this should only
           have a performance impact).
 	- ev_once now passes both timeout and io to the callback if both
@@ -286,10 +286,10 @@ TODO: include ev_xyz_start in each example?
           not clearing revents field in ev_poll (Brandon Black)
           (no such systems are known at this time).
         - work around a bug in realloc on openbsd and darwin,
-          also makes the errornous valgrind complaints
+          also makes the erroneous valgrind complaints
           go away (noted by various people).
         - fix ev_async_pending, add c++ wrapper for ev_async
-          (based on patch sent by Johannes Deisenhofer.
+          (based on patch sent by Johannes Deisenhofer).
         - add sensible set method to ev::embed.
         - made integer constants type int in ev.h.
 
