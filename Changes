@@ -24,7 +24,8 @@ TODO: include ev_xyz_start in each example?
           on freebsd...).
         - configure now prepends -O3, not appends it, so one can still
           override it.
-        - greatly expanded the portability section.
+        - ev.pod: greatly expanded the portability section, added a porting
+          section, a description of watcher states and made lots of minor fixes.
         - disable poll backend on AIX, the poll header spams the namespace
           and it's not worth working around dead platforms (reported
           and analyzed by Aivars Kalvans).
@@ -37,7 +38,7 @@ TODO: include ev_xyz_start in each example?
         - update libev.m4 HAVE_CLOCK_SYSCALL test for newer glibcs.
         - add section on accept() problems to the manpage.
         - rename EV_TIMEOUT to EV_TIMER.
-        - rename ev_loop_count/depth/verify.
+        - rename ev_loop_count/depth/verify/loop/unloop.
         - switch to two-digit minor version.
         - work around an apparent gentoo compiler bug.
         - define _DARWIN_UNLIMITED_SELECT. just so.
