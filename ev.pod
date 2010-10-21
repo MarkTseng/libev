@@ -295,8 +295,8 @@ Example: This is basically the same thing that libev does internally, too.
 =head1 FUNCTIONS CONTROLLING THE EVENT LOOP
 
 An event loop is described by a C<struct ev_loop *> (the C<struct> is
-I<not> optional in case unless libev 3 compatibility is disabled, as libev
-3 had an C<ev_loop> function colliding with the struct name).
+I<not> optional in this case unless libev 3 compatibility is disabled, as
+libev 3 had an C<ev_loop> function colliding with the struct name).
 
 The library knows two types of such loops, the I<default> loop, which
 supports signals and child events, and dynamically created event loops
@@ -992,9 +992,10 @@ In the following description, uppercase C<TYPE> in names stands for the
 watcher type, e.g. C<ev_TYPE_start> can mean C<ev_timer_start> for timer
 watchers and C<ev_io_start> for I/O watchers.
 
-A watcher is a structure that you create and register to record your
-interest in some event. For instance, if you want to wait for STDIN to
-become readable, you would create an C<ev_io> watcher for that:
+A watcher is an opaque structure that you allocate and register to record
+your interest in some event. To make a concrete example, imagine you want
+to wait for STDIN to become readable, you would create an C<ev_io> watcher
+for that:
 
    static void my_cb (struct ev_loop *loop, ev_io *w, int revents)
    {
@@ -1019,11 +1020,11 @@ stack).
 Each watcher has an associated watcher structure (called C<struct ev_TYPE>
 or simply C<ev_TYPE>, as typedefs are provided for all watcher structs).
 
-Each watcher structure must be initialised by a call to C<ev_init
-(watcher *, callback)>, which expects a callback to be provided. This
-callback gets invoked each time the event occurs (or, in the case of I/O
-watchers, each time the event loop detects that the file descriptor given
-is readable and/or writable).
+Each watcher structure must be initialised by a call to C<ev_init (watcher
+*, callback)>, which expects a callback to be provided. This callback is
+invoked each time the event occurs (or, in the case of I/O watchers, each
+time the event loop detects that the file descriptor given is readable
+and/or writable).
 
 Each watcher type further has its own C<< ev_TYPE_set (watcher *, ...) >>
 macro to configure it, with arguments specific to the watcher type. There
@@ -1128,6 +1129,65 @@ callbacks is well-written it can just attempt the operation and cope with
 the error from read() or write(). This will not work in multi-threaded
 programs, though, as the fd could already be closed and reused for another
 thing, so beware.
+
+=back
+
+=head2 WATCHER STATES
+
+There are various watcher states mentioned throughout this manual -
+active, pending and so on. In this section these states and the rules to
+transition between them will be described in more detail - and while these
+rules might look complicated, they usually do "the right thing".
+
+=over 4
+
+=item initialiased
+
+Before a watcher can be registered with the event looop it has to be
+initialised. This can be done with a call to C<ev_TYPE_init>, or calls to
+C<ev_init> followed by the watcher-specific C<ev_TYPE_set> function.
+
+In this state it is simply some block of memory that is suitable for use
+in an event loop. It can be moved around, freed, reused etc. at will.
+
+=item started/running/active
+
+Once a watcher has been started with a call to C<ev_TYPE_start> it becomes
+property of the event loop, and is actively waiting for events. While in
+this state it cannot be accessed (except in a few documented ways), moved,
+freed or anything else - the only legal thing is to keep a pointer to it,
+and call libev functions on it that are documented to work on active watchers.
+
+=item pending
+
+If a watcher is active and libev determines that an event it is interested
+in has occured (such as a timer expiring), it will become pending. It will
+stay in this pending state until either it is stopped or its callback is
+about to be invoked, so it is not normally pending inside the watcher
+callback.
+
+The watcher might or might not be active while it is pending (for example,
+an expired non-repeating timer can be pending but no longer active). If it
+is stopped, it can be freely accessed (e.g. by calling C<ev_TYPE_set>),
+but it is still property of the event loop at this time, so cannot be
+moved, freed or reused. And if it is active the rules described in the
+previous item still apply.
+
+It is also possible to feed an event on a watcher that is not active (e.g.
+via C<ev_feed_event>), in which case it becomes pending without being
+active.
+
+=item stopped
+
+A watcher can be stopped implicitly by libev (in which case it might still
+be pending), or explicitly by calling its C<ev_TYPE_stop> function. The
+latter will clear any pending state the watcher might be in, regardless
+of whether it was active or not, so stopping a watcher explicitly before
+freeing it is often a good idea.
+
+While stopped (and not pending) the watcher is essentially in the
+initialised state, that is it can be reused, moved, modified in any way
+you wish.
 
 =back
 
