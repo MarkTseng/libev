@@ -64,7 +64,10 @@ namespace ev {
     NONE     = EV_NONE,
     READ     = EV_READ,
     WRITE    = EV_WRITE,
+#if EV_COMPAT3
     TIMEOUT  = EV_TIMEOUT,
+#endif
+    TIMER    = EV_TIMER,
     PERIODIC = EV_PERIODIC,
     SIGNAL   = EV_SIGNAL,
     CHILD    = EV_CHILD,
@@ -95,14 +98,18 @@ namespace ev {
 
   enum
   {
+#if EV_COMPAT3
     NONBLOCK = EVLOOP_NONBLOCK,
-    ONESHOT  = EVLOOP_ONESHOT
+    ONESHOT  = EVLOOP_ONESHOT,
+#endif
+    NOWAIT   = EVRUN_NOWAIT,
+    ONCE     = EVRUN_ONCE
   };
 
   enum how_t
   {
-    ONE = EVUNLOOP_ONE,
-    ALL = EVUNLOOP_ALL
+    ONE = EVBREAK_ONE,
+    ALL = EVBREAK_ALL
   };
 
   struct bad_loop
@@ -188,14 +195,26 @@ namespace ev {
     }
 #endif
 
+#if EV_COMPAT3
     void loop (int flags = 0)
     {
-      ev_loop (EV_AX_ flags);
+      ev_run (EV_AX_ flags);
     }
 
     void unloop (how_t how = ONE) throw ()
     {
-      ev_unloop (EV_AX_ how);
+      ev_break (EV_AX_ how);
+    }
+#endif
+
+    void run (int flags = 0)
+    {
+      ev_run (EV_AX_ flags);
+    }
+
+    void break_loop (how_t how = ONE) throw ()
+    {
+      ev_break (EV_AX_ how);
     }
 
     void post_fork () throw ()

@@ -147,6 +147,12 @@ typedef double ev_tstamp;
 # include <sys/stat.h>
 #endif
 
+#ifdef __cplusplus
+# define EV_DEFARG(x) = x
+#else
+# define EV_DEFARG(x)
+#endif
+
 /* support multiple event loops? */
 #if EV_MULTIPLICITY
 struct ev_loop;
@@ -194,7 +200,9 @@ enum {
   EV__IOFDSET =       0x80, /* internal use only */
   EV_IO       =    EV_READ, /* alias for type-detection */
   EV_TIMER    = 0x00000100, /* timer timed out */
+#if EV_COMPAT3
   EV_TIMEOUT  =   EV_TIMER, /* pre 4.0 API compatibility */
+#endif
   EV_PERIODIC = 0x00000200, /* periodic timer timed out */
   EV_SIGNAL   = 0x00000400, /* signal was received */
   EV_CHILD    = 0x00000800, /* child/pid had status change */
@@ -513,7 +521,7 @@ ev_default_loop_uc (void)
 /* the default loop is the only one that handles signals and child watchers */
 /* you can call this as often as you like */
 EV_INLINE struct ev_loop *
-ev_default_loop (unsigned int flags)
+ev_default_loop (unsigned int flags EV_DEFARG (0))
 {
   struct ev_loop *loop = ev_default_loop_uc ();
 
@@ -528,7 +536,7 @@ ev_default_loop (unsigned int flags)
 }
 
 /* create and destroy alternative loops that don't handle signals */
-struct ev_loop *ev_loop_new (unsigned int flags);
+struct ev_loop *ev_loop_new (unsigned int flags EV_DEFARG (0));
 void ev_loop_destroy (EV_P);
 void ev_loop_fork (EV_P);
 
@@ -536,7 +544,7 @@ ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after 
 
 #else
 
-int ev_default_loop (unsigned int flags); /* returns true when successful */
+int ev_default_loop (unsigned int flags EV_DEFARG (0)); /* returns true when successful */
 
 EV_INLINE ev_tstamp
 ev_now (void)
@@ -593,8 +601,8 @@ enum {
 };
 
 #if EV_PROTOTYPES
-void ev_run (EV_P_ int flags);
-void ev_break (EV_P_ int how); /* set to 1 to break out of event loop, set to 2 to break out of all event loops */
+void ev_run (EV_P_ int flags EV_DEFARG (0));
+void ev_break (EV_P_ int how EV_DEFARG (EVBREAK_ONE)); /* break out of the loop */
 
 /*
  * ref/unref can be used to add or remove a refcount on the mainloop. every watcher
