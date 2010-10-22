@@ -147,6 +147,7 @@ typedef double ev_tstamp;
 # include <sys/stat.h>
 #endif
 
+/* in C++ we can use this to provide default arguments */
 #ifdef __cplusplus
 # define EV_DEFARG(x) = x
 #else
@@ -156,15 +157,16 @@ typedef double ev_tstamp;
 /* support multiple event loops? */
 #if EV_MULTIPLICITY
 struct ev_loop;
-# define EV_P struct ev_loop *loop                /* a loop as sole parameter in a declaration */
+# define EV_P  struct ev_loop *loop               /* a loop as sole parameter in a declaration */
 # define EV_P_ EV_P,                              /* a loop as first of multiple parameters */
-# define EV_A loop                                /* a loop as sole argument to a function call */
+# define EV_A  loop                               /* a loop as sole argument to a function call */
 # define EV_A_ EV_A,                              /* a loop as first of multiple arguments */
-# define EV_DEFAULT_UC ev_default_loop_uc ()      /* the default loop, if initialised, as sole arg */
+# define EV_DEFAULT_UC  ev_default_loop_uc ()     /* the default loop, if initialised, as sole arg */
 # define EV_DEFAULT_UC_ EV_DEFAULT_UC,            /* the default loop as first of multiple arguments */
-# define EV_DEFAULT ev_default_loop (0)           /* the default loop as sole arg */
+# define EV_DEFAULT  ev_default_loop (0)          /* the default loop as sole arg */
 # define EV_DEFAULT_ EV_DEFAULT,                  /* the default loop as first of multiple arguments */
-# define EV_PDEF EV_P EV_DEFARG (EV_DEFAULT_UC)   /* EV_P, but with default argument in C++ */
+# define EV_PDEF  EV_P EV_DEFARG (EV_DEFAULT_UC)  /* EV_P, but with default argument in C++ */
+# define EV_PDEF_ EV_P EV_DEFARG (EV_DEFAULT_UC), /* EV_P_, but with default argument in C++ */
 #else
 # define EV_P void
 # define EV_P_
@@ -174,16 +176,19 @@ struct ev_loop;
 # define EV_DEFAULT_
 # define EV_DEFAULT_UC
 # define EV_DEFAULT_UC_
-# define EV_PDEF EV_P
+# define EV_PDEF  EV_P
+# define EV_PDEF_ EV_P_
 # undef EV_EMBED_ENABLE
 #endif
 
+/* EV_INLINE is used for functions in header files */
 #if __STDC_VERSION__ >= 199901L || __GNUC__ >= 3
 # define EV_INLINE static inline
 #else
 # define EV_INLINE static
 #endif
 
+/* EV_PROTOTYPES can be sued to switch of prototype declarations */
 #ifndef EV_PROTOTYPES
 # define EV_PROTOTYPES 1
 #endif
@@ -603,8 +608,8 @@ enum {
 };
 
 #if EV_PROTOTYPES
-void ev_run (EV_P_ int flags EV_DEFARG (0));
-void ev_break (EV_P_ int how EV_DEFARG (EVBREAK_ONE)); /* break out of the loop */
+void ev_run (EV_PDEF_ int flags EV_DEFARG (0));
+void ev_break (EV_PDEF_ int how EV_DEFARG (EVBREAK_ONE)); /* break out of the loop */
 
 /*
  * ref/unref can be used to add or remove a refcount on the mainloop. every watcher
