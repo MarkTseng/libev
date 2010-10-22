@@ -167,7 +167,7 @@ library in any way.
 
 Returns the current time as libev would use it. Please note that the
 C<ev_now> function is usually faster and also often returns the timestamp
-you actually want to know. Also interetsing is the combination of
+you actually want to know. Also interesting is the combination of
 C<ev_update_now> and C<ev_now>.
 
 =item ev_sleep (ev_tstamp interval)

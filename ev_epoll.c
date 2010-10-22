@@ -150,7 +150,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
                | (ev->events & (EPOLLIN  | EPOLLERR | EPOLLHUP) ? EV_READ  : 0);
 
       /* check for spurious notification */
-      /* we assume that fd is always in range, as we never shrink the anfds arraay */
+      /* we assume that fd is always in range, as we never shrink the anfds array */
       if (expect_false ((uint32_t)anfds [fd].egen != (uint32_t)(ev->data.u64 >> 32)))
         {
           /* recreate kernel state */
