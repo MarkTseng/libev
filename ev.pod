@@ -167,7 +167,8 @@ library in any way.
 
 Returns the current time as libev would use it. Please note that the
 C<ev_now> function is usually faster and also often returns the timestamp
-you actually want to know.
+you actually want to know. Also interetsing is the combination of
+C<ev_update_now> and C<ev_now>.
 
 =item ev_sleep (ev_tstamp interval)
 
@@ -215,12 +216,13 @@ a must have and can we have a torrent of it please!!!11
 
 =item unsigned int ev_recommended_backends ()
 
-Return the set of all backends compiled into this binary of libev and also
-recommended for this platform. This set is often smaller than the one
-returned by C<ev_supported_backends>, as for example kqueue is broken on
-most BSDs and will not be auto-detected unless you explicitly request it
-(assuming you know what you are doing). This is the set of backends that
-libev will probe for if you specify no backends explicitly.
+Return the set of all backends compiled into this binary of libev and
+also recommended for this platform, meaning it will work for most file
+descriptor types. This set is often smaller than the one returned by
+C<ev_supported_backends>, as for example kqueue is broken on most BSDs
+and will not be auto-detected unless you explicitly request it (assuming
+you know what you are doing). This is the set of backends that libev will
+probe for if you specify no backends explicitly.
 
 =item unsigned int ev_embeddable_backends ()
 
