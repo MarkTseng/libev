@@ -49,6 +49,7 @@ TODO: EVRUN_XXX?
         - improve compatibility to older C++ compilers.
         - (experimental) ev_run/ev_default_loop/ev_break/ev_loop_new have now
           default arguments when compiled as C++.
+        - enable automake dependency tracking.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

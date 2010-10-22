@@ -384,7 +384,6 @@ EV_CPP(extern "C" {)
 #endif
 
 #if EV_USE_INOTIFY
-# include <sys/utsname.h>
 # include <sys/statfs.h>
 # include <sys/inotify.h>
 /* some very old inotify.h headers don't have IN_DONT_FOLLOW */
@@ -524,6 +523,10 @@ static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? 
 #endif
 
 /*****************************************************************************/
+
+#ifdef __linux
+# include <sys/utsname.h>
+#endif
 
 static unsigned int noinline
 ev_linux_version (void)
