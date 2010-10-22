@@ -126,7 +126,7 @@ this argument.
 =head2 TIME REPRESENTATION
 
 Libev represents time as a single floating point number, representing
-the (fractional) number of seconds since the (POSIX) epoch (in practise
+the (fractional) number of seconds since the (POSIX) epoch (in practice
 somewhere near the beginning of 1970, details are complicated, don't
 ask). This type is called C<ev_tstamp>, which is what you should use
 too. It usually aliases to the C<double> type in C. When you need to do
