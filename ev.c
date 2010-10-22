@@ -37,10 +37,6 @@
  * either the BSD or the GPL.
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* this big block deduces configuration from config.h */
 #ifndef EV_STANDALONE
 # ifdef EV_CONFIG_H
@@ -183,6 +179,8 @@ extern "C" {
 #else
 # include "ev.h"
 #endif
+
+EV_CPP(extern "C" {)
 
 #ifndef _WIN32
 # include <sys/time.h>
@@ -413,13 +411,7 @@ extern "C" {
 #   define EFD_CLOEXEC 02000000
 #  endif
 # endif
-# ifdef __cplusplus
-extern "C" {
-# endif
-int (eventfd) (unsigned int initval, int flags);
-# ifdef __cplusplus
-}
-# endif
+EV_CPP(extern "C") int (eventfd) (unsigned int initval, int flags);
 #endif
 
 #if EV_USE_SIGNALFD
@@ -435,19 +427,13 @@ int (eventfd) (unsigned int initval, int flags);
 #   define SFD_CLOEXEC 02000000
 #  endif
 # endif
-# ifdef __cplusplus
-extern "C" {
-# endif
-int signalfd (int fd, const sigset_t *mask, int flags);
+EV_CPP (extern "C") int signalfd (int fd, const sigset_t *mask, int flags);
 
 struct signalfd_siginfo
 {
   uint32_t ssi_signo;
   char pad[128 - sizeof (uint32_t)];
 };
-# ifdef __cplusplus
-}
-# endif
 #endif
 
 /**/
@@ -3809,7 +3795,5 @@ ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w))
   #include "ev_wrap.h"
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+EV_CPP(})
 
