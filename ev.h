@@ -156,15 +156,15 @@ typedef double ev_tstamp;
 /* support multiple event loops? */
 #if EV_MULTIPLICITY
 struct ev_loop;
-# define EV_P struct ev_loop *loop
-# define EV_P_ EV_P,
-# define EV_A loop
-# define EV_A_ EV_A,
-# define EV_DEFAULT_UC ev_default_loop_uc ()
-# define EV_DEFAULT_UC_ EV_DEFAULT_UC,
-# define EV_DEFAULT ev_default_loop (0)
-# define EV_DEFAULT_ EV_DEFAULT,
-# define EV_PDEF EV_P EV_DEFARG (EV_DEFAULT_UC)
+# define EV_P struct ev_loop *loop                /* a loop as sole parameter in a declaration */
+# define EV_P_ EV_P,                              /* a loop as first of multiple parameters */
+# define EV_A loop                                /* a loop as sole argument to a function call */
+# define EV_A_ EV_A,                              /* a loop as first of multiple arguments */
+# define EV_DEFAULT_UC ev_default_loop_uc ()      /* the default loop, if initialised, as sole arg */
+# define EV_DEFAULT_UC_ EV_DEFAULT_UC,            /* the default loop as first of multiple arguments */
+# define EV_DEFAULT ev_default_loop (0)           /* the default loop as sole arg */
+# define EV_DEFAULT_ EV_DEFAULT,                  /* the default loop as first of multiple arguments */
+# define EV_PDEF EV_P EV_DEFARG (EV_DEFAULT_UC)   /* EV_P, but with default argument in C++ */
 #else
 # define EV_P void
 # define EV_P_
