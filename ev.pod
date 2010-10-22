@@ -4877,8 +4877,8 @@ and work, but the library code will of course be larger.
 
 =item active
 
-A watcher is active as long as it has been started (has been attached to
-an event loop) but not yet stopped (disassociated from the event loop).
+A watcher is active as long as it has been started and not yet stopped.
+See L<WATCHER STATES> for details.
 
 =item application
 
@@ -4890,7 +4890,7 @@ The address of a function that is called when some event has been
 detected. Callbacks are being passed the event loop, the watcher that
 received the event, and the actual event bitset.
 
-=item callback invocation
+=item callback/watcher invocation
 
 The act of calling the callback associated with a watcher.
 
@@ -4919,12 +4919,8 @@ watchers and events.
 
 =item pending
 
-A watcher is pending as soon as the corresponding event has been detected,
-and stops being pending as soon as the watcher will be invoked or its
-pending status is explicitly cleared by the application.
-
-A watcher can be pending, but not active. Stopping a watcher also clears
-its pending status.
+A watcher is pending as soon as the corresponding event has been
+detected. See L<WATCHER STATES> for details.
 
 =item real time
 
@@ -4940,10 +4936,6 @@ clock.
 
 A data structure that describes interest in certain events. Watchers need
 to be started (attached to an event loop) before they can receive events.
-
-=item watcher invocation
-
-The act of calling the callback associated with a watcher.
 
 =back
 
