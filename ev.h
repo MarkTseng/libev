@@ -164,6 +164,7 @@ struct ev_loop;
 # define EV_DEFAULT_UC_ EV_DEFAULT_UC,
 # define EV_DEFAULT ev_default_loop (0)
 # define EV_DEFAULT_ EV_DEFAULT,
+# define EV_PDEF EV_P EV_DEFARG (EV_DEFAULT_UC)
 #else
 # define EV_P void
 # define EV_P_
@@ -173,6 +174,7 @@ struct ev_loop;
 # define EV_DEFAULT_
 # define EV_DEFAULT_UC
 # define EV_DEFAULT_UC_
+# define EV_PDEF EV_P
 # undef EV_EMBED_ENABLE
 #endif
 
@@ -537,10 +539,10 @@ ev_default_loop (unsigned int flags EV_DEFARG (0))
 
 /* create and destroy alternative loops that don't handle signals */
 struct ev_loop *ev_loop_new (unsigned int flags EV_DEFARG (0));
-void ev_loop_destroy (EV_P);
-void ev_loop_fork (EV_P);
+void ev_loop_destroy (EV_PDEF);
+void ev_loop_fork (EV_PDEF);
 
-ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after each poll */
+ev_tstamp ev_now (EV_PDEF); /* time w.r.t. timers and the eventloop, updated after each poll */
 
 #else
 
@@ -556,7 +558,7 @@ ev_now (void)
 #endif /* multiplicity */
 
 EV_INLINE int
-ev_is_default_loop (EV_P)
+ev_is_default_loop (EV_PDEF)
 {
 #if EV_MULTIPLICITY
   extern struct ev_loop *ev_default_loop_ptr;
@@ -574,9 +576,9 @@ void ev_default_destroy (void); /* destroy the default loop */
 /* you can actually call it at any time, anywhere :) */
 void ev_default_fork (void);
 
-unsigned int ev_backend (EV_P); /* backend in use by loop */
+unsigned int ev_backend (EV_PDEF); /* backend in use by loop */
 
-void ev_now_update (EV_P); /* update event loop time */
+void ev_now_update (EV_PDEF); /* update event loop time */
 
 #if EV_WALK_ENABLE
 /* walk (almost) all watchers in the loop of a given type, invoking the */
@@ -609,8 +611,8 @@ void ev_break (EV_P_ int how EV_DEFARG (EVBREAK_ONE)); /* break out of the loop 
  * keeps one reference. if you have a long-running watcher you never unregister that
  * should not keep ev_loop from running, unref() after starting, and ref() before stopping.
  */
-void ev_ref   (EV_P);
-void ev_unref (EV_P);
+void ev_ref   (EV_PDEF);
+void ev_unref (EV_PDEF);
 
 /*
  * convenience function, wait for a single event, without registering an event watcher
@@ -619,27 +621,27 @@ void ev_unref (EV_P);
 void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg);
 
 # if EV_FEATURE_API
-unsigned int ev_iteration (EV_P); /* number of loop iterations */
-unsigned int ev_depth     (EV_P); /* #ev_loop enters - #ev_loop leaves */
-void         ev_verify    (EV_P); /* abort if loop data corrupted */
+unsigned int ev_iteration (EV_PDEF); /* number of loop iterations */
+unsigned int ev_depth     (EV_PDEF); /* #ev_loop enters - #ev_loop leaves */
+void         ev_verify    (EV_PDEF); /* abort if loop data corrupted */
 
 void ev_set_io_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
 void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval); /* sleep at least this time, default 0 */
 
 /* advanced stuff for threading etc. support, see docs */
 void ev_set_userdata (EV_P_ void *data);
-void *ev_userdata (EV_P);
+void *ev_userdata (EV_PDEF);
 void ev_set_invoke_pending_cb (EV_P_ void (*invoke_pending_cb)(EV_P));
 void ev_set_loop_release_cb (EV_P_ void (*release)(EV_P), void (*acquire)(EV_P));
 
-unsigned int ev_pending_count (EV_P); /* number of pending events, if any */
-void ev_invoke_pending (EV_P); /* invoke all pending watchers */
+unsigned int ev_pending_count (EV_PDEF); /* number of pending events, if any */
+void ev_invoke_pending (EV_PDEF); /* invoke all pending watchers */
 
 /*
  * stop/start the timer handling.
  */
-void ev_suspend (EV_P);
-void ev_resume  (EV_P);
+void ev_suspend (EV_PDEF);
+void ev_resume  (EV_PDEF);
 #endif
 
 #endif

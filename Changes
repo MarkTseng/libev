@@ -44,8 +44,10 @@ TODO: include ev_xyz_start in each example?
         - define _DARWIN_UNLIMITED_SELECT. just so.
         - use enum instead of #define for most constants.
         - improve compatibility to older C++ compilers.
-        - ev_run/ev_default_loop/ev_break/ev_loop_new have now default
-          arguments when compiled as C++.
+        - (experimental) ev_run/ev_default_loop/ev_break/ev_loop_new have now
+          default arguments when compiled as C++.
+        - (experimental) all ev_functions that accept only a loop argument
+          default that to EV_DEFAULT_UC when compiled as C++.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

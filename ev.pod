@@ -4533,9 +4533,10 @@ OpenGL drivers.
 The kqueue syscall is broken in all known versions - most versions support
 only sockets, many support pipes.
 
-Libev tries to work around this by not using C<kqueue> by default on
-this rotten platform, but of course you can still ask for it when creating
-a loop.
+Libev tries to work around this by not using C<kqueue> by default on this
+rotten platform, but of course you can still ask for it when creating a
+loop - embedding a socket-only kqueue loop into a select-based one is
+probably going to work well.
 
 =head3 C<poll> is buggy
 
@@ -4564,19 +4565,21 @@ work on OS/X.
 
 The default compile environment on Solaris is unfortunately so
 thread-unsafe that you can't even use components/libraries compiled
-without C<-D_REENTRANT> (as long as they use C<errno>), which, of course,
-isn't defined by default.
+without C<-D_REENTRANT> in a threaded program, which, of course, isn't
+defined by default. A valid, if stupid, implementation choice.
 
 If you want to use libev in threaded environments you have to make sure
 it's compiled with C<_REENTRANT> defined.
 
 =head3 Event port backend
 
-The scalable event interface for Solaris is called "event ports". Unfortunately,
-this mechanism is very buggy. If you run into high CPU usage, your program
-freezes or you get a large number of spurious wakeups, make sure you have
-all the relevant and latest kernel patches applied. No, I don't know which
-ones, but there are multiple ones.
+The scalable event interface for Solaris is called "event
+ports". Unfortunately, this mechanism is very buggy in all major
+releases. If you run into high CPU usage, your program freezes or you get
+a large number of spurious wakeups, make sure you have all the relevant
+and latest kernel patches applied. No, I don't know which ones, but there
+are multiple ones to apply, and afterwards, event ports actually work
+great.
 
 If you can't get it to work, you can try running the program by setting
 the environment variable C<LIBEV_FLAGS=3> to only allow C<poll> and
@@ -4587,7 +4590,7 @@ C<select> backends.
 AIX unfortunately has a broken C<poll.h> header. Libev works around
 this by trying to avoid the poll backend altogether (i.e. it's not even
 compiled in), which normally isn't a big problem as C<select> works fine
-with large bitsets, and AIX is dead anyway.
+with large bitsets on AIX, and AIX is dead anyway.
 
 =head2 WIN32 PLATFORM LIMITATIONS AND WORKAROUNDS
 
