@@ -4884,6 +4884,10 @@ See L<WATCHER STATES> for details.
 
 In this document, an application is whatever is using libev.
 
+=item backend
+
+The part of the code dealing with the operating system interfaces.
+
 =item callback
 
 The address of a function that is called when some event has been
