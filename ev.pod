@@ -195,7 +195,8 @@ compatible to older versions, so a larger minor version alone is usually
 not a problem.
 
 Example: Make sure we haven't accidentally been linked against the wrong
-version (note, however, that this will not detect ABI mismatches :).
+version (note, however, that this will not detect other ABI mismatches,
+such as LFS or reentrancy).
 
    assert (("libev version mismatch",
             ev_version_major () == EV_VERSION_MAJOR
