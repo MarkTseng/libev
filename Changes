@@ -24,6 +24,7 @@ TODO: EVRUN_XXX?
           not to need it (helpfully pointed out by Tilghman Lesher).
         - do not use poll by default on freebsd, it's broken (what isn't
           on freebsd...).
+        - allow to embed epoll on kernels >= 2.6.32.
         - configure now prepends -O3, not appends it, so one can still
           override it.
         - ev.pod: greatly expanded the portability section, added a porting

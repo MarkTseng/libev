@@ -525,6 +525,44 @@ static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? 
 
 /*****************************************************************************/
 
+static unsigned int noinline
+ev_linux_version (void)
+{
+#ifdef __linux
+  struct utsname buf;
+  unsigned int v;
+  int i;
+  char *p = buf.release;
+
+  if (uname (&buf))
+    return 0;
+
+  for (i = 3+1; --i; )
+    {
+      unsigned int c = 0;
+
+      for (;;)
+        {
+          if (*p >= '0' && *p <= '9')
+            c = c * 10 + *p++ - '0';
+          else
+            {
+              p += *p == '.';
+              break;
+            }
+        }
+
+      v = (v << 8) | c;
+    }
+
+  return v;
+#else
+  return 0;
+#endif
+}
+
+/*****************************************************************************/
+
 #if EV_AVOID_STDIO
 static void noinline
 ev_printerr (const char *msg)
@@ -1532,8 +1570,8 @@ ev_embeddable_backends (void)
   int flags = EVBACKEND_EPOLL | EVBACKEND_KQUEUE | EVBACKEND_PORT;
 
   /* epoll embeddability broken on all linux versions up to at least 2.6.23 */
-  /* please fix it and tell me how to detect the fix */
-  flags &= ~EVBACKEND_EPOLL;
+  if (ev_linux_version () < 0x020620) /* disable it on linux < 2.6.32 */
+    flags &= ~EVBACKEND_EPOLL;
 
   return flags;
 }
@@ -3050,38 +3088,6 @@ infy_cb (EV_P_ ev_io *w, int revents)
       infy_wd (EV_A_ ev->wd, ev->wd, ev);
       ofs += sizeof (struct inotify_event) + ev->len;
     }
-}
-
-inline_size unsigned int
-ev_linux_version (void)
-{
-  struct utsname buf;
-  unsigned int v;
-  int i;
-  char *p = buf.release;
-
-  if (uname (&buf))
-    return 0;
-
-  for (i = 3+1; --i; )
-    {
-      unsigned int c = 0;
-
-      for (;;)
-        {
-          if (*p >= '0' && *p <= '9')
-            c = c * 10 + *p++ - '0';
-          else
-            {
-              p += *p == '.';
-              break;
-            }
-        }
-
-      v = (v << 8) | c;
-    }
-
-  return v;
 }
 
 inline_size void

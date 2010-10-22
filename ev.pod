@@ -227,10 +227,10 @@ probe for if you specify no backends explicitly.
 =item unsigned int ev_embeddable_backends ()
 
 Returns the set of backends that are embeddable in other event loops. This
-is the theoretical, all-platform, value. To find which backends
-might be supported on the current system, you would need to look at
-C<ev_embeddable_backends () & ev_supported_backends ()>, likewise for
-recommended ones.
+value is platform-specific but can include backends not available on the
+current system. To find which embeddable backends might be supported on
+the current system, you would need to look at C<ev_embeddable_backends ()
+& ev_supported_backends ()>, likewise for recommended ones.
 
 See the description of C<ev_embed> watchers for more info.
 
