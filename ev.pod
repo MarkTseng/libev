@@ -910,7 +910,11 @@ more often than 100 times per second:
 
 This call will simply invoke all pending watchers while resetting their
 pending state. Normally, C<ev_run> does this automatically when required,
-but when overriding the invoke callback this call comes handy.
+but when overriding the invoke callback this call comes handy. This
+function can be invoked from a watcher - this can be useful for example
+when you want to do some lengthy calculation and want to pass further
+event handling to another thread (you still have to make sure only one
+thread executes within C<ev_invoke_pending> or C<ev_run> of course).
 
 =item int ev_pending_count (loop)
 
