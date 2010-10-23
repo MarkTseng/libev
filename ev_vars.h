@@ -117,6 +117,10 @@ VARx(struct port_event *, port_events)
 VARx(int, port_eventmax)
 #endif
 
+#if EV_USE_IOCP || EV_GENWRAP
+VARx(HANDLE, iocp)
+#endif
+
 VARx(int *, fdchanges)
 VARx(int, fdchangemax)
 VARx(int, fdchangecnt)

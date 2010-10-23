@@ -670,8 +670,11 @@ typedef struct
 #if EV_USE_EPOLL
   unsigned int egen;    /* generation counter to counter epoll bugs */
 #endif
-#if EV_SELECT_IS_WINSOCKET
+#if EV_SELECT_IS_WINSOCKET || EV_USE_IOCP
   SOCKET handle;
+#endif
+#if EV_USE_IOCP
+  OVERLAPPED or, ow;
 #endif
 } ANFD;
 
@@ -977,12 +980,13 @@ fd_reify (EV_P)
 
       anfd->reify  = 0;
 
-#if EV_SELECT_IS_WINSOCKET
+#if EV_SELECT_IS_WINSOCKET || EV_USE_IOCP
       if (o_reify & EV__IOFDSET)
         {
           unsigned long arg;
           anfd->handle = EV_FD_TO_WIN32_HANDLE (fd);
           assert (("libev: only socket fds supported in this configuration", ioctlsocket (anfd->handle, FIONREAD, &arg) == 0));
+          printf ("oi %d %x\n", fd, anfd->handle);//D
         }
 #endif
 
@@ -1491,6 +1495,9 @@ childcb (EV_P_ ev_signal *sw, int revents)
 
 /*****************************************************************************/
 
+#if EV_USE_IOCP
+# include "ev_iocp.c"
+#endif
 #if EV_USE_PORT
 # include "ev_port.c"
 #endif
@@ -1697,6 +1704,9 @@ loop_init (EV_P_ unsigned int flags)
       if (!(flags & 0x0000ffffU))
         flags |= ev_recommended_backends ();
 
+#if EV_USE_IOCP
+      if (!backend && (flags & EVBACKEND_IOCP  )) backend = iocp_init   (EV_A_ flags);
+#endif
 #if EV_USE_PORT
       if (!backend && (flags & EVBACKEND_PORT  )) backend = port_init   (EV_A_ flags);
 #endif
@@ -1758,6 +1768,9 @@ loop_destroy (EV_P)
   if (backend_fd >= 0)
     close (backend_fd);
 
+#if EV_USE_IOCP
+  if (backend == EVBACKEND_IOCP  ) iocp_destroy   (EV_A);
+#endif
 #if EV_USE_PORT
   if (backend == EVBACKEND_PORT  ) port_destroy   (EV_A);
 #endif

@@ -47,6 +47,7 @@
 #define kqueue_eventmax ((loop)->kqueue_eventmax)
 #define port_events ((loop)->port_events)
 #define port_eventmax ((loop)->port_eventmax)
+#define iocp ((loop)->iocp)
 #define fdchanges ((loop)->fdchanges)
 #define fdchangemax ((loop)->fdchangemax)
 #define fdchangecnt ((loop)->fdchangecnt)
@@ -135,6 +136,7 @@
 #undef kqueue_eventmax
 #undef port_events
 #undef port_eventmax
+#undef iocp
 #undef fdchanges
 #undef fdchangemax
 #undef fdchangecnt
