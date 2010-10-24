@@ -1738,6 +1738,10 @@ ev_loop_destroy (EV_P)
 {
   int i;
 
+  /* mimic free (0) */
+  if (!EV_A)
+    return;
+
 #if EV_CLEANUP_ENABLE
   /* queue cleanup watchers (and execute them) */
   if (expect_false (cleanupcnt))

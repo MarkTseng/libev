@@ -1114,6 +1114,10 @@ The embedded event loop specified in the C<ev_embed> watcher needs attention.
 The event loop has been resumed in the child process after fork (see
 C<ev_fork>).
 
+=item C<EV_CLEANUP>
+
+The event loop is abotu to be destroyed (see C<ev_cleanup>).
+
 =item C<EV_ASYNC>
 
 The given async watcher has been asynchronously notified (see C<ev_async>).
@@ -3099,6 +3103,41 @@ kind. There is a C<ev_fork_set> macro, but using it is utterly pointless,
 believe me.
 
 =back
+
+
+=head2 C<ev_cleanup> - even the best things end
+
+Cleanup watchers are called just before the event loop they are registered
+with is being destroyed.
+
+While there is no guarantee that the event loop gets destroyed, cleanup
+watchers provide a convenient method to install cleanup watchers for your
+program, worker threads and so on - you just to make sure to destroy the
+loop when you want them to be invoked.
+
+=head3 Watcher-Specific Functions and Data Members
+
+=over 4
+
+=item ev_cleanup_init (ev_signal *, callback)
+
+Initialises and configures the cleanup watcher - it has no parameters of
+any kind. There is a C<ev_cleanup_set> macro, but using it is utterly
+pointless, believe me.
+
+=back
+
+Example: Register an atexit handler to destroy the default loop, so any
+cleanup functions are called.
+
+   static void
+   program_exits (void)
+   {
+     ev_loop_destroy (EV_DEFAULT_UC);
+   }
+
+   ...
+   atexit (program_exits);
 
 
 =head2 C<ev_async> - how to wake up an event loop
