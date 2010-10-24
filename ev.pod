@@ -45,7 +45,7 @@ libev - a high performance full-featured event loop written in C
    main (void)
    {
      // use the default event loop unless you have special needs
-     struct ev_loop *loop = ev_default_loop (0);
+     struct ev_loop *loop = EV_DEFAULT;
 
      // initialise an io watcher, then start it
      // this one will watch for stdin to become readable
@@ -295,7 +295,7 @@ Example: This is basically the same thing that libev does internally, too.
 
 =back
 
-=head1 FUNCTIONS CONTROLLING THE EVENT LOOP
+=head1 FUNCTIONS CONTROLLING EVENT LOOPS
 
 An event loop is described by a C<struct ev_loop *> (the C<struct> is
 I<not> optional in this case unless libev 3 compatibility is disabled, as
@@ -309,24 +309,56 @@ which do not.
 
 =item struct ev_loop *ev_default_loop (unsigned int flags)
 
-This will initialise the default event loop if it hasn't been initialised
-yet and return it. If the default loop could not be initialised, returns
-false. If it already was initialised it simply returns it (and ignores the
-flags. If that is troubling you, check C<ev_backend ()> afterwards).
+This returns the "default" event loop object, which is what you should
+normally use when you just need "the event loop". Event loop objects and
+the C<flags> parameter are described in more detail in the entry for
+C<ev_loop_new>.
+
+If the default loop is already initialised then this function simply
+returns it (and ignores the flags. If that is troubling you, check
+C<ev_backend ()> afterwards). Otherwise it will create it with the given
+flags, which should almost always be C<0>, unless the caller is also the
+one calling C<ev_run> or otherwise qualifies as "the main program".
 
 If you don't know what event loop to use, use the one returned from this
-function.
+function (or via the C<EV_DEFAULT> macro).
 
 Note that this function is I<not> thread-safe, so if you want to use it
-from multiple threads, you have to lock (note also that this is unlikely,
-as loops cannot be shared easily between threads anyway).
+from multiple threads, you have to employ some kind of mutex (note also
+that this case is unlikely, as loops cannot be shared easily between
+threads anyway).
 
-The default loop is the only loop that can handle C<ev_signal> and
-C<ev_child> watchers, and to do this, it always registers a handler
-for C<SIGCHLD>. If this is a problem for your application you can either
-create a dynamic loop with C<ev_loop_new> that doesn't do that, or you
-can simply overwrite the C<SIGCHLD> signal handler I<after> calling
-C<ev_default_init>.
+The default loop is the only loop that can handle C<ev_child> watchers,
+and to do this, it always registers a handler for C<SIGCHLD>. If this is
+a problem for your application you can either create a dynamic loop with
+C<ev_loop_new> which doesn't do that, or you can simply overwrite the
+C<SIGCHLD> signal handler I<after> calling C<ev_default_init>.
+
+Example: This is the most typical usage.
+
+   if (!ev_default_loop (0))
+     fatal ("could not initialise libev, bad $LIBEV_FLAGS in environment?");
+
+Example: Restrict libev to the select and poll backends, and do not allow
+environment settings to be taken into account:
+
+   ev_default_loop (EVBACKEND_POLL | EVBACKEND_SELECT | EVFLAG_NOENV);
+
+Example: Use whatever libev has to offer, but make sure that kqueue is
+used if available (warning, breaks stuff, best use only with your own
+private event loop and only if you know the OS supports your types of
+fds):
+
+   ev_default_loop (ev_recommended_backends () | EVBACKEND_KQUEUE);
+
+=item struct ev_loop *ev_loop_new (unsigned int flags)
+
+This will create and initialise a new event loop object. If the loop
+could not be initialised, returns false.
+
+Note that this function I<is> thread-safe, and one common way to use
+libev with threads is indeed to create one loop per thread, and using the
+default loop in the "main" or "initial" thread.
 
 The flags argument can be used to specify special behaviour or specific
 backends to use, and is usually specified as C<0> (or C<EVFLAG_AUTO>).
@@ -554,69 +586,42 @@ then only these backends will be tried (in the reverse order as listed
 here). If none are specified, all backends in C<ev_recommended_backends
 ()> will be tried.
 
-Example: This is the most typical usage.
-
-   if (!ev_default_loop (0))
-     fatal ("could not initialise libev, bad $LIBEV_FLAGS in environment?");
-
-Example: Restrict libev to the select and poll backends, and do not allow
-environment settings to be taken into account:
-
-   ev_default_loop (EVBACKEND_POLL | EVBACKEND_SELECT | EVFLAG_NOENV);
-
-Example: Use whatever libev has to offer, but make sure that kqueue is
-used if available (warning, breaks stuff, best use only with your own
-private event loop and only if you know the OS supports your types of
-fds):
-
-   ev_default_loop (ev_recommended_backends () | EVBACKEND_KQUEUE);
-
-=item struct ev_loop *ev_loop_new (unsigned int flags)
-
-Similar to C<ev_default_loop>, but always creates a new event loop that is
-always distinct from the default loop.
-
-Note that this function I<is> thread-safe, and one common way to use
-libev with threads is indeed to create one loop per thread, and using the
-default loop in the "main" or "initial" thread.
-
 Example: Try to create a event loop that uses epoll and nothing else.
 
    struct ev_loop *epoller = ev_loop_new (EVBACKEND_EPOLL | EVFLAG_NOENV);
    if (!epoller)
      fatal ("no epoll found here, maybe it hides under your chair");
 
-=item ev_default_destroy ()
+=item ev_loop_destroy (loop)
 
-Destroys the default loop (frees all memory and kernel state etc.). None
-of the active event watchers will be stopped in the normal sense, so
-e.g. C<ev_is_active> might still return true. It is your responsibility to
-either stop all watchers cleanly yourself I<before> calling this function,
-or cope with the fact afterwards (which is usually the easiest thing, you
-can just ignore the watchers and/or C<free ()> them for example).
+Destroys an event loop object (frees all memory and kernel state
+etc.). None of the active event watchers will be stopped in the normal
+sense, so e.g. C<ev_is_active> might still return true. It is your
+responsibility to either stop all watchers cleanly yourself I<before>
+calling this function, or cope with the fact afterwards (which is usually
+the easiest thing, you can just ignore the watchers and/or C<free ()> them
+for example).
 
 Note that certain global state, such as signal state (and installed signal
 handlers), will not be freed by this function, and related watchers (such
 as signal and child watchers) would need to be stopped manually.
 
-In general it is not advisable to call this function except in the
-rare occasion where you really need to free e.g. the signal handling
-pipe fds. If you need dynamically allocated loops it is better to use
-C<ev_loop_new> and C<ev_loop_destroy>.
+This function is normally used on loop objects allocated by
+C<ev_loop_new>, but it can also be used on the default loop returned by
+C<ev_default_loop>, in which case it is not thread-safe.
 
-=item ev_loop_destroy (loop)
+Note that it is not advisable to call this function on the default loop
+except in the rare occasion where you really need to free it's resources.
+If you need dynamically allocated loops it is better to use C<ev_loop_new>
+and C<ev_loop_destroy>.
 
-Like C<ev_default_destroy>, but destroys an event loop created by an
-earlier call to C<ev_loop_new>.
+=item ev_loop_fork (loop)
 
-=item ev_default_fork ()
-
-This function sets a flag that causes subsequent C<ev_run> iterations
-to reinitialise the kernel state for backends that have one. Despite the
+This function sets a flag that causes subsequent C<ev_run> iterations to
+reinitialise the kernel state for backends that have one. Despite the
 name, you can call it anytime, but it makes most sense after forking, in
-the child process (or both child and parent, but that again makes little
-sense). You I<must> call it in the child before using any of the libev
-functions, and it will only take effect at the next C<ev_run> iteration.
+the child process. You I<must> call it (or use C<EVFLAG_FORKCHECK>) in the
+child before resuming or calling C<ev_run>.
 
 Again, you I<have> to call it on I<any> loop that you want to re-use after 
 a fork, I<even if you do not plan to use the loop in the parent>. This is
@@ -631,17 +636,19 @@ difference, but libev will usually detect this case on its own and do a
 costly reset of the backend).
 
 The function itself is quite fast and it's usually not a problem to call
-it just in case after a fork. To make this easy, the function will fit in
-quite nicely into a call to C<pthread_atfork>:
+it just in case after a fork.
 
-    pthread_atfork (0, 0, ev_default_fork);
+Example: Automate calling C<ev_loop_fork> on the default loop when
+using pthreads.
 
-=item ev_loop_fork (loop)
+   static void
+   post_fork_child (void)
+   {
+     ev_loop_fork (EV_DEFAULT);
+   }
 
-Like C<ev_default_fork>, but acts on an event loop created by
-C<ev_loop_new>. Yes, you have to call this on every allocated event loop
-after fork that you want to re-use in the child, and how you keep track of 
-them is entirely your own problem.
+   ...
+   pthread_atfork (0, 0, post_fork_child);
 
 =item int ev_is_default_loop (loop)
 
@@ -3077,10 +3084,11 @@ signal watchers).
 
 When this is not possible, or you want to use the default loop for
 other reasons, then in the process that wants to start "fresh", call
-C<ev_default_destroy ()> followed by C<ev_default_loop (...)>. Destroying
-the default loop will "orphan" (not stop) all registered watchers, so you
-have to be careful not to execute code that modifies those watchers. Note
-also that in that case, you have to re-register any signal watchers.
+C<ev_loop_destroy (EV_DEFAULT)> followed by C<ev_default_loop (...)>.
+Destroying the default loop will "orphan" (not stop) all registered
+watchers, so you have to be careful not to execute code that modifies
+those watchers. Note also that in that case, you have to re-register any
+signal watchers.
 
 =head3 Watcher-Specific Functions and Data Members
 
@@ -4831,6 +4839,13 @@ compatibility, so most programs should still compile. Those might be
 removed in later versions of libev, so better update early than late.
 
 =over 4
+
+=item C<ev_default_destroy> and C<ev_default_fork> have been removed
+
+These calls can be replaced easily by their C<ev_loop_xxx> counterparts:
+
+   ev_loop_destroy (EV_DEFAULT);
+   ev_loop_fork (EV_DEFAULT);
 
 =item function/symbol renames
 
