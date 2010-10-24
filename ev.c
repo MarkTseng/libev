@@ -1738,9 +1738,11 @@ ev_loop_destroy (EV_P)
 {
   int i;
 
+#if EV_MULTIPLICITY
   /* mimic free (0) */
   if (!EV_A)
     return;
+#endif
 
 #if EV_CLEANUP_ENABLE
   /* queue cleanup watchers (and execute them) */

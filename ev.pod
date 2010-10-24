@@ -302,8 +302,8 @@ I<not> optional in this case unless libev 3 compatibility is disabled, as
 libev 3 had an C<ev_loop> function colliding with the struct name).
 
 The library knows two types of such loops, the I<default> loop, which
-supports signals and child events, and dynamically created event loops
-which do not.
+supports child process events, and dynamically created event loops which
+do not.
 
 =over 4
 

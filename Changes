@@ -55,6 +55,7 @@ TODO: ev_default_destroy, ev_default_fork
           default arguments when compiled as C++.
         - enable automake dependency tracking.
         - ev_loop_new no longer leaks memory when loop creation failed.
+        - new ev_cleanup watcher type.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested
