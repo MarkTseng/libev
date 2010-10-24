@@ -3107,8 +3107,8 @@ believe me.
 
 =head2 C<ev_cleanup> - even the best things end
 
-Cleanup watchers are called just before the event loop they are registered
-with is being destroyed.
+Cleanup watchers are called just before the event loop is being destroyed
+by a call to C<ev_loop_destroy>.
 
 While there is no guarantee that the event loop gets destroyed, cleanup
 watchers provide a convenient method to install cleanup hooks for your
