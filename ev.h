@@ -104,7 +104,7 @@ EV_CPP(extern "C" {)
 #endif
 
 #ifndef EV_CLEANUP_ENABLE
-# define EV_CLEANUP_ENABLE 0 /* not implemented */
+# define EV_CLEANUP_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_SIGNAL_ENABLE

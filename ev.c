@@ -1738,6 +1738,15 @@ ev_loop_destroy (EV_P)
 {
   int i;
 
+#if EV_CLEANUP_ENABLE
+  /* queue cleanup watchers (and execute them) */
+  if (expect_false (cleanupcnt))
+    {
+      queue_events (EV_A_ (W *)cleanups, cleanupcnt, EV_CLEANUP);
+      EV_INVOKE_PENDING;
+    }
+#endif
+
 #if EV_CHILD_ENABLE
   if (ev_is_active (&childev))
     {
