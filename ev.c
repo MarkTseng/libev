@@ -3594,6 +3594,8 @@ ev_cleanup_start (EV_P_ ev_cleanup *w)
   array_needsize (ev_cleanup *, cleanups, cleanupmax, cleanupcnt, EMPTY2);
   cleanups [cleanupcnt - 1] = w;
 
+  /* cleanup watchers should never keep a refcount on the loop */
+  ev_unref (EV_A);
   EV_FREQUENT_CHECK;
 }
 
@@ -3605,6 +3607,7 @@ ev_cleanup_stop (EV_P_ ev_cleanup *w)
     return;
 
   EV_FREQUENT_CHECK;
+  ev_ref (EV_A);
 
   {
     int active = ev_active (w);
