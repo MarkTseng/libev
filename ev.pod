@@ -344,13 +344,6 @@ environment settings to be taken into account:
 
    ev_default_loop (EVBACKEND_POLL | EVBACKEND_SELECT | EVFLAG_NOENV);
 
-Example: Use whatever libev has to offer, but make sure that kqueue is
-used if available (warning, breaks stuff, best use only with your own
-private event loop and only if you know the OS supports your types of
-fds):
-
-   ev_default_loop (ev_recommended_backends () | EVBACKEND_KQUEUE);
-
 =item struct ev_loop *ev_loop_new (unsigned int flags)
 
 This will create and initialise a new event loop object. If the loop
@@ -591,6 +584,11 @@ Example: Try to create a event loop that uses epoll and nothing else.
    struct ev_loop *epoller = ev_loop_new (EVBACKEND_EPOLL | EVFLAG_NOENV);
    if (!epoller)
      fatal ("no epoll found here, maybe it hides under your chair");
+
+Example: Use whatever libev has to offer, but make sure that kqueue is
+used if available.
+
+   struct ev_loop *loop = ev_loop_new (ev_recommended_backends () | EVBACKEND_KQUEUE);
 
 =item ev_loop_destroy (loop)
 

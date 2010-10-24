@@ -1,8 +1,9 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 TODO: include ev_xyz_start in each example?
-TODO: ev_pdef stupid idea?
-TODO: EVRUN_XXX?
+TODO: which supports signals and child events
+TODO: pointer races
+TODO: ev_default_destroy, ev_default_fork
 	- "PORTING FROM LIBEV 3.X TO 4.X" (in ev.pod) is recommended reading.
 	- ev_embed_stop did not correctly stop the watcher (very good
           testcase by Vladimir Timofeev).
@@ -14,6 +15,8 @@ TODO: EVRUN_XXX?
 	- replace EV_MINIMAL by EV_FEATURES.
         - prefer EPOLL_CTL_ADD over EPOLL_CTL_MOD in some more cases, as it
           seems the former is *much* faster than the latter.
+        - linux kernel version detection (for inotify bug workarounds)
+          did not work properly.
         - reduce the number of spurious wake-ups with the ports backend.
         - remove dependency on sys/queue.h on freebsd (patch by Vanilla Hsu).
         - do async init within ev_async_start, not ev_async_set, which avoids
@@ -42,6 +45,7 @@ TODO: EVRUN_XXX?
         - add section on accept() problems to the manpage.
         - rename EV_TIMEOUT to EV_TIMER.
         - rename ev_loop_count/depth/verify/loop/unloop.
+        - remove ev_default_destroy and ev_default_fork.
         - switch to two-digit minor version.
         - work around an apparent gentoo compiler bug.
         - define _DARWIN_UNLIMITED_SELECT. just so.
@@ -50,6 +54,7 @@ TODO: EVRUN_XXX?
         - (experimental) ev_run/ev_default_loop/ev_break/ev_loop_new have now
           default arguments when compiled as C++.
         - enable automake dependency tracking.
+        - ev_loop_new no longer leaks memory when loop creation failed.
 
 3.9  Thu Dec 31 07:59:59 CET 2009
 	- signalfd is no longer used by default and has to be requested

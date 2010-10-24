@@ -158,7 +158,7 @@ struct ev_loop;
 # define EV_P_ EV_P,                              /* a loop as first of multiple parameters */
 # define EV_A  loop                               /* a loop as sole argument to a function call */
 # define EV_A_ EV_A,                              /* a loop as first of multiple arguments */
-# define EV_DEFAULT_UC  ev_default_loop_uc ()     /* the default loop, if initialised, as sole arg */
+# define EV_DEFAULT_UC  ev_default_loop_uc_ ()    /* the default loop, if initialised, as sole arg */
 # define EV_DEFAULT_UC_ EV_DEFAULT_UC,            /* the default loop as first of multiple arguments */
 # define EV_DEFAULT  ev_default_loop (0)          /* the default loop as sole arg */
 # define EV_DEFAULT_ EV_DEFAULT,                  /* the default loop as first of multiple arguments */
@@ -516,7 +516,7 @@ void ev_set_syserr_cb (void (*cb)(const char *msg));
 struct ev_loop *ev_default_loop (unsigned int flags EV_CPP (= 0));
 
 EV_INLINE struct ev_loop *
-ev_default_loop_uc (void)
+ev_default_loop_uc_ (void)
 {
   extern struct ev_loop *ev_default_loop_ptr;
 
@@ -526,13 +526,13 @@ ev_default_loop_uc (void)
 EV_INLINE int
 ev_is_default_loop (EV_P)
 {
-  return EV_A == ev_default_loop_uc ();
+  return EV_A == EV_DEFAULT_UC;
 }
 
 /* create and destroy alternative loops that don't handle signals */
 struct ev_loop *ev_loop_new (unsigned int flags EV_CPP (= 0));
+/* destroy event loops, also works for the default loop */
 void ev_loop_destroy (EV_P);
-void ev_loop_fork (EV_P);
 
 ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after each poll */
 
@@ -557,12 +557,11 @@ ev_is_default_loop (void)
 
 #endif /* multiplicity */
 
-void ev_default_destroy (void); /* destroy the default loop */
-/* this needs to be called after fork, to duplicate the default loop */
-/* if you create alternative loops you have to call ev_loop_fork on them */
+/* this needs to be called after fork, to duplicate the loop */
+/* when you want to re-use it in the child */
 /* you can call it in either the parent or the child */
 /* you can actually call it at any time, anywhere :) */
-void ev_default_fork (void);
+void ev_loop_fork (EV_P);
 
 unsigned int ev_backend (EV_P); /* backend in use by loop */
 
@@ -778,6 +777,8 @@ void ev_async_send     (EV_P_ ev_async *w);
   #if EV_PROTOTYPES
     EV_INLINE void ev_loop   (EV_P_ int flags) { ev_run   (EV_A_ flags); }
     EV_INLINE void ev_unloop (EV_P_ int how  ) { ev_break (EV_A_ how  ); }
+    EV_INLINE void ev_default_destroy (void) { ev_loop_destroy (EV_DEFAULT); }
+    EV_INLINE void ev_default_fork    (void) { ev_loop_fork    (EV_DEFAULT); }
     #if EV_FEATURE_API
       EV_INLINE void ev_loop_count  (EV_P) { ev_iteration  (EV_A); }
       EV_INLINE void ev_loop_depth  (EV_P) { ev_depth      (EV_A); }

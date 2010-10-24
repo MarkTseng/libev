@@ -219,11 +219,7 @@ namespace ev {
 
     void post_fork () throw ()
     {
-#if EV_MULTIPLICITY
       ev_loop_fork (EV_AX);
-#else
-      ev_default_fork ();
-#endif
     }
 
     unsigned int backend () const throw ()
@@ -394,11 +390,6 @@ namespace ev {
 #endif
       )
         throw bad_loop ();
-    }
-
-    ~default_loop () throw ()
-    {
-      ev_default_destroy ();
     }
 
   private:

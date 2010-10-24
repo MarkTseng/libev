@@ -532,8 +532,8 @@ static unsigned int noinline
 ev_linux_version (void)
 {
 #ifdef __linux
+  unsigned int v = 0;
   struct utsname buf;
-  unsigned int v;
   int i;
   char *p = buf.release;
 
@@ -1733,10 +1733,18 @@ loop_init (EV_P_ unsigned int flags)
 }
 
 /* free up a loop structure */
-static void noinline
-loop_destroy (EV_P)
+void
+ev_loop_destroy (EV_P)
 {
   int i;
+
+#if EV_CHILD_ENABLE
+  if (ev_is_active (&childev))
+    {
+      ev_ref (EV_A); /* child watcher */
+      ev_signal_stop (EV_A_ &childev);
+    }
+#endif
 
   if (ev_is_active (&pipe_w))
     {
@@ -1814,6 +1822,15 @@ loop_destroy (EV_P)
 #endif
 
   backend = 0;
+
+#if EV_MULTIPLICITY
+  if (ev_is_default_loop (EV_A))
+#endif
+    ev_default_loop_ptr = 0;
+#if EV_MULTIPLICITY
+  else
+    ev_free (EV_A);
+#endif
 }
 
 #if EV_USE_INOTIFY
@@ -1882,21 +1899,10 @@ ev_loop_new (unsigned int flags)
   if (ev_backend (EV_A))
     return EV_A;
 
+  ev_free (EV_A);
   return 0;
 }
 
-void
-ev_loop_destroy (EV_P)
-{
-  loop_destroy (EV_A);
-  ev_free (loop);
-}
-
-void
-ev_loop_fork (EV_P)
-{
-  postfork = 1; /* must be in line with ev_default_fork */
-}
 #endif /* multiplicity */
 
 #if EV_VERIFY
@@ -2040,30 +2046,9 @@ ev_default_loop (unsigned int flags)
 }
 
 void
-ev_default_destroy (void)
+ev_loop_fork (EV_P)
 {
-#if EV_MULTIPLICITY
-  EV_P = ev_default_loop_ptr;
-#endif
-
-  ev_default_loop_ptr = 0;
-
-#if EV_CHILD_ENABLE
-  ev_ref (EV_A); /* child watcher */
-  ev_signal_stop (EV_A_ &childev);
-#endif
-
-  loop_destroy (EV_A);
-}
-
-void
-ev_default_fork (void)
-{
-#if EV_MULTIPLICITY
-  EV_P = ev_default_loop_ptr;
-#endif
-
-  postfork = 1; /* must be in line with ev_loop_fork */
+  postfork = 1; /* must be in line with ev_default_fork */
 }
 
 /*****************************************************************************/
