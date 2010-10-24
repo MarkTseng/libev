@@ -3096,7 +3096,7 @@ signal watchers.
 
 =over 4
 
-=item ev_fork_init (ev_signal *, callback)
+=item ev_fork_init (ev_fork *, callback)
 
 Initialises and configures the fork watcher - it has no parameters of any
 kind. There is a C<ev_fork_set> macro, but using it is utterly pointless,
@@ -3119,7 +3119,7 @@ loop when you want them to be invoked.
 
 =over 4
 
-=item ev_cleanup_init (ev_signal *, callback)
+=item ev_cleanup_init (ev_cleanup *, callback)
 
 Initialises and configures the cleanup watcher - it has no parameters of
 any kind. There is a C<ev_cleanup_set> macro, but using it is utterly
@@ -4881,7 +4881,7 @@ removed in later versions of libev, so better update early than late.
 
 These calls can be replaced easily by their C<ev_loop_xxx> counterparts:
 
-   ev_loop_destroy (EV_DEFAULT);
+   ev_loop_destroy (EV_DEFAULT_UC);
    ev_loop_fork (EV_DEFAULT);
 
 =item function/symbol renames
