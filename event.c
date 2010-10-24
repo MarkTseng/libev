@@ -47,6 +47,9 @@
 # include "event.h"
 #endif
 
+/* same definition as in ev.c */
+#define EV_TV_SET(tv,t) do { tv.tv_sec = (long)t; tv.tv_usec = (long)((t - tv.tv_sec) * 1e6); } while (0)
+
 #if EV_MULTIPLICITY
 # define dLOOPev struct ev_loop *loop = (struct ev_loop *)ev->ev_base
 # define dLOOPbase struct ev_loop *loop = (struct ev_loop *)base
