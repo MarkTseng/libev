@@ -3100,7 +3100,7 @@ signal watchers.
 
 Initialises and configures the fork watcher - it has no parameters of any
 kind. There is a C<ev_fork_set> macro, but using it is utterly pointless,
-believe me.
+really.
 
 =back
 
@@ -3128,7 +3128,7 @@ can call libev functions in the callback, except C<ev_cleanup_start>.
 
 Initialises and configures the cleanup watcher - it has no parameters of
 any kind. There is a C<ev_cleanup_set> macro, but using it is utterly
-pointless, believe me.
+pointless, I assure you.
 
 =back
 
