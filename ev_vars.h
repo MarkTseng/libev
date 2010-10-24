@@ -156,6 +156,12 @@ VARx(int, forkmax)
 VARx(int, forkcnt)
 #endif
 
+#if EV_CLEANUP_ENABLE || EV_GENWRAP
+VARx(struct ev_cleanup **, cleanups)
+VARx(int, cleanupmax)
+VARx(int, cleanupcnt)
+#endif
+
 #if EV_ASYNC_ENABLE || EV_GENWRAP
 VARx(EV_ATOMIC_T, async_pending)
 VARx(struct ev_async **, asyncs)

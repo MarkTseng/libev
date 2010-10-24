@@ -8,9 +8,7 @@ ev_check_stop
 ev_child_start
 ev_child_stop
 ev_clear_pending
-ev_default_destroy
-ev_default_fork
-ev_default_loop_init
+ev_default_loop
 ev_default_loop_ptr
 ev_depth
 ev_embed_start

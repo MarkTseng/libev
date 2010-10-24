@@ -100,11 +100,11 @@ EV_CPP(extern "C" {)
 #endif
 
 #ifndef EV_FORK_ENABLE
-# define EV_FORK_ENABLE 0 /* not implemented */
+# define EV_FORK_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_CLEANUP_ENABLE
-# define EV_CLEANUP_ENABLE EV_FEATURE_WATCHERS
+# define EV_CLEANUP_ENABLE 0 /* not implemented */
 #endif
 
 #ifndef EV_SIGNAL_ENABLE
@@ -427,7 +427,9 @@ typedef struct ev_embed
   ev_periodic periodic;  /* unused */
   ev_idle idle;          /* unused */
   ev_fork fork;          /* private */
+#if EV_CLEANUP_ENABLE
   ev_cleanup cleanup;    /* unused */
+#endif
 } ev_embed;
 #endif
 

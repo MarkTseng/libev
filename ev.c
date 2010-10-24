@@ -1815,6 +1815,9 @@ ev_loop_destroy (EV_P)
 #if EV_FORK_ENABLE
   array_free (fork, EMPTY);
 #endif
+#if EV_CLEANUP_ENABLE
+  array_free (cleanup, EMPTY);
+#endif
   array_free (prepare, EMPTY);
   array_free (check, EMPTY);
 #if EV_ASYNC_ENABLE
@@ -1985,6 +1988,11 @@ ev_verify (EV_P)
 #if EV_FORK_ENABLE
   assert (forkmax >= forkcnt);
   array_verify (EV_A_ (W *)forks, forkcnt);
+#endif
+
+#if EV_CLEANUP_ENABLE
+  assert (cleanupmax >= cleanupcnt);
+  array_verify (EV_A_ (W *)cleanups, cleanupcnt);
 #endif
 
 #if EV_ASYNC_ENABLE
@@ -3556,6 +3564,44 @@ ev_fork_stop (EV_P_ ev_fork *w)
 
     forks [active - 1] = forks [--forkcnt];
     ev_active (forks [active - 1]) = active;
+  }
+
+  ev_stop (EV_A_ (W)w);
+
+  EV_FREQUENT_CHECK;
+}
+#endif
+
+#if EV_CLEANUP_ENABLE
+void
+ev_cleanup_start (EV_P_ ev_cleanup *w)
+{
+  if (expect_false (ev_is_active (w)))
+    return;
+
+  EV_FREQUENT_CHECK;
+
+  ev_start (EV_A_ (W)w, ++cleanupcnt);
+  array_needsize (ev_cleanup *, cleanups, cleanupmax, cleanupcnt, EMPTY2);
+  cleanups [cleanupcnt - 1] = w;
+
+  EV_FREQUENT_CHECK;
+}
+
+void
+ev_cleanup_stop (EV_P_ ev_cleanup *w)
+{
+  clear_pending (EV_A_ (W)w);
+  if (expect_false (!ev_is_active (w)))
+    return;
+
+  EV_FREQUENT_CHECK;
+
+  {
+    int active = ev_active (w);
+
+    cleanups [active - 1] = cleanups [--cleanupcnt];
+    ev_active (cleanups [active - 1]) = active;
   }
 
   ev_stop (EV_A_ (W)w);
