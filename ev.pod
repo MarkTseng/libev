@@ -3111,7 +3111,7 @@ Cleanup watchers are called just before the event loop they are registered
 with is being destroyed.
 
 While there is no guarantee that the event loop gets destroyed, cleanup
-watchers provide a convenient method to install cleanup watchers for your
+watchers provide a convenient method to install cleanup hooks for your
 program, worker threads and so on - you just to make sure to destroy the
 loop when you want them to be invoked.
 
