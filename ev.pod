@@ -3115,6 +3115,11 @@ watchers provide a convenient method to install cleanup hooks for your
 program, worker threads and so on - you just to make sure to destroy the
 loop when you want them to be invoked.
 
+Cleanup watchers are invoked in the same way as any other watcher. Unlike
+all other watchers, they do not keep a reference to the event loop (which
+makes a lot of sense if you think about it). Like all other watchers, you
+can call libev functions in the callback, except C<ev_cleanup_start>.
+
 =head3 Watcher-Specific Functions and Data Members
 
 =over 4
