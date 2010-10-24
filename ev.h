@@ -100,7 +100,11 @@ EV_CPP(extern "C" {)
 #endif
 
 #ifndef EV_FORK_ENABLE
-# define EV_FORK_ENABLE EV_FEATURE_WATCHERS
+# define EV_FORK_ENABLE 0 /* not implemented */
+#endif
+
+#ifndef EV_CLEANUP_ENABLE
+# define EV_CLEANUP_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_SIGNAL_ENABLE
@@ -212,7 +216,8 @@ enum {
   EV_CHECK    = 0x00008000, /* event loop finished poll */
   EV_EMBED    = 0x00010000, /* embedded event loop needs sweep */
   EV_FORK     = 0x00020000, /* event loop resumed in child */
-  EV_ASYNC    = 0x00040000, /* async intra-loop signal */
+  EV_CLEANUP  = 0x00040000, /* event loop resumed in child */
+  EV_ASYNC    = 0x00080000, /* async intra-loop signal */
   EV_CUSTOM   = 0x01000000, /* for use by user code */
   EV_ERROR    = 0x80000000  /* sent when an error occurs */
 };
@@ -391,10 +396,20 @@ typedef struct ev_check
 
 #if EV_FORK_ENABLE
 /* the callback gets invoked before check in the child process when a fork was detected */
+/* revent EV_FORK */
 typedef struct ev_fork
 {
   EV_WATCHER (ev_fork)
 } ev_fork;
+#endif
+
+#if EV_CLEANUP_ENABLE
+/* is invoked just before the loop gets destroyed */
+/* revent EV_CLEANUP */
+typedef struct ev_cleanup
+{
+  EV_WATCHER (ev_cleanup)
+} ev_cleanup;
 #endif
 
 #if EV_EMBED_ENABLE
@@ -412,6 +427,7 @@ typedef struct ev_embed
   ev_periodic periodic;  /* unused */
   ev_idle idle;          /* unused */
   ev_fork fork;          /* private */
+  ev_cleanup cleanup;    /* unused */
 } ev_embed;
 #endif
 
@@ -449,6 +465,9 @@ union ev_any_watcher
   struct ev_check check;
 #if EV_FORK_ENABLE
   struct ev_fork fork;
+#endif
+#if EV_CLEANUP_ENABLE
+  struct ev_cleanup cleanup;
 #endif
 #if EV_EMBED_ENABLE
   struct ev_embed embed;
@@ -653,6 +672,7 @@ void ev_resume  (EV_P);
 #define ev_check_set(ev)                     /* nop, yes, this is a serious in-joke */
 #define ev_embed_set(ev,other_)              do { (ev)->other = (other_); } while (0)
 #define ev_fork_set(ev)                      /* nop, yes, this is a serious in-joke */
+#define ev_cleanup_set(ev)                   /* nop, yes, this is a serious in-joke */
 #define ev_async_set(ev)                     /* nop, yes, this is a serious in-joke */
 
 #define ev_io_init(ev,cb,fd,events)          do { ev_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
@@ -666,6 +686,7 @@ void ev_resume  (EV_P);
 #define ev_check_init(ev,cb)                 do { ev_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
 #define ev_embed_init(ev,cb,other)           do { ev_init ((ev), (cb)); ev_embed_set ((ev),(other)); } while (0)
 #define ev_fork_init(ev,cb)                  do { ev_init ((ev), (cb)); ev_fork_set ((ev)); } while (0)
+#define ev_cleanup_init(ev,cb)               do { ev_init ((ev), (cb)); ev_cleanup_set ((ev)); } while (0)
 #define ev_async_init(ev,cb)                 do { ev_init ((ev), (cb)); ev_async_set ((ev)); } while (0)
 
 #define ev_is_pending(ev)                    (0 + ((ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
@@ -753,6 +774,11 @@ void ev_check_stop     (EV_P_ ev_check *w);
 # if EV_FORK_ENABLE
 void ev_fork_start     (EV_P_ ev_fork *w);
 void ev_fork_stop      (EV_P_ ev_fork *w);
+# endif
+
+# if EV_CLEANUP_ENABLE
+void ev_cleanup_start  (EV_P_ ev_cleanup *w);
+void ev_cleanup_stop   (EV_P_ ev_cleanup *w);
 # endif
 
 # if EV_EMBED_ENABLE
