@@ -2008,11 +2008,10 @@ ev_verify (EV_P)
 
 #if EV_MULTIPLICITY
 struct ev_loop *
-ev_default_loop_init (unsigned int flags)
 #else
 int
-ev_default_loop (unsigned int flags)
 #endif
+ev_default_loop (unsigned int flags)
 {
   if (!ev_default_loop_ptr)
     {

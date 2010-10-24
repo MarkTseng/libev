@@ -510,6 +510,11 @@ void ev_set_allocator (void *(*cb)(void *ptr, long size));
 void ev_set_syserr_cb (void (*cb)(const char *msg));
 
 #if EV_MULTIPLICITY
+
+/* the default loop is the only one that handles signals and child watchers */
+/* you can call this as often as you like */
+struct ev_loop *ev_default_loop (unsigned int flags EV_CPP (= 0));
+
 EV_INLINE struct ev_loop *
 ev_default_loop_uc (void)
 {
@@ -518,21 +523,10 @@ ev_default_loop_uc (void)
   return ev_default_loop_ptr;
 }
 
-/* the default loop is the only one that handles signals and child watchers */
-/* you can call this as often as you like */
-EV_INLINE struct ev_loop *
-ev_default_loop (unsigned int flags EV_CPP (= 0))
+EV_INLINE int
+ev_is_default_loop (EV_P)
 {
-  struct ev_loop *loop = ev_default_loop_uc ();
-
-  if (!loop)
-    {
-      extern struct ev_loop *ev_default_loop_init (unsigned int flags);
-
-      loop = ev_default_loop_init (flags);
-    }
-
-  return loop;
+  return EV_A == ev_default_loop_uc ();
 }
 
 /* create and destroy alternative loops that don't handle signals */
@@ -553,19 +547,15 @@ ev_now (void)
 
   return ev_rt_now;
 }
-#endif /* multiplicity */
 
+/* looks weird, but ev_is_default_loop (EV_A) still works if this exists */
 EV_INLINE int
-ev_is_default_loop (EV_P)
+ev_is_default_loop (void)
 {
-#if EV_MULTIPLICITY
-  extern struct ev_loop *ev_default_loop_ptr;
-
-  return !!(EV_A == ev_default_loop_ptr);
-#else
   return 1;
-#endif
 }
+
+#endif /* multiplicity */
 
 void ev_default_destroy (void); /* destroy the default loop */
 /* this needs to be called after fork, to duplicate the default loop */
