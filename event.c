@@ -47,9 +47,6 @@
 # include "event.h"
 #endif
 
-/* same definition as in ev.c */
-#define EV_TV_SET(tv,t) do { tv.tv_sec = (long)t; tv.tv_usec = (long)((t - tv.tv_sec) * 1e6); } while (0)
-
 #if EV_MULTIPLICITY
 # define dLOOPev struct ev_loop *loop = (struct ev_loop *)ev->ev_base
 # define dLOOPbase struct ev_loop *loop = (struct ev_loop *)base
@@ -301,7 +298,12 @@ int event_pending (struct event *ev, short events, struct timeval *tv)
       revents |= EV_TIMEOUT;
 
       if (tv)
-        EV_TV_SET (tv, ev_now (EV_A)); /* not sure if this is right :) */
+        {
+          ev_tstamp at = ev_now (EV_A);
+
+          tv->tv_sec  = (long)at;
+          tv->tv_usec = (long)((at - (ev_tstamp)tv->tv_sec) * 1e6);
+        }
     }
 
   return events & revents;
