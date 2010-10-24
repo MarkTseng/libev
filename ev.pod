@@ -1116,7 +1116,7 @@ C<ev_fork>).
 
 =item C<EV_CLEANUP>
 
-The event loop is abotu to be destroyed (see C<ev_cleanup>).
+The event loop is about to be destroyed (see C<ev_cleanup>).
 
 =item C<EV_ASYNC>
 
