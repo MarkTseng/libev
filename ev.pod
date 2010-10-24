@@ -4874,13 +4874,20 @@ involves iterating over all running async watchers or all signal numbers.
 
 =head1 PORTING FROM LIBEV 3.X TO 4.X
 
-The major version 4 introduced some minor incompatible changes to the API.
+The major version 4 introduced some incompatible changes to the API.
 
-At the moment, the C<ev.h> header file tries to implement superficial
-compatibility, so most programs should still compile. Those might be
-removed in later versions of libev, so better update early than late.
+At the moment, the C<ev.h> header file provides compatibility definitions
+for all changes, so most programs should still compile. The compatibility
+layer might be removed in later versions of libev, so better update to the
+new API early than late.
 
 =over 4
+
+=item C<EV_COMPAT3> backwards compatibility mechanism
+
+The backward compatibility mechanism can be controlled by
+C<EV_COMPAT3>. See L<PREPROCESSOR SYMBOLS/MACROS> in the L<EMBEDDING>
+section.
 
 =item C<ev_default_destroy> and C<ev_default_fork> have been removed
 
@@ -4915,12 +4922,6 @@ ev_loop> anymore and C<EV_TIMER> now follows the same naming scheme
 as all other watcher types. Note that C<ev_loop_fork> is still called
 C<ev_loop_fork> because it would otherwise clash with the C<ev_fork>
 typedef.
-
-=item C<EV_COMPAT3> backwards compatibility mechanism
-
-The backward compatibility mechanism can be controlled by
-C<EV_COMPAT3>. See L<PREPROCESSOR SYMBOLS/MACROS> in the L<EMBEDDING>
-section.
 
 =item C<EV_MINIMAL> mechanism replaced by C<EV_FEATURES>
 
