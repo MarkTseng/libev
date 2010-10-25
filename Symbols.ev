@@ -7,6 +7,8 @@ ev_check_start
 ev_check_stop
 ev_child_start
 ev_child_stop
+ev_cleanup_start
+ev_cleanup_stop
 ev_clear_pending
 ev_default_loop
 ev_default_loop_ptr
