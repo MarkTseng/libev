@@ -552,8 +552,6 @@ ev_is_default_loop (EV_P)
 
 /* create and destroy alternative loops that don't handle signals */
 struct ev_loop *ev_loop_new (unsigned int flags EV_CPP (= 0));
-/* destroy event loops, also works for the default loop */
-void ev_loop_destroy (EV_P);
 
 ev_tstamp ev_now (EV_P); /* time w.r.t. timers and the eventloop, updated after each poll */
 
@@ -577,6 +575,9 @@ ev_is_default_loop (void)
 }
 
 #endif /* multiplicity */
+
+/* destroy event loops, also works for the default loop */
+void ev_loop_destroy (EV_P);
 
 /* this needs to be called after fork, to duplicate the loop */
 /* when you want to re-use it in the child */
