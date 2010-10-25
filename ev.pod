@@ -80,6 +80,14 @@ with libev.
 Familiarity with event based programming techniques in general is assumed
 throughout this document.
 
+=head1 WHAT TO READ WHEN IN A HURRY
+
+This manual tries to be very detailed, but unfortunately, this also makes
+it very long. If you just want to know the basics of libev, I suggest
+reading L<ANATOMY OF A WATCHER>, then the L<EXAMPLE PROGRAM> above and
+look up the missing functions in L<GLOBAL FUNCTIONS> and the C<ev_io> and
+C<ev_timer> sections in L<WATCHER TYPES>.
+
 =head1 ABOUT LIBEV
 
 Libev is an event loop: you register interest in certain events (such as a
