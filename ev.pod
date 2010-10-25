@@ -825,9 +825,9 @@ has processed all outstanding events). The C<how> argument must be either
 C<EVBREAK_ONE>, which will make the innermost C<ev_run> call return, or
 C<EVBREAK_ALL>, which will make all nested C<ev_run> calls return.
 
-This "unloop state" will be cleared when entering C<ev_run> again.
+This "break state" will be cleared when entering C<ev_run> again.
 
-It is safe to call C<ev_break> from outside any C<ev_run> calls. ##TODO##
+It is safe to call C<ev_break> from outside any C<ev_run> calls, too.
 
 =item ev_ref (loop)
 
