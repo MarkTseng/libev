@@ -4759,6 +4759,11 @@ assumes that the same (machine) code can be used to call any watcher
 callback: The watcher callbacks have different type signatures, but libev
 calls them using an C<ev_watcher *> internally.
 
+=item pointer accesses must be thread-atomic
+
+Accessing a pointer value must be atomic, it must both be readable and
+writable in one piece - this is the case on all current architectures.
+
 =item C<sig_atomic_t volatile> must be thread-atomic as well
 
 The type C<sig_atomic_t volatile> (or whatever is defined as
@@ -5006,5 +5011,6 @@ to be started (attached to an event loop) before they can receive events.
 
 =head1 AUTHOR
 
-Marc Lehmann <libev@schmorp.de>, with repeated corrections by Mikael Magnusson.
+Marc Lehmann <libev@schmorp.de>, with repeated corrections by Mikael
+Magnusson and Emanuele Giaquinta.
 
