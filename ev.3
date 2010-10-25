@@ -946,9 +946,9 @@ has processed all outstanding events). The \f(CW\*(C`how\*(C'\fR argument must b
 \&\f(CW\*(C`EVBREAK_ONE\*(C'\fR, which will make the innermost \f(CW\*(C`ev_run\*(C'\fR call return, or
 \&\f(CW\*(C`EVBREAK_ALL\*(C'\fR, which will make all nested \f(CW\*(C`ev_run\*(C'\fR calls return.
 .Sp
-This \*(L"unloop state\*(R" will be cleared when entering \f(CW\*(C`ev_run\*(C'\fR again.
+This \*(L"break state\*(R" will be cleared when entering \f(CW\*(C`ev_run\*(C'\fR again.
 .Sp
-It is safe to call \f(CW\*(C`ev_break\*(C'\fR from outside any \f(CW\*(C`ev_run\*(C'\fR calls. ##TODO##
+It is safe to call \f(CW\*(C`ev_break\*(C'\fR from outside any \f(CW\*(C`ev_run\*(C'\fR calls, too.
 .IP "ev_ref (loop)" 4
 .IX Item "ev_ref (loop)"
 .PD 0
