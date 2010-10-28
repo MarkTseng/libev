@@ -197,7 +197,7 @@ struct ev_loop;
 
 /* eventmask, revents, events... */
 enum {
-  EV_UNDEF    =         -1, /* guaranteed to be invalid */
+  EV_UNDEF    = 0xFFFFFFFF, /* guaranteed to be invalid */
   EV_NONE     =       0x00, /* no events */
   EV_READ     =       0x01, /* ev_io detected read will not block */
   EV_WRITE    =       0x02, /* ev_io detected write will not block */
