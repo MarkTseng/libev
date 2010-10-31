@@ -593,11 +593,9 @@ ev_syserr (const char *msg)
   else
     {
 #if EV_AVOID_STDIO
-      const char *err = strerror (errno);
-
       ev_printerr (msg);
       ev_printerr (": ");
-      ev_printerr (err);
+      ev_printerr (strerror (errno));
       ev_printerr ("\n");
 #else
       perror (msg);
@@ -641,9 +639,9 @@ ev_realloc (void *ptr, long size)
   if (!ptr && size)
     {
 #if EV_AVOID_STDIO
-      ev_printerr ("libev: memory allocation failed, aborting.\n");
+      ev_printerr ("(libev) memory allocation failed, aborting.\n");
 #else
-      fprintf (stderr, "libev: cannot allocate %ld bytes, aborting.", size);
+      fprintf (stderr, "(libev) cannot allocate %ld bytes, aborting.", size);
 #endif
       abort ();
     }
