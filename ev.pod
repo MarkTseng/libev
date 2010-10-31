@@ -465,8 +465,9 @@ epoll scales either O(1) or O(active_fds).
 The epoll mechanism deserves honorable mention as the most misdesigned
 of the more advanced event mechanisms: mere annoyances include silently
 dropping file descriptors, requiring a system call per change per file
-descriptor (and unnecessary guessing of parameters), problems with dup and
-so on. The biggest issue is fork races, however - if a program forks then
+descriptor (and unnecessary guessing of parameters), problems with dup,
+returning before the timeout value requiring additional iterations and so
+on. The biggest issue is fork races, however - if a program forks then
 I<both> parent and child process have to recreate the epoll set, which can
 take considerable time (one syscall per file descriptor) and is of course
 hard to detect.
