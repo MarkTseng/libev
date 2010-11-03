@@ -404,14 +404,14 @@ environment variable.
 =item C<EVFLAG_NOINOTIFY>
 
 When this flag is specified, then libev will not attempt to use the
-I<inotify> API for it's C<ev_stat> watchers. Apart from debugging and
+I<inotify> API for its C<ev_stat> watchers. Apart from debugging and
 testing, this flag can be useful to conserve inotify file descriptors, as
 otherwise each loop using C<ev_stat> watchers consumes one inotify handle.
 
 =item C<EVFLAG_SIGNALFD>
 
 When this flag is specified, then libev will attempt to use the
-I<signalfd> API for it's C<ev_signal> (and C<ev_child>) watchers. This API
+I<signalfd> API for its C<ev_signal> (and C<ev_child>) watchers. This API
 delivers signals synchronously, which makes it both faster and might make
 it possible to get the queued signal data. It can also simplify signal
 handling with threads, as long as you properly block signals in your
@@ -621,7 +621,7 @@ C<ev_loop_new>, but it can also be used on the default loop returned by
 C<ev_default_loop>, in which case it is not thread-safe.
 
 Note that it is not advisable to call this function on the default loop
-except in the rare occasion where you really need to free it's resources.
+except in the rare occasion where you really need to free its resources.
 If you need dynamically allocated loops it is better to use C<ev_loop_new>
 and C<ev_loop_destroy>.
 
@@ -2262,7 +2262,7 @@ Example: Call a callback every hour, starting now:
 
 Signal watchers will trigger an event when the process receives a specific
 signal one or more times. Even though signals are very asynchronous, libev
-will try it's best to deliver signals synchronously, i.e. as part of the
+will try its best to deliver signals synchronously, i.e. as part of the
 normal event processing, like any other event.
 
 If you want signals to be delivered truly asynchronously, just use

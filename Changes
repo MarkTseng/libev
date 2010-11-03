@@ -1,5 +1,7 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+        - automake fucked it up, apparently, --add-missing -f is not quite enough
+          to make it update its files. grrr.
         - change EV_UNDEF to 0xffffffff to silence some overzealous compilers.
         - use "(libev) " prefix for all libev error messages now.
 
