@@ -809,9 +809,9 @@ void ev_async_send     (EV_P_ ev_async *w);
     EV_INLINE void ev_default_destroy (void) { ev_loop_destroy (EV_DEFAULT); }
     EV_INLINE void ev_default_fork    (void) { ev_loop_fork    (EV_DEFAULT); }
     #if EV_FEATURE_API
-      EV_INLINE void ev_loop_count  (EV_P) { ev_iteration  (EV_A); }
-      EV_INLINE void ev_loop_depth  (EV_P) { ev_depth      (EV_A); }
-      EV_INLINE void ev_loop_verify (EV_P) { ev_verify     (EV_A); }
+      EV_INLINE unsigned int ev_loop_count  (EV_P) { return ev_iteration  (EV_A); }
+      EV_INLINE unsigned int ev_loop_depth  (EV_P) { return ev_depth      (EV_A); }
+      EV_INLINE void         ev_loop_verify (EV_P) {        ev_verify     (EV_A); }
     #endif
   #endif
 #else
