@@ -1,5 +1,6 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
+4.01 Fri Nov  5 21:51:29 CET 2010
         - automake fucked it up, apparently, --add-missing -f is not quite enough
           to make it update its files, so 4.00 didn't install ev++.h and
           event.h on make install. grrr.

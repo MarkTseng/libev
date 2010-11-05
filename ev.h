@@ -193,7 +193,7 @@ struct ev_loop;
 /*****************************************************************************/
 
 #define EV_VERSION_MAJOR 4
-#define EV_VERSION_MINOR 0
+#define EV_VERSION_MINOR 1
 
 /* eventmask, revents, events... */
 enum {

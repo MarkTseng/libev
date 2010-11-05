@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "LIBEV 3"
-.TH LIBEV 3 "2010-10-25" "libev-4.00" "libev - high performance full featured event loop"
+.TH LIBEV 3 "2010-11-03" "libev-4.01" "libev - high performance full featured event loop"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -363,8 +363,8 @@ the current system, you would need to look at \f(CW\*(C`ev_embeddable_backends (
 & ev_supported_backends ()\*(C'\fR, likewise for recommended ones.
 .Sp
 See the description of \f(CW\*(C`ev_embed\*(C'\fR watchers for more info.
-.IP "ev_set_allocator (void *(*cb)(void *ptr, long size)) [\s-1NOT\s0 \s-1REENTRANT\s0]" 4
-.IX Item "ev_set_allocator (void *(*cb)(void *ptr, long size)) [NOT REENTRANT]"
+.IP "ev_set_allocator (void *(*cb)(void *ptr, long size))" 4
+.IX Item "ev_set_allocator (void *(*cb)(void *ptr, long size))"
 Sets the allocation function to use (the prototype is similar \- the
 semantics are identical to the \f(CW\*(C`realloc\*(C'\fR C89/SuS/POSIX function). It is
 used to allocate and free memory (no surprises here). If it returns zero
@@ -400,8 +400,8 @@ retries (example requires a standards-compliant \f(CW\*(C`realloc\*(C'\fR).
 \&   ...
 \&   ev_set_allocator (persistent_realloc);
 .Ve
-.IP "ev_set_syserr_cb (void (*cb)(const char *msg)); [\s-1NOT\s0 \s-1REENTRANT\s0]" 4
-.IX Item "ev_set_syserr_cb (void (*cb)(const char *msg)); [NOT REENTRANT]"
+.IP "ev_set_syserr_cb (void (*cb)(const char *msg))" 4
+.IX Item "ev_set_syserr_cb (void (*cb)(const char *msg))"
 Set the callback function to call on a retryable system call error (such
 as failed select, poll, epoll_wait). The message is a printable string
 indicating the system call or subsystem causing the problem. If this
@@ -523,14 +523,14 @@ environment variable.
 .el .IP "\f(CWEVFLAG_NOINOTIFY\fR" 4
 .IX Item "EVFLAG_NOINOTIFY"
 When this flag is specified, then libev will not attempt to use the
-\&\fIinotify\fR \s-1API\s0 for it's \f(CW\*(C`ev_stat\*(C'\fR watchers. Apart from debugging and
+\&\fIinotify\fR \s-1API\s0 for its \f(CW\*(C`ev_stat\*(C'\fR watchers. Apart from debugging and
 testing, this flag can be useful to conserve inotify file descriptors, as
 otherwise each loop using \f(CW\*(C`ev_stat\*(C'\fR watchers consumes one inotify handle.
 .ie n .IP """EVFLAG_SIGNALFD""" 4
 .el .IP "\f(CWEVFLAG_SIGNALFD\fR" 4
 .IX Item "EVFLAG_SIGNALFD"
 When this flag is specified, then libev will attempt to use the
-\&\fIsignalfd\fR \s-1API\s0 for it's \f(CW\*(C`ev_signal\*(C'\fR (and \f(CW\*(C`ev_child\*(C'\fR) watchers. This \s-1API\s0
+\&\fIsignalfd\fR \s-1API\s0 for its \f(CW\*(C`ev_signal\*(C'\fR (and \f(CW\*(C`ev_child\*(C'\fR) watchers. This \s-1API\s0
 delivers signals synchronously, which makes it both faster and might make
 it possible to get the queued signal data. It can also simplify signal
 handling with threads, as long as you properly block signals in your
@@ -584,11 +584,13 @@ epoll scales either O(1) or O(active_fds).
 The epoll mechanism deserves honorable mention as the most misdesigned
 of the more advanced event mechanisms: mere annoyances include silently
 dropping file descriptors, requiring a system call per change per file
-descriptor (and unnecessary guessing of parameters), problems with dup and
-so on. The biggest issue is fork races, however \- if a program forks then
-\&\fIboth\fR parent and child process have to recreate the epoll set, which can
-take considerable time (one syscall per file descriptor) and is of course
-hard to detect.
+descriptor (and unnecessary guessing of parameters), problems with dup,
+returning before the timeout value, resulting in additional iterations
+(and only giving 5ms accuracy while select on the same platform gives
+0.1ms) and so on. The biggest issue is fork races, however \- if a program
+forks then \fIboth\fR parent and child process have to recreate the epoll
+set, which can take considerable time (one syscall per file descriptor)
+and is of course hard to detect.
 .Sp
 Epoll is also notoriously buggy \- embedding epoll fds \fIshould\fR work, but
 of course \fIdoesn't\fR, and epoll just loves to report events for totally
@@ -599,6 +601,8 @@ employing an additional generation counter and comparing that against the
 events to filter out spurious ones, recreating the set when required. Last
 not least, it also refuses to work with some file descriptors which work
 perfectly fine with \f(CW\*(C`select\*(C'\fR (files, many character devices...).
+.Sp
+Epoll is truly the train wreck analog among event poll mechanisms.
 .Sp
 While stopping, setting and starting an I/O watcher in the same iteration
 will result in some caching, there is still a system call per such
@@ -740,7 +744,7 @@ This function is normally used on loop objects allocated by
 \&\f(CW\*(C`ev_default_loop\*(C'\fR, in which case it is not thread-safe.
 .Sp
 Note that it is not advisable to call this function on the default loop
-except in the rare occasion where you really need to free it's resources.
+except in the rare occasion where you really need to free its resources.
 If you need dynamically allocated loops it is better to use \f(CW\*(C`ev_loop_new\*(C'\fR
 and \f(CW\*(C`ev_loop_destroy\*(C'\fR.
 .IP "ev_loop_fork (loop)" 4
@@ -2393,7 +2397,7 @@ Example: Call a callback every hour, starting now:
 .IX Subsection "ev_signal - signal me when a signal gets signalled!"
 Signal watchers will trigger an event when the process receives a specific
 signal one or more times. Even though signals are very asynchronous, libev
-will try it's best to deliver signals synchronously, i.e. as part of the
+will try its best to deliver signals synchronously, i.e. as part of the
 normal event processing, like any other event.
 .PP
 If you want signals to be delivered truly asynchronously, just use
