@@ -357,9 +357,9 @@ environment settings to be taken into account:
 This will create and initialise a new event loop object. If the loop
 could not be initialised, returns false.
 
-Note that this function I<is> thread-safe, and one common way to use
-libev with threads is indeed to create one loop per thread, and using the
-default loop in the "main" or "initial" thread.
+This function is thread-safe, and one common way to use libev with
+threads is indeed to create one loop per thread, and using the default
+loop in the "main" or "initial" thread.
 
 The flags argument can be used to specify special behaviour or specific
 backends to use, and is usually specified as C<0> (or C<EVFLAG_AUTO>).
@@ -679,15 +679,16 @@ prepare and check phases.
 =item unsigned int ev_depth (loop)
 
 Returns the number of times C<ev_run> was entered minus the number of
-times C<ev_run> was exited, in other words, the recursion depth.
+times C<ev_run> was exited normally, in other words, the recursion depth.
 
 Outside C<ev_run>, this number is zero. In a callback, this number is
 C<1>, unless C<ev_run> was invoked recursively (or from another thread),
 in which case it is higher.
 
-Leaving C<ev_run> abnormally (setjmp/longjmp, cancelling the thread
-etc.), doesn't count as "exit" - consider this as a hint to avoid such
-ungentleman-like behaviour unless it's really convenient.
+Leaving C<ev_run> abnormally (setjmp/longjmp, cancelling the thread,
+throwing an exception etc.), doesn't count as "exit" - consider this
+as a hint to avoid such ungentleman-like behaviour unless it's really
+convenient, in which case it is fully supported.
 
 =item unsigned int ev_backend (loop)
 
@@ -759,6 +760,11 @@ that automatically loops as long as it has to and no longer by virtue
 of relying on its watchers stopping correctly, that is truly a thing of
 beauty.
 
+This function is also I<mostly> exception-safe - you can break out of
+a C<ev_run> call by calling C<longjmp> in a callback, throwing a C++
+exception and so on. This does not decrement the C<ev_depth> value, nor
+will it clear any outstanding C<EVBREAK_ONE> breaks.
+
 A flags value of C<EVRUN_NOWAIT> will look for new events, will handle
 those events and any already outstanding ones, but will not wait and
 block your process in case there are no events and will return after one
@@ -829,9 +835,10 @@ has processed all outstanding events). The C<how> argument must be either
 C<EVBREAK_ONE>, which will make the innermost C<ev_run> call return, or
 C<EVBREAK_ALL>, which will make all nested C<ev_run> calls return.
 
-This "break state" will be cleared when entering C<ev_run> again.
+This "break state" will be cleared on the next call to C<ev_run>.
 
-It is safe to call C<ev_break> from outside any C<ev_run> calls, too.
+It is safe to call C<ev_break> from outside any C<ev_run> calls, too, in
+which case it will have no effect.
 
 =item ev_ref (loop)
 
