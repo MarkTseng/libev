@@ -3369,12 +3369,67 @@ loop!).
 =back
 
 
+=head1 COMMON OR USEFUL IDIOMS (OR BOTH)
+
+This section explains some common idioms that are not immediately
+obvious. Note that examples are sprinkled over the whole manual, and this
+section only contains stuff that wouldn't fit anywhere else.
+
+=over 4
+
+=item Model/nested event loop invocations and exit conditions.
+
+Often (especially in GUI toolkits) there are places where you have
+I<modal> interaction, which is most easily implemented by recursively
+invoking C<ev_run>.
+
+This brings the problem of exiting - a callback might want to finish the
+main C<ev_run> call, but not the nested one (e.g. user clicked "Quit", but
+a modal "Are you sure?" dialog is still waiting), or just the nested one
+and not the main one (e.g. user clocked "Ok" in a modal dialog), or some
+other combination: In these cases, C<ev_break> will not work alone.
+
+The solution is to maintain "break this loop" variable for each C<ev_run>
+invocation, and use a loop around C<ev_run> until the condition is
+triggered, using C<EVRUN_ONCE>:
+
+   // main loop
+   int exit_main_loop = 0;
+
+   while (!exit_main_loop)
+     ev_run (EV_DEFAULT_ EVRUN_ONCE);
+
+   // in a model watcher
+   int exit_nested_loop = 0;
+
+   while (!exit_nested_loop)
+     ev_run (EV_A_ EVRUN_ONCE);
+
+To exit from any of these loops, just set the corresponding exit variable:
+
+   // exit modal loop
+   exit_nested_loop = 1;
+
+   // exit main program, after modal loop is finished
+   exit_main_loop = 1;
+
+   // exit both
+   exit_main_loop = exit_nested_loop = 1;
+
+=back
+
+
 =head1 LIBEVENT EMULATION
 
 Libev offers a compatibility emulation layer for libevent. It cannot
 emulate the internals of libevent, so here are some usage hints:
 
 =over 4
+
+=item * Only the libevent-1.4.1-beta API is being emulated.
+
+This was the newest libevent version available when libev was implemented,
+and is still mostly uncanged in 2010.
 
 =item * Use it by including <event.h>, as usual.
 
