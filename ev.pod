@@ -3429,7 +3429,7 @@ emulate the internals of libevent, so here are some usage hints:
 =item * Only the libevent-1.4.1-beta API is being emulated.
 
 This was the newest libevent version available when libev was implemented,
-and is still mostly uncanged in 2010.
+and is still mostly unchanged in 2010.
 
 =item * Use it by including <event.h>, as usual.
 
