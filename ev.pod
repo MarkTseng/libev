@@ -991,7 +991,7 @@ document.
 
 =item ev_set_userdata (loop, void *data)
 
-=item ev_userdata (loop)
+=item void *ev_userdata (loop)
 
 Set and retrieve a single C<void *> associated with a loop. When
 C<ev_set_userdata> has never been called, then C<ev_userdata> returns
