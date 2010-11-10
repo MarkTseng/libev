@@ -3474,11 +3474,11 @@ classes add (compared to plain C-style watchers) is the event loop pointer
 that the watcher is associated with (or no additional members at all if
 you disable C<EV_MULTIPLICITY> when embedding libev).
 
-Currently, functions, and static and non-static member functions can be
-used as callbacks. Other types should be easy to add as long as they only
-need one additional pointer for context. If you need support for other
-types of functors please contact the author (preferably after implementing
-it).
+Currently, functions, static and non-static member functions and classes
+with C<operator ()> can be used as callbacks. Other types should be easy
+to add as long as they only need one additional pointer for context. If
+you need support for other types of functors please contact the author
+(preferably after implementing it).
 
 Here is a list of things available in the C<ev> namespace:
 
