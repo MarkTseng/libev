@@ -988,7 +988,7 @@ document.
 
 Set and retrieve a single C<void *> associated with a loop. When
 C<ev_set_userdata> has never been called, then C<ev_userdata> returns
-C<0.>
+C<0>.
 
 These two functions can be used to associate arbitrary data with a loop,
 and are intended solely for the C<invoke_pending_cb>, C<release> and
