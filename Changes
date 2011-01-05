@@ -4,7 +4,10 @@ TODO: move some other examples to common idioms? combining watchers,
 thread usage, coroutine switch?
 
 TODO: /dev/null epoll breakage, maybe catch EPERM?
+TODO: frankenpoll
 4.03
+	- support files, /dev/zero etc. the same way as select in the epoll
+          backend, by generating events on our own.
 	- define EV_READ/EV_WRITE as macros in event.h, as some programs use
           #ifdef to test for them.
 

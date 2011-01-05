@@ -40,6 +40,9 @@
 #define pollidxmax ((loop)->pollidxmax)
 #define epoll_events ((loop)->epoll_events)
 #define epoll_eventmax ((loop)->epoll_eventmax)
+#define epoll_eperms ((loop)->epoll_eperms)
+#define epoll_epermcnt ((loop)->epoll_epermcnt)
+#define epoll_epermmax ((loop)->epoll_epermmax)
 #define kqueue_changes ((loop)->kqueue_changes)
 #define kqueue_changemax ((loop)->kqueue_changemax)
 #define kqueue_changecnt ((loop)->kqueue_changecnt)
@@ -132,6 +135,9 @@
 #undef pollidxmax
 #undef epoll_events
 #undef epoll_eventmax
+#undef epoll_eperms
+#undef epoll_epermcnt
+#undef epoll_epermmax
 #undef kqueue_changes
 #undef kqueue_changemax
 #undef kqueue_changecnt

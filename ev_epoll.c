@@ -203,7 +203,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
       epoll_events = (struct epoll_event *)ev_malloc (sizeof (struct epoll_event) * epoll_eventmax);
     }
 
-  /* now add events for all fds where epoll fails, while select works... */
+  /* now synthesize events for all fds where epoll fails, while select works... */
   for (i = epoll_epermcnt; i--; )
     {
       int fd = epoll_eperms [i];

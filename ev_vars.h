@@ -1,7 +1,7 @@
 /*
  * loop member variable declarations
  *
- * Copyright (c) 2007,2008,2009,2010 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009,2010,2011 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -102,6 +102,9 @@ VARx(int, pollidxmax)
 #if EV_USE_EPOLL || EV_GENWRAP
 VARx(struct epoll_event *, epoll_events)
 VARx(int, epoll_eventmax)
+VARx(int *, epoll_eperms)
+VARx(int, epoll_epermcnt)
+VARx(int, epoll_epermmax)
 #endif
 
 #if EV_USE_KQUEUE || EV_GENWRAP
