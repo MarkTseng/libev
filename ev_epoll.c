@@ -1,7 +1,7 @@
 /*
  * libev epoll fd activity backend
  *
- * Copyright (c) 2007,2008,2009,2010 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009,2010,2011 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -53,7 +53,8 @@
  *    (such as files). while not critical, no other advanced interface
  *    seems to share this (rather non-unixy) limitation.
  * e) epoll claims to be embeddable, but in practise you never get
- *    a ready event for the epoll fd.
+ *    a ready event for the epoll fd (broken: <=2.6.26, working: >=2.6.32).
+ * f) epoll_ctl returning EPERM means the fd is always ready.
  *
  * lots of "weird code" and complication handling in this file is due
  * to these design problems with epoll, as we try very hard to avoid
@@ -63,6 +64,8 @@
  */
 
 #include <sys/epoll.h>
+
+#define EV_EMASK_EPERM 0x80
 
 static void
 epoll_modify (EV_P_ int fd, int oev, int nev)
@@ -111,6 +114,19 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
 
       if (!epoll_ctl (backend_fd, EPOLL_CTL_MOD, fd, &ev))
         return;
+    }
+  else if (expect_true (errno == EPERM))
+    {
+      anfds [fd].emask = EV_EMASK_EPERM;
+
+      /* add fd to epoll_eperms, if not already inside */
+      if (!(oldmask & EV_EMASK_EPERM))
+        {
+          array_needsize (int, epoll_eperms, epoll_epermmax, epoll_epermcnt + 1, EMPTY2);
+          epoll_eperms [epoll_epermcnt++] = fd;
+        }
+
+      return;
     }
 
   fd_kill (EV_A_ fd);
@@ -186,6 +202,18 @@ epoll_poll (EV_P_ ev_tstamp timeout)
       epoll_eventmax = array_nextsize (sizeof (struct epoll_event), epoll_eventmax, epoll_eventmax + 1);
       epoll_events = (struct epoll_event *)ev_malloc (sizeof (struct epoll_event) * epoll_eventmax);
     }
+
+  /* now add events for all fds where epoll fails, while select works... */
+  for (i = epoll_epermcnt; i--; )
+    {
+      int fd = epoll_eperms [i];
+      unsigned char events = anfds [fd].events & (EV_READ | EV_WRITE);
+
+      if (anfds [fd].emask & EV_EMASK_EPERM && events)
+        fd_event (EV_A_ fd, events);
+      else
+        epoll_eperms [i] = epoll_eperms [--epoll_epermcnt];
+    }
 }
 
 int inline_size
@@ -217,6 +245,7 @@ void inline_size
 epoll_destroy (EV_P)
 {
   ev_free (epoll_events);
+  array_free (epoll_eperm, EMPTY);
 }
 
 void inline_size
