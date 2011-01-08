@@ -117,6 +117,8 @@ epoll_modify (EV_P_ int fd, int oev, int nev)
     }
   else if (expect_true (errno == EPERM))
     {
+      /* EPERM means the fd is always ready, but epoll is too snobbish */
+      /* to handle it, unlike select or poll. */
       anfds [fd].emask = EV_EMASK_EPERM;
 
       /* add fd to epoll_eperms, if not already inside */
