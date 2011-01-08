@@ -869,7 +869,7 @@ running when nothing else is active.
    ev_signal exitsig;
    ev_signal_init (&exitsig, sig_cb, SIGINT);
    ev_signal_start (loop, &exitsig);
-   evf_unref (loop);
+   ev_unref (loop);
 
 Example: For some weird reason, unregister the above signal handler again.
 
