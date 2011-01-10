@@ -584,19 +584,21 @@ immensely.
 This uses the Solaris 10 event port mechanism. As with everything on Solaris,
 it's really slow, but it still scales very well (O(active_fds)).
 
-Please note that Solaris event ports can deliver a lot of spurious
-notifications, so you need to use non-blocking I/O or other means to avoid
-blocking when no data (or space) is available.
-
 While this backend scales well, it requires one system call per active
 file descriptor per loop iteration. For small and medium numbers of file
 descriptors a "slow" C<EVBACKEND_SELECT> or C<EVBACKEND_POLL> backend
 might perform better.
 
-On the positive side, with the exception of the spurious readiness
-notifications, this backend actually performed fully to specification
-in all tests and is fully embeddable, which is a rare feat among the
-OS-specific backends (I vastly prefer correctness over speed hacks).
+On the positive side, this backend actually performed fully to
+specification in all tests and is fully embeddable, which is a rare feat
+among the OS-specific backends (I vastly prefer correctness over speed
+hacks).
+
+On the negative side, the interface is I<bizarre>, with the event polling
+function sometimes returning events to the caller even though an error
+occured, but with no indication whether it has done so or not (yes, it's
+even documented that way) - deadly for edge-triggered interfaces, but
+fortunately libev seems to be able to work around it.
 
 This backend maps C<EV_READ> and C<EV_WRITE> in the same way as
 C<EVBACKEND_POLL>.
