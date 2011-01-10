@@ -4,7 +4,6 @@ TODO: move some other examples to common idioms? combining watchers,
 thread usage, coroutine switch?
 
 TODO: frankenpoll
-TODO: frankenports
 TODO: allow files and so on
 4.03
 	- support files, /dev/zero etc. the same way as select in the epoll
@@ -15,7 +14,9 @@ TODO: allow files and so on
         - new (to become default) EVFLAG_NOSIGMASK flag.
         - new EVBACKEND_MASK symbol.
         - ports backend: work around solaris bug 6874410 and many related ones
-          (EINTR, maybe more), with no performance loss.
+          (EINTR, maybe more), with no performance loss (note that the solaris
+          bug report is actually wrong, reality is far more bizarre and broken
+          than that).
 
 4.01 Fri Nov  5 21:51:29 CET 2010
         - automake fucked it up, apparently, --add-missing -f is not quite enough

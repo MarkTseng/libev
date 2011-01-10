@@ -594,11 +594,15 @@ specification in all tests and is fully embeddable, which is a rare feat
 among the OS-specific backends (I vastly prefer correctness over speed
 hacks).
 
-On the negative side, the interface is I<bizarre>, with the event polling
+On the negative side, the interface is I<bizarre> - so bizarre that
+even sun itself gets it wrong in their code examples: The event polling
 function sometimes returning events to the caller even though an error
 occured, but with no indication whether it has done so or not (yes, it's
-even documented that way) - deadly for edge-triggered interfaces, but
-fortunately libev seems to be able to work around it.
+even documented that way) - deadly for edge-triggered interfaces where
+you absolutely have to know whether an event occured or not because you
+have to re-arm the watcher.
+
+Fortunately libev seems to be able to work around these idiocies.
 
 This backend maps C<EV_READ> and C<EV_WRITE> in the same way as
 C<EVBACKEND_POLL>.
