@@ -85,9 +85,11 @@
 #define fs_2625 ((loop)->fs_2625)
 #define fs_hash ((loop)->fs_hash)
 #define sig_pending ((loop)->sig_pending)
+#define nosigmask ((loop)->nosigmask)
 #define sigfd ((loop)->sigfd)
 #define sigfd_w ((loop)->sigfd_w)
 #define sigfd_set ((loop)->sigfd_set)
+#define origflags ((loop)->origflags)
 #define loop_count ((loop)->loop_count)
 #define loop_depth ((loop)->loop_depth)
 #define userdata ((loop)->userdata)
@@ -180,9 +182,11 @@
 #undef fs_2625
 #undef fs_hash
 #undef sig_pending
+#undef nosigmask
 #undef sigfd
 #undef sigfd_w
 #undef sigfd_set
+#undef origflags
 #undef loop_count
 #undef loop_depth
 #undef userdata
