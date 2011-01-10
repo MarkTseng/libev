@@ -597,9 +597,9 @@ hacks).
 On the negative side, the interface is I<bizarre> - so bizarre that
 even sun itself gets it wrong in their code examples: The event polling
 function sometimes returning events to the caller even though an error
-occured, but with no indication whether it has done so or not (yes, it's
+occurred, but with no indication whether it has done so or not (yes, it's
 even documented that way) - deadly for edge-triggered interfaces where
-you absolutely have to know whether an event occured or not because you
+you absolutely have to know whether an event occurred or not because you
 have to re-arm the watcher.
 
 Fortunately libev seems to be able to work around these idiocies.
