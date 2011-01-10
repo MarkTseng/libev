@@ -307,7 +307,7 @@ This function can be used to "simulate" a signal receive. It is completely
 safe to call this function at any time, from any context, including signal
 handlers or random threads.
 
-It's main use is to customise signal handling in your process, especially
+Its main use is to customise signal handling in your process, especially
 in the presence of threads. For example, you could block signals
 by default in all threads (and specifying C<EVFLAG_NOSIGMASK> when
 creating any loops), and in one thread, use C<sigwait> or any other
