@@ -2113,9 +2113,6 @@ ev_invoke_pending (EV_P)
       {
         ANPENDING *p = pendings [pri] + --pendingcnt [pri];
 
-        /*assert (("libev: non-pending watcher on pending list", p->w->pending));*/
-        /* ^ this is no longer true, as pending_w could be here */
-
         p->w->pending = 0;
         EV_CB_INVOKE (p->w, p->events);
         EV_FREQUENT_CHECK;

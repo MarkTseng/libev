@@ -1359,70 +1359,8 @@ functions that do not need a watcher.
 
 =back
 
-=head2 ASSOCIATING CUSTOM DATA WITH A WATCHER
-
-Each watcher has, by default, a member C<void *data> that you can change
-and read at any time: libev will completely ignore it. This can be used
-to associate arbitrary data with your watcher. If you need more data and
-don't want to allocate memory and store a pointer to it in that data
-member, you can also "subclass" the watcher type and provide your own
-data:
-
-   struct my_io
-   {
-     ev_io io;
-     int otherfd;
-     void *somedata;
-     struct whatever *mostinteresting;
-   };
-
-   ...
-   struct my_io w;
-   ev_io_init (&w.io, my_cb, fd, EV_READ);
-
-And since your callback will be called with a pointer to the watcher, you
-can cast it back to your own type:
-
-   static void my_cb (struct ev_loop *loop, ev_io *w_, int revents)
-   {
-     struct my_io *w = (struct my_io *)w_;
-     ...
-   }
-
-More interesting and less C-conformant ways of casting your callback type
-instead have been omitted.
-
-Another common scenario is to use some data structure with multiple
-embedded watchers:
-
-   struct my_biggy
-   {
-     int some_data;
-     ev_timer t1;
-     ev_timer t2;
-   }
-
-In this case getting the pointer to C<my_biggy> is a bit more
-complicated: Either you store the address of your C<my_biggy> struct
-in the C<data> member of the watcher (for woozies), or you need to use
-some pointer arithmetic using C<offsetof> inside your watchers (for real
-programmers):
-
-   #include <stddef.h>
-
-   static void
-   t1_cb (EV_P_ ev_timer *w, int revents)
-   {
-     struct my_biggy big = (struct my_biggy *)
-       (((char *)w) - offsetof (struct my_biggy, t1));
-   }
-
-   static void
-   t2_cb (EV_P_ ev_timer *w, int revents)
-   {
-     struct my_biggy big = (struct my_biggy *)
-       (((char *)w) - offsetof (struct my_biggy, t2));
-   }
+See also the L<ASSOCIATING CUSTOM DATA WITH A WATCHER> and L<BUILDING YOUR
+OWN COMPOSITE WATCHERS> idioms.
 
 =head2 WATCHER STATES
 
@@ -3458,6 +3396,74 @@ This section explains some common idioms that are not immediately
 obvious. Note that examples are sprinkled over the whole manual, and this
 section only contains stuff that wouldn't fit anywhere else.
 
+=head2 ASSOCIATING CUSTOM DATA WITH A WATCHER
+
+Each watcher has, by default, a C<void *data> member that you can read
+or modify at any time: libev will completely ignore it. This can be used
+to associate arbitrary data with your watcher. If you need more data and
+don't want to allocate memory separately and store a pointer to it in that
+data member, you can also "subclass" the watcher type and provide your own
+data:
+
+   struct my_io
+   {
+     ev_io io;
+     int otherfd;
+     void *somedata;
+     struct whatever *mostinteresting;
+   };
+
+   ...
+   struct my_io w;
+   ev_io_init (&w.io, my_cb, fd, EV_READ);
+
+And since your callback will be called with a pointer to the watcher, you
+can cast it back to your own type:
+
+   static void my_cb (struct ev_loop *loop, ev_io *w_, int revents)
+   {
+     struct my_io *w = (struct my_io *)w_;
+     ...
+   }
+
+More interesting and less C-conformant ways of casting your callback
+function type instead have been omitted.
+
+=head2 BUILDING YOUR OWN COMPOSITE WATCHERS
+
+Another common scenario is to use some data structure with multiple
+embedded watchers, in effect creating your own watcher that combines
+multiple libev event sources into one "super-watcher":
+
+   struct my_biggy
+   {
+     int some_data;
+     ev_timer t1;
+     ev_timer t2;
+   }
+
+In this case getting the pointer to C<my_biggy> is a bit more
+complicated: Either you store the address of your C<my_biggy> struct in
+the C<data> member of the watcher (for woozies or C++ coders), or you need
+to use some pointer arithmetic using C<offsetof> inside your watchers (for
+real programmers):
+
+   #include <stddef.h>
+
+   static void
+   t1_cb (EV_P_ ev_timer *w, int revents)
+   {
+     struct my_biggy big = (struct my_biggy *)
+       (((char *)w) - offsetof (struct my_biggy, t1));
+   }
+
+   static void
+   t2_cb (EV_P_ ev_timer *w, int revents)
+   {
+     struct my_biggy big = (struct my_biggy *)
+       (((char *)w) - offsetof (struct my_biggy, t2));
+   }
+
 =head2 MODEL/NESTED EVENT LOOP INVOCATIONS AND EXIT CONDITIONS
 
 Often (especially in GUI toolkits) there are places where you have
@@ -3635,7 +3641,63 @@ an event loop currently blocking in the kernel will have no knowledge
 about the newly added timer. By waking up the loop it will pick up any new
 watchers in the next event loop iteration.
 
-=back
+=head2 THREADS, COROUTINES, CONTINUATIONS, QUEUES... INSTEAD OF CALLBACKS
+
+While the overhead of a callback that e.g. schedules a thread is small, it
+is still an overhead. If you embed libev, and your main usage is with some
+kind of threads or coroutines, you might want to customise libev so that
+doesn't need callbacks anymore.
+
+Imagine you have coroutines that you can switch to using a function
+C<switch_to (coro)>, that libev runs in a coroutine called C<libev_coro>
+and that due to some magic, the currently active coroutine is stored in a
+global called C<current_coro>. Then you can build your own "wait for libev
+event" primitive by changing C<EV_CB_DECLARE> and C<EV_CB_INVOKE> (note
+the differing C<;> conventions):
+
+   #define EV_CB_DECLARE(type)   struct my_coro *cb;
+   #define EV_CB_INVOKE(watcher) switch_to ((watcher)->cb)
+
+That means instead of having a C callback function, you store the
+coroutine to switch to in each watcher, and instead of having libev call
+your callback, you instead have it switch to that coroutine.
+
+A coroutine might now wait for an event with a function called
+C<wait_for_event>. (the watcher needs to be started, as always, but it doesn't
+matter when, or whether the watcher is active or not when this function is
+called):
+
+   void
+   wait_for_event (ev_watcher *w)
+   {
+     ev_cb_set (w) = current_coro;
+     switch_to (libev_coro);
+   }
+
+That basically suspends the coroutine inside C<wait_for_event> and
+continues the libev coroutine, which, when appropriate, switches back to
+this or any other coroutine. I am sure if you sue this your own :)
+
+You can do similar tricks if you have, say, threads with an event queue -
+instead of storing a coroutine, you store the queue object and instead of
+switching to a coroutine, you push the watcher onto the queue and notify
+any waiters.
+
+To embed libev, see L<EMBEDDING>, but in short, it's easiest to create two
+files, F<my_ev.h> and F<my_ev.c> that include the respective libev files:
+
+   // my_ev.h
+   #define EV_CB_DECLARE(type)   struct my_coro *cb;
+   #define EV_CB_INVOKE(watcher) switch_to ((watcher)->cb);
+   #include "../libev/ev.h"
+
+   // my_ev.c
+   #define EV_H "my_ev.h"
+   #include "../libev/ev.c"
+
+And then use F<my_ev.h> when you would normally use F<ev.h>, and compile
+F<my_ev.c> into your project. When properly specifying include paths, you
+can even use F<ev.h> as header file name directly.
 
 
 =head1 LIBEVENT EMULATION
@@ -4575,7 +4637,7 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
    #include "ev_cpp.h"
    #include "ev.c"
 
-=head1 INTERACTION WITH OTHER PROGRAMS OR LIBRARIES
+=head1 INTERACTION WITH OTHER PROGRAMS, LIBRARIES OR THE ENVIRONMENT
 
 =head2 THREADS AND COROUTINES
 
