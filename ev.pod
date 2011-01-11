@@ -3635,6 +3635,8 @@ an event loop currently blocking in the kernel will have no knowledge
 about the newly added timer. By waking up the loop it will pick up any new
 watchers in the next event loop iteration.
 
+=back
+
 
 =head1 LIBEVENT EMULATION
 
@@ -4573,7 +4575,7 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
    #include "ev_cpp.h"
    #include "ev.c"
 
-=head1 INTERACTION WITH OTHER PROGRAMS, LIBRARIES OR THE ENVIRONMENT
+=head1 INTERACTION WITH OTHER PROGRAMS OR LIBRARIES
 
 =head2 THREADS AND COROUTINES
 
