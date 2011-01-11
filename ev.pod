@@ -3506,7 +3506,7 @@ To exit from any of these loops, just set the corresponding exit variable:
 =head2 THREAD LOCKING EXAMPLE
 
 Here is a fictitious example of how to run an event loop in a different
-thread than where callbacks are being invoked and watchers are
+thread from where callbacks are being invoked and watchers are
 created/added/removed.
 
 For a real-world example, see the C<EV::Loop::Async> perl module,
