@@ -3458,9 +3458,7 @@ This section explains some common idioms that are not immediately
 obvious. Note that examples are sprinkled over the whole manual, and this
 section only contains stuff that wouldn't fit anywhere else.
 
-=over 4
-
-=item Model/nested event loop invocations and exit conditions.
+=head2 MODEL/NESTED EVENT LOOP INVOCATIONS AND EXIT CONDITIONS
 
 Often (especially in GUI toolkits) there are places where you have
 I<modal> interaction, which is most easily implemented by recursively
@@ -3499,7 +3497,7 @@ To exit from any of these loops, just set the corresponding exit variable:
    // exit both
    exit_main_loop = exit_nested_loop = 1;
 
-=item Thread locking example
+=head2 THREAD LOCKING EXAMPLE
 
 Here is a fictitious example of how to run an event loop in a different
 thread than where callbacks are being invoked and watchers are
@@ -3636,8 +3634,6 @@ Note that sending the C<ev_async> watcher is required because otherwise
 an event loop currently blocking in the kernel will have no knowledge
 about the newly added timer. By waking up the loop it will pick up any new
 watchers in the next event loop iteration.
-
-=back
 
 
 =head1 LIBEVENT EMULATION
@@ -4577,7 +4573,7 @@ And a F<ev_cpp.C> implementation file that contains libev proper and is compiled
    #include "ev_cpp.h"
    #include "ev.c"
 
-=head1 INTERACTION WITH OTHER PROGRAMS OR LIBRARIES
+=head1 INTERACTION WITH OTHER PROGRAMS, LIBRARIES OR THE ENVIRONMENT
 
 =head2 THREADS AND COROUTINES
 
@@ -4638,7 +4634,7 @@ watcher callback into the event loop interested in the signal.
 
 =back
 
-See also L<Thread locking example>.
+See also L<THREAD LOCKING EXAMPLE>.
 
 =head3 COROUTINES
 
