@@ -19,6 +19,7 @@ ev_embed_sweep
 ev_embeddable_backends
 ev_feed_event
 ev_feed_fd_event
+ev_feed_signal
 ev_feed_signal_event
 ev_fork_start
 ev_fork_stop
