@@ -1,6 +1,6 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
-4.03
+4.03 Tue Jan 11 14:37:25 CET 2011
 	- officially support polling files with all backends.
 	- support files, /dev/zero etc. the same way as select in the epoll
           backend, by generating events on our own.
