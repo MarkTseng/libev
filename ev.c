@@ -817,6 +817,14 @@ ev_sleep (ev_tstamp delay)
     }
 }
 
+inline_speed int
+ev_timeout_to_ms (ev_tstamp timeout)
+{
+  int ms = timeout * 1000. + .999999;
+
+  return expect_true (ms) ? ms : timeout < 1e-6 ? 0 : 1;
+}
+
 /*****************************************************************************/
 
 #define MALLOC_ROUND 4096 /* prefer to allocate in chunks of this size, must be 2**n and >> 4 longs */

@@ -148,7 +148,7 @@ epoll_poll (EV_P_ ev_tstamp timeout)
   /* the default libev max wait time, however. */
   EV_RELEASE_CB;
   eventcnt = epoll_wait (backend_fd, epoll_events, epoll_eventmax,
-                         epoll_epermcnt ? 0 : (int)ceil (timeout * 1000.));
+                         epoll_epermcnt ? 0 : ev_timeout_to_ms (timeout));
   EV_ACQUIRE_CB;
 
   if (expect_false (eventcnt < 0))
