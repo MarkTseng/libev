@@ -1353,6 +1353,7 @@ pipecb (EV_P_ ev_io *iow, int revents)
       read (evpipe [0], &dummy, 1);
     }
 
+#if EV_SIGNAL_ENABLE
   if (sig_pending)
     {    
       sig_pending = 0;
@@ -1361,6 +1362,7 @@ pipecb (EV_P_ ev_io *iow, int revents)
         if (expect_false (signals [i].pending))
           ev_feed_signal_event (EV_A_ i + 1);
     }
+#endif
 
 #if EV_ASYNC_ENABLE
   if (async_pending)

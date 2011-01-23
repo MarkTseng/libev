@@ -1380,8 +1380,10 @@ Before a watcher can be registered with the event looop it has to be
 initialised. This can be done with a call to C<ev_TYPE_init>, or calls to
 C<ev_init> followed by the watcher-specific C<ev_TYPE_set> function.
 
-In this state it is simply some block of memory that is suitable for use
-in an event loop. It can be moved around, freed, reused etc. at will.
+In this state it is simply some block of memory that is suitable for
+use in an event loop. It can be moved around, freed, reused etc. at
+will - as long as you either keep the memory contents intact, or call
+C<ev_TYPE_init> again.
 
 =item started/running/active
 
@@ -1419,8 +1421,9 @@ of whether it was active or not, so stopping a watcher explicitly before
 freeing it is often a good idea.
 
 While stopped (and not pending) the watcher is essentially in the
-initialised state, that is it can be reused, moved, modified in any way
-you wish.
+initialised state, that is, it can be reused, moved, modified in any way
+you wish (but when you trash the memory block, you need to C<ev_TYPE_init>
+it again).
 
 =back
 
