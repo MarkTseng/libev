@@ -60,7 +60,7 @@ libev - a high performance full-featured event loop written in C
      // now wait for events to arrive
      ev_run (loop, 0);
 
-     // unloop was called, so exit
+     // break was called, so exit
      return 0;
    }
 
@@ -870,7 +870,7 @@ anymore.
    ... queue jobs here, make sure they register event watchers as long
    ... as they still have work to do (even an idle watcher will do..)
    ev_run (my_loop, 0);
-   ... jobs done or somebody called unloop. yeah!
+   ... jobs done or somebody called break. yeah!
 
 =item ev_break (loop, how)
 
@@ -3549,7 +3549,7 @@ First, you need to associate some data with the event loop:
       ev_set_invoke_pending_cb (EV_A_ l_invoke);
       ev_set_loop_release_cb (EV_A_ l_release, l_acquire);
 
-      // then create the thread running ev_loop
+      // then create the thread running ev_run
       pthread_create (&u->tid, 0, l_run, EV_A);
    }
 
