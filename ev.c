@@ -378,7 +378,8 @@ EV_CPP(extern "C" {)
 #endif
 
 #if !EV_USE_NANOSLEEP
-# ifndef _WIN32
+/* hp-ux has it in sys/time.h, which we unconditionally include above */
+# if !defined(_WIN32) && !defined(__hpux)
 #  include <sys/select.h>
 # endif
 #endif
@@ -2193,6 +2194,15 @@ timers_reify (EV_P)
 }
 
 #if EV_PERIODIC_ENABLE
+
+inline_speed
+periodic_recalc (EV_P_ ev_periodic *w)
+{
+  /* TODO: use slow but potentially more correct incremental algo, */
+  /* also do not rely on ceil */
+  ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
+}
+
 /* make periodics pending */
 inline_size void
 periodics_reify (EV_P)
@@ -2221,7 +2231,8 @@ periodics_reify (EV_P)
             }
           else if (w->interval)
             {
-              ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
+              periodic_recalc (EV_A_ w);
+
               /* if next trigger time is not sufficiently in the future, put it there */
               /* this might happen because of floating point inexactness */
               if (ev_at (w) - ev_rt_now < TIME_EPSILON)
@@ -2265,7 +2276,7 @@ periodics_reschedule (EV_P)
       if (w->reschedule_cb)
         ev_at (w) = w->reschedule_cb (w, ev_rt_now);
       else if (w->interval)
-        ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
+        periodic_recalc (EV_A_ w);
 
       ANHE_at_cache (periodics [i]);
     }
@@ -2767,8 +2778,7 @@ ev_periodic_start (EV_P_ ev_periodic *w)
   else if (w->interval)
     {
       assert (("libev: ev_periodic_start called with negative interval value", w->interval >= 0.));
-      /* this formula differs from the one in periodic_reify because we do not always round up */
-      ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
+      periodic_recalc (EV_A_ w);
     }
   else
     ev_at (w) = w->offset;

@@ -39,8 +39,11 @@
 
 #ifndef _WIN32
 /* for unix systems */
-# include <sys/select.h>
 # include <inttypes.h>
+# ifndef __hpux
+/* for REAL unix systems */
+# include <sys/select.h>
+# endif
 #endif
 
 #ifndef EV_SELECT_USE_FD_SET
