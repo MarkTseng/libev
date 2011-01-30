@@ -3190,7 +3190,7 @@ cleanup functions are called.
 
 =head2 C<ev_async> - how to wake up an event loop
 
-In general, you cannot use an C<ev_run> from multiple threads or other
+In general, you cannot use an C<ev_loop> from multiple threads or other
 asynchronous sources such as signal handlers (as opposed to multiple event
 loops - those are of course safe to use in different threads).
 
@@ -3310,10 +3310,12 @@ trust me.
 =item ev_async_send (loop, ev_async *)
 
 Sends/signals/activates the given C<ev_async> watcher, that is, feeds
-an C<EV_ASYNC> event on the watcher into the event loop. Unlike
-C<ev_feed_event>, this call is safe to do from other threads, signal or
-similar contexts (see the discussion of C<EV_ATOMIC_T> in the embedding
-section below on what exactly this means).
+an C<EV_ASYNC> event on the watcher into the event loop, and instanlty
+returns.
+
+Unlike C<ev_feed_event>, this call is safe to do from other threads,
+signal or similar contexts (see the discussion of C<EV_ATOMIC_T> in the
+embedding section below on what exactly this means).
 
 Note that, as with other watchers in libev, multiple events might get
 compressed into a single callback invocation (another way to look at this
