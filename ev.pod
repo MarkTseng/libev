@@ -5239,5 +5239,5 @@ to be started (attached to an event loop) before they can receive events.
 =head1 AUTHOR
 
 Marc Lehmann <libev@schmorp.de>, with repeated corrections by Mikael
-Magnusson and Emanuele Giaquinta.
+Magnusson and Emanuele Giaquinta, and minor corrections by many others.
 
