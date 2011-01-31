@@ -42,7 +42,7 @@
 # include <inttypes.h>
 # ifndef __hpux
 /* for REAL unix systems */
-# include <sys/select.h>
+#  include <sys/select.h>
 # endif
 #endif
 
