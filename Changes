@@ -5,6 +5,8 @@ TODO: ev_loop_wakeup
 TODO: windows handle caching, added/not removed in ev_select.c
 	- do no rely on ceil() in ev_e?poll.c.
         - backport libev to HP-UX versions before 11 v3.
+        - configure did not detect nanosleep and clock_gettime properly when
+          they are available in the libc (as opposed to -lrt).
 
 4.03 Tue Jan 11 14:37:25 CET 2011
 	- officially support polling files with all backends.
