@@ -5226,7 +5226,7 @@ The physical time that is observed. It is apparently strictly monotonic :)
 =item wall-clock time
 
 The time and date as shown on clocks. Unlike real time, it can actually
-be wrong and jump forwards and backwards, e.g. when the you adjust your
+be wrong and jump forwards and backwards, e.g. when you adjust your
 clock.
 
 =item watcher
