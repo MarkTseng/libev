@@ -185,7 +185,7 @@ struct ev_loop;
 # define EV_INLINE static
 #endif
 
-/* EV_PROTOTYPES can be sued to switch of prototype declarations */
+/* EV_PROTOTYPES can be used to switch of prototype declarations */
 #ifndef EV_PROTOTYPES
 # define EV_PROTOTYPES 1
 #endif
@@ -193,7 +193,7 @@ struct ev_loop;
 /*****************************************************************************/
 
 #define EV_VERSION_MAJOR 4
-#define EV_VERSION_MINOR 3
+#define EV_VERSION_MINOR 4
 
 /* eventmask, revents, events... */
 enum {
