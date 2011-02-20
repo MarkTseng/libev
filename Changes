@@ -3,7 +3,7 @@ Revision history for libev, a high-performance and full-featured event loop.
 TODO: ev_loop_prefork hint?
 
 	- change the default periodic reschedule function to hopefully be more
-          exact and correct.
+          exact and correct even in corner cases or in the far future.
         - document reasonable ranges for interval and offset.
         - do not rely on -lm anymore: use it when available but use our
           own floor () if it is missing. This should make it easier to embed.
