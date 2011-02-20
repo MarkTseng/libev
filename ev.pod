@@ -2153,9 +2153,12 @@ Another way to think about it (for the mathematically inclined) is that
 C<ev_periodic> will try to run the callback in this mode at the next possible
 time where C<time = offset (mod interval)>, regardless of any time jumps.
 
-For numerical stability it is preferable that the C<offset> value is near
-C<ev_now ()> (the current time), but there is no range requirement for
-this value, and in fact is often specified as zero.
+The C<interval> I<MUST> be positive, and for numerical stability, the
+interval value should be higher than C<1/8192> (which is around 100
+microseconds) and C<offset> should be higher than C<0> and should have
+at most a similar magnitude as the current time (say, within a factor of
+ten). Typical values for offset are, in fact, C<0> or something between
+C<0> and C<interval>, which is also the recommended range.
 
 Note also that there is an upper limit to how often a timer can fire (CPU
 speed for example), so if C<interval> is very small then timing stability
@@ -4205,6 +4208,15 @@ F<event.h> that are not directly supported by the libev core alone.
 
 In standalone mode, libev will still try to automatically deduce the
 configuration, but has to be more conservative.
+
+=item EV_USE_FLOOR
+
+If defined to be C<1>, libev will use the C<floor ()> function for its
+periodic reschedule calculations, otherwise libev will fall back on a
+portable (slower) implementation. If you enable this, you usually have to
+link against libm or something equivalent. Enabling this when the C<floor>
+function is not available will fail, so the safe default is to not enable
+this.
 
 =item EV_USE_MONOTONIC
 

@@ -45,6 +45,12 @@
 #  include "config.h"
 # endif
 
+#if HAVE_FLOOR
+# ifndef EV_USE_FLOOR
+#  define EV_USE_FLOOR 1
+# endif
+#endif
+
 # if HAVE_CLOCK_SYSCALL
 #  ifndef EV_USE_CLOCK_SYSCALL
 #   define EV_USE_CLOCK_SYSCALL 1
@@ -158,7 +164,6 @@
  
 #endif
 
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
@@ -232,6 +237,10 @@ EV_CPP(extern "C" {)
 /* to make it compile regardless, just remove the above line, */
 /* but consider reporting it, too! :) */
 # define EV_NSIG 65
+#endif
+
+#ifndef EV_USE_FLOOR
+# define EV_USE_FLOOR 0
 #endif
 
 #ifndef EV_USE_CLOCK_SYSCALL
@@ -445,14 +454,11 @@ struct signalfd_siginfo
 #endif
 
 /*
- * This is used to avoid floating point rounding problems.
- * It is added to ev_rt_now when scheduling periodics
- * to ensure progress, time-wise, even when rounding
- * errors are against us.
+ * This is used to work around floating point rounding problems.
  * This value is good at least till the year 4000.
- * Better solutions welcome.
  */
-#define TIME_EPSILON  0.0001220703125 /* 1/8192 */
+#define MIN_INTERVAL  0.0001220703125 /* 1/2**13, good till 4000 */
+/*#define MIN_INTERVAL  0.00000095367431640625 /* 1/2**20, good till 2200 */
 
 #define MIN_TIMEJUMP  1. /* minimum timejump that gets detected (if monotonic clock available) */
 #define MAX_BLOCKTIME 59.743 /* never wait longer than this time (to detect time jumps) */
@@ -521,6 +527,54 @@ static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? 
 
 #ifdef _WIN32
 # include "ev_win32.c"
+#endif
+
+/*****************************************************************************/
+
+/* define a suitable floor function (only used by periodics atm) */
+
+#if EV_USE_FLOOR
+# include <math.h>
+# define ev_floor(v) floor (v)
+#else
+
+#include <float.h>
+
+/* a floor() replacement function, should be independent of ev_tstamp type */
+static ev_tstamp noinline
+ev_floor (ev_tstamp v)
+{
+  /* the choice of shift factor is not terribly important */
+#if FLT_RADIX != 2 /* assume FLT_RADIX == 10 */
+  const ev_tstamp shift = sizeof (unsigned long) >= 8 ? 10000000000000000000. : 1000000000.;
+#else
+  const ev_tstamp shift = sizeof (unsigned long) >= 8 ? 18446744073709551616. : 4294967296.;
+#endif
+
+  /* argument too large for an unsigned long? */
+  if (expect_false (v >= shift))
+    {
+      ev_tstamp f;
+
+      if (v == v - 1.)
+        return v; /* very large number */
+
+      f = shift * ev_floor (v * (1. / shift));
+      return f + ev_floor (v - f);
+    }
+
+  /* special treatment for negative args? */
+  if (expect_false (v < 0.))
+    {
+      ev_tstamp f = -ev_floor (-v);
+
+      return f - (f == v ? 0 : 1);
+    }
+
+  /* fits into an unsigned long */
+  return (unsigned long)v;
+}
+
 #endif
 
 /*****************************************************************************/
@@ -2210,12 +2264,28 @@ timers_reify (EV_P)
 
 #if EV_PERIODIC_ENABLE
 
-inline_speed void
+static void noinline
 periodic_recalc (EV_P_ ev_periodic *w)
 {
-  /* TODO: use slow but potentially more correct incremental algo, */
-  /* also do not rely on ceil */
-  ev_at (w) = w->offset + ceil ((ev_rt_now - w->offset) / w->interval) * w->interval;
+  ev_tstamp interval = w->interval > MIN_INTERVAL ? w->interval : MIN_INTERVAL;
+  ev_tstamp at = w->offset + interval * ev_floor ((ev_rt_now - w->offset) / interval);
+
+  /* the above almost always errs on the low side */
+  while (at <= ev_rt_now)
+    {
+      ev_tstamp nat = at + w->interval;
+
+      /* when resolution fails us, we use ev_rt_now */
+      if (expect_false (nat == at))
+        {
+          at = ev_rt_now;
+          break;
+        }
+
+      at = nat;
+    }
+
+  ev_at (w) = at;
 }
 
 /* make periodics pending */
@@ -2247,20 +2317,6 @@ periodics_reify (EV_P)
           else if (w->interval)
             {
               periodic_recalc (EV_A_ w);
-
-              /* if next trigger time is not sufficiently in the future, put it there */
-              /* this might happen because of floating point inexactness */
-              if (ev_at (w) - ev_rt_now < TIME_EPSILON)
-                {
-                  ev_at (w) += w->interval;
-
-                  /* if interval is unreasonably low we might still have a time in the past */
-                  /* so correct this. this will make the periodic very inexact, but the user */
-                  /* has effectively asked to get triggered more often than possible */
-                  if (ev_at (w) < ev_rt_now)
-                    ev_at (w) = ev_rt_now;
-                }
-
               ANHE_at_cache (periodics [HEAP0]);
               downheap (periodics, periodiccnt, HEAP0);
             }
@@ -2348,9 +2404,12 @@ time_update (EV_P_ ev_tstamp max_block)
        */
       for (i = 4; --i; )
         {
+          ev_tstamp diff;
           rtmn_diff = ev_rt_now - mn_now;
 
-          if (expect_true (fabs (odiff - rtmn_diff) < MIN_TIMEJUMP))
+          diff = odiff - rtmn_diff;
+
+          if (expect_true ((diff < 0. ? -diff : diff) < MIN_TIMEJUMP))
             return; /* all is well */
 
           ev_rt_now = ev_time ();
