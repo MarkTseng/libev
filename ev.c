@@ -1036,7 +1036,7 @@ fd_reify (EV_P)
       int fd = fdchanges [i];
       ANFD *anfd = anfds + fd;
 
-      if (anfd->reify & EV__IOFDSET)
+      if (anfd->reify & EV__IOFDSET && anfd->head)
         {
           SOCKET handle = EV_FD_TO_WIN32_HANDLE (fd);
 
