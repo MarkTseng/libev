@@ -485,10 +485,10 @@ C<EV_WRITE> to C<POLLOUT | POLLERR | POLLHUP>.
 Use the linux-specific epoll(7) interface (for both pre- and post-2.6.9
 kernels).
 
-For few fds, this backend is a bit little slower than poll and select,
-but it scales phenomenally better. While poll and select usually scale
-like O(total_fds) where n is the total number of fds (or the highest fd),
-epoll scales either O(1) or O(active_fds).
+For few fds, this backend is a bit little slower than poll and select, but
+it scales phenomenally better. While poll and select usually scale like
+O(total_fds) where total_fds is the total number of fds (or the highest
+fd), epoll scales either O(1) or O(active_fds).
 
 The epoll mechanism deserves honorable mention as the most misdesigned
 of the more advanced event mechanisms: mere annoyances include silently
