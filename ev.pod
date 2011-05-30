@@ -827,7 +827,9 @@ with something not expressible using other libev watchers (i.e. "roll your
 own C<ev_run>"). However, a pair of C<ev_prepare>/C<ev_check> watchers is
 usually a better approach for this kind of thing.
 
-Here are the gory details of what C<ev_run> does:
+Here are the gory details of what C<ev_run> does (this is for your
+understanding, not a guarantee that things will work exactly like this in
+future versions):
 
    - Increment loop depth.
    - Reset the ev_break status.
