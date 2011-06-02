@@ -195,7 +195,12 @@ select_poll (EV_P_ ev_tstamp timeout)
        */
       if (errno == EINVAL)
         {
-          ev_sleep (timeout);
+          if (timeout)
+            {
+              unsigned long ms = timeout * 1e3;
+              Sleep (ms ? ms : 1);
+            }
+
           return;
         }
       #endif
@@ -269,7 +274,7 @@ select_poll (EV_P_ ev_tstamp timeout)
 int inline_size
 select_init (EV_P_ int flags)
 {
-  backend_fudge  = 0.; /* posix says this is zero */
+  backend_fudge  = 1e-6;
   backend_modify = select_modify;
   backend_poll   = select_poll;
 
@@ -306,5 +311,4 @@ select_destroy (EV_P)
   ev_free (vec_eo);
   #endif
 }
-
 

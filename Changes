@@ -5,6 +5,9 @@ TODO: ev_loop_wakeup
 TODO: confusion about threads ongiong
 TODO: not_blocked flag.
 
+	- correct backend_fudge for most backends, and implement a windows
+          specific workaround to avoid looping because we call both
+          select and Sleep, both with different time resolutions.
 	- change the default periodic reschedule function to hopefully be more
           exact and correct even in corner cases or in the far future.
         - document reasonable ranges for interval and offset.

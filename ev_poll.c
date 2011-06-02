@@ -129,7 +129,7 @@ poll_poll (EV_P_ ev_tstamp timeout)
 int inline_size
 poll_init (EV_P_ int flags)
 {
-  backend_fudge  = 0.; /* posix says this is zero */
+  backend_fudge  = 1e-3;
   backend_modify = poll_modify;
   backend_poll   = poll_poll;
 

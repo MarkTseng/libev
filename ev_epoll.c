@@ -234,7 +234,7 @@ epoll_init (EV_P_ int flags)
 
   fcntl (backend_fd, F_SETFD, FD_CLOEXEC);
 
-  backend_fudge  = 0.; /* kernel sources seem to indicate this to be zero */
+  backend_fudge  = 1./1024.; /* epoll does sometimes return early, this is just to avoid the worst */
   backend_modify = epoll_modify;
   backend_poll   = epoll_poll;
 
