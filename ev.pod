@@ -501,19 +501,22 @@ forks then I<both> parent and child process have to recreate the epoll
 set, which can take considerable time (one syscall per file descriptor)
 and is of course hard to detect.
 
-Epoll is also notoriously buggy - embedding epoll fds I<should> work, but
-of course I<doesn't>, and epoll just loves to report events for totally
-I<different> file descriptors (even already closed ones, so one cannot
-even remove them from the set) than registered in the set (especially
-on SMP systems). Libev tries to counter these spurious notifications by
-employing an additional generation counter and comparing that against the
-events to filter out spurious ones, recreating the set when required. Last
+Epoll is also notoriously buggy - embedding epoll fds I<should> work,
+but of course I<doesn't>, and epoll just loves to report events for
+totally I<different> file descriptors (even already closed ones, so
+one cannot even remove them from the set) than registered in the set
+(especially on SMP systems). Libev tries to counter these spurious
+notifications by employing an additional generation counter and comparing
+that against the events to filter out spurious ones, recreating the set
+when required. Epoll also errornously rounds down timeouts, but gives you
+no way to know when and by how much, so sometimes you have to busy-wait
+because epoll returns immediately despite a nonzero timeout. And last
 not least, it also refuses to work with some file descriptors which work
 perfectly fine with C<select> (files, many character devices...).
 
-Epoll is truly the train wreck analog among event poll mechanisms,
-a frankenpoll, cobbled together in a hurry, no thought to design or
-interaction with others.
+Epoll is truly the train wreck among event poll mechanisms, a frankenpoll,
+cobbled together in a hurry, no thought to design or interaction with
+others. Oh, the pain, will it ever stop...
 
 While stopping, setting and starting an I/O watcher in the same iteration
 will result in some caching, there is still a system call per such
