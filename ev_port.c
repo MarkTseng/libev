@@ -147,6 +147,12 @@ port_init (EV_P_ int flags)
 
   fcntl (backend_fd, F_SETFD, FD_CLOEXEC); /* not sure if necessary, hopefully doesn't hurt */
 
+  /* if my reading of the opensolaris kernel sources are correct, then
+   * opensolaris does something very stupid: it checks if the time has already
+   * elapsed and doesn't round up if that is the case,m otherwise it DOES round
+   * up. Since we can't know what the case is, we need to guess by using a
+   * "large enough" timeout. Normally, 1e-9 would be correct.
+   */
   backend_fudge  = 1e-3; /* needed to compensate for port_getn returning early */
   backend_modify = port_modify;
   backend_poll   = port_poll;
