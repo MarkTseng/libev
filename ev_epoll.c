@@ -236,9 +236,9 @@ epoll_init (EV_P_ int flags)
 
   fcntl (backend_fd, F_SETFD, FD_CLOEXEC);
 
-  backend_fudge  = 1./1024.; /* epoll does sometimes return early, this is just to avoid the worst */
-  backend_modify = epoll_modify;
-  backend_poll   = epoll_poll;
+  backend_mintime = 1./1024.; /* epoll does sometimes return early, this is just to avoid the worst */
+  backend_modify  = epoll_modify;
+  backend_poll    = epoll_poll;
 
   epoll_eventmax = 64; /* initial number of events receivable per poll */
   epoll_events = (struct epoll_event *)ev_malloc (sizeof (struct epoll_event) * epoll_eventmax);

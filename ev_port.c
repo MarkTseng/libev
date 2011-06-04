@@ -153,9 +153,9 @@ port_init (EV_P_ int flags)
    * up. Since we can't know what the case is, we need to guess by using a
    * "large enough" timeout. Normally, 1e-9 would be correct.
    */
-  backend_fudge  = 1e-3; /* needed to compensate for port_getn returning early */
-  backend_modify = port_modify;
-  backend_poll   = port_poll;
+  backend_mintime = 1e-3; /* needed to compensate for port_getn returning early */
+  backend_modify  = port_modify;
+  backend_poll    = port_poll;
 
   port_eventmax = 64; /* initial number of events receivable per poll */
   port_events = (port_event_t *)ev_malloc (sizeof (port_event_t) * port_eventmax);

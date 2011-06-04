@@ -129,9 +129,9 @@ poll_poll (EV_P_ ev_tstamp timeout)
 int inline_size
 poll_init (EV_P_ int flags)
 {
-  backend_fudge  = 1e-3;
-  backend_modify = poll_modify;
-  backend_poll   = poll_poll;
+  backend_mintime = 1e-3;
+  backend_modify  = poll_modify;
+  backend_poll    = poll_poll;
 
   pollidxs = 0; pollidxmax = 0;
   polls    = 0; pollmax    = 0; pollcnt = 0;
