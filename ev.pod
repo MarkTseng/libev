@@ -957,7 +957,8 @@ at the cost of increasing latency. Timeouts (both C<ev_periodic> and
 C<ev_timer>) will not be affected. Setting this to a non-null value will
 introduce an additional C<ev_sleep ()> call into most loop iterations. The
 sleep time ensures that libev will not poll for I/O events more often then
-once per this interval, on average.
+once per this interval, on average (as long as the host time resolution is
+good enough).
 
 Likewise, by setting a higher I<timeout collect interval> you allow libev
 to spend more time collecting timeouts, at the expense of increased
