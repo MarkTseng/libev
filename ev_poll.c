@@ -92,7 +92,7 @@ poll_poll (EV_P_ ev_tstamp timeout)
   int res;
   
   EV_RELEASE_CB;
-  res = poll (polls, pollcnt, ev_timeout_to_ms (timeout));
+  res = poll (polls, pollcnt, timeout * 1e3);
   EV_ACQUIRE_CB;
 
   if (expect_false (res < 0))

@@ -5,14 +5,17 @@ TODO: ev_loop_wakeup
 TODO: confusion about threads ongiong
 TODO: not_blocked flag.
 
+TODO: ev_sleep suffers from different backend_fudge...
 	- correct backend_fudge for most backends, and implement a windows
           specific workaround to avoid looping because we call both
           select and Sleep, both with different time resolutions.
+        - document range and guarantees of ev_sleep.
 	- change the default periodic reschedule function to hopefully be more
           exact and correct even in corner cases or in the far future.
-        - document reasonable ranges for interval and offset.
+        - document reasonable ranges for periodics interval and offset.
         - do not rely on -lm anymore: use it when available but use our
-          own floor () if it is missing. This should make it easier to embed.
+          own floor () if it is missing. This should make it easier to embed,
+          as no external libraries are required.
 
 4.04 Wed Feb 16 09:01:51 CET 2011
 	- fix two problems in the native win32 backend, where reuse of fd's

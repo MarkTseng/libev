@@ -180,9 +180,15 @@ C<ev_update_now> and C<ev_now>.
 
 =item ev_sleep (ev_tstamp interval)
 
-Sleep for the given interval: The current thread will be blocked until
-either it is interrupted or the given time interval has passed. Basically
-this is a sub-second-resolution C<sleep ()>.
+Sleep for the given interval: The current thread will be blocked
+until either it is interrupted or the given time interval has
+passed (approximately - it might return a bit earlier even if not
+interrupted). Returns immediately if C<< interval <= 0 >>.
+
+Basically this is a sub-second-resolution C<sleep ()>.
+
+The range of the C<interval> is limited - libev only guarantees to work
+with sleep times of up to one day (C<< interval <= 86400 >>).
 
 =item int ev_version_major ()
 
