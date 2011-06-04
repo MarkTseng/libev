@@ -443,7 +443,7 @@ example) that can't properly initialise their signal masks.
 =item C<EVFLAG_NOSIGMASK>
 
 When this flag is specified, then libev will avoid to modify the signal
-mask. Specifically, this means you ahve to make sure signals are unblocked
+mask. Specifically, this means you have to make sure signals are unblocked
 when you want to receive them.
 
 This behaviour is useful when you want to do your own signal handling, or
@@ -514,7 +514,7 @@ one cannot even remove them from the set) than registered in the set
 (especially on SMP systems). Libev tries to counter these spurious
 notifications by employing an additional generation counter and comparing
 that against the events to filter out spurious ones, recreating the set
-when required. Epoll also errornously rounds down timeouts, but gives you
+when required. Epoll also erroneously rounds down timeouts, but gives you
 no way to know when and by how much, so sometimes you have to busy-wait
 because epoll returns immediately despite a nonzero timeout. And last
 not least, it also refuses to work with some file descriptors which work
@@ -1388,7 +1388,7 @@ rules might look complicated, they usually do "the right thing".
 
 =item initialiased
 
-Before a watcher can be registered with the event looop it has to be
+Before a watcher can be registered with the event loop it has to be
 initialised. This can be done with a call to C<ev_TYPE_init>, or calls to
 C<ev_init> followed by the watcher-specific C<ev_TYPE_set> function.
 
@@ -4906,7 +4906,7 @@ model. Libev still offers limited functionality on this platform in
 the form of the C<EVBACKEND_SELECT> backend, and only supports socket
 descriptors. This only applies when using Win32 natively, not when using
 e.g. cygwin. Actually, it only applies to the microsofts own compilers,
-as every compielr comes with a slightly differently broken/incompatible
+as every compiler comes with a slightly differently broken/incompatible
 environment.
 
 Lifting these limitations would basically require the full
