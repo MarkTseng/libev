@@ -2507,14 +2507,14 @@ ev_run (EV_P_ int flags)
 
             if (timercnt)
               {
-                ev_tstamp to = ANHE_at (timers [HEAP0]) - mn_now + backend_mintime;
+                ev_tstamp to = ANHE_at (timers [HEAP0]) - mn_now;
                 if (waittime > to) waittime = to;
               }
 
 #if EV_PERIODIC_ENABLE
             if (periodiccnt)
               {
-                ev_tstamp to = ANHE_at (periodics [HEAP0]) - ev_rt_now + backend_mintime;
+                ev_tstamp to = ANHE_at (periodics [HEAP0]) - ev_rt_now;
                 if (waittime > to) waittime = to;
               }
 #endif
@@ -2522,6 +2522,11 @@ ev_run (EV_P_ int flags)
             /* don't let timeouts decrease the waittime below timeout_blocktime */
             if (expect_false (waittime < timeout_blocktime))
               waittime = timeout_blocktime;
+
+            /* at this point, we NEED to wait, so we have to ensure */
+            /* to pass a minimum nonzero value to the backend */
+            if (expect_false (waittime < backend_mintime))
+              waittime = backend_mintime;
 
             /* extra check because io_blocktime is commonly 0 */
             if (expect_false (io_blocktime))
