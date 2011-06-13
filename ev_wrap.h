@@ -25,6 +25,8 @@
 #define evfd ((loop)->evfd)
 #define evpipe ((loop)->evpipe)
 #define pipe_w ((loop)->pipe_w)
+#define pipe_write_wanted ((loop)->pipe_write_wanted)
+#define pipe_write_skipped ((loop)->pipe_write_skipped)
 #define curpid ((loop)->curpid)
 #define postfork ((loop)->postfork)
 #define vec_ri ((loop)->vec_ri)
@@ -122,6 +124,8 @@
 #undef evfd
 #undef evpipe
 #undef pipe_w
+#undef pipe_write_wanted
+#undef pipe_write_skipped
 #undef curpid
 #undef postfork
 #undef vec_ri

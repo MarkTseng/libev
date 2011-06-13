@@ -610,11 +610,11 @@ hacks).
 
 On the negative side, the interface is I<bizarre> - so bizarre that
 even sun itself gets it wrong in their code examples: The event polling
-function sometimes returning events to the caller even though an error
+function sometimes returns events to the caller even though an error
 occurred, but with no indication whether it has done so or not (yes, it's
-even documented that way) - deadly for edge-triggered interfaces where
-you absolutely have to know whether an event occurred or not because you
-have to re-arm the watcher.
+even documented that way) - deadly for edge-triggered interfaces where you
+absolutely have to know whether an event occurred or not because you have
+to re-arm the watcher.
 
 Fortunately libev seems to be able to work around these idiocies.
 
@@ -2025,7 +2025,7 @@ do stuff) the timer will not fire more than once per event loop iteration.
 
 =item ev_timer_again (loop, ev_timer *)
 
-This will act as if the timer timed out and restart it again if it is
+This will act as if the timer timed out and restarts it again if it is
 repeating. The exact semantics are:
 
 If the timer is pending, its pending status is cleared.
@@ -3222,9 +3222,6 @@ of "global async watchers" by using a watcher on an otherwise unused
 signal, and C<ev_feed_signal> to signal this watcher from another thread,
 even without knowing which loop owns the signal.
 
-Unlike C<ev_signal> watchers, C<ev_async> works with any event loop, not
-just the default loop.
-
 =head3 Queueing
 
 C<ev_async> does not support queueing of data in any way. The reason
@@ -3333,13 +3330,16 @@ signal or similar contexts (see the discussion of C<EV_ATOMIC_T> in the
 embedding section below on what exactly this means).
 
 Note that, as with other watchers in libev, multiple events might get
-compressed into a single callback invocation (another way to look at this
-is that C<ev_async> watchers are level-triggered, set on C<ev_async_send>,
-reset when the event loop detects that).
+compressed into a single callback invocation (another way to look at
+this is that C<ev_async> watchers are level-triggered: they are set on
+C<ev_async_send>, reset when the event loop detects that).
 
-This call incurs the overhead of a system call only once per event loop
-iteration, so while the overhead might be noticeable, it doesn't apply to
-repeated calls to C<ev_async_send> for the same event loop.
+This call incurs the overhead of at most one extra system call per event
+loop iteration, if the event loop is blocked, and no syscall at all if
+the event loop (or your program) is processing events. That means that
+repeated calls are basically free (there is no need to avoid calls for
+performance reasons) and that the overhead becomes smaller (typically
+zero) under load.
 
 =item bool = ev_async_pending (ev_async *)
 
@@ -4371,10 +4371,11 @@ indicate GNU/Linux + Glibc 2.4 or newer, otherwise disabled.
 =item EV_ATOMIC_T
 
 Libev requires an integer type (suitable for storing C<0> or C<1>) whose
-access is atomic with respect to other threads or signal contexts. No such
-type is easily found in the C language, so you can provide your own type
-that you know is safe for your purposes. It is used both for signal handler "locking"
-as well as for signal and thread safety in C<ev_async> watchers.
+access is atomic and serialised with respect to other threads or signal
+contexts. No such type is easily found in the C language, so you can
+provide your own type that you know is safe for your purposes. It is used
+both for signal handler "locking" as well as for signal and thread safety
+in C<ev_async> watchers.
 
 In the absence of this define, libev will use C<sig_atomic_t volatile>
 (from F<signal.h>), which is usually good enough on most platforms.
@@ -5122,8 +5123,9 @@ watchers becomes O(1) with respect to priority handling.
 =item Processing signals: O(max_signal_number)
 
 Sending involves a system call I<iff> there were no other C<ev_async_send>
-calls in the current loop iteration. Checking for async and signal events
-involves iterating over all running async watchers or all signal numbers.
+calls in the current loop iteration and the loop is currently
+blocked. Checking for async and signal events involves iterating over all
+running async watchers or all signal numbers.
 
 =back
 

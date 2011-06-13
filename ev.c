@@ -1370,27 +1370,36 @@ evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 {
   if (!*flag)
     {
-      int old_errno = errno; /* save errno because write might clobber it */
-      char dummy;
-
       *flag = 1;
 
-#if EV_USE_EVENTFD
-      if (evfd >= 0)
-        {
-          uint64_t counter = 1;
-          write (evfd, &counter, sizeof (uint64_t));
-        }
-      else
-#endif
-        /* win32 people keep sending patches that change this write() to send() */
-        /* and then run away. but send() is wrong, it wants a socket handle on win32 */
-        /* so when you think this write should be a send instead, please find out */
-        /* where your send() is from - it's definitely not the microsoft send, and */
-        /* tell me. thank you. */
-        write (evpipe [1], &dummy, 1);
+      pipe_write_skipped = 1;
 
-      errno = old_errno;
+      if (pipe_write_wanted)
+        {
+          int old_errno = errno; /* save errno because write will clobber it */
+          char dummy;
+
+          pipe_write_skipped = 0;
+
+#if EV_USE_EVENTFD
+          if (evfd >= 0)
+            {
+              uint64_t counter = 1;
+              write (evfd, &counter, sizeof (uint64_t));
+            }
+          else
+#endif
+            {
+              /* win32 people keep sending patches that change this write() to send() */
+              /* and then run away. but send() is wrong, it wants a socket handle on win32 */
+              /* so when you think this write should be a send instead, please find out */
+              /* where your send() is from - it's definitely not the microsoft send, and */
+              /* tell me. thank you. */
+              write (evpipe [1], &dummy, 1);
+            }
+
+          errno = old_errno;
+        }
     }
 }
 
@@ -1401,19 +1410,24 @@ pipecb (EV_P_ ev_io *iow, int revents)
 {
   int i;
 
+  if (revents & EV_READ)
+    {
 #if EV_USE_EVENTFD
-  if (evfd >= 0)
-    {
-      uint64_t counter;
-      read (evfd, &counter, sizeof (uint64_t));
-    }
-  else
+      if (evfd >= 0)
+        {
+          uint64_t counter;
+          read (evfd, &counter, sizeof (uint64_t));
+        }
+      else
 #endif
-    {
-      char dummy;
-      /* see discussion in evpipe_write when you think this read should be recv in win32 */
-      read (evpipe [0], &dummy, 1);
+        {
+          char dummy;
+          /* see discussion in evpipe_write when you think this read should be recv in win32 */
+          read (evpipe [0], &dummy, 1);
+        }
     }
+
+  pipe_write_skipped = 0;
 
 #if EV_SIGNAL_ENABLE
   if (sig_pending)
@@ -1452,6 +1466,8 @@ ev_feed_signal (int signum)
   if (!EV_A)
     return;
 #endif
+
+  evpipe_init (EV_A);
 
   signals [signum - 1].pending = 1;
   evpipe_write (EV_A_ &sig_pending);
@@ -1759,27 +1775,29 @@ loop_init (EV_P_ unsigned int flags)
           && getenv ("LIBEV_FLAGS"))
         flags = atoi (getenv ("LIBEV_FLAGS"));
 
-      ev_rt_now         = ev_time ();
-      mn_now            = get_clock ();
-      now_floor         = mn_now;
-      rtmn_diff         = ev_rt_now - mn_now;
+      ev_rt_now          = ev_time ();
+      mn_now             = get_clock ();
+      now_floor          = mn_now;
+      rtmn_diff          = ev_rt_now - mn_now;
 #if EV_FEATURE_API
-      invoke_cb         = ev_invoke_pending;
+      invoke_cb          = ev_invoke_pending;
 #endif
 
-      io_blocktime      = 0.;
-      timeout_blocktime = 0.;
-      backend           = 0;
-      backend_fd        = -1;
-      sig_pending       = 0;
+      io_blocktime       = 0.;
+      timeout_blocktime  = 0.;
+      backend            = 0;
+      backend_fd         = -1;
+      sig_pending        = 0;
 #if EV_ASYNC_ENABLE
-      async_pending     = 0;
+      async_pending      = 0;
 #endif
+      pipe_write_skipped = 0;
+      pipe_write_wanted  = 0;
 #if EV_USE_INOTIFY
-      fs_fd             = flags & EVFLAG_NOINOTIFY ? -1 : -2;
+      fs_fd              = flags & EVFLAG_NOINOTIFY ? -1 : -2;
 #endif
 #if EV_USE_SIGNALFD
-      sigfd             = flags & EVFLAG_SIGNALFD  ? -2 : -1;
+      sigfd              = flags & EVFLAG_SIGNALFD  ? -2 : -1;
 #endif
 
       if (!(flags & EVBACKEND_MASK))
@@ -1954,12 +1972,7 @@ loop_fork (EV_P)
 
   if (ev_is_active (&pipe_w))
     {
-      /* this "locks" the handlers against writing to the pipe */
-      /* while we modify the fd vars */
-      sig_pending   = 1;
-#if EV_ASYNC_ENABLE
-      async_pending = 1;
-#endif
+      /* pipe_write_wanted must be false now, so modifying fd vars should be safe */
 
       ev_ref (EV_A);
       ev_io_stop (EV_A_ &pipe_w);
@@ -2501,7 +2514,10 @@ ev_run (EV_P_ int flags)
         /* update time to cancel out callback processing overhead */
         time_update (EV_A_ 1e100);
 
-        if (expect_true (!(flags & EVRUN_NOWAIT || idleall || !activecnt)))
+        /* from now on, we want a pipe-wake-up */
+        pipe_write_wanted = 1;
+
+        if (expect_true (!(flags & EVRUN_NOWAIT || idleall || !activecnt || pipe_write_skipped)))
           {
             waittime = MAX_BLOCKTIME;
 
@@ -2550,6 +2566,15 @@ ev_run (EV_P_ int flags)
         assert ((loop_done = EVBREAK_RECURSE, 1)); /* assert for side effect */
         backend_poll (EV_A_ waittime);
         assert ((loop_done = EVBREAK_CANCEL, 1)); /* assert for side effect */
+
+        pipe_write_wanted = 0;
+
+        if (pipe_write_skipped)
+          {
+            assert (("libev: pipe_w not active, but pipe not written", ev_is_active (&pipe_w)));
+            ev_feed_event (EV_A_ &pipe_w, EV_CUSTOM);
+          }
+
 
         /* update ev_rt_now, do magic */
         time_update (EV_A_ waittime + sleeptime);

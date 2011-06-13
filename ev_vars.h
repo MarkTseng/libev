@@ -73,6 +73,8 @@ VARx(int, evfd)
 #endif
 VAR (evpipe, int evpipe [2])
 VARx(ev_io, pipe_w)
+VARx(EV_ATOMIC_T, pipe_write_wanted)
+VARx(EV_ATOMIC_T, pipe_write_skipped)
 
 #if !defined(_WIN32) || EV_GENWRAP
 VARx(pid_t, curpid)
