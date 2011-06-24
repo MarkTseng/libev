@@ -3946,7 +3946,7 @@ watchers in the constructor.
    class myclass
    {
      ev::io   io  ; void io_cb   (ev::io   &w, int revents);
-     ev::io2  io2 ; void io2_cb  (ev::io   &w, int revents);
+     ev::io   io2 ; void io2_cb  (ev::io   &w, int revents);
      ev::idle idle; void idle_cb (ev::idle &w, int revents);
 
      myclass (int fd)
