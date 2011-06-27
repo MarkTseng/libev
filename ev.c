@@ -1522,7 +1522,8 @@ ev_feed_signal (int signum)
     return;
 #endif
 
-  evpipe_init (EV_A);
+  if (!ev_active (&pipe_w))
+    return;
 
   signals [signum - 1].pending = 1;
   evpipe_write (EV_A_ &sig_pending);
