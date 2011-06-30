@@ -182,7 +182,6 @@ VAR (fs_hash, ANFS fs_hash [EV_INOTIFY_HASHSIZE])
 #endif
 
 VARx(EV_ATOMIC_T, sig_pending)
-VARx(int, nosigmask)
 #if EV_USE_SIGNALFD || EV_GENWRAP
 VARx(int, sigfd)
 VARx(ev_io, sigfd_w)
