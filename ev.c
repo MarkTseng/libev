@@ -966,7 +966,7 @@ array_realloc (int elem, void *base, int *cur, int cnt)
 #define array_needsize(type,base,cur,cnt,init)			\
   if (expect_false ((cnt) > (cur)))				\
     {								\
-      int ocur_ = (cur);					\
+      int ecb_unused ocur_ = (cur);					\
       (base) = (type *)array_realloc				\
          (sizeof (type), (base), &(cur), (cnt));		\
       init ((base) + (ocur_), (cur) - ocur_);			\
