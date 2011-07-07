@@ -4007,7 +4007,7 @@ L<http://hackage.haskell.org/cgi-bin/hackage-scripts/package/hlibev>.
 =item D
 
 Leandro Lucarella has written a D language binding (F<ev.d>) for libev, to
-be found at L<http://proj.llucax.com.ar/wiki/evd>.
+be found at L<http://www.llucax.com.ar/proj/ev.d/index.html>.
 
 =item Ocaml
 
