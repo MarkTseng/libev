@@ -4378,7 +4378,9 @@ both for signal handler "locking" as well as for signal and thread safety
 in C<ev_async> watchers.
 
 In the absence of this define, libev will use C<sig_atomic_t volatile>
-(from F<signal.h>), which is usually good enough on most platforms.
+(from F<signal.h>), which is usually good enough on most platforms,
+although strictly speaking using a type that also implies a memory fence
+is required.
 
 =item EV_H (h)
 
