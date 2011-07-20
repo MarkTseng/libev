@@ -1458,7 +1458,7 @@ inline_speed void
 evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 {
   if (expect_true (*flag))
-    /*return*//*D*/;
+    return;
 
   *flag = 1;
 
