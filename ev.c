@@ -1466,17 +1466,17 @@ evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 
   *flag = 1;
 
-  ECB_MEMORY_FENCE_RELEASE;
+  ECB_MEMORY_FENCE_RELEASE; /* make sure flag is visible before the wakeup */
 
   pipe_write_skipped = 1;
 
-  ECB_MEMORY_FENCE;
+  ECB_MEMORY_FENCE; /* make sure pipe_write_skipped is visible before we check pipe_write_wanted */
 
   if (pipe_write_wanted)
     {
       int old_errno;
 
-      pipe_write_skipped = 0; /* optimisation only */
+      pipe_write_skipped = 0; /* just an optimsiation, no fence needed */
 
       old_errno = errno; /* save errno because write will clobber it */
 
@@ -2618,7 +2618,7 @@ ev_run (EV_P_ int flags)
         /* from now on, we want a pipe-wake-up */
         pipe_write_wanted = 1;
 
-        ECB_MEMORY_FENCE;
+        ECB_MEMORY_FENCE; /* amke sure pipe_write_wanted is visible before we check for potential skips */
 
         if (expect_true (!(flags & EVRUN_NOWAIT || idleall || !activecnt || pipe_write_skipped)))
           {
@@ -2670,7 +2670,7 @@ ev_run (EV_P_ int flags)
         backend_poll (EV_A_ waittime);
         assert ((loop_done = EVBREAK_CANCEL, 1)); /* assert for side effect */
 
-        pipe_write_wanted = 0;
+        pipe_write_wanted = 0; /* just an optimsiation, no fence needed */
 
         if (pipe_write_skipped)
           {
