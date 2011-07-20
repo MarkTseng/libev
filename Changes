@@ -2,6 +2,7 @@ Revision history for libev, a high-performance and full-featured event loop.
 
 TODO: ev_loop_wakeup
 
+TODO: EV_MF_ACQ / EV_MF_REL (e.g. __sync_synchronize)
 4.10
 	- fix a race where the workaround against the epoll fork bugs
           caused signals to not be handled anymore.

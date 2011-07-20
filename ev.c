@@ -494,6 +494,45 @@ struct signalfd_siginfo
   #define ecb_inline static
 #endif
 
+#ifndef ECB_MEMORY_FENCE
+  #if ECB_GCC_VERSION(2,5)
+    #if __x86
+      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("lock; orb $0, -1(%%esp)" : : : "memory")
+      #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
+      #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE /* better be safe than sorry */
+    #elif __amd64
+      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("mfence" : : : "memory")
+      #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("lfence" : : : "memory")
+      #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("sfence")
+    #endif
+  #endif
+#endif
+
+#ifndef ECB_MEMORY_FENCE
+  #if ECB_GCC_VERSION(4,4)
+    #define ECB_MEMORY_FENCE         __sync_synchronize ()
+    #define ECB_MEMORY_FENCE_ACQUIRE ({ char dummy = 0; __sync_lock_test_and_set (&dummy, 1); })
+    #define ECB_MEMORY_FENCE_RELEASE ({ char dummy = 1; __sync_lock_release      (&dummy   ); })
+  #elif _MSC_VER >= 1400
+    #define ECB_MEMORY_FENCE         do { } while (0)
+    #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
+    #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
+  #elif defined(_WIN32) && defined(MemoryBarrier)
+    #define ECB_MEMORY_FENCE         MemoryBarrier ()
+    #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
+    #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
+  #endif
+#endif
+
+#ifndef ECB_MEMORY_FENCE
+  #include <pthread.h>
+
+  static pthread_mutex_t ecb_mf_lock = PTHREAD_MUTEX_INITIALIZER;
+  #define ECB_MEMORY_FENCE do { pthread_mutex_lock (&ecb_mf_lock); pthread_mutex_unlock (&ecb_mf_lock); } while (0)
+  #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
+  #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
+#endif
+
 #if ECB_GCC_VERSION(3,1)
   #define ecb_attribute(attrlist)        __attribute__(attrlist)
   #define ecb_is_constant(expr)          __builtin_constant_p (expr)
@@ -1422,39 +1461,43 @@ evpipe_init (EV_P)
 inline_speed void
 evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 {
-  if (!*flag)
+  if (expect_true (*flag))
+    return;
+
+  *flag = 1;
+
+  ECB_MEMORY_FENCE_RELEASE;
+
+  pipe_write_skipped = 1;
+
+  ECB_MEMORY_FENCE;
+
+  if (pipe_write_wanted)
     {
-      *flag = 1;
+      int old_errno;
 
-      pipe_write_skipped = 1;
+      pipe_write_skipped = 0; /* optimisation only */
 
-      if (pipe_write_wanted)
-        {
-          int old_errno;
-
-          pipe_write_skipped = 0;
-
-          old_errno = errno; /* save errno because write will clobber it */
+      old_errno = errno; /* save errno because write will clobber it */
 
 #if EV_USE_EVENTFD
-          if (evfd >= 0)
-            {
-              uint64_t counter = 1;
-              write (evfd, &counter, sizeof (uint64_t));
-            }
-          else
-#endif
-            {
-              /* win32 people keep sending patches that change this write() to send() */
-              /* and then run away. but send() is wrong, it wants a socket handle on win32 */
-              /* so when you think this write should be a send instead, please find out */
-              /* where your send() is from - it's definitely not the microsoft send, and */
-              /* tell me. thank you. */
-              write (evpipe [1], &(evpipe [1]), 1);
-            }
-
-          errno = old_errno;
+      if (evfd >= 0)
+        {
+          uint64_t counter = 1;
+          write (evfd, &counter, sizeof (uint64_t));
         }
+      else
+#endif
+        {
+          /* win32 people keep sending patches that change this write() to send() */
+          /* and then run away. but send() is wrong, it wants a socket handle on win32 */
+          /* so when you think this write should be a send instead, please find out */
+          /* where your send() is from - it's definitely not the microsoft send, and */
+          /* tell me. thank you. */
+          write (evpipe [1], &(evpipe [1]), 1);
+        }
+
+      errno = old_errno;
     }
 }
 
@@ -2574,6 +2617,8 @@ ev_run (EV_P_ int flags)
 
         /* from now on, we want a pipe-wake-up */
         pipe_write_wanted = 1;
+
+        ECB_MEMORY_FENCE;
 
         if (expect_true (!(flags & EVRUN_NOWAIT || idleall || !activecnt || pipe_write_skipped)))
           {
