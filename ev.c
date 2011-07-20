@@ -513,10 +513,6 @@ struct signalfd_siginfo
     #define ECB_MEMORY_FENCE         __sync_synchronize ()
     #define ECB_MEMORY_FENCE_ACQUIRE ({ char dummy = 0; __sync_lock_test_and_set (&dummy, 1); })
     #define ECB_MEMORY_FENCE_RELEASE ({ char dummy = 1; __sync_lock_release      (&dummy   ); })
-  #elif _MSC_VER >= 1400
-    #define ECB_MEMORY_FENCE         do { } while (0)
-    #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
-    #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
   #elif defined(_WIN32) && defined(MemoryBarrier)
     #define ECB_MEMORY_FENCE         MemoryBarrier ()
     #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
@@ -1462,7 +1458,7 @@ inline_speed void
 evpipe_write (EV_P_ EV_ATOMIC_T *flag)
 {
   if (expect_true (*flag))
-    return;
+    /*return*//*D*/;
 
   *flag = 1;
 
