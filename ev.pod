@@ -4065,7 +4065,11 @@ suitable for use with C<EV_A>.
 =item C<EV_DEFAULT>, C<EV_DEFAULT_>
 
 Similar to the other two macros, this gives you the value of the default
-loop, if multiple loops are supported ("ev loop default").
+loop, if multiple loops are supported ("ev loop default"). The default loop
+will be initialised if it isn't already initialised.
+
+For non-multiplicity builds, these macros do nothing, so you always have
+to initialise the loop somewhere.
 
 =item C<EV_DEFAULT_UC>, C<EV_DEFAULT_UC_>
 
@@ -4413,6 +4417,10 @@ will have the C<struct ev_loop *> as first argument, and you can create
 additional independent event loops. Otherwise there will be no support
 for multiple event loops and there is no first event loop pointer
 argument. Instead, all functions act on the single default loop.
+
+Note that C<EV_DEFAULT> and C<EV_DEFAULT_> will no longer provide a
+default loop when multiplicity is switched off - you always have to
+initialise the loop manually in this case.
 
 =item EV_MINPRI
 
