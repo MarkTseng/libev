@@ -499,7 +499,7 @@ struct signalfd_siginfo
     #if __x86
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("lock; orb $0, -1(%%esp)" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
-      #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
+      #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE /* better be safe than sorry */
     #elif __amd64
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("mfence" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("lfence" : : : "memory")
@@ -513,7 +513,12 @@ struct signalfd_siginfo
     #define ECB_MEMORY_FENCE         __sync_synchronize ()
     #define ECB_MEMORY_FENCE_ACQUIRE ({ char dummy = 0; __sync_lock_test_and_set (&dummy, 1); })
     #define ECB_MEMORY_FENCE_RELEASE ({ char dummy = 1; __sync_lock_release      (&dummy   ); })
-  #elif defined(_WIN32) && defined(MemoryBarrier)
+  #elif _MSC_VER >= 1400 && 0 /* TODO: only true when using volatiles */
+    #define ECB_MEMORY_FENCE         do { } while (0)
+    #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
+    #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
+  #elif defined(_WIN32)
+    #include <WinNT.h>
     #define ECB_MEMORY_FENCE         MemoryBarrier ()
     #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
     #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
