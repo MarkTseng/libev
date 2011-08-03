@@ -513,10 +513,11 @@ struct signalfd_siginfo
     #define ECB_MEMORY_FENCE         __sync_synchronize ()
     #define ECB_MEMORY_FENCE_ACQUIRE ({ char dummy = 0; __sync_lock_test_and_set (&dummy, 1); })
     #define ECB_MEMORY_FENCE_RELEASE ({ char dummy = 1; __sync_lock_release      (&dummy   ); })
-  #elif _MSC_VER >= 1400 && 0 /* TODO: only true when using volatiles */
-    #define ECB_MEMORY_FENCE         do { } while (0)
-    #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
-    #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
+  #elif _MSC_VER >= 1400 /* VC++ 2005 */
+    #pragma intrinsic(_ReadBarrier,_WriteBarrier,_ReadWriteBarrier)
+    #define ECB_MEMORY_FENCE         _ReadWriteBarrier ()
+    #define ECB_MEMORY_FENCE_ACQUIRE _ReadWriteBarrier () /* according to msdn, _ReadBarrier is not a load fence */
+    #define ECB_MEMORY_FENCE_RELEASE _WriteBarrier ()
   #elif defined(_WIN32)
     #include <WinNT.h>
     #define ECB_MEMORY_FENCE         MemoryBarrier ()
@@ -2619,7 +2620,7 @@ ev_run (EV_P_ int flags)
         /* from now on, we want a pipe-wake-up */
         pipe_write_wanted = 1;
 
-        ECB_MEMORY_FENCE; /* amke sure pipe_write_wanted is visible before we check for potential skips */
+        ECB_MEMORY_FENCE; /* make sure pipe_write_wanted is visible before we check for potential skips */
 
         if (expect_true (!(flags & EVRUN_NOWAIT || idleall || !activecnt || pipe_write_skipped)))
           {
