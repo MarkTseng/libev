@@ -554,15 +554,26 @@ struct signalfd_siginfo
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("mfence" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("lfence" : : : "memory")
       #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("sfence") /* play safe - not needed in any current cpu */
+    #elif __powerpc__ || __ppc__ || __powerpc64__ || __ppc64__
+      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("sync" : : : "memory")
+    #elif defined(__ARM_ARCH_6__ ) || defined(__ARM_ARCH_6J__ ) \
+       || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6ZK__) \
+       || defined(__ARM_ARCH_7__ ) || defined(__ARM_ARCH_7A__ ) \
+       || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7R__ )
+      #define ECB_MEMORY_FENCE \
+        do { \
+           int null = 0; \
+           __asm__ __volatile__ ("mcr p15,0,%0,c6,c10,5", : "=&r" (null) : : "memory"); \
+        while (0)
     #endif
   #endif
 #endif
 
 #ifndef ECB_MEMORY_FENCE
-  #if ECB_GCC_VERSION(4,4)
+  #if ECB_GCC_VERSION(4,4) || defined(__INTEL_COMPILER)
     #define ECB_MEMORY_FENCE         __sync_synchronize ()
-    #define ECB_MEMORY_FENCE_ACQUIRE ({ char dummy = 0; __sync_lock_test_and_set (&dummy, 1); })
-    #define ECB_MEMORY_FENCE_RELEASE ({ char dummy = 1; __sync_lock_release      (&dummy   ); })
+    /*#define ECB_MEMORY_FENCE_ACQUIRE ({ char dummy = 0; __sync_lock_test_and_set (&dummy, 1); }) */
+    /*#define ECB_MEMORY_FENCE_RELEASE ({ char dummy = 1; __sync_lock_release      (&dummy   ); }) */
   #elif _MSC_VER >= 1400 /* VC++ 2005 */
     #pragma intrinsic(_ReadBarrier,_WriteBarrier,_ReadWriteBarrier)
     #define ECB_MEMORY_FENCE         _ReadWriteBarrier ()
@@ -571,26 +582,32 @@ struct signalfd_siginfo
   #elif defined(_WIN32)
     #include <WinNT.h>
     #define ECB_MEMORY_FENCE         MemoryBarrier () /* actually just xchg on x86... scary */
-    #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
-    #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
   #endif
 #endif
 
 #ifndef ECB_MEMORY_FENCE
-  /*
-   * if you get undefined symbol references to pthread_mutex_lock,
-   * or failure to find pthread.h, then you should implement
-   * the ECB_MEMORY_FENCE operations for your cpu/compiler
-   * OR provide pthread.h and link against the posix thread library
-   * of your system.
-   */
-  #include <pthread.h>
-  #define ECB_NEEDS_PTHREADS 1
-  #define ECB_MEMORY_FENCE_NEEDS_PTHREADS 1
+  #if !ECB_AVOID_PTHREADS
+    /*
+     * if you get undefined symbol references to pthread_mutex_lock,
+     * or failure to find pthread.h, then you should implement
+     * the ECB_MEMORY_FENCE operations for your cpu/compiler
+     * OR provide pthread.h and link against the posix thread library
+     * of your system.
+     */
+    #include <pthread.h>
+    #define ECB_NEEDS_PTHREADS 1
+    #define ECB_MEMORY_FENCE_NEEDS_PTHREADS 1
 
-  static pthread_mutex_t ecb_mf_lock = PTHREAD_MUTEX_INITIALIZER;
-  #define ECB_MEMORY_FENCE do { pthread_mutex_lock (&ecb_mf_lock); pthread_mutex_unlock (&ecb_mf_lock); } while (0)
+    static pthread_mutex_t ecb_mf_lock = PTHREAD_MUTEX_INITIALIZER;
+    #define ECB_MEMORY_FENCE do { pthread_mutex_lock (&ecb_mf_lock); pthread_mutex_unlock (&ecb_mf_lock); } while (0)
+  #endif
+#endif
+
+#if !defined(ECB_MEMORY_FENCE_ACQUIRE) && defined(ECB_MEMORY_FENCE)
   #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
+#endif
+
+#if !defined(ECB_MEMORY_FENCE_RELEASE) && defined(ECB_MEMORY_FENCE)
   #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
 #endif
 
@@ -847,6 +864,12 @@ ecb_function_ ecb_bool ecb_little_endian (void) { return ecb_byteorder_helper ()
 #endif
 
 /* ECB.H END */
+
+#if ECB_MEMORY_FENCE_NEEDS_PTHREADS
+# undef ECB_MEMORY_FENCE
+# undef ECB_MEMORY_FENCE_ACQUIRE
+# undef ECB_MEMORY_FENCE_RELEASE
+#endif
 
 #define expect_false(cond) ecb_expect_false (cond)
 #define expect_true(cond)  ecb_expect_true  (cond)
@@ -1756,7 +1779,7 @@ evpipe_write (EV_P_ EV_ATOMIC_T *flag)
     {
       int old_errno;
 
-      pipe_write_skipped = 0; /* just an optimsiation, no fence needed */
+      pipe_write_skipped = 0; /* just an optimisation, no fence needed */
 
       old_errno = errno; /* save errno because write will clobber it */
 
