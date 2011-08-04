@@ -539,9 +539,7 @@ struct signalfd_siginfo
 /* ECB_NO_SMP     - ecb might be used in multiple threads, but only on a single cpu */
 
 #if ECB_NO_THREADS || ECB_NO_SMP
-  #define ECB_MEMORY_FENCE         do { } while (0)
-  #define ECB_MEMORY_FENCE_ACQUIRE do { } while (0)
-  #define ECB_MEMORY_FENCE_RELEASE do { } while (0)
+  #define ECB_MEMORY_FENCE do { } while (0)
 #endif
 
 #ifndef ECB_MEMORY_FENCE
@@ -557,14 +555,11 @@ struct signalfd_siginfo
     #elif __powerpc__ || __ppc__ || __powerpc64__ || __ppc64__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("sync" : : : "memory")
     #elif defined(__ARM_ARCH_6__ ) || defined(__ARM_ARCH_6J__ ) \
-       || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6ZK__) \
-       || defined(__ARM_ARCH_7__ ) || defined(__ARM_ARCH_7A__ ) \
+       || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6ZK__)
+      #define ECB_MEMORY_FENCE __asm__ __volatile__ ("mcr p15,0,%0,c7,c10,4" : : "r" (0) : "memory")
+    #elif defined(__ARM_ARCH_7__ ) || defined(__ARM_ARCH_7A__ ) \
        || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7R__ )
-      #define ECB_MEMORY_FENCE \
-        do { \
-           int null = 0; \
-           __asm__ __volatile__ ("mcr p15,0,%0,c6,c10,5", : "=&r" (null) : : "memory"); \
-        while (0)
+      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dsb" : : : "memory")
     #endif
   #endif
 #endif
