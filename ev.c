@@ -556,10 +556,10 @@ struct signalfd_siginfo
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("sync" : : : "memory")
     #elif defined(__ARM_ARCH_6__ ) || defined(__ARM_ARCH_6J__ ) \
        || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6ZK__)
-      #define ECB_MEMORY_FENCE __asm__ __volatile__ ("mcr p15,0,%0,c7,c10,4" : : "r" (0) : "memory")
+      #define ECB_MEMORY_FENCE __asm__ __volatile__ ("mcr p15,0,%0,c7,c10,5" : : "r" (0) : "memory")
     #elif defined(__ARM_ARCH_7__ ) || defined(__ARM_ARCH_7A__ ) \
        || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7R__ )
-      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dsb" : : : "memory")
+      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dmb" : : : "memory")
     #endif
   #endif
 #endif
