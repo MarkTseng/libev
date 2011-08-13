@@ -1773,10 +1773,11 @@ monotonic clock option helps a lot here).
 
 The callback is guaranteed to be invoked only I<after> its timeout has
 passed (not I<at>, so on systems with very low-resolution clocks this
-might introduce a small delay). If multiple timers become ready during the
-same loop iteration then the ones with earlier time-out values are invoked
-before ones of the same priority with later time-out values (but this is
-no longer true when a callback calls C<ev_run> recursively).
+might introduce a small delay, see "the special problem of being too
+early", below). If multiple timers become ready during the same loop
+iteration then the ones with earlier time-out values are invoked before
+ones of the same priority with later time-out values (but this is no
+longer true when a callback calls C<ev_run> recursively).
 
 =head3 Be smart about timeouts
 
@@ -1953,6 +1954,43 @@ rather complicated, but extremely efficient, something that really pays
 off after the first million or so of active timers, i.e. it's usually
 overkill :)
 
+=head3 The special problem of being too early
+
+If you ask a timer to call your callback after three seconds, then
+you expect it to be invoked after three seconds - but of course, this
+cannot be guaranteed to infinite precision. Less obviously, it cannot be
+guaranteed to any precision by libev - imagine somebody suspending the
+process a STOP signal for a few hours for example.
+
+So, libev tries to invoke your callback as soon as possible I<after> the
+delay has occured, but cannot guarantee this.
+
+A less obvious failure mode is calling your callback too early: many event
+loops compare timestamps with a "elapsed delay >= requested delay", but
+this can cause your callback to be invoked much earlier than you would
+expect.
+
+To see why, imagine a system with a clock that only offers full second
+resolution (think windows if you can't come up with a broken enough OS
+yourself). If you schedule a one-second timer at the time 500.9, then the
+event loop will schedule your timeout to elapse at a system time of 500
+(500.9 truncated to the resolution) + 1, or 501.
+
+If an event library looks at the timeout 0.1s later, it will see "501 >=
+501" and invoke the callback 0.1s after it was started, even though a
+one-second delay was requested - this is being "too early", despite best
+intentions.
+
+This is the reason why libev will never invoke the callback if the elapsed
+delay equals the requested delay, but only when the elapsed delay is
+larger than the requested delay. In the example above, libev would only invoke
+the callback at system time 502, or 1.1s after the timer was started.
+
+So, while libev cannot guarantee that your callback will be invoked
+exactly when requested, it I<can> and I<does> guarantee that the requested
+delay has actually elapsed, or in other words, it always errs on the "too
+late" side of things.
+
 =head3 The special problem of time updates
 
 Establishing the current time is a costly operation (it usually takes at
@@ -1972,6 +2010,39 @@ timeout on the current time, use something like this to adjust for this:
 If the event loop is suspended for a long time, you can also force an
 update of the time returned by C<ev_now ()> by calling C<ev_now_update
 ()>.
+
+=head3 The special problem of unsychronised clocks
+
+Modern systems have a variety of clocks - libev itself uses the normal
+"wall clock" clock and, if available, the monotonic clock (to avoid time
+jumps).
+
+Neither of these clocks is synchronised with each other or any other clock
+on the system, so C<ev_time ()> might return a considerably different time
+than C<gettimeofday ()> or C<time ()>. On a GNU/Linux system, for example,
+a call to C<gettimeofday> might return a second count that is one higher
+than a directly following call to C<time>.
+
+The moral of this is to only compare libev-related timestamps with
+C<ev_time ()> and C<ev_now ()>, at least if you want better precision than
+a seocnd or so.
+
+One more problem arises due to this lack of synchronisation: if libev uses
+the system monotonic clock and you compare timestamps from C<ev_time>
+or C<ev_now> from when you started your timer and when your callback is
+invoked, you will find that sometimes the callback is a bit "early".
+
+This is because C<ev_timer>s work in real time, not wall clock time, so
+libev makes sure your callback is not invoked before the delay happened,
+I<measured according to the real time>, not the system clock.
+
+If your timeouts are based on a physical timescale (e.g. "time out this
+connection after 100 seconds") then this shouldn't bother you as it is
+exactly the right behaviour.
+
+If you want to compare wall clock/system timestamps to your timers, then
+you need to use C<ev_periodic>s, as these are based on the wall clock
+time, where your comparisons will always generate correct results.
 
 =head3 The special problems of suspended animation
 
