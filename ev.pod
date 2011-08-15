@@ -1963,7 +1963,7 @@ guaranteed to any precision by libev - imagine somebody suspending the
 process a STOP signal for a few hours for example.
 
 So, libev tries to invoke your callback as soon as possible I<after> the
-delay has occured, but cannot guarantee this.
+delay has occurred, but cannot guarantee this.
 
 A less obvious failure mode is calling your callback too early: many event
 loops compare timestamps with a "elapsed delay >= requested delay", but
@@ -2025,7 +2025,7 @@ than a directly following call to C<time>.
 
 The moral of this is to only compare libev-related timestamps with
 C<ev_time ()> and C<ev_now ()>, at least if you want better precision than
-a seocnd or so.
+a second or so.
 
 One more problem arises due to this lack of synchronisation: if libev uses
 the system monotonic clock and you compare timestamps from C<ev_time>
@@ -5134,7 +5134,7 @@ good enough for at least into the year 4000 with millisecond accuracy
 implementations using IEEE 754, which is basically all existing ones.
 
 With IEEE 754 doubles, you get microsecond accuracy until at least the
-year 2255 (and millisecond accuray till the year 287396 - by then, libev
+year 2255 (and millisecond accuracy till the year 287396 - by then, libev
 is either obsolete or somebody patched it to use C<long double> or
 something like that, just kidding).
 
