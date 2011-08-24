@@ -861,9 +861,20 @@ ecb_function_ ecb_bool ecb_little_endian (void) { return ecb_byteorder_helper ()
 /* ECB.H END */
 
 #if ECB_MEMORY_FENCE_NEEDS_PTHREADS
-# undef ECB_MEMORY_FENCE
-# undef ECB_MEMORY_FENCE_ACQUIRE
-# undef ECB_MEMORY_FENCE_RELEASE
+/* if your architetcure doesn't need memory fences, e.g. because it is
+ * single-cpu/core, or if you use libev in a project that doesn't use libev
+ * from multiple threads, then you can define ECB_AVOID_PTHREADS when compiling
+ * libev, in which casess the memory fences become nops.
+ * alternatively, you can remove this #error and link against libpthread,
+ * which will then provide the memory fences.
+ */
+# error "memory fences not defined for your architecture, please report"
+#endif
+
+#ifndef ECB_MEMORY_FENCE
+# define ECB_MEMORY_FENCE do { } while (0)
+# define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE
+# define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
 #endif
 
 #define expect_false(cond) ecb_expect_false (cond)
