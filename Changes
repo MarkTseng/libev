@@ -19,7 +19,7 @@ TODO: #define EV_API_DECL static? ev_default_loop_ptr?
           own floor () if it is missing. This should make it easier to embed,
           as no external libraries are required.
         - strategically import macros from libecb and mark rarely-used functions
-          as cache-hold (saving almost 2k code size on typical amd64 setups).
+          as cache-cold (saving almost 2k code size on typical amd64 setups).
         - add Symbols.ev and Symbols.event files, that were missing.
 
 4.04 Wed Feb 16 09:01:51 CET 2011
