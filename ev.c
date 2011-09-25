@@ -543,7 +543,7 @@ struct signalfd_siginfo
 #endif
 
 #ifndef ECB_MEMORY_FENCE
-  #if ECB_GCC_VERSION(2,5)
+  #if ECB_GCC_VERSION(2,5) || defined(__INTEL_COMPILER) || defined(__clang__)
     #if __i386__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("lock; orb $0, -1(%%esp)" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE /* non-lock xchg might be enough */
@@ -565,7 +565,7 @@ struct signalfd_siginfo
 #endif
 
 #ifndef ECB_MEMORY_FENCE
-  #if ECB_GCC_VERSION(4,4) || defined(__INTEL_COMPILER)
+  #if ECB_GCC_VERSION(4,4) || defined(__INTEL_COMPILER) || defined(__clang__)
     #define ECB_MEMORY_FENCE         __sync_synchronize ()
     /*#define ECB_MEMORY_FENCE_ACQUIRE ({ char dummy = 0; __sync_lock_test_and_set (&dummy, 1); }) */
     /*#define ECB_MEMORY_FENCE_RELEASE ({ char dummy = 1; __sync_lock_release      (&dummy   ); }) */
@@ -843,6 +843,22 @@ ecb_function_ ecb_bool ecb_little_endian (void) { return ecb_byteorder_helper ()
   #define ecb_mod(m,n) ((m) % (n) + ((m) % (n) < 0 ? (n) : 0))
 #else
   #define ecb_mod(m,n) ((m) < 0 ? ((n) - 1 - ((-1 - (m)) % (n))) : ((m) % (n)))
+#endif
+
+#if __cplusplus
+  template<typename T>
+  static inline T ecb_div_rd (T val, T div)
+  {
+    return val < 0 ? - ((-val + div - 1) / div) : (val          ) / div;
+  }
+  template<typename T>
+  static inline T ecb_div_ru (T val, T div)
+  {
+    return val < 0 ? - ((-val          ) / div) : (val + div - 1) / div;
+  }
+#else
+  #define ecb_div_rd(val,div) ((val) < 0 ? - ((-(val) + (div) - 1) / (div)) : ((val)            ) / (div))
+  #define ecb_div_ru(val,div) ((val) < 0 ? - ((-(val)            ) / (div)) : ((val) + (div) - 1) / (div))
 #endif
 
 #if ecb_cplusplus_does_not_suck

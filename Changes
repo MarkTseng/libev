@@ -4,6 +4,8 @@ TODO: ev_loop_wakeup
 
 TODO: EV_NO_THREADS/NO_SMP and/or EV_USE_PTHREADS or so. also document.
 TODO: #define EV_API_DECL static? ev_default_loop_ptr?
+TODO: EV_STANDALONE == NO_HASSEL (do not use clock_gettime in ev_standalone)
+TODO: memory fences for clang
 4.10
 	- fix a race where the workaround against the epoll fork bugs
           caused signals to not be handled anymore.
