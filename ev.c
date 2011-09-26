@@ -185,8 +185,6 @@
 # include "ev.h"
 #endif
 
-EV_CPP(extern "C" {)
-
 #ifndef _WIN32
 # include <sys/time.h>
 # include <sys/wait.h>
@@ -4417,6 +4415,4 @@ ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w))
 #if EV_MULTIPLICITY
   #include "ev_wrap.h"
 #endif
-
-EV_CPP(})
 
