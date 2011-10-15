@@ -1303,7 +1303,7 @@ array_nextsize (int elem, int cur, int cnt)
     ncur <<= 1;
   while (cnt > ncur);
 
-  /* if size is large, round to MALLOC_ROUND - 4 * longs to accomodate malloc overhead */
+  /* if size is large, round to MALLOC_ROUND - 4 * longs to accommodate malloc overhead */
   if (elem * ncur > MALLOC_ROUND - sizeof (void *) * 4)
     {
       ncur *= elem;
