@@ -1993,8 +1993,8 @@ late" side of things.
 
 =head3 The special problem of time updates
 
-Establishing the current time is a costly operation (it usually takes at
-least two system calls): EV therefore updates its idea of the current
+Establishing the current time is a costly operation (it usually takes
+at least one system call): EV therefore updates its idea of the current
 time only before and after C<ev_run> collects new events, which causes a
 growing difference between C<ev_now ()> and C<ev_time ()> when handling
 lots of events in one iteration.
@@ -2011,7 +2011,7 @@ If the event loop is suspended for a long time, you can also force an
 update of the time returned by C<ev_now ()> by calling C<ev_now_update
 ()>.
 
-=head3 The special problem of unsychronised clocks
+=head3 The special problem of unsynchronised clocks
 
 Modern systems have a variety of clocks - libev itself uses the normal
 "wall clock" clock and, if available, the monotonic clock (to avoid time
