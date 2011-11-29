@@ -1022,7 +1022,7 @@ each call to a libev function.
 
 However, C<ev_run> can run an indefinite time, so it is not feasible
 to wait for it to return. One way around this is to wake up the event
-loop via C<ev_break> and C<av_async_send>, another way is to set these
+loop via C<ev_break> and C<ev_async_send>, another way is to set these
 I<release> and I<acquire> callbacks on the loop.
 
 When set, then C<release> will be called just before the thread is
