@@ -1960,7 +1960,7 @@ If you ask a timer to call your callback after three seconds, then
 you expect it to be invoked after three seconds - but of course, this
 cannot be guaranteed to infinite precision. Less obviously, it cannot be
 guaranteed to any precision by libev - imagine somebody suspending the
-process a STOP signal for a few hours for example.
+process with a STOP signal for a few hours for example.
 
 So, libev tries to invoke your callback as soon as possible I<after> the
 delay has occurred, but cannot guarantee this.
@@ -3475,7 +3475,7 @@ Example: wait up to ten seconds for data to appear on STDIN_FILENO.
 =item ev_feed_fd_event (loop, int fd, int revents)
 
 Feed an event on the given fd, as if a file descriptor backend detected
-the given events it.
+the given events.
 
 =item ev_feed_signal_event (loop, int signum)
 
