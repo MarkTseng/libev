@@ -3825,7 +3825,7 @@ called):
 
 That basically suspends the coroutine inside C<wait_for_event> and
 continues the libev coroutine, which, when appropriate, switches back to
-this or any other coroutine. I am sure if you sue this your own :)
+this or any other coroutine.
 
 You can do similar tricks if you have, say, threads with an event queue -
 instead of storing a coroutine, you store the queue object and instead of
