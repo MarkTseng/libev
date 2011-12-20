@@ -3,7 +3,6 @@ Revision history for libev, a high-performance and full-featured event loop.
 TODO: ev_loop_wakeup
 
 TODO: EV_NO_THREADS/NO_SMP and/or EV_USE_PTHREADS or so. also document.
-TODO: #define EV_API_DECL static? ev_default_loop_ptr?
 TODO: EV_STANDALONE == NO_HASSEL (do not use clock_gettime in ev_standalone)
 TODO: memory fences for clang
 TODO: fix repeat=0 in http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#Be_smart_about_timeouts
@@ -28,6 +27,8 @@ TODO: fix repeat=0 in http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#Be_sm
         - fix #3 "be smart about timeouts" to not "deadlock" when
           timeout == now, also improve the section overall.
         - avoid "AVOIDING FINISHING BEFORE RETURNING" idiom.
+        - support new EV_API_STATIC mode to make all libev symbols
+          static.
 
 4.04 Wed Feb 16 09:01:51 CET 2011
 	- fix two problems in the native win32 backend, where reuse of fd's
