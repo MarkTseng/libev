@@ -1862,62 +1862,76 @@ In this case, it would be more efficient to leave the C<ev_timer> alone,
 but remember the time of last activity, and check for a real timeout only
 within the callback:
 
+   ev_tstamp timeout = 60.;
    ev_tstamp last_activity; // time of last activity
+   ev_timer timer;
 
    static void
    callback (EV_P_ ev_timer *w, int revents)
    {
-     ev_tstamp now     = ev_now (EV_A);
-     ev_tstamp timeout = last_activity + 60.;
+     // calculate when the timeout would happen
+     ev_tstamp after = last_activity - ev_now (EV_A) + timeout;
 
-     // if last_activity + 60. is older than now, we did time out
-     if (timeout < now)
+     // if negative, it means we the timeout already occured
+     if (after < 0.)
        {
          // timeout occurred, take action
        }
      else
        {
-         // callback was invoked, but there was some activity, re-arm
-         // the watcher to fire in last_activity + 60, which is
-         // guaranteed to be in the future, so "again" is positive:
-         w->repeat = timeout - now;
-         ev_timer_again (EV_A_ w);
+         // callback was invoked, but there was some recent 
+         // activity.  simply restart the timer to time out
+         // after "after" seconds, which is the earliest time
+         // the timeout can occur.
+         ev_timer_set (w, after, 0.);
+         ev_timer_start (EV_A_ w);
        }
    }
 
-To summarise the callback: first calculate the real timeout (defined
-as "60 seconds after the last activity"), then check if that time has
-been reached, which means something I<did>, in fact, time out. Otherwise
-the callback was invoked too early (C<timeout> is in the future), so
-re-schedule the timer to fire at that future time, to see if maybe we have
-a timeout then.
+To summarise the callback: first calculate in how many seconds the
+timeout will occur (by calculating the absolute time when it would occur,
+C<last_activity + timeout>, and subtracting the current time, C<ev_now
+(EV_A)> from that).
 
-Note how C<ev_timer_again> is used, taking advantage of the
-C<ev_timer_again> optimisation when the timer is already running.
+If this value is negative, then we are already past the timeout, i.e. we
+timed out, and need to do whatever is needed in this case.
+
+Otherwise, we now the earliest time at which the timeout would trigger,
+and simply start the timer with this timeout value.
+
+In other words, each time the callback is invoked it will check whether
+the timeout cocured. If not, it will simply reschedule itself to check
+again at the earliest time it could time out. Rinse. Repeat.
 
 This scheme causes more callback invocations (about one every 60 seconds
 minus half the average time between activity), but virtually no calls to
 libev to change the timeout.
 
-To start the timer, simply initialise the watcher and set C<last_activity>
-to the current time (meaning we just have some activity :), then call the
-callback, which will "do the right thing" and start the timer:
+To start the machinery, simply initialise the watcher and set
+C<last_activity> to the current time (meaning there was some activity just
+now), then call the callback, which will "do the right thing" and start
+the timer:
 
-   ev_init (timer, callback);
-   last_activity = ev_now (loop);
-   callback (loop, timer, EV_TIMER);
+   last_activity = ev_now (EV_A);
+   ev_init (&timer, callback);
+   callback (EV_A_ &timer, 0);
 
-And when there is some activity, simply store the current time in
+When there is some activity, simply store the current time in
 C<last_activity>, no libev calls at all:
 
-   last_activity = ev_now (loop);
+   if (activity detected)
+     last_activity = ev_now (EV_A);
+
+When your timeout value changes, then the timeout can be changed by simply
+providing a new value, stopping the timer and calling the callback, which
+will agaion do the right thing (for example, time out immediately :).
+
+   timeout = new_value;
+   ev_timer_stop (EV_A_ &timer);
+   callback (EV_A_ &timer, 0);
 
 This technique is slightly more complex, but in most cases where the
 time-out is unlikely to be triggered, much more efficient.
-
-Changing the timeout is trivial as well (if it isn't hard-coded in the
-callback :) - just change the timeout and invoke the callback, which will
-fix things for you.
 
 =item 4. Wee, just use a double-linked list for your timeouts.
 
@@ -3558,6 +3572,46 @@ real programmers):
      struct my_biggy big = (struct my_biggy *)
        (((char *)w) - offsetof (struct my_biggy, t2));
    }
+
+=head2 AVOIDING FINISHING BEFORE RETURNING
+
+Often you have structures like this in event-based programs:
+
+  callback ()
+  {
+    free (request);
+  }
+
+  request = start_new_request (..., callback);
+
+The intent is to start some "lengthy" operation. The C<request> could be
+used to cancel the operation, or do other things with it.
+
+It's not uncommon to have code paths in C<start_new_request> that
+immediately invoke the callback, for example, to report errors. Or you add
+some caching layer that finds that it can skip the lengthy aspects of the
+operation and simply invoke the callback with the result.
+
+The problem here is that this will happen I<before> C<start_new_request>
+has returned, so C<request> is not set.
+
+Even if you pass the request by some safer means to the callback, you
+might want to do something to the request after starting it, such as
+canceling it, which probably isn't working so well when the callback has
+already been invoked.
+
+A common way around all these issues is to make sure that
+C<start_new_request> I<always> returns before the callback is invoked. If
+C<start_new_request> immediately knows the result, it can artificially
+delay invoking the callback by e.g. using a C<prepare> or C<idle> watcher
+for example, or more sneakily, by reusing an existing (stopped) watcher
+and pushing it into the pending queue:
+
+   ev_set_cb (watcher, callback);
+   ev_feed_event (EV_A_ watcher, 0);
+
+This way, C<start_new_request> can safely return before the callback is
+invoked, while not delaying callback invocation too much.
 
 =head2 MODEL/NESTED EVENT LOOP INVOCATIONS AND EXIT CONDITIONS
 
