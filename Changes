@@ -4,9 +4,6 @@ TODO: ev_loop_wakeup
 
 TODO: EV_NO_THREADS/NO_SMP and/or EV_USE_PTHREADS or so. also document.
 TODO: EV_STANDALONE == NO_HASSEL (do not use clock_gettime in ev_standalone)
-TODO: memory fences for clang
-ASKEXG!TODO: #define EV_API_DECL static? ev_default_loop_ptr? ev_rt_now?
-ASKEXG!TODO: fix repeat=0 in http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#Be_smart_about_timeouts
 4.10
 	- fix a race where the workaround against the epoll fork bugs
           caused signals to not be handled anymore.
