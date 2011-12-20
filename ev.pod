@@ -3635,7 +3635,7 @@ triggered, using C<EVRUN_ONCE>:
    while (!exit_main_loop)
      ev_run (EV_DEFAULT_ EVRUN_ONCE);
 
-   // in a model watcher
+   // in a modal watcher
    int exit_nested_loop = 0;
 
    while (!exit_nested_loop)
