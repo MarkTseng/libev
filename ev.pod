@@ -4654,6 +4654,17 @@ when you use C<-Wl,--gc-sections -ffunction-sections>) functions unused by
 your program might be left out as well - a binary starting a timer and an
 I/O watcher then might come out at only 5Kb.
 
+=item EV_API_STATIC
+
+If this symbol is defined (by default it is not), then all identifiers
+will have static linkage. This means that libev will not export any
+identifiers, and you cannot link against libev anymore. This can be useful
+when you embed libev, only want to use libev functions in a single file,
+and do not want its identifiers to be visible.
+
+To use this, define C<EV_API_STATIC> and include F<ev.c> in the file that
+wants to use libev.
+
 =item EV_AVOID_STDIO
 
 If this is set to C<1> at compiletime, then libev will avoid using stdio
