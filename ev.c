@@ -878,7 +878,7 @@ ecb_function_ ecb_bool ecb_little_endian (void) { return ecb_byteorder_helper ()
 /* if your architecture doesn't need memory fences, e.g. because it is
  * single-cpu/core, or if you use libev in a project that doesn't use libev
  * from multiple threads, then you can define ECB_AVOID_PTHREADS when compiling
- * libev, in which casess the memory fences become nops.
+ * libev, in which cases the memory fences become nops.
  * alternatively, you can remove this #error and link against libpthread,
  * which will then provide the memory fences.
  */
@@ -1195,11 +1195,11 @@ typedef struct
   #include "ev_wrap.h"
 
   static struct ev_loop default_loop_struct;
-  EV_API_DECL struct ev_loop *ev_default_loop_ptr = 0; /* needs to be initialised to make it a defintiino despite extern */
+  EV_API_DECL struct ev_loop *ev_default_loop_ptr = 0; /* needs to be initialised to make it a definition despite extern */
 
 #else
 
-  EV_API_DECL ev_tstamp ev_rt_now = 0; /* needs to be initialised to make it a defintiino despite extern */
+  EV_API_DECL ev_tstamp ev_rt_now = 0; /* needs to be initialised to make it a definition despite extern */
   #define VAR(name,decl) static decl;
     #include "ev_vars.h"
   #undef VAR
@@ -2993,7 +2993,7 @@ ev_run (EV_P_ int flags)
         backend_poll (EV_A_ waittime);
         assert ((loop_done = EVBREAK_CANCEL, 1)); /* assert for side effect */
 
-        pipe_write_wanted = 0; /* just an optimsiation, no fence needed */
+        pipe_write_wanted = 0; /* just an optimisation, no fence needed */
 
         if (pipe_write_skipped)
           {
