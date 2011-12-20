@@ -3928,7 +3928,7 @@ Aliases to the same types/functions as with the C<ev_> prefix.
 For each C<ev_TYPE> watcher in F<ev.h> there is a corresponding class of
 the same name in the C<ev> namespace, with the exception of C<ev_signal>
 which is called C<ev::sig> to avoid clashes with the C<signal> macro
-defines by many implementations.
+defined by many implementations.
 
 All of those classes have these methods:
 
