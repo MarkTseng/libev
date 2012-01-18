@@ -541,12 +541,12 @@ struct signalfd_siginfo
 #endif
 
 #ifndef ECB_MEMORY_FENCE
-  #if ECB_GCC_VERSION(2,5) || defined(__INTEL_COMPILER) || defined(__clang__) || __SUNPRO_C >= 0x5110 || __SUNPRO_xC >= 0x5110
-    #if __i386__
+  #if ECB_GCC_VERSION(2,5) || defined(__INTEL_COMPILER) || defined(__clang__) || __SUNPRO_C >= 0x5110 || __SUNPRO_CC >= 0x5110
+    #if __i386 || __i386__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("lock; orb $0, -1(%%esp)" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE /* non-lock xchg might be enough */
       #define ECB_MEMORY_FENCE_RELEASE do { } while (0) /* unlikely to change in future cpus */
-    #elif __amd64
+    #elif __amd64 || __amd64__ || __x86_64 || __x86_64__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("mfence" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("lfence" : : : "memory")
       #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("sfence") /* play safe - not needed in any current cpu */
@@ -558,7 +558,7 @@ struct signalfd_siginfo
     #elif defined(__ARM_ARCH_7__ ) || defined(__ARM_ARCH_7A__ ) \
        || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7R__ )
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dmb" : : : "memory")
-    #elif defined(__sparc)
+    #elif __sparc || __sparc__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("membar #LoadStore | #StoreLoad | #LoadLoad | #StoreStore" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("membar #LoadLoad" : : : "memory")
       #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("membar #StoreStore")
