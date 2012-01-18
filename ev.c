@@ -559,9 +559,9 @@ struct signalfd_siginfo
        || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7R__ )
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dmb" : : : "memory")
     #elif __sparc || __sparc__
-      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("membar #LoadStore | #StoreLoad | #LoadLoad | #StoreStore" : : : "memory")
-      #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("membar #LoadLoad" : : : "memory")
-      #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("membar #StoreStore")
+      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("membar #LoadStore | #LoadLoad | #StoreStore | #StoreLoad | " : : : "memory")
+      #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("membar #LoadStore | #LoadLoad" : : : "memory")
+      #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("membar #LoadStore |             #StoreStore")
     #endif
   #endif
 #endif
