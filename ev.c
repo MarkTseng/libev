@@ -469,7 +469,7 @@ struct signalfd_siginfo
 /*
  * libecb - http://software.schmorp.de/pkg/libecb
  *
- * Copyright (©) 2009-2011 Marc Alexander Lehmann <libecb@schmorp.de>
+ * Copyright (©) 2009-2012 Marc Alexander Lehmann <libecb@schmorp.de>
  * Copyright (©) 2011 Emanuele Giaquinta
  * All rights reserved.
  *
@@ -541,7 +541,7 @@ struct signalfd_siginfo
 #endif
 
 #ifndef ECB_MEMORY_FENCE
-  #if ECB_GCC_VERSION(2,5) || defined(__INTEL_COMPILER) || defined(__clang__)
+  #if ECB_GCC_VERSION(2,5) || defined(__INTEL_COMPILER) || defined(__clang__) || __SUNPRO_C >= 0x5110 || __SUNPRO_xC >= 0x5110
     #if __i386__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("lock; orb $0, -1(%%esp)" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE ECB_MEMORY_FENCE /* non-lock xchg might be enough */
@@ -558,6 +558,10 @@ struct signalfd_siginfo
     #elif defined(__ARM_ARCH_7__ ) || defined(__ARM_ARCH_7A__ ) \
        || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7R__ )
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dmb" : : : "memory")
+    #elif defined(__sparc)
+      #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("membar #LoadStore | #StoreLoad | #LoadLoad | #StoreStore" : : : "memory")
+      #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("membar #LoadLoad" : : : "memory")
+      #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("membar #StoreStore")
     #endif
   #endif
 #endif
@@ -575,6 +579,11 @@ struct signalfd_siginfo
   #elif defined(_WIN32)
     #include <WinNT.h>
     #define ECB_MEMORY_FENCE         MemoryBarrier () /* actually just xchg on x86... scary */
+  #elif __SUNPRO_C >= 0x5110 || __SUNPRO_CC >= 0x5110
+    #include <mbarrier.h>
+    #define ECB_MEMORY_FENCE         __machine_rw_barrier ()
+    #define ECB_MEMORY_FENCE_ACQUIRE __machine_r_barrier  ()
+    #define ECB_MEMORY_FENCE_RELEASE __machine_w_barrier  ()
   #endif
 #endif
 
@@ -758,6 +767,36 @@ typedef int ecb_bool;
     return r + ecb_ld32 (x);
   }
 #endif
+
+ecb_function_ uint8_t  ecb_bitrev8  (uint8_t  x) ecb_const;
+ecb_function_ uint8_t  ecb_bitrev8  (uint8_t  x)
+{
+  return (  (x * 0x0802U & 0x22110U)
+          | (x * 0x8020U & 0x88440U)) * 0x10101U >> 16; 
+}
+
+ecb_function_ uint16_t ecb_bitrev16 (uint16_t x) ecb_const;
+ecb_function_ uint16_t ecb_bitrev16 (uint16_t x)
+{
+  x = ((x >>  1) &     0x5555) | ((x &     0x5555) <<  1);
+  x = ((x >>  2) &     0x3333) | ((x &     0x3333) <<  2);
+  x = ((x >>  4) &     0x0f0f) | ((x &     0x0f0f) <<  4);
+  x = ( x >>  8              ) | ( x               <<  8);
+
+  return x;
+}
+
+ecb_function_ uint32_t ecb_bitrev32 (uint32_t x) ecb_const;
+ecb_function_ uint32_t ecb_bitrev32 (uint32_t x)
+{
+  x = ((x >>  1) & 0x55555555) | ((x & 0x55555555) <<  1);
+  x = ((x >>  2) & 0x33333333) | ((x & 0x33333333) <<  2);
+  x = ((x >>  4) & 0x0f0f0f0f) | ((x & 0x0f0f0f0f) <<  4);
+  x = ((x >>  8) & 0x00ff00ff) | ((x & 0x00ff00ff) <<  8);
+  x = ( x >> 16              ) | ( x               << 16);
+
+  return x;
+}
 
 /* popcount64 is only available on 64 bit cpus as gcc builtin */
 /* so for this version we are lazy */
