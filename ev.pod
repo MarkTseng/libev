@@ -4665,6 +4665,9 @@ and do not want its identifiers to be visible.
 To use this, define C<EV_API_STATIC> and include F<ev.c> in the file that
 wants to use libev.
 
+This option only works when libev is compiled with a C compiler, as C++
+doesn't support the required declaration syntax.
+
 =item EV_AVOID_STDIO
 
 If this is set to C<1> at compiletime, then libev will avoid using stdio
