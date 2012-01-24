@@ -4,7 +4,9 @@ TODO: ev_loop_wakeup
 
 TODO: EV_NO_THREADS/NO_SMP and/or EV_USE_PTHREADS or so. also document.
 TODO: EV_STANDALONE == NO_HASSEL (do not use clock_gettime in ev_standalone)
-4.10
+4.11
+	- INCOMPATIBLE CHANGE: ev_timer_again now clears the pending status, as
+          was documented already, but not implemented in the repeating case.
 	- fix a race where the workaround against the epoll fork bugs
           caused signals to not be handled anymore.
 	- correct backend_fudge for most backends, and implement a windows

@@ -2114,7 +2114,7 @@ This will act as if the timer timed out, and restarts it again if it is
 repeating. It basically works like calling C<ev_timer_stop>, updating the
 timeout to the C<repeat> value and calling C<ev_timer_start>.
 
-The exact semantics are as in the wollofing rules, all of which will be
+The exact semantics are as in the following rules, all of which will be
 applied to the watcher:
 
 =over 4
