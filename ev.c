@@ -3301,7 +3301,7 @@ ev_timer_again (EV_P_ ev_timer *w)
 {
   EV_FREQUENT_CHECK;
 
-  clear_pending (EV_A_ w);
+  clear_pending (EV_A_ (W)w);
 
   if (ev_is_active (w))
     {
