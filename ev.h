@@ -544,7 +544,9 @@ EV_API_DECL void ev_set_syserr_cb (void (*cb)(const char *msg));
 /* you can call this as often as you like */
 EV_API_DECL struct ev_loop *ev_default_loop (unsigned int flags EV_CPP (= 0));
 
+#ifdef EV_API_STATIC
 EV_API_DECL struct ev_loop *ev_default_loop_ptr;
+#endif
 
 EV_INLINE struct ev_loop *
 ev_default_loop_uc_ (void)
