@@ -29,6 +29,8 @@ TODO: EV_STANDALONE == NO_HASSEL (do not use clock_gettime in ev_standalone)
         - avoid "AVOIDING FINISHING BEFORE RETURNING" idiom.
         - support new EV_API_STATIC mode to make all libev symbols
           static.
+        - supply default CFLAGS of -g -O3 with gcc when original CFLAGS
+          were empty.
 
 4.04 Wed Feb 16 09:01:51 CET 2011
 	- fix two problems in the native win32 backend, where reuse of fd's
