@@ -185,6 +185,17 @@
 # include "ev.h"
 #endif
 
+#if EV_NO_THREADS
+# undef EV_NO_SMP
+# define EV_NO_SMP 1
+# undef ECB_NO_THREADS
+# define ECB_NO_THREADS 1
+#endif
+#if EV_NO_SMP
+# undef EV_NO_SMP
+# define ECB_NO_SMP 1
+#endif
+
 #ifndef _WIN32
 # include <sys/time.h>
 # include <sys/wait.h>
@@ -535,6 +546,10 @@ struct signalfd_siginfo
 
 /* ECB_NO_THREADS - ecb is not used by multiple threads, ever */
 /* ECB_NO_SMP     - ecb might be used in multiple threads, but only on a single cpu */
+
+#if ECB_NO_THREADS
+# define ECB_NO_SMP 1
+#endif
 
 #if ECB_NO_THREADS || ECB_NO_SMP
   #define ECB_MEMORY_FENCE do { } while (0)

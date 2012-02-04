@@ -4506,6 +4506,19 @@ interface to speed up C<ev_stat> watchers. Its actual availability will
 be detected at runtime. If undefined, it will be enabled if the headers
 indicate GNU/Linux + Glibc 2.4 or newer, otherwise disabled.
 
+=item EV_NO_SMP
+
+If defined to be C<1>, libev will assume that memory is always coherent
+between threads, that is, threads can be used, but threads never run on
+different cpus (or different cpu cores). This reduces dependencies
+and makes libev faster.
+
+=item EV_NO_THREADS
+
+If defined to be C<1>, libev will assume that it will never be called
+from different threads, which is a stronger assumption than C<EV_NO_SMP>,
+above. This reduces dependencies and makes libev faster.
+
 =item EV_ATOMIC_T
 
 Libev requires an integer type (suitable for storing C<0> or C<1>) whose
