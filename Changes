@@ -1,9 +1,9 @@
 Revision history for libev, a high-performance and full-featured event loop.
 
 TODO: ev_loop_wakeup
-
 TODO: EV_STANDALONE == NO_HASSEL (do not use clock_gettime in ev_standalone)
-4.11
+
+4.11 Sat Feb  4 19:52:39 CET 2012
 	- INCOMPATIBLE CHANGE: ev_timer_again now clears the pending status, as
           was documented already, but not implemented in the repeating case.
         - new compiletime symbols: EV_NO_SMP and EV_NO_THREADS.
